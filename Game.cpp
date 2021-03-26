@@ -45,7 +45,7 @@ void CreateImGuiWindow(float deltaTime)
 	ImGui::SetWindowPos({ 0,0 }, ImGuiCond_FirstUseEver);
 	ImGui::SetWindowSize({ 200,200 }, ImGuiCond_FirstUseEver);
 	ImGui::Begin("FPS");
-	ImGui::Text("Frame rate: %d", fps);
+	ImGui::Text("Frame rate: %d", fps); 
 	ImGui::End();
 }
 
