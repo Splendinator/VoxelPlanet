@@ -1,4 +1,6 @@
-#include "../Graphics/DomGraphics.h"
+#include "pch.h"
+
+#include "DomGraphics.h"
 
 #include "DomWindow/DomWindow.h"
 #include "DomLog/DomLog.h"
@@ -29,10 +31,10 @@ void DomWindowMessageHook(tagMSG& msg)
 // Get the delta time in seconds
 float GetDeltaTime()
 {
-	static auto prevTime = std::chrono::system_clock::now().time_since_epoch();
 	auto currentTime = std::chrono::system_clock::now().time_since_epoch();
+	static auto prevTime = currentTime;
 	
-	const float deltaTime = (currentTime - prevTime).count() / 10000000.f; // TODO: This magic number should be gathered from the std::ratio (Numberator / Denominator)s
+	const float deltaTime = (currentTime - prevTime).count() / 10000000.f; /// #TODO: This magic number should be gathered from the std::ratio (Numberator / Denominator)s
 
 	prevTime = currentTime;
 
@@ -58,14 +60,14 @@ void domMain()
 	HWND windowHandle = dmwi::getWindowHandle();
 	ImGui_ImplWin32_Init(windowHandle);
 	ImGuiIO& IO = ImGui::GetIO();
-	IO.DisplaySize.x = dmwi::getWindowWidth();
-	IO.DisplaySize.y = dmwi::getWindowHeight();
+	IO.DisplaySize.x = (float)dmwi::getWindowWidth();
+	IO.DisplaySize.y = (float)dmwi::getWindowHeight();
 
 	dmwi::SetMessageHook(DomWindowMessageHook);
 #endif //~ #ifdef DOMIMGUI
 
 	dmgf::NewInit();
-	game::init(48,27);
+	Game::Init();
 
 	while (!dmwi::isPressed(dmwi::Button::ESC))
 	{
@@ -83,10 +85,11 @@ void domMain()
 #endif //~ #ifdef DOMIMGUI
 
 		dmwi::tick();
-		game::tick(deltaTime);
+		Game::tick(deltaTime);
 		dmgf::Tick(deltaTime);
 	}
 
+	Game::UnInit();
 	dmgf::UnInit();
 
 #ifdef DOMIMGUI

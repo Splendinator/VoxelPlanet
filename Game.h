@@ -2,9 +2,10 @@
 
 #include <vector>
 
-namespace game
+namespace Game
 {
-	void init(int height, int width);
+	void Init();
+	void UnInit();
 
 	void tick(float deltaTime);
 }
