@@ -131,6 +131,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>DomImport.lib;DomLog.lib;DomWindow.lib;Graphics.lib;tensorflow.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>16777216</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -142,11 +143,22 @@
     </ClCompile>
     <ClCompile Include="PlanetGenerate.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="StbImageCompile.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="tinyobj_loader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Graphics\Shaders\ImGuiFrag.frag" />
+    <None Include="..\Graphics\Shaders\ImGuiVert.vert" />
+    <None Include="..\Graphics\Shaders\TriangleFrag.frag" />
+    <None Include="..\Graphics\Shaders\TriangleVert.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

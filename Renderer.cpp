@@ -12,38 +12,40 @@
 #include "DomUtils/DomUtils.h"
 #include "DomImport/DomImport.h"
 #include "DomWindow/DomWindow.h"
+#include "stb_image.h"
+#include "tinyobj_loader.h"
 
 #include "../Graphics/Camera.h"
-#include "../Graphics/VulkanModuleDebugMessenger.h"
-#include "../Graphics/VulkanModuleInstance.h"
-#include "../Graphics/VulkanModuleSurface.h"
-#include "../Graphics/VulkanModulePhysicalDevice.h"
-#include "../Graphics/VulkanModuleDevice.h"
-#include "../Graphics/VulkanModuleQueue.h"
-#include "../Graphics/VulkanModuleCommandPool.h"
-#include "../Graphics/VulkanModuleCommandBuffer.h"
-#include "../Graphics/VulkanModuleSwapChain.h"
-#include "../Graphics/VulkanModuleRenderPass.h"
-#include "../Graphics/VulkanModuleShader.h"
-#include "../Graphics/VulkanModuleFramebuffer.h"
 #include "../Graphics/VulkanModuleBuffer.h"
-#include "../Graphics/VulkanModuleDeviceMemoryBuffer.h"
-#include "../Graphics/VulkanModuleDeviceMemoryImage.h"
-#include "../Graphics/VulkanModulePipelineLayout.h"
-#include "../Graphics/VulkanModulePipeline.h"
-#include "../Graphics/VulkanModuleDescriptorPool.h"
-#include "../Graphics/VulkanModuleDescriptorSetLayout.h"
-#include "../Graphics/VulkanModuleDescriptorSetBinding.h"
-#include "../Graphics/VulkanModuleDescriptorSet.h"
+#include "../Graphics/VulkanModuleCommandBuffer.h"
+#include "../Graphics/VulkanModuleCommandPool.h"
+#include "../Graphics/VulkanModuleDebugMessenger.h"
 #include "../Graphics/VulkanModuleDescriptorBufferInfo.h"
 #include "../Graphics/VulkanModuleDescriptorImageInfo.h"
+#include "../Graphics/VulkanModuleDescriptorPool.h"
+#include "../Graphics/VulkanModuleDescriptorSet.h"
+#include "../Graphics/VulkanModuleDescriptorSetBinding.h"
+#include "../Graphics/VulkanModuleDescriptorSetLayout.h"
 #include "../Graphics/VulkanModuleDescriptorSetWrite.h"
+#include "../Graphics/VulkanModuleDevice.h"
+#include "../Graphics/VulkanModuleDeviceMemoryBuffer.h"
+#include "../Graphics/VulkanModuleDeviceMemoryImage.h"
+#include "../Graphics/VulkanModuleFramebuffer.h"
 #include "../Graphics/VulkanModuleImage.h"
 #include "../Graphics/VulkanModuleImageSwapChain.h"
 #include "../Graphics/VulkanModuleImageView.h"
+#include "../Graphics/VulkanModuleInstance.h"
+#include "../Graphics/VulkanModulePhysicalDevice.h"
+#include "../Graphics/VulkanModulePipeline.h"
+#include "../Graphics/VulkanModulePipelineLayout.h"
+#include "../Graphics/VulkanModuleQueue.h"
+#include "../Graphics/VulkanModuleRenderPass.h"
 #include "../Graphics/VulkanModuleSampler.h"
-#include "../Graphics/VulkanVertexData.h"
+#include "../Graphics/VulkanModuleShader.h"
+#include "../Graphics/VulkanModuleSurface.h"
+#include "../Graphics/VulkanModuleSwapChain.h"
 #include "../Graphics/VulkanUtils.h"
+#include "../Graphics/VulkanVertexData.h"
 
 #include <Windows.h>
 #include <vulkan/vulkan.h>
@@ -68,6 +70,8 @@ Camera camera;
 u32 currentBuffer = 0;
 const char* destPath = "../Graphics/Shaders/CompiledShaders"; // Destination shader files
 
+std::vector<float> rawVertexData;
+
 // The instance. This is the alpha and the omega.
 VulkanModuleInstance vulkanInstance;
 // Debug messenger.
@@ -79,12 +83,13 @@ VulkanModulePhysicalDevice vulkanPhysicalDevice(&vulkanInstance);
 // Logical device
 VulkanModuleDevice vulkanDevice(&vulkanPhysicalDevice, &vulkanSurface);
 // Graphics Queue
-VulkanModuleQueue vulkanGraphicsQueue(VK_QUEUE_GRAPHICS_BIT, &vulkanDevice);
+VulkanModuleQueue vulkanGraphicsQueue(VK_QUEUE_GRAPHICS_BIT, &vulkanDevice); 
 // Command Pool
 VulkanModuleCommandPool vulkanCommandPool(&vulkanDevice);
 // Command Buffer
 VulkanModuleCommandBuffer vulkanCommandBuffer(&vulkanDevice, &vulkanCommandPool);
 VulkanModuleCommandBuffer vulkanCommandBuffer2(&vulkanDevice, &vulkanCommandPool);
+VulkanModuleCommandBuffer commandBufferStaging(&vulkanDevice, &vulkanCommandPool);
 // Swap Chain
 VulkanModuleSwapChain vulkanSwapChain(VkFormat::VK_FORMAT_B8G8R8A8_UNORM, &vulkanPhysicalDevice, &vulkanDevice, &vulkanSurface);
 // Images
@@ -105,7 +110,7 @@ VulkanModuleImage vulkanDepthBufferImage // Depth image
 	VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED,
 	&vulkanDevice
 );
-VulkanModuleDeviceMemoryImage depthBufferMemory(&vulkanPhysicalDevice, &vulkanDevice, &vulkanDepthBufferImage); //We need to explicitly give the depth buffer memory, but not the swap chain images as they already have memory from the swap chain
+VulkanModuleDeviceMemoryImage depthBufferMemory(VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &vulkanPhysicalDevice, &vulkanDevice, &vulkanDepthBufferImage); //We need to explicitly give the depth buffer memory, but not the swap chain images as they already have memory from the swap chain
 
 // Image views
 VulkanModuleImageView vulkanSwapChainImageView1(vulkanSwapChainImage1.GetImageFormat(), VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT, &vulkanDevice, &vulkanSwapChainImage1);
@@ -179,28 +184,56 @@ VulkanModuleArraySized<VulkanModuleImageView, 2> frameBuffer2ImageViews({ &vulka
 VulkanModuleFramebuffer vulkanModuleFrameBuffer1(&vulkanDevice, &vulkanRenderPass, &vulkanSwapChain, &frameBuffer1ImageViews);
 VulkanModuleFramebuffer vulkanModuleFrameBuffer2(&vulkanDevice, &vulkanRenderPass, &vulkanSwapChain, &frameBuffer2ImageViews);
 // Vertex Buffer Creation Data
-VulkanModuleBuffer<VulkanVertexData<VulkanVertexAttributePos, VulkanVertexAttributeNormal, VulkanVertexAttributeUVCoords>> vulkanModuleVertexBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &vulkanDevice, 6);
+VulkanModuleBuffer<VulkanVertexData<VulkanVertexAttributePos, VulkanVertexAttributeNormal, VulkanVertexAttributeUVCoords>> vulkanModuleVertexBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &vulkanDevice, 10000);
 // Vertex Buffer Memory
-VulkanModuleDeviceMemoryBuffer vulkanModuleVertexMemory(&vulkanPhysicalDevice, &vulkanDevice, &vulkanModuleVertexBuffer);
+VulkanModuleDeviceMemoryBuffer vulkanModuleVertexMemory(VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &vulkanPhysicalDevice, &vulkanDevice, &vulkanModuleVertexBuffer);
 // Shader Array
 VulkanModuleArraySized<VulkanModuleShader, 2> vulkanModuleShaders({ &vulkanShaderVertex, &vulkanShaderFragment });
-/// TEMP POOL STUFF
+
+// Brick wall texture
+const u32 brickWallImageSize = 1024;
+const u32 brickWallImageDepth = 1;
+VulkanModuleImage moduleBrickWallImage(
+	VkImageType::VK_IMAGE_TYPE_2D,
+	VkFormat::VK_FORMAT_R8G8B8A8_UNORM,
+	&brickWallImageSize,
+	&brickWallImageSize,
+	&brickWallImageDepth,
+	1,
+	VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT,
+	VkImageTiling::VK_IMAGE_TILING_OPTIMAL,
+	(VkImageUsageFlagBits)(VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT),
+	VkSharingMode::VK_SHARING_MODE_EXCLUSIVE,
+	VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED,
+	&vulkanDevice
+);
+/// #TEMP: Make this into a staging buffer?
+VulkanModuleDeviceMemoryImage moduleBrickWallMemory(VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &vulkanPhysicalDevice, &vulkanDevice, &moduleBrickWallImage);
+VulkanModuleImageView moduleBrickWallImageView(VkFormat::VK_FORMAT_R8G8B8A8_UNORM, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT, &vulkanDevice, &moduleBrickWallImage);
+
 // Descriptor Pool
 VulkanModuleDescriptorPool vulkanModuleDescriptorPool(&vulkanDevice);
 // Descriptor Buffer
 VulkanModuleBuffer<VulkanVertexData<VulkanVertexAttributeMatrix1, VulkanVertexAttributeMatrix2, VulkanVertexAttributeMatrix3>> bufferMVPMatrix(VkBufferUsageFlagBits::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, &vulkanDevice);
-VulkanModuleDeviceMemoryBuffer bufferMemoryMVPMatrix(&vulkanPhysicalDevice, &vulkanDevice, &bufferMVPMatrix);
+VulkanModuleDeviceMemoryBuffer bufferMemoryMVPMatrix(VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &vulkanPhysicalDevice, &vulkanDevice, &bufferMVPMatrix);
 VulkanModuleDescriptorBufferInfo descriptorInfoBufferMVPMatrix(&bufferMVPMatrix);
+// Descriptor Staging Buffer
+VulkanModuleBuffer<VulkanVertexData<VulkanVertexAttributeSingleByte>> bufferStaging(VkBufferUsageFlagBits::VK_BUFFER_USAGE_TRANSFER_SRC_BIT, &vulkanDevice, 1024*1024*16);
+VulkanModuleDeviceMemoryBuffer bufferMemoryStaging(VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &vulkanPhysicalDevice, &vulkanDevice, &bufferStaging);
+// Descriptor Sampler2D
+VulkanModuleSampler moduleSampler(&vulkanDevice);
+VulkanModuleDescriptorImageInfo moduleDescriptorImageInfo(&moduleSampler, &moduleBrickWallImageView);
 // Descriptor Binding
 VulkanModuleDescriptorSetBinding vulkanModuleDescriptorSetBinding(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, &descriptorInfoBufferMVPMatrix);
+VulkanModuleDescriptorSetBinding moduleDescriptorSetBindingSampler(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, &moduleDescriptorImageInfo);
 // Descriptor Set Layout
-VulkanModuleArraySized<VulkanModuleDescriptorSetBinding, 1> bindings({ &vulkanModuleDescriptorSetBinding });
+VulkanModuleArraySized<VulkanModuleDescriptorSetBinding, 2> bindings({ &vulkanModuleDescriptorSetBinding, &moduleDescriptorSetBindingSampler });
 VulkanModuleDescriptorSetLayout vulkanModuleDescriptorSetLayout(&vulkanDevice, &bindings);
 // Descriptor Set
 VulkanModuleDescriptorSet vulkanModuleDescriptorSet(&vulkanDevice, &vulkanModuleDescriptorPool, &vulkanModuleDescriptorSetLayout);
 // Write operation
-VulkanModuleDescriptorSetWrite vulkanModuleDescriptorSetWrite(&vulkanDevice, &vulkanModuleDescriptorSet, &vulkanModuleDescriptorSetBinding);
-/// END POOL STUFF
+VulkanModuleDescriptorSetWrite vulkanModuleDescriptorSetWrite(VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, &vulkanDevice, &vulkanModuleDescriptorSet, &vulkanModuleDescriptorSetBinding);
+VulkanModuleDescriptorSetWrite moduleDescriptorSetWriteSampler(VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, &vulkanDevice, &vulkanModuleDescriptorSet, &moduleDescriptorSetBindingSampler);
 // Pipeline Layout
 VulkanModuleArraySized<VulkanModuleDescriptorSetLayout, 1> pipelineLayoutDescriptorSets({ &vulkanModuleDescriptorSetLayout });
 VulkanModulePipelineLayout vulkanModulePipelineLayout(&vulkanDevice, &pipelineLayoutDescriptorSets);
@@ -217,7 +250,6 @@ VulkanModuleArraySized<VulkanModuleShader, 2> imGuiShaders({ &vulkanShaderVertex
 VulkanModulePipeline vulkanPipeline(&vulkanDevice, &vulkanSwapChain, &vulkanRenderPass, &vulkanModulePipelineLayout, &imGuiShaders, &vulkanModuleVertexBuffer);
 
 #ifdef DOMIMGUI
-
 VulkanModuleDescriptorPool imGuiDescriptorPool(&vulkanDevice);
 
 VulkanModuleSampler imGuiSampler(&vulkanDevice);
@@ -249,23 +281,192 @@ void dmgf::NewInit()
 	vulkanInstance.PreInitialise();
 	vulkanInstance.Initialise();
 
-	/// Remove this once we have textures working!
-	float tempQuadData[] =
+	// Load a 3d model from file
 	{
-		0.0f,0.0f,0.0f,		0.0f,0.0f,1.0f,		0.0f,0.0f,
-		0.0f,1.0f,0.0f,		0.0f,0.0f,1.0f,		0.0f,1.0f,
-		1.0f,1.0f,0.0f,		0.0f,0.0f,1.0f,		1.0f,1.0f,
-		0.0f,0.0f,0.0f,		0.0f,0.0f,1.0f,		0.0f,0.0f,
-		1.0f,1.0f,0.0f,		0.0f,0.0f,1.0f,		1.0f,1.0f,
-		1.0f,0.0f,0.0f,		0.0f,0.0f,1.0f,		1.0f,0.0f
-	};
+		tinyobj::attrib_t attributes;
+		std::vector<tinyobj::shape_t> shapes;
+		std::vector<tinyobj::material_t> materials;
+		std::string error;
+		std::string warning;
 
-	void* pData;
-	vkMapMemory(vulkanDevice.GetHandle(), vulkanModuleVertexMemory.GetHandle(), 0, sizeof(tempQuadData), 0, &pData);
-	memcpy(pData, tempQuadData, sizeof(tempQuadData));
-	vkUnmapMemory(vulkanDevice.GetHandle(), vulkanModuleVertexMemory.GetHandle());
+		bool bSuccess = tinyobj::LoadObj(&attributes, &shapes, &materials, &warning, &error, "..\\Content\\Meshes\\Monkey.obj");
+
+		if (bSuccess)
+		{
+			for (const tinyobj::shape_t& shape : shapes)
+			{
+				for (tinyobj::index_t index : shape.mesh.indices)
+				{
+					// Position
+					rawVertexData.push_back(attributes.vertices[(int)index.vertex_index * 3 + 0]);
+					rawVertexData.push_back(attributes.vertices[(int)index.vertex_index * 3 + 1]);
+					rawVertexData.push_back(attributes.vertices[(int)index.vertex_index * 3 + 2]);
+
+					// Normals
+					rawVertexData.push_back(attributes.normals[(int)index.normal_index * 3 + 0]);
+					rawVertexData.push_back(attributes.normals[(int)index.normal_index * 3 + 1]);
+					rawVertexData.push_back(attributes.normals[(int)index.normal_index * 3 + 2]);
+
+					// TexCoords
+					rawVertexData.push_back(attributes.texcoords[(int)index.texcoord_index * 2 + 0]);
+					rawVertexData.push_back(attributes.texcoords[(int)index.texcoord_index * 2 + 1]);
+				}
+			}
+		}
+		else
+		{
+			DOMLOG_WARN("No 3d model!")
+		}
+
+		void* pData;
+		const size_t numBytes = rawVertexData.size() * sizeof(*rawVertexData.data());
+
+		vkMapMemory(vulkanDevice.GetHandle(), vulkanModuleVertexMemory.GetHandle(), 0, rawVertexData.size(), 0, &pData);
+		memcpy(pData, rawVertexData.data(), numBytes);
+		vkUnmapMemory(vulkanDevice.GetHandle(), vulkanModuleVertexMemory.GetHandle());
+	}
+
+	// Load the image data from the jpg file
+	{
+		int width, height, channels;
+		unsigned char* rawImageData = nullptr;
+		rawImageData = stbi_load("..\\Content\\Textures\\Green.png", &width, &height, &channels, 0);
+
+		if (rawImageData)
+		{
+			const int numBytes = width * height * channels;
+			void* pRawTextureData;
+
+			vkMapMemory(vulkanDevice.GetHandle(), bufferMemoryStaging.GetHandle(), 0, numBytes, 0, &pRawTextureData);
+			memcpy(pRawTextureData, rawImageData, numBytes);
+			vkUnmapMemory(vulkanDevice.GetHandle(), bufferMemoryStaging.GetHandle());
+		}
+		else
+		{
+			DOMLOG_WARN("No image found!");
+		}
+	}
+
+	// Staging command buffer
+	{
+		VkCommandBufferBeginInfo commandBufferBegin = {};
+		commandBufferBegin.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		vkBeginCommandBuffer(commandBufferStaging.GetHandle(), &commandBufferBegin);
+
+		// 1. Translate the image from UYNDEFINED to TRANSFER_OPTIMAL to prepare it for the 
+		{
+			VkImageMemoryBarrier imageMemoryBarrier;
+			imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			imageMemoryBarrier.pNext = nullptr;
+			imageMemoryBarrier.srcAccessMask = 0; // No access to the image has been done yet
+			imageMemoryBarrier.dstAccessMask = VkAccessFlagBits::VK_ACCESS_TRANSFER_WRITE_BIT; // We are going to write to it.
+			imageMemoryBarrier.oldLayout = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED; // The image was UNDEFINED as we have only just created it.
+			imageMemoryBarrier.newLayout = VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL; // We want it to be TRANSFER_DST since we're copying things into it from the staging buffer
+			imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			imageMemoryBarrier.image = moduleBrickWallImage.GetHandle();
+
+			imageMemoryBarrier.subresourceRange.aspectMask = VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT;
+			imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
+			imageMemoryBarrier.subresourceRange.baseArrayLayer = 0;
+			imageMemoryBarrier.subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
+			imageMemoryBarrier.subresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
+
+			vkCmdPipelineBarrier(
+				commandBufferStaging.GetHandle(),
+				VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, // Before the transform we need to finish the transfer (vkCmdCopyBufferToImage())
+				VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT, // No stages after the transform
+				0,
+				0,
+				nullptr,
+				0,
+				nullptr,
+				1,
+				&imageMemoryBarrier
+			);
+		}
+
+		// 2. Copy from the raw bytes memcpy'd into stagingBuffer into the BrickWallImage texture
+		{
+			VkBufferImageCopy imageCopyParams;
+			imageCopyParams.bufferOffset = 0;
+			imageCopyParams.bufferImageHeight = 0;
+			imageCopyParams.bufferRowLength = 0;
+
+			imageCopyParams.imageSubresource.aspectMask = VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT;
+			imageCopyParams.imageSubresource.mipLevel = 0;
+			imageCopyParams.imageSubresource.baseArrayLayer = 0;
+			imageCopyParams.imageSubresource.layerCount = 1;
+
+			imageCopyParams.imageOffset.x = 0;
+			imageCopyParams.imageOffset.y = 0;
+			imageCopyParams.imageOffset.z = 0;
+
+			imageCopyParams.imageExtent.width = brickWallImageSize;
+			imageCopyParams.imageExtent.height = brickWallImageSize;
+			imageCopyParams.imageExtent.depth = 1;
+
+			vkCmdCopyBufferToImage(
+				commandBufferStaging.GetHandle(),
+				bufferStaging.GetHandle(),
+				moduleBrickWallImage.GetHandle(),
+				VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+				1,
+				&imageCopyParams);
+		}
+
+		// 3. After the transfer is complete, change layout from TRANSFER_OPTIMAL to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL so it can be sampled from in the shader as a Sampler2D
+		{
+			VkImageMemoryBarrier imageMemoryBarrier;
+			imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			imageMemoryBarrier.pNext = nullptr;
+			imageMemoryBarrier.srcAccessMask = 0; // VkAccessFlagBits::VK_ACCESS_HOST_WRITE_BIT; // We have done a write transfer so far
+			imageMemoryBarrier.dstAccessMask = 0; // No access needed after transaction
+			imageMemoryBarrier.oldLayout = VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			imageMemoryBarrier.newLayout = VkImageLayout::VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			imageMemoryBarrier.image = moduleBrickWallImage.GetHandle();
+
+			imageMemoryBarrier.subresourceRange.aspectMask = VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT;
+			imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
+			imageMemoryBarrier.subresourceRange.baseArrayLayer = 0;
+			imageMemoryBarrier.subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
+			imageMemoryBarrier.subresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
+
+			vkCmdPipelineBarrier(
+				commandBufferStaging.GetHandle(),
+				VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT, // Before the transform we need to finish the transfer (vkCmdCopyBufferToImage())
+				VkPipelineStageFlagBits::VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, // No stages after the transform since this is the last VkCommand
+				0, // We have already written to the image
+				0, // We are not doing anything else to the image afterwards so we don't need to access anything
+				nullptr,
+				0,
+				nullptr,
+				1,
+				&imageMemoryBarrier
+			);
+		}
+
+		vkEndCommandBuffer(commandBufferStaging.GetHandle());
+
+		VkSubmitInfo submitInfo = {};
+		submitInfo.pNext = NULL;
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.waitSemaphoreCount = 0;
+		submitInfo.pWaitSemaphores = nullptr;
+		submitInfo.pWaitDstStageMask = nullptr;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &commandBufferStaging.GetHandle();
+		submitInfo.signalSemaphoreCount = 0;
+		submitInfo.pSignalSemaphores = NULL;
+
+		vkQueueSubmit(vulkanGraphicsQueue.GetHandle(), 1, &submitInfo, nullptr);
+	}
+
 
 #ifdef DOMIMGUI
+	// ImGui
 	ImGui_ImplVulkan_InitInfo initParams;
 
 	initParams.CheckVkResultFn = &ImGuiDebugCallback;
@@ -305,7 +506,10 @@ void dmgf::NewInit()
 
 	vkQueueSubmit(vulkanGraphicsQueue.GetHandle(), 1, &submitInfo, nullptr); /// FENCE HERE?
 #endif //~ #ifdef DOMIMGUI
-}
+
+	/// #TODO: This should use semaphores and that
+	vkQueueWaitIdle(vulkanGraphicsQueue.GetHandle());
+ }
 
 void dmgf::UnInit()
 {
@@ -382,7 +586,7 @@ void dmgf::Tick(float deltaTime)
 
 	vkCmdBindDescriptorSets(commandBuffer.GetHandle(), VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanModulePipelineLayout.GetHandle(), 0, 1, &vulkanModuleDescriptorSet.GetHandle(), 0, nullptr);
 
-	vkCmdDraw(commandBuffer.GetHandle(), 6, 1, 0, 0);
+	vkCmdDraw(commandBuffer.GetHandle(), (u32)(rawVertexData.size() / 8), 1, 0, 0);
 
 #ifdef DOMIMGUI
 	vkCmdNextSubpass(commandBuffer.GetHandle(), VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);

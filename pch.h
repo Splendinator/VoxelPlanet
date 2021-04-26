@@ -3,6 +3,10 @@
 // MY HEADERS
 #include "DomLog/DomLog.h"
 
+// EXTERNAL
+#include "stb_image.h"
+#include "tinyobj_loader.h"
+
 // STL
 #include <string.h>
 #include <unordered_map>

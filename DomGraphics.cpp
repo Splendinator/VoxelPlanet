@@ -80,7 +80,7 @@ VulkanModuleDevice vulkanDevice(&vulkanPhysicalDevice, &vulkanSurface);
 // Graphics Queue
 VulkanModuleQueue vulkanGraphicsQueue(VK_QUEUE_GRAPHICS_BIT, &vulkanDevice);
 // Command Pool
-VulkanModuleCommandPool vulkanCommandPool(&vulkanDevice);
+VulkanModuleCommandPool   vulkanCommandPool(&vulkanDevice);
 // Command Buffer
 VulkanModuleCommandBuffer vulkanCommandBuffer(&vulkanDevice, &vulkanCommandPool);
 VulkanModuleCommandBuffer vulkanCommandBuffer2(&vulkanDevice, &vulkanCommandPool);
@@ -114,7 +114,7 @@ VulkanModuleImageView vulkanDepthBufferImageView(vulkanDepthBufferImage.GetImage
 //~ Begin render pass
 // Attachments
 VulkanModuleAttachmentDescription colourAttachment(
-	VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT,
+	VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT, 
 	VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR,
 	VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE,
 	VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED,
@@ -300,8 +300,6 @@ void dmgf::Tick(float deltaTime)
 
 	vkCmdBindDescriptorSets(commandBuffer.GetHandle(), VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, vulkanModulePipelineLayout.GetHandle(), 0, 1, &vulkanModuleDescriptorSet.GetHandle(), 0, nullptr);
 
-	DrawChunks(commandBuffer);
-
 #ifdef DOMIMGUI
 	vkCmdNextSubpass(commandBuffer.GetHandle(), VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
 
@@ -364,58 +362,6 @@ void dmgf::Tick(float deltaTime)
 Camera& dmgf::GetCamera()
 {
 	return camera;
-}
-
-#include <unordered_map>
-
-
-struct BufferRegion
-{
-	u32 start;
-	u32 size;
-};
-
-std::unordered_map<Chunk*, BufferRegion> chunkMap;
-u32 lastHostMemoryIndex = 0;
-u32 lastDeviceMemoryIndex = 0;
-
-void dmgf::AddChunk(Chunk* chunk, std::vector<dmgf::Quad>& quads)
-{
-	constexpr int MAX_VERTS = MAX_QUADS * 6;
-
-	const u32 numVerts = quads.size() * 6;
-	const u32 memorySize = sizeof(Quad) * quads.size();
-	
-	chunkMap.insert({ chunk, { lastHostMemoryIndex, numVerts } });
-
-	/// #TODO: Actually write a memory manager instead of this shit
-	// Circle buffer wrap around
-	if (lastHostMemoryIndex + numVerts > MAX_VERTS)
-	{
-		lastDeviceMemoryIndex = 0;
-		lastHostMemoryIndex = 0;
-	}
-
-	void* pData;
-	vkMapMemory(vulkanDevice.GetHandle(), vulkanModuleVertexMemory.GetHandle(), lastDeviceMemoryIndex, memorySize, 0, &pData);
-	memcpy(pData, quads.data(), memorySize);
-	vkUnmapMemory(vulkanDevice.GetHandle(), vulkanModuleVertexMemory.GetHandle());
-	
-	lastHostMemoryIndex += numVerts;
-	lastDeviceMemoryIndex += memorySize;
-}
-
-void dmgf::RemoveChunk(Chunk* chunk)
-{
-	chunkMap.erase(chunk);
-}
-
-void dmgf::DrawChunks(VulkanModuleCommandBuffer& commandBuffer)
-{
-	for (auto& it : chunkMap)
-	{
-		vkCmdDraw(commandBuffer.GetHandle(), it.second.size, 1, it.second.start, 0);
-	}
 }
 
 dmut::HeapAlloc<char> GetShaderFilepath(const char* shaderName)

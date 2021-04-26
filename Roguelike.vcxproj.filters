@@ -25,6 +25,12 @@
     <Filter Include="PCH">
       <UniqueIdentifier>{c60b2984-a7b3-4294-b241-c7d68299b539}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ExternalCode">
+      <UniqueIdentifier>{ff116285-adf4-4c08-affe-651dc253671c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{6a8de722-72c8-4563-a2e8-e3894f103d2c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -45,6 +51,9 @@
     <ClCompile Include="pch.cpp">
       <Filter>PCH</Filter>
     </ClCompile>
+    <ClCompile Include="StbImageCompile.cpp">
+      <Filter>ExternalCode</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -56,5 +65,25 @@
     <ClInclude Include="pch.h">
       <Filter>PCH</Filter>
     </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>ExternalCode</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyobj_loader.h">
+      <Filter>ExternalCode</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Graphics\Shaders\ImGuiFrag.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Graphics\Shaders\ImGuiVert.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Graphics\Shaders\TriangleFrag.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Graphics\Shaders\TriangleVert.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
