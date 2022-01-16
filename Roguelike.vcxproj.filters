@@ -45,7 +45,7 @@
     <ClCompile Include="JumpGame.cpp">
       <Filter>Archived</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer.cpp">
+    <ClCompile Include="OLD_Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
@@ -53,6 +53,18 @@
     </ClCompile>
     <ClCompile Include="StbImageCompile.cpp">
       <Filter>ExternalCode</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -71,6 +83,15 @@
     <ClInclude Include="tinyobj_loader.h">
       <Filter>ExternalCode</Filter>
     </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Graphics\Shaders\ImGuiFrag.frag">
@@ -79,10 +100,10 @@
     <None Include="..\Graphics\Shaders\ImGuiVert.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Graphics\Shaders\TriangleFrag.frag">
+    <None Include="..\Graphics\Shaders\VectorFrag.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Graphics\Shaders\TriangleVert.vert">
+    <None Include="..\Graphics\Shaders\VectorVert.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

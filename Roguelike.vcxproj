@@ -70,8 +70,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>C:\Users\Dominic\Desktop\Big Folder of Userfulness\C++\My Libraries;$(SolutionDir)$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Users\Dominic\Desktop\TempGame\ImGui;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Dominic\Desktop\Big Folder of Userfulness\C++\My Libraries;$(SolutionDir)$(Platform)\$(Configuration)\;C:\VulkanSDK\1.2.198.1\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Dominic\Desktop\TempGame\ImGui;C:\VulkanSDK\1.2.198.1\Include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)\Exe\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -119,8 +119,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Dominic\Desktop\Big Folder of Userfulness\C++\My Headers;C:\VulkanSDK\1.2.131.2\Include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DOMIMGUI;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Dominic\Desktop\Big Folder of Userfulness\C++\My Headers;C:\VulkanSDK\1.2.198.1\Include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -138,27 +138,34 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="JumpGame.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PlanetGenerate.cpp" />
+    <ClCompile Include="OLD_Renderer.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="ResourceLoader.cpp" />
     <ClCompile Include="StbImageCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="ResourceLoader.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="tinyobj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Graphics\Shaders\ImGuiFrag.frag" />
     <None Include="..\Graphics\Shaders\ImGuiVert.vert" />
-    <None Include="..\Graphics\Shaders\TriangleFrag.frag" />
-    <None Include="..\Graphics\Shaders\TriangleVert.vert" />
+    <None Include="..\Graphics\Shaders\VectorFrag.frag" />
+    <None Include="..\Graphics\Shaders\VectorVert.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

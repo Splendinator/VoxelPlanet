@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#ifdef JUMP_GAME
+#ifdef JUMP_GAME /// We aren't using this file any more so IFDEF it out
 
 #include "Game.h"
 

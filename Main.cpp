@@ -7,12 +7,14 @@
 
 #include <chrono>
 
+/// #TEMP: Turn on DOMIMGUI
 #ifdef DOMIMGUI
 #include <imgui.h>
 #include <imgui_impl_win32.h>
 #endif //~ #ifdef DOMIMGUI
 
 #include "Game.h"
+
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -66,18 +68,12 @@ void domMain()
 	dmwi::SetMessageHook(DomWindowMessageHook);
 #endif //~ #ifdef DOMIMGUI
 
-	dmgf::NewInit();
+	dmgf::Init();
 	Game::Init();
 
 	while (!dmwi::isPressed(dmwi::Button::ESC))
 	{
 		float deltaTime = GetDeltaTime();
-
-		if (dmwi::isPressed(dmwi::Button::F1))
-		{
-			static bool bIsCursorLocked;
-			dmwi::LockCursor(bIsCursorLocked = !bIsCursorLocked);
-		}
 
 #ifdef DOMIMGUI
 		ImGui_ImplWin32_NewFrame();

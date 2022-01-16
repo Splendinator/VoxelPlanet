@@ -17,7 +17,7 @@ namespace dmgf
 	};
 
 	// Initialise graphics -- Must be called after the window has been initialised.
-	void NewInit();
+	void Init();
 
 	// Uninitialise graphics
 	void UnInit();

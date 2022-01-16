@@ -4,14 +4,15 @@
 
 #include "DomGraphics.h"
 
+#include "../Graphics/Camera.h"
 #include "DomLog/DomLog.h"
-#include "DomMath/Vec3.h"
 #include "DomMath/Constants.h"
 #include "DomMath/Constexpr.h"
 #include "DomMath/Math.h"
+#include "DomMath/Vec3.h"
 #include "DomUtils/DomUtils.h"
 #include "DomWindow/DomWindow.h"
-#include "../Graphics/Camera.h"
+#include "ResourceLoader.h"
 
 #include <imgui.h>
 #include <time.h>
@@ -26,6 +27,7 @@ void Game::UnInit()
 
 }
 
+#ifdef DOMIMGUI
 void CreateImGuiWindow(float deltaTime)
 {
 	static int numFrames = 0;
@@ -48,6 +50,7 @@ void CreateImGuiWindow(float deltaTime)
 	ImGui::Text("Frame rate: %d", fps); 
 	ImGui::End();
 }
+#endif //~ #ifdef DOMIMGUI
 
 void GameplayTick(float deltaTime)
 {
@@ -56,6 +59,8 @@ void GameplayTick(float deltaTime)
 
 void Game::tick(float deltaTime)
 {
+#ifdef DOMIMGUI
 	CreateImGuiWindow(deltaTime);
+#endif //~ #ifdef DOMIMGUI
 	GameplayTick(deltaTime);
 }
