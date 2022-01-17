@@ -44,6 +44,7 @@ VkShaderModule CreateShader(const char* pShaderName);
 VkSwapchainKHR CreateSwapchain();
 
 VkBuffer CreateVertexBuffer();
+VkBuffer CreateUniformBuffer();
 
 VkRenderPass CreateRenderPass();
 
@@ -53,6 +54,8 @@ VkDescriptorSetLayout CreateDescriptorSetLayout();
 
 VkDescriptorSet CreateDescriptorSet();
 
+void UpdateVectorBuffer();
+
 VkPipelineLayout CreatePipelineLayout();
 
 VkPipeline CreatePipeline();
@@ -61,7 +64,7 @@ VkCommandPool CreateCommandPool();
 
 VkCommandBuffer CreateCommandBuffer();
 
-VkDeviceMemory CreateDeviceMemory();
+VkDeviceMemory CreateDeviceMemory(VkDeviceSize memorySize);
 
 VkImage CreateImage();
 
@@ -96,18 +99,18 @@ VkCommandBuffer handleCommandBuffer1 = VK_NULL_HANDLE;
 VkCommandBuffer handleCommandBuffer2 = VK_NULL_HANDLE;
 VkDeviceMemory handleDeviceMemoryVertex = VK_NULL_HANDLE;
 dmut::HeapAllocSize<VkImage> handleSwapChainImages;
+VkDeviceMemory handleDeviceMemoryVectorBuffer = VK_NULL_HANDLE;
+VkBuffer handleBufferVector = VK_NULL_HANDLE;
 
 // Unused
 VkBuffer handleStagingBuffer = VK_NULL_HANDLE;
-VkDeviceMemory handleDeviceMemory = VK_NULL_HANDLE;
+VkDeviceMemory handleDeviceMemoryVertexBuffer = VK_NULL_HANDLE;
 
 uint32_t deviceQueueFamilyIndex = 0;
 const char* pShaderPath = "../Graphics/Shaders/CompiledShaders"; // compiled SPIRV files
 
 namespace dmgf
 {
-/// #TEMP: PRAGMA
-#pragma optimize( "", off )
 	void Init()
 	{
 #ifndef DOMRELEASE
@@ -139,18 +142,28 @@ namespace dmgf
 		handleCommandPool = CreateCommandPool();
 		handleCommandBuffer1 = CreateCommandBuffer();
 		handleCommandBuffer2 = CreateCommandBuffer();
-		handleDeviceMemory = CreateDeviceMemory();
-		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleVertextBuffer, handleDeviceMemory, 0), "BindVertexBuffer");
+		handleDeviceMemoryVertexBuffer = CreateDeviceMemory(0x100); // #TODO: This number is what the error message said to put here, we need to query the VkBuffer's memory requirements
+		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleVertextBuffer, handleDeviceMemoryVertexBuffer, 0), "BindVertexBuffer");
+
+		// Descriptor set uniform buffer
+		handleDeviceMemoryVectorBuffer = CreateDeviceMemory(4 * 4096);
+		handleBufferVector = CreateUniformBuffer();
+		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferVector, handleDeviceMemoryVectorBuffer, 0), "BindUniformBuffer");
+		UpdateVectorBuffer();
 	}
 
 	void UnInit()
 	{
-		/// #TEMP: Destroy shit
+		vkFreeMemory(handleDevice, handleDeviceMemoryVertexBuffer, nullptr);
 		vkDestroyCommandPool(handleDevice, handleCommandPool, nullptr);
 		vkDestroyPipeline(handleDevice, handlePipeline, nullptr);
 		vkDestroyPipelineLayout(handleDevice, handlePipelineLayout, nullptr);
 		vkDestroyDescriptorSetLayout(handleDevice, handleDescriptorSetLayout, nullptr);
 		vkDestroyDescriptorPool(handleDevice, handleDescriptorPool, nullptr);
+		vkDestroyFramebuffer(handleDevice, handleFrameBuffer2, nullptr);
+		vkDestroyFramebuffer(handleDevice, handleFrameBuffer1, nullptr);
+		vkDestroyImageView(handleDevice, handleImageView2, nullptr);
+		vkDestroyImageView(handleDevice, handleImageView1, nullptr);
 		vkDestroyRenderPass(handleDevice, handleRenderPass, nullptr);
 		vkDestroyBuffer(handleDevice, handleVertextBuffer, nullptr);
 		vkDestroyShaderModule(handleDevice, handleShaderVertex, nullptr);
@@ -160,7 +173,7 @@ namespace dmgf
 		vkDestroySurfaceKHR(handleInstance, handleSurface, nullptr);
 		vkDestroyInstance(handleInstance, nullptr);
 	}
-#pragma optimize( "", on )
+
 	void Tick(float deltaTime)
 	{
 		SubmitDrawCommand();
@@ -168,54 +181,61 @@ namespace dmgf
 
 	Camera& GetCamera()
 	{
+		// #TODO: Delete these unused
 		return mainCamera;
 	}
 
 	VkDevice& GetDeviceHandle()
 	{
+		// #TODO: Delete these unused
 		return handleDevice;
 	}
 
 	VkPhysicalDevice& GetPhysicalDeviceHandle()
 	{
+		// #TODO: Delete these unused
 		return handlePhysicalDevice;
 	}
 
 	VkDeviceMemory& GetStagingBufferMemoryHandle()
 	{
-		return handleDeviceMemory;
+		// #TODO: Delete these unused
+		return handleDeviceMemoryVertexBuffer;
 	}
 
 	VkBuffer& GetStagingBufferHandle()
 	{
+		// #TODO: Delete these unused
 		return handleStagingBuffer;
 	}
 
 	VkCommandPool& GetCommandPool()
 	{
+		// #TODO: Delete these unused
 		return handleCommandPool;
 	}
 
 	VkQueue& GetGraphicsQueueHandle()
 	{
+		// #TODO: Delete these unused
 		return handleGraphicsQueue;
 	}
 
 	u32 GetGraphicsQueueFamily()
 	{
-		/// #TEMP: DO THIS
+		// #TODO: Delete these unused
 		return 0;
 	}
 
 	void* AddNewObject(Texture* texture, Mesh* mesh)
 	{
-		/// #TEMP: DO THIS
+		// #TODO: Delete these unused
 		return nullptr;
 	}
 
 	void SetObjectPos(void* pHandle, const Mat4f& modelMatrix)
 	{
-		/// #TEMP: DO THIS
+		// #TODO: Delete these unused
 	}
 }
 
@@ -484,7 +504,7 @@ VkBuffer CreateVertexBuffer()
 	createInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	createInfo.pNext = nullptr;
 	createInfo.flags = 0;
-	createInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+	createInfo.usage = VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 	createInfo.size = sizeof(Vertex) * VERTEX_BUFFER_SIZE;
 	createInfo.queueFamilyIndexCount = 0; // Don't need this?
 	createInfo.pQueueFamilyIndices = nullptr;
@@ -492,6 +512,24 @@ VkBuffer CreateVertexBuffer()
 
 	VkBuffer returnedHandle = VK_NULL_HANDLE;
 	VulkanUtils::ErrorCheck(vkCreateBuffer(handleDevice, &createInfo, nullptr, &returnedHandle), "VertexBuffer");
+	return returnedHandle;
+}
+
+VkBuffer CreateUniformBuffer()
+{
+
+	VkBufferCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
+	createInfo.usage = VkBufferUsageFlagBits::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+	createInfo.size = 4 * 4096;
+	createInfo.queueFamilyIndexCount = 0;
+	createInfo.pQueueFamilyIndices = nullptr;
+	createInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	VkBuffer returnedHandle = VK_NULL_HANDLE;
+	VulkanUtils::ErrorCheck(vkCreateBuffer(handleDevice, &createInfo, nullptr, &returnedHandle), "UniformBuffer");
 	return returnedHandle;
 }
 
@@ -603,6 +641,68 @@ VkDescriptorSet CreateDescriptorSet()
 	VkDescriptorSet returnedLayout = VK_NULL_HANDLE;
 	VulkanUtils::ErrorCheck(vkAllocateDescriptorSets(handleDevice, &allocInfo, &returnedLayout), "DescriptorSet");
 	return returnedLayout;
+}
+
+/// #TEMP: Remove this, just testing
+#include "VectorPrimitiveCircle.h"
+
+void UpdateVectorBuffer()
+{
+	u32 data[4096] = {};
+
+	VectorPrimitiveCircle c;
+	c.x = 200;
+	c.y = 200;
+	c.rad = 200;
+	c.red = 0;
+	c.blue = 0;
+	c.green = 255;
+
+	c.Serialize(data);
+
+	void* pDeviceData = nullptr;
+	vkMapMemory(handleDevice, handleDeviceMemoryVectorBuffer, 0, sizeof(data), 0, &pDeviceData);
+	memcpy(pDeviceData, data, sizeof(data));
+	vkUnmapMemory(handleDevice, handleDeviceMemoryVectorBuffer);
+
+	vkMapMemory(handleDevice, handleDeviceMemoryVectorBuffer, 4, 100, 0, &pDeviceData);
+	memcpy(pDeviceData, &data[1], 100);
+	vkUnmapMemory(handleDevice, handleDeviceMemoryVectorBuffer);
+	vkMapMemory(handleDevice, handleDeviceMemoryVectorBuffer, 8, 100, 0, &pDeviceData);
+	memcpy(pDeviceData, &data[2], 100);
+	vkUnmapMemory(handleDevice, handleDeviceMemoryVectorBuffer);
+	vkMapMemory(handleDevice, handleDeviceMemoryVectorBuffer, 12, 100, 0, &pDeviceData);
+	memcpy(pDeviceData, &data[3], 100);
+	vkUnmapMemory(handleDevice, handleDeviceMemoryVectorBuffer);
+	vkMapMemory(handleDevice, handleDeviceMemoryVectorBuffer, 16, 100, 0, &pDeviceData);
+	memcpy(pDeviceData, &data[4], 100);
+	vkUnmapMemory(handleDevice, handleDeviceMemoryVectorBuffer);
+
+	///vkMapMemory(handleDevice, handleDeviceMemoryVectorBuffer, 2, sizeof(data), 0, &pDeviceData);
+	///memcpy(pDeviceData, data, sizeof(data));
+	///vkUnmapMemory(handleDevice, handleDeviceMemoryVectorBuffer);
+	///
+	///vkMapMemory(handleDevice, handleDeviceMemoryVectorBuffer, 3, sizeof(data), 0, &pDeviceData);
+	///memcpy(pDeviceData, data, sizeof(data));
+	///vkUnmapMemory(handleDevice, handleDeviceMemoryVectorBuffer);
+
+	VkDescriptorBufferInfo descriptorBufferInfo = {};
+	descriptorBufferInfo.buffer = handleBufferVector;
+	descriptorBufferInfo.offset = 0;
+	descriptorBufferInfo.range = 100;
+
+	VkWriteDescriptorSet descriptorSetWrite = {};
+	descriptorSetWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorSetWrite.pNext = nullptr;
+	descriptorSetWrite.dstSet = handleDescriptorSet;
+	descriptorSetWrite.dstBinding = 0;
+	descriptorSetWrite.dstArrayElement = 0;
+	descriptorSetWrite.descriptorCount = 1;
+	descriptorSetWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorSetWrite.pImageInfo = nullptr;
+	descriptorSetWrite.pBufferInfo = &descriptorBufferInfo;
+	descriptorSetWrite.pTexelBufferView = nullptr;
+	vkUpdateDescriptorSets(handleDevice, 1, &descriptorSetWrite, 0, nullptr);
 }
 
 VkPipelineLayout CreatePipelineLayout()
@@ -779,12 +879,12 @@ VkCommandBuffer CreateCommandBuffer()
 	return returnedHandle;
 }
 
-VkDeviceMemory CreateDeviceMemory()
+VkDeviceMemory CreateDeviceMemory(VkDeviceSize memorySize)
 {
 	VkMemoryAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.pNext = nullptr;
-	allocInfo.allocationSize = 0x100; // #TODO: This number is what the error message said to put here, we need to query the VkBuffer's memory requirements
+	allocInfo.allocationSize = memorySize;
 	allocInfo.memoryTypeIndex = 8; // #TODO: Util function to pick the physical device memory that has certain flags (in this case 8 == HOST_VISIBLE)
 
 	VkDeviceMemory returnedHandle = VK_NULL_HANDLE;
@@ -795,7 +895,7 @@ VkDeviceMemory CreateDeviceMemory()
 VkImage CreateImage()
 {
 	// #TODO: Do this if we want textures
-
+	DOMASSERT(false, "Implement this cunt");
 	VkImage returnedHandle = VK_NULL_HANDLE;
 	///VulkanUtils::ErrorCheck(vkCreateImage(handleDevice, &createInfo, nullptr, &returnedHandle), "Image");
 	return returnedHandle;
@@ -841,8 +941,6 @@ VkFramebuffer CreateFramebuffer(VkImageView inHandleImageView)
 	return returnedHandle;
 }
 
-/// #TEMP: PRAGMA
-#pragma optimize( "", off )
 void SubmitDrawCommand()
 {
 	static uint32_t currentBuffer = 0; // Which framebuffer to use (swapchain swaps between 2 framebuffers)
@@ -881,6 +979,8 @@ void SubmitDrawCommand()
 	vkCmdBindVertexBuffers(handleCommandBuffer, 0, 1, &handleVertextBuffer, &vertexBufferOffset);
 	vkCmdBindPipeline(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipeline);
 
+	vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 0, 1, &handleDescriptorSet, 0, nullptr);
+
 	Vertex quad[6] =
 	{
 		{-1.0f, -1.0f, 0.0f},
@@ -892,9 +992,9 @@ void SubmitDrawCommand()
 	};
 
 	void* pDeviceData = nullptr;
-	vkMapMemory(handleDevice, handleDeviceMemory, 0, sizeof(quad), 0, &pDeviceData);
+	vkMapMemory(handleDevice, handleDeviceMemoryVertexBuffer, 0, sizeof(quad), 0, &pDeviceData);
 	memcpy(pDeviceData, quad, sizeof(quad));
-	vkUnmapMemory(handleDevice, handleDeviceMemory);
+	vkUnmapMemory(handleDevice, handleDeviceMemoryVertexBuffer);
 
 	vkCmdDraw(handleCommandBuffer, DMUT_ARRAY_SIZE(quad), 1, 0, 0);
 
@@ -945,4 +1045,3 @@ void SubmitDrawCommand()
 
 	currentBuffer ^= 1;
 }
-#pragma optimize( "", on )

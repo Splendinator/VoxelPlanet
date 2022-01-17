@@ -31,6 +31,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{6a8de722-72c8-4563-a2e8-e3894f103d2c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="VectorPrimitives">
+      <UniqueIdentifier>{ba01619d-8bb5-4a15-b6e9-7e39e38e1447}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -66,6 +69,21 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VectorPrimitiveBase.cpp">
+      <Filter>VectorPrimitives</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorPrimitiveCircle.cpp">
+      <Filter>VectorPrimitives</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorPrimitiveRectangle.cpp">
+      <Filter>VectorPrimitives</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorPrimitiveLayer.cpp">
+      <Filter>VectorPrimitives</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorPrimitiveShape.cpp">
+      <Filter>VectorPrimitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -91,6 +109,24 @@
     </ClInclude>
     <ClInclude Include="ResourceLoader.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorPrimitiveBase.h">
+      <Filter>VectorPrimitives</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorPrimitiveCircle.h">
+      <Filter>VectorPrimitives</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorPrimitiveRectangle.h">
+      <Filter>VectorPrimitives</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorPrimitiveTypes.h">
+      <Filter>VectorPrimitives</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorPrimitiveLayer.h">
+      <Filter>VectorPrimitives</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorPrimitiveShape.h">
+      <Filter>VectorPrimitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

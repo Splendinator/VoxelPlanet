@@ -150,6 +150,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="VectorPrimitiveBase.cpp" />
+    <ClCompile Include="VectorPrimitiveCircle.cpp" />
+    <ClCompile Include="VectorPrimitiveLayer.cpp" />
+    <ClCompile Include="VectorPrimitiveRectangle.cpp" />
+    <ClCompile Include="VectorPrimitiveShape.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
@@ -160,6 +165,12 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="tinyobj_loader.h" />
+    <ClInclude Include="VectorPrimitiveBase.h" />
+    <ClInclude Include="VectorPrimitiveCircle.h" />
+    <ClInclude Include="VectorPrimitiveLayer.h" />
+    <ClInclude Include="VectorPrimitiveRectangle.h" />
+    <ClInclude Include="VectorPrimitiveShape.h" />
+    <ClInclude Include="VectorPrimitiveTypes.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Graphics\Shaders\ImGuiFrag.frag" />
