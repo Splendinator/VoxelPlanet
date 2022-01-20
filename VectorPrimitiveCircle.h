@@ -9,9 +9,12 @@
 class VectorPrimitiveCircle : public VectorPrimitiveShape
 {
 public:
-	void Serialize(u32* pBuffer) override;
+	//~ Begin VectorPrimitiveBase Interface
+	u32* Serialize(u32* pBuffer) override;
+	std::istream& PopulateFromFile(std::istream& stream) override;
+	//~ End VectorPrimitiveBase Interface
 
-/// #TEMP: private:
+private:
 	u32 x = 0;
 	u32 y = 0;
 	u32 rad = 0;

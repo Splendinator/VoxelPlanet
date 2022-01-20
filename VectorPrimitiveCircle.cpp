@@ -4,7 +4,7 @@
 
 #include "VectorPrimitiveTypes.h"
 
-void VectorPrimitiveCircle::Serialize(u32* pBuffer)
+u32* VectorPrimitiveCircle::Serialize(u32* pBuffer)
 {
 	*pBuffer = (u32)EPrimitiveType::Cirlce;
 	++pBuffer;
@@ -16,5 +16,10 @@ void VectorPrimitiveCircle::Serialize(u32* pBuffer)
 	*pBuffer = rad;
 	++pBuffer;
 
-	VectorPrimitiveShape::Serialize(pBuffer);
+	return VectorPrimitiveShape::Serialize(pBuffer);
+}
+
+std::istream& VectorPrimitiveCircle::PopulateFromFile(std::istream& stream)
+{
+	return stream;
 }

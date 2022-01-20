@@ -3,7 +3,10 @@
 class VectorPrimitiveShape : public VectorPrimitiveBase
 {
 public:
-	void Serialize(u32* pBuffer) override;
+	//~ Begin VectorPrimitiveBase Interface
+	u32* Serialize(u32* pBuffer) override;
+	std::istream& PopulateFromFile(std::istream& stream) override;
+	//~ End VectorPrimitiveBase Interface
 
 /// #TEMP: private: 
 

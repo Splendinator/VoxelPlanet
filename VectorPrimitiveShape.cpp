@@ -2,7 +2,7 @@
 
 #include "VectorPrimitiveShape.h"
 
-void VectorPrimitiveShape::Serialize(u32* pBuffer)
+u32* VectorPrimitiveShape::Serialize(u32* pBuffer)
 {
 	*pBuffer = red;
 	++pBuffer;
@@ -12,4 +12,11 @@ void VectorPrimitiveShape::Serialize(u32* pBuffer)
 	
 	*pBuffer = blue;
 	++pBuffer;
+
+	return pBuffer;
+}
+
+std::istream& VectorPrimitiveShape::PopulateFromFile(std::istream& stream)
+{
+	return stream;
 }
