@@ -4,7 +4,7 @@
 
 /** VectorPrimitiveFactoryLayer
 *
-* This class is used for #TEMP
+* This class is used for VectorPrimitiveLayer
 */
 class VectorPrimitiveFactoryLayer : public VectorPrimitiveFactoryBase
 {

@@ -4,7 +4,7 @@
 
 /** VectorPrimitiveFactoryRectangle
 *
-* This class is used for #TEMP
+* This class is used to create a VectorPrimitiveRectangle
 */
 class VectorPrimitiveFactoryRectangle : public VectorPrimitiveFactoryBase
 {

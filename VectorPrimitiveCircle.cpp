@@ -3,6 +3,7 @@
 #include "VectorPrimitiveCircle.h"
 
 #include "VectorPrimitiveTypes.h"
+#include "DomImport/XMLUtils.h"
 
 u32* VectorPrimitiveCircle::Serialize(u32* pBuffer)
 {
@@ -21,5 +22,12 @@ u32* VectorPrimitiveCircle::Serialize(u32* pBuffer)
 
 std::istream& VectorPrimitiveCircle::PopulateFromFile(std::istream& stream)
 {
+	VectorPrimitiveShape::PopulateFromFile(stream);
+
+	// #TODO: Should these be floats instead?
+	x = (u32)std::stof(dmim::GetNextAttribute(stream, "cx"));
+	y = (u32)std::stof(dmim::GetNextAttribute(stream, "cy"));
+	rad = (u32)std::stof(dmim::GetNextAttribute(stream, "r"));
+
 	return stream;
 }

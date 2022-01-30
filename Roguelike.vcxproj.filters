@@ -40,6 +40,9 @@
     <Filter Include="VertexRender\VectorPrimitives\Factories">
       <UniqueIdentifier>{c91876b3-f581-4b3d-95e6-04160bcfe662}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ECS">
+      <UniqueIdentifier>{3cc9f9ce-808d-407d-8cb6-27865779297f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -102,15 +105,15 @@
     <ClCompile Include="VectorPrimitiveFactoryRectangle.cpp">
       <Filter>VertexRender\VectorPrimitives\Factories</Filter>
     </ClCompile>
-    <ClCompile Include="VectorPrimitiveFactoryManager.cpp">
+    <ClCompile Include="VectorArt.cpp">
       <Filter>VertexRender\VectorPrimitives\Factories</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererObject.cpp">
+      <Filter>VertexRender</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
@@ -161,8 +164,17 @@
     <ClInclude Include="VectorPrimitiveFactoryRectangle.h">
       <Filter>VertexRender\VectorPrimitives\Factories</Filter>
     </ClInclude>
-    <ClInclude Include="VectorPrimitiveFactoryManager.h">
+    <ClInclude Include="VectorArt.h">
       <Filter>VertexRender\VectorPrimitives\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererObject.h">
+      <Filter>VertexRender</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>VertexRender</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS.h">
+      <Filter>ECS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

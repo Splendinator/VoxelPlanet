@@ -2,8 +2,6 @@
 
 #include "Game.h"
 
-#include "DomGraphics.h"
-
 #include "../Graphics/Camera.h"
 #include "DomLog/DomLog.h"
 #include "DomMath/Constants.h"
@@ -17,9 +15,41 @@
 #include <imgui.h>
 #include <time.h>
 
+/// #TEMP: Temp for testing ECS
+#include "ECS.h"
+#include "Renderer.h"
+ECS ecs;
+
 void Game::Init()
 {
-	
+	ecs.RegisterSystem(std::make_unique<SystemRender>());
+
+	{
+		Entity& e = ecs.GetEntity(0);
+		e.components.AddComponent(EComponents::Mesh);
+		e.components.AddComponent(EComponents::Transform);
+		ecs.GetComponent<Mesh>(0).pRendererObject = dmgf::AddObjectFromSVG("C:/Users/Dominic/Desktop/Grass.svg");
+		ecs.GetComponent<Transform>(0).x = 2;
+		ecs.GetComponent<Transform>(0).y = 2;
+	}
+	{
+		Entity& e = ecs.GetEntity(1);
+		e.components.AddComponent(EComponents::Mesh);
+		///e.components.AddComponent(EComponents::Transform);
+	}
+	{
+		Entity& e = ecs.GetEntity(2);
+		///e.components.AddComponent(EComponents::Mesh);
+		e.components.AddComponent(EComponents::Transform);
+	}
+	{
+		Entity& e = ecs.GetEntity(3);
+		e.components.AddComponent(EComponents::Mesh);
+		e.components.AddComponent(EComponents::Transform);
+		ecs.GetComponent<Mesh>(3).pRendererObject = dmgf::AddObjectFromSVG("C:/Users/Dominic/Desktop/Grass.svg");
+		ecs.GetComponent<Transform>(3).x = 5;
+		ecs.GetComponent<Transform>(3).y = 5;
+	}
 }
 
 void Game::UnInit()
@@ -54,7 +84,7 @@ void CreateImGuiWindow(float deltaTime)
 
 void GameplayTick(float deltaTime)
 {
-
+	ecs.Tick(deltaTime);
 }
 
 void Game::tick(float deltaTime)

@@ -15,8 +15,10 @@ public:
 	//~ End VectorPrimitiveBase Interface
 
 private:
-	u32 x = 0;
+	// Coordinates of center
+	u32 x = 0; 
 	u32 y = 0;
+
 	u32 rad = 0;
 };
 

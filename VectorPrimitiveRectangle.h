@@ -15,5 +15,11 @@ public:
 	//~ End VectorPrimitiveBase Interface
 
 private:
+	// Coorinates of top left
+	u32 x;
+	u32 y;
+
+	u32 width;
+	u32 height;
 };
 

@@ -9,6 +9,7 @@
 class VectorPrimitiveBase
 {
 public:
+	virtual ~VectorPrimitiveBase() = default;
 
 	// This should be overridden to serialize the primitive to the input buffer.
 	// Serialized vector art is decoded and rendered by VectorFrag.frag so write this function in such a way that it can be replicated inversely in GLSL (c code)
@@ -16,7 +17,7 @@ public:
 	virtual u32* Serialize(u32* pBuffer) = 0;
 
 	// This should be overridden to read in the contents of this vector primitive from an SVG file (xml file).
-	// This should start reading from right after the associated tag. i.e reading in a circle will start after "<ellipse"
+	// This should start reading from right after the associated tag. i.e reading in a circle will start after "<circle"
 	virtual std::istream& PopulateFromFile(std::istream& stream) = 0;
 
 

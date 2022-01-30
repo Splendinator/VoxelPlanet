@@ -5,14 +5,13 @@
 #include "../Graphics/Camera.h"
 #include "../Graphics/VulkanUtils.h"
 #include "DomImport/DomImport.h"
+#include "DomMath/Mat4.h"
+#include "DomMath/Math.h"
 #include "DomWindow/DomWindow.h"
+#include "RendererObject.h"
+#include "VectorArt.h"
 
 #include <vulkan/vulkan_win32.h>
-
-/// #TEMP: Remove this, just testing
-#include "VectorPrimitiveCircle.h"
-#include "VectorPrimitiveLayer.h"
-#include "VectorPrimitiveFactoryManager.h"
 
 namespace
 {
@@ -20,6 +19,18 @@ namespace
 	struct Vertex
 	{
 		float pos[3];
+		float uv[2];
+	};
+
+	// Struct descriving a single rendered object
+	struct RenderedObjectEntry
+	{
+		std::string fileName;
+		VectorArt vectorArt;
+		VkDescriptorSet handleDescriptorSet = VK_NULL_HANDLE; // Descriptor set to bind
+		VkBuffer handleBuffer = VK_NULL_HANDLE; // Buffer big enough to hold serilized vector art
+		VkDeviceMemory handleDeviceMemory = VK_NULL_HANDLE; // Memory to hold buffer
+		std::vector<std::unique_ptr<RendererObject>> rendererObjects; // #TODO: This memory will be fragmented to FUCK and accessed every frame, we need an allocator later on
 	};
 
 	// #TODO: These needs to be grabbed from the surface
@@ -51,17 +62,19 @@ namespace
 	VkSwapchainKHR CreateSwapchain();
 
 	VkBuffer CreateVertexBuffer();
-	VkBuffer CreateUniformBuffer();
+	VkBuffer CreateUniformBuffer(size_t size);
 
 	VkRenderPass CreateRenderPass();
 
 	VkDescriptorPool CreateDescriptorPool();
 
-	VkDescriptorSetLayout CreateDescriptorSetLayout();
+	VkDescriptorSetLayout CreateDescriptorSetLayout(VkShaderStageFlagBits shaderStage, uint32_t bindingNumber);
 
-	VkDescriptorSet CreateDescriptorSet();
+	VkDescriptorSet CreateDescriptorSet(VkDescriptorSetLayout layout);
 
-	void UpdateVectorBuffer();
+	void UpdateVectorBuffer(RenderedObjectEntry& entry);
+	void UpdateViewBuffer(float deltaTime);
+	void UpdateProjectionBuffer();
 
 	VkPipelineLayout CreatePipelineLayout();
 
@@ -93,8 +106,11 @@ namespace
 	VkBuffer handleVertextBuffer = VK_NULL_HANDLE;
 	VkRenderPass handleRenderPass = VK_NULL_HANDLE;
 	VkDescriptorPool handleDescriptorPool = VK_NULL_HANDLE;
-	VkDescriptorSetLayout handleDescriptorSetLayout = VK_NULL_HANDLE;
-	VkDescriptorSet handleDescriptorSet = VK_NULL_HANDLE;
+	VkDescriptorSetLayout handleDescriptorSetLayoutProjection = VK_NULL_HANDLE; // Updated once at start
+	VkDescriptorSetLayout handleDescriptorSetLayoutView = VK_NULL_HANDLE; // Updated once per frame 
+	VkDescriptorSetLayout handleDescriptorSetLayoutVector = VK_NULL_HANDLE; // Updated once per vector art
+	VkDescriptorSet handleDescriptorSetProjection = VK_NULL_HANDLE;
+	VkDescriptorSet handleDescriptorSetView = VK_NULL_HANDLE;
 	VkPipelineLayout handlePipelineLayout = VK_NULL_HANDLE;
 	VkPipeline handlePipeline = VK_NULL_HANDLE;
 	VkCommandPool handleCommandPool = VK_NULL_HANDLE;
@@ -107,7 +123,10 @@ namespace
 	VkDeviceMemory handleDeviceMemoryVertex = VK_NULL_HANDLE;
 	dmut::HeapAllocSize<VkImage> handleSwapChainImages;
 	VkDeviceMemory handleDeviceMemoryVectorBuffer = VK_NULL_HANDLE;
-	VkBuffer handleBufferVector = VK_NULL_HANDLE;
+	VkDeviceMemory handleDeviceMemoryViewBuffer = VK_NULL_HANDLE;
+	VkDeviceMemory handleDeviceMemoryProjectionBuffer = VK_NULL_HANDLE;
+	VkBuffer handleBufferView = VK_NULL_HANDLE;
+	VkBuffer handleBufferProjection = VK_NULL_HANDLE;
 
 	// Unused
 	VkBuffer handleStagingBuffer = VK_NULL_HANDLE;
@@ -115,6 +134,9 @@ namespace
 
 	uint32_t deviceQueueFamilyIndex = 0;
 	const char* pShaderPath = "../Graphics/Shaders/CompiledShaders"; // compiled SPIRV files
+
+	// List of all rendered objects in the game
+	std::vector<RenderedObjectEntry> renderedObjects;
 }
 
 namespace dmgf
@@ -143,30 +165,48 @@ namespace dmgf
 		handleFrameBuffer1 = CreateFramebuffer(handleImageView1);
 		handleFrameBuffer2 = CreateFramebuffer(handleImageView2);
 		handleDescriptorPool = CreateDescriptorPool();
-		handleDescriptorSetLayout = CreateDescriptorSetLayout();
-		handleDescriptorSet = CreateDescriptorSet();
+		handleDescriptorSetLayoutProjection = CreateDescriptorSetLayout(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 0); 
+		handleDescriptorSetLayoutView = CreateDescriptorSetLayout(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 1);       
+		handleDescriptorSetLayoutVector = CreateDescriptorSetLayout(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, 0); 
+		handleDescriptorSetView = CreateDescriptorSet(handleDescriptorSetLayoutView);
+		handleDescriptorSetProjection = CreateDescriptorSet(handleDescriptorSetLayoutProjection);
 		handlePipelineLayout = CreatePipelineLayout();
 		handlePipeline = CreatePipeline();
 		handleCommandPool = CreateCommandPool();
 		handleCommandBuffer1 = CreateCommandBuffer();
 		handleCommandBuffer2 = CreateCommandBuffer();
-		handleDeviceMemoryVertexBuffer = CreateDeviceMemory(0x100); // #TODO: This number is what the error message said to put here, we need to query the VkBuffer's memory requirements
+		handleDeviceMemoryVertexBuffer = CreateDeviceMemory(0x100); // #TODO: Query memory requirements with vkGetBufferMemoryRequirements() instead of hard coding 0x100
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleVertextBuffer, handleDeviceMemoryVertexBuffer, 0), "BindVertexBuffer");
 
-		// Descriptor set uniform buffer
-		handleDeviceMemoryVectorBuffer = CreateDeviceMemory(4 * 4096);
-		handleBufferVector = CreateUniformBuffer();
-		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferVector, handleDeviceMemoryVectorBuffer, 0), "BindUniformBuffer");
-		UpdateVectorBuffer();
+		// View buffer
+		const size_t viewBufferSize = sizeof(Mat4f);
+		handleDeviceMemoryViewBuffer = CreateDeviceMemory(0x100);
+		handleBufferView = CreateUniformBuffer(viewBufferSize);
+		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferView, handleDeviceMemoryViewBuffer, 0), "BindUniformBuffer");
+
+		// Projection buffer
+		const size_t projectionBufferSize = sizeof(Mat4f);
+		handleDeviceMemoryProjectionBuffer = CreateDeviceMemory(0x100);
+		handleBufferProjection = CreateUniformBuffer(projectionBufferSize);
+		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferProjection, handleDeviceMemoryProjectionBuffer, 0), "BindUniformBuffer");
+		UpdateProjectionBuffer();
 	}
 
 	void UnInit()
 	{
+		/// #TEMP: Tear down vector of RendererObjects
+		vkDestroyBuffer(handleDevice, handleBufferProjection, nullptr);
+		vkDestroyBuffer(handleDevice, handleBufferView, nullptr);
+		vkFreeMemory(handleDevice, handleDeviceMemoryProjectionBuffer, nullptr);
+		vkFreeMemory(handleDevice, handleDeviceMemoryViewBuffer, nullptr);
+		vkFreeMemory(handleDevice, handleDeviceMemoryVectorBuffer, nullptr);
 		vkFreeMemory(handleDevice, handleDeviceMemoryVertexBuffer, nullptr);
 		vkDestroyCommandPool(handleDevice, handleCommandPool, nullptr);
 		vkDestroyPipeline(handleDevice, handlePipeline, nullptr);
 		vkDestroyPipelineLayout(handleDevice, handlePipelineLayout, nullptr);
-		vkDestroyDescriptorSetLayout(handleDevice, handleDescriptorSetLayout, nullptr);
+		vkDestroyDescriptorSetLayout(handleDevice, handleDescriptorSetLayoutVector, nullptr);
+		vkDestroyDescriptorSetLayout(handleDevice, handleDescriptorSetLayoutView, nullptr);
+		vkDestroyDescriptorSetLayout(handleDevice, handleDescriptorSetLayoutProjection, nullptr);
 		vkDestroyDescriptorPool(handleDevice, handleDescriptorPool, nullptr);
 		vkDestroyFramebuffer(handleDevice, handleFrameBuffer2, nullptr);
 		vkDestroyFramebuffer(handleDevice, handleFrameBuffer1, nullptr);
@@ -184,66 +224,42 @@ namespace dmgf
 
 	void Tick(float deltaTime)
 	{
+		UpdateViewBuffer(deltaTime);
 		SubmitDrawCommand();
 	}
 
-	Camera& GetCamera()
+	RendererObject* AddObjectFromSVG(const char* pFileName)
 	{
-		// #TODO: Delete these unused
-		return mainCamera;
-	}
+		auto result = std::find_if(renderedObjects.begin(), renderedObjects.end(), [pFileName](RenderedObjectEntry& entry)
+			{
+				return entry.fileName == pFileName;
+			});
 
-	VkDevice& GetDeviceHandle()
-	{
-		// #TODO: Delete these unused
-		return handleDevice;
-	}
+		RenderedObjectEntry* pEntry = nullptr;
 
-	VkPhysicalDevice& GetPhysicalDeviceHandle()
-	{
-		// #TODO: Delete these unused
-		return handlePhysicalDevice;
-	}
+		if (result == renderedObjects.end())
+		{
+			renderedObjects.resize(renderedObjects.size() + 1);
 
-	VkDeviceMemory& GetStagingBufferMemoryHandle()
-	{
-		// #TODO: Delete these unused
-		return handleDeviceMemoryVertexBuffer;
-	}
+			pEntry = &renderedObjects.back();
+			pEntry->fileName = pFileName;
+			pEntry->vectorArt = VectorArt(pFileName);
+			
+			// Set up vulkan handles (descriptor set + memory)
+			const size_t vectorBufferSize = sizeof(int) * 4 * 4096; // #TODO: Figure out how large the serialized vector art is
+			pEntry->handleDescriptorSet = CreateDescriptorSet(handleDescriptorSetLayoutVector);
+			pEntry->handleDeviceMemory = CreateDeviceMemory(vectorBufferSize);
+			pEntry->handleBuffer = CreateUniformBuffer(vectorBufferSize);
+			VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, pEntry->handleBuffer, pEntry->handleDeviceMemory, 0), "BindUniformBuffer");
+		}
+		else
+		{
+			pEntry = &(*result);
+		}
 
-	VkBuffer& GetStagingBufferHandle()
-	{
-		// #TODO: Delete these unused
-		return handleStagingBuffer;
-	}
+		pEntry->rendererObjects.emplace_back(std::make_unique<RendererObject>());
+		return pEntry->rendererObjects.back().get();
 
-	VkCommandPool& GetCommandPool()
-	{
-		// #TODO: Delete these unused
-		return handleCommandPool;
-	}
-
-	VkQueue& GetGraphicsQueueHandle()
-	{
-		// #TODO: Delete these unused
-		return handleGraphicsQueue;
-	}
-
-	u32 GetGraphicsQueueFamily()
-	{
-		// #TODO: Delete these unused
-		return 0;
-	}
-
-	void* AddNewObject(Texture* texture, Mesh* mesh)
-	{
-		// #TODO: Delete these unused
-		return nullptr;
-	}
-
-	void SetObjectPos(void* pHandle, const Mat4f& modelMatrix)
-	{
-		// #TODO: Delete these unused
 	}
 }
 
@@ -525,7 +541,7 @@ namespace
 		return returnedHandle;
 	}
 
-	VkBuffer CreateUniformBuffer()
+	VkBuffer CreateUniformBuffer(size_t size)
 	{
 
 		VkBufferCreateInfo createInfo = {};
@@ -533,7 +549,7 @@ namespace
 		createInfo.pNext = nullptr;
 		createInfo.flags = 0;
 		createInfo.usage = VkBufferUsageFlagBits::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-		createInfo.size = 4 * 4096;
+		createInfo.size = size;
 		createInfo.queueFamilyIndexCount = 0;
 		createInfo.pQueueFamilyIndices = nullptr;
 		createInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -602,13 +618,13 @@ namespace
 	{
 		VkDescriptorPoolSize poolSizes[] =
 		{
-			{ VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 }
+			{ VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 100 }
 		};
 
 		VkDescriptorPoolCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		createInfo.pNext = nullptr;
-		createInfo.maxSets = 1;
+		createInfo.maxSets = 100;
 		createInfo.poolSizeCount = DMUT_ARRAY_SIZE(poolSizes);
 		createInfo.pPoolSizes = poolSizes;
 
@@ -618,12 +634,12 @@ namespace
 
 	}
 
-	VkDescriptorSetLayout CreateDescriptorSetLayout()
-	{
+	VkDescriptorSetLayout CreateDescriptorSetLayout(VkShaderStageFlagBits shaderStage, uint32_t bindingNumber)
+{
 		VkDescriptorSetLayoutBinding binding;
-		binding.binding = 0;
+		binding.binding = bindingNumber;
 		binding.descriptorCount = 1;
-		binding.stageFlags = VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT; // This uniform buffer will hold the array of vector art primitives
+		binding.stageFlags = shaderStage; // This uniform buffer will hold the array of vector art primitives
 		binding.pImmutableSamplers = (VkSampler*)nullptr;
 		binding.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 
@@ -639,45 +655,101 @@ namespace
 		return returnedLayout;
 	}
 
-	VkDescriptorSet CreateDescriptorSet()
+	VkDescriptorSet CreateDescriptorSet(VkDescriptorSetLayout layout)
 	{
 		VkDescriptorSetAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		allocInfo.pNext = nullptr;
 		allocInfo.descriptorPool = handleDescriptorPool;
 		allocInfo.descriptorSetCount = 1;
-		allocInfo.pSetLayouts = &handleDescriptorSetLayout;
+		allocInfo.pSetLayouts = &layout;
 
 		VkDescriptorSet returnedLayout = VK_NULL_HANDLE;
 		VulkanUtils::ErrorCheck(vkAllocateDescriptorSets(handleDevice, &allocInfo, &returnedLayout), "DescriptorSet");
 		return returnedLayout;
 	}
 
-	void UpdateVectorBuffer()
+	void UpdateVectorBuffer(RenderedObjectEntry& entry)
 	{
 		u32 data[4096] = {};
 
-		VectorPrimitiveLayer l = VectorPrimitiveFactoryManager::ReadInFile("C:/Users/Dominic/Desktop/drawing.svg");
+		entry.vectorArt.Serialize(data);
 
 		void* pDeviceData = nullptr;
-		vkMapMemory(handleDevice, handleDeviceMemoryVectorBuffer, 0, sizeof(data), 0, &pDeviceData);
+		vkMapMemory(handleDevice, entry.handleDeviceMemory, 0, sizeof(data), 0, &pDeviceData);
 		int* pDeviceInts = (int*)pDeviceData;
 		for (int i = 0; i < 1024; ++i)
 		{
 			// #TODO: Try and understand why there's a fucking 16 byte stride or whatever in the GPU memory
 			pDeviceInts[i * 4] = data[i];
 		}
-		vkUnmapMemory(handleDevice, handleDeviceMemoryVectorBuffer);
+		vkUnmapMemory(handleDevice, entry.handleDeviceMemory);
 
 		VkDescriptorBufferInfo descriptorBufferInfo = {};
-		descriptorBufferInfo.buffer = handleBufferVector;
+		descriptorBufferInfo.buffer = entry.handleBuffer;
 		descriptorBufferInfo.offset = 0;
 		descriptorBufferInfo.range = VK_WHOLE_SIZE;
 
 		VkWriteDescriptorSet descriptorSetWrite = {};
 		descriptorSetWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorSetWrite.pNext = nullptr;
-		descriptorSetWrite.dstSet = handleDescriptorSet;
+		descriptorSetWrite.dstSet = entry.handleDescriptorSet;
+		descriptorSetWrite.dstBinding = 0;
+		descriptorSetWrite.dstArrayElement = 0;
+		descriptorSetWrite.descriptorCount = 1;
+		descriptorSetWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorSetWrite.pImageInfo = nullptr;
+		descriptorSetWrite.pBufferInfo = &descriptorBufferInfo;
+		descriptorSetWrite.pTexelBufferView = nullptr;
+		vkUpdateDescriptorSets(handleDevice, 1, &descriptorSetWrite, 0, nullptr);
+	}
+
+	void UpdateViewBuffer(float deltaTime)
+{
+		Mat4f viewMatrix = Mat4f::Identity();
+		void* pDeviceData = nullptr;
+		vkMapMemory(handleDevice, handleDeviceMemoryViewBuffer, 0, sizeof(Mat4f), 0, &pDeviceData);
+		memcpy(pDeviceData, &viewMatrix, sizeof(Mat4f));
+		vkUnmapMemory(handleDevice, handleDeviceMemoryViewBuffer);
+
+		VkDescriptorBufferInfo descriptorBufferInfo = {};
+		descriptorBufferInfo.buffer = handleBufferView;
+		descriptorBufferInfo.offset = 0;
+		descriptorBufferInfo.range = VK_WHOLE_SIZE;
+
+		VkWriteDescriptorSet descriptorSetWrite = {};
+		descriptorSetWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorSetWrite.pNext = nullptr;
+		descriptorSetWrite.dstSet = handleDescriptorSetView;
+		descriptorSetWrite.dstBinding = 1;
+		descriptorSetWrite.dstArrayElement = 0;
+		descriptorSetWrite.descriptorCount = 1;
+		descriptorSetWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorSetWrite.pImageInfo = nullptr;
+		descriptorSetWrite.pBufferInfo = &descriptorBufferInfo;
+		descriptorSetWrite.pTexelBufferView = nullptr;
+		vkUpdateDescriptorSets(handleDevice, 1, &descriptorSetWrite, 0, nullptr);
+	}
+
+	void UpdateProjectionBuffer()
+	{
+		Mat4f projectionMatrix = dmma::generateOrthoganol(0, EXTENT_WIDTH, 0, EXTENT_HEIGHT, 0.0f, 1.0f);
+		projectionMatrix.transpose();
+		
+		void* pDeviceData = nullptr;
+		vkMapMemory(handleDevice, handleDeviceMemoryProjectionBuffer, 0, sizeof(Mat4f), 0, &pDeviceData);
+		*((Mat4f*)pDeviceData) = projectionMatrix;
+		vkUnmapMemory(handleDevice, handleDeviceMemoryProjectionBuffer);
+
+		VkDescriptorBufferInfo descriptorBufferInfo = {};
+		descriptorBufferInfo.buffer = handleBufferProjection;
+		descriptorBufferInfo.offset = 0;
+		descriptorBufferInfo.range = VK_WHOLE_SIZE;
+
+		VkWriteDescriptorSet descriptorSetWrite = {};
+		descriptorSetWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorSetWrite.pNext = nullptr;
+		descriptorSetWrite.dstSet = handleDescriptorSetProjection;
 		descriptorSetWrite.dstBinding = 0;
 		descriptorSetWrite.dstArrayElement = 0;
 		descriptorSetWrite.descriptorCount = 1;
@@ -690,12 +762,22 @@ namespace
 
 	VkPipelineLayout CreatePipelineLayout()
 	{
+		// Model matrix
+		VkPushConstantRange pushConstantRange = {};
+		pushConstantRange.offset = 0;
+		pushConstantRange.size = sizeof(Mat4f); 
+		pushConstantRange.stageFlags = VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT;
+
+		VkDescriptorSetLayout layouts[] = { handleDescriptorSetLayoutProjection, handleDescriptorSetLayoutView, handleDescriptorSetLayoutVector };
+
 		VkPipelineLayoutCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		createInfo.pNext = nullptr;
 		createInfo.flags = 0;
-		createInfo.setLayoutCount = 1;
-		createInfo.pSetLayouts = &handleDescriptorSetLayout;
+		createInfo.setLayoutCount = DMUT_ARRAY_SIZE(layouts);
+		createInfo.pSetLayouts = layouts;
+		createInfo.pushConstantRangeCount = 1;
+		createInfo.pPushConstantRanges = &pushConstantRange;
 
 		VkPipelineLayout returnedLayout = VK_NULL_HANDLE;
 		VulkanUtils::ErrorCheck(vkCreatePipelineLayout(handleDevice, &createInfo, nullptr, &returnedLayout), "PipelineLayout");
@@ -798,18 +880,26 @@ namespace
 		vertexDescription.stride = sizeof(Vertex);
 		vertexDescription.inputRate = VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
 
-		VkVertexInputAttributeDescription positionAttributeDescription = {};
-		positionAttributeDescription.binding = 0;
-		positionAttributeDescription.location = 0;
-		positionAttributeDescription.offset = offsetof(Vertex, pos);
-		positionAttributeDescription.format = VK_FORMAT_R32G32B32_SFLOAT;
+		VkVertexInputAttributeDescription vertexAttributeDescriptions[2] = {};
+		
+		// Position - binding 0 location 0
+		vertexAttributeDescriptions[0].binding = 0;
+		vertexAttributeDescriptions[0].location = 0;
+		vertexAttributeDescriptions[0].offset = offsetof(Vertex, pos);
+		vertexAttributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+		
+		// UV - binding 0 location 1
+		vertexAttributeDescriptions[1].binding = 0;
+		vertexAttributeDescriptions[1].location = 1;
+		vertexAttributeDescriptions[1].offset = offsetof(Vertex, uv);
+		vertexAttributeDescriptions[1].format = VK_FORMAT_R32G32_SFLOAT;
 
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		vertexInputInfo.vertexBindingDescriptionCount = 1;
 		vertexInputInfo.pVertexBindingDescriptions = &vertexDescription; // Optional
-		vertexInputInfo.vertexAttributeDescriptionCount = 1;
-		vertexInputInfo.pVertexAttributeDescriptions = &positionAttributeDescription;
+		vertexInputInfo.vertexAttributeDescriptionCount = 2;
+		vertexInputInfo.pVertexAttributeDescriptions = vertexAttributeDescriptions;
 
 		///// The actual create structure
 		VkGraphicsPipelineCreateInfo createInfo = {};
@@ -962,16 +1052,17 @@ namespace
 		vkCmdBindVertexBuffers(handleCommandBuffer, 0, 1, &handleVertextBuffer, &vertexBufferOffset);
 		vkCmdBindPipeline(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipeline);
 
-		vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 0, 1, &handleDescriptorSet, 0, nullptr);
+		vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 0, 1, &handleDescriptorSetProjection, 0, nullptr);
+		vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 1, 1, &handleDescriptorSetView, 0, nullptr);
 
 		Vertex quad[6] =
 		{
-			{-1.0f, -1.0f, 0.0f},
-			{ 1.0f, -1.0f, 0.0f},
-			{-1.0f,  1.0f, 0.0f},
-			{ 1.0f, -1.0f, 0.0f},
-			{ 1.0f,  1.0f, 0.0f},
-			{-1.0f,  1.0f, 0.0f}
+			{ 0.0f,  0.0f, 0.0f,       0.0f, 0.0f},
+			{ 1.0f,  0.0f, 0.0f,       1.0f, 0.0f},
+			{ 0.0f,  1.0f, 0.0f,       0.0f, 1.0f},
+			{ 1.0f,  0.0f, 0.0f,       1.0f, 0.0f},
+			{ 1.0f,  1.0f, 0.0f,       1.0f, 1.0f},
+			{ 0.0f,  1.0f, 0.0f,       0.0f, 1.0f}
 		};
 
 		void* pDeviceData = nullptr;
@@ -979,8 +1070,20 @@ namespace
 		memcpy(pDeviceData, quad, sizeof(quad));
 		vkUnmapMemory(handleDevice, handleDeviceMemoryVertexBuffer);
 
-		vkCmdDraw(handleCommandBuffer, DMUT_ARRAY_SIZE(quad), 1, 0, 0);
+		for (auto& renderObject : renderedObjects)
+		{
+			UpdateVectorBuffer(renderObject);
+			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 2, 1, &renderObject.handleDescriptorSet, 0, nullptr);
 
+			for (auto& rendererObject : renderObject.rendererObjects)
+			{
+				Mat4f modelMatrix = rendererObject->GetModelMatrix();
+				vkCmdPushConstants(handleCommandBuffer, handlePipelineLayout, VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Mat4f), &modelMatrix);
+
+				vkCmdDraw(handleCommandBuffer, DMUT_ARRAY_SIZE(quad), 1, 0, 0);
+			}
+		}
+		
 		vkCmdEndRenderPass(handleCommandBuffer);
 		vkEndCommandBuffer(handleCommandBuffer);
 

@@ -5,6 +5,15 @@
 #include "DomImport/XMLUtils.h"
 #include "VectorPrimitiveFactoryCircle.h"
 #include "VectorPrimitiveFactoryLayer.h"
+#include "VectorPrimitiveFactoryRectangle.h"
+
+VectorPrimitiveLayer::~VectorPrimitiveLayer()
+{
+	for (VectorPrimitiveBase* child : children)
+	{
+		delete child;
+	}
+}
 
 u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 {
@@ -26,11 +35,13 @@ std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 
 	static VectorPrimitiveFactoryLayer factoryLayer;
 	static VectorPrimitiveFactoryCircle factoryCircle;
+	static VectorPrimitiveFactoryRectangle factoryRectangle;
 
 	static FactoryEntry factories[]
 	{
 		{"g", &factoryLayer},
-		{"ellipse", &factoryCircle},
+		{"circle", &factoryCircle},
+		{"rect", &factoryRectangle},
 	};
 
 	auto FindFactory = [](std::string tag) -> VectorPrimitiveFactoryBase*

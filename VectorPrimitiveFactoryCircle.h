@@ -4,7 +4,7 @@
 
 /** VectorPrimitiveFactoryCircle
 *
-* This class is used for #TEMP
+* This class is used to create a VectorPrimitiveCircle
 */
 class VectorPrimitiveFactoryCircle : public VectorPrimitiveFactoryBase
 {

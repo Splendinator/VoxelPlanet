@@ -8,8 +8,7 @@ public:
 	std::istream& PopulateFromFile(std::istream& stream) override;
 	//~ End VectorPrimitiveBase Interface
 
-/// #TEMP: private: 
-
+private: 
 	// Colour
 	u32 red = 0;
 	u32 green = 0;

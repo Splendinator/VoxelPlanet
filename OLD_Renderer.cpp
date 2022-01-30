@@ -212,7 +212,7 @@ VulkanModuleImage moduleBrickWallImage(
 	VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED,
 	&vulkanDevice
 );
-/// #TEMP: Make this into a staging buffer?
+/// TEMP: Make this into a staging buffer?
 VulkanModuleDeviceMemoryImage moduleBrickWallMemory(VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &vulkanPhysicalDevice, &vulkanDevice, &moduleBrickWallImage);
 VulkanModuleImageView moduleBrickWallImageView(VkFormat::VK_FORMAT_R8G8B8A8_UNORM, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT, &vulkanDevice, &moduleBrickWallImage);
 
@@ -542,8 +542,8 @@ struct ObjectEntry
 };
 
 // Vector of all the objects 
-/// #TODO: sort this by meshes and then textures and use proper instanced rendering and that
-/// #TEMP: need to delete the objects I s'pose
+/// TODO: sort this by meshes and then textures and use proper instanced rendering and that
+/// TEMP: need to delete the objects I s'pose
 std::vector<ObjectEntry*> objects;
 
 void* dmgf::AddNewObject(Texture* texture, Mesh* mesh)
@@ -626,7 +626,7 @@ void dmgf::Tick(float deltaTime)
 
 	vkCmdBeginRenderPass(commandBuffer.GetHandle(), &renderPassBegin, VK_SUBPASS_CONTENTS_INLINE);
 
-	/// #TEMP: This needs to get all thingies with the same vertex data + texture combo and split them into seperate vectors that can be instanced.
+	/// TEMP: This needs to get all thingies with the same vertex data + texture combo and split them into seperate vectors that can be instanced.
 
 	///// Prepare model matrices
 	///for (int i = 0; i < objects.size(); ++i)

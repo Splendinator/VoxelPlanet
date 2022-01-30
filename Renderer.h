@@ -1,12 +1,9 @@
 #pragma once
 
-#include "DomUtils/DomUtils.h"
 #include "DomMath/Mat4.h"
+#include "DomUtils/DomUtils.h"
 
-class Camera;
-class Mesh;
-class Texture;
-struct ObjectEntry;
+class RendererObject;
 
 namespace dmgf
 {
@@ -19,19 +16,6 @@ namespace dmgf
 	// Once per frame
 	void Tick(float deltaTime);
 
-	Camera& GetCamera();
-
-	// Getters for various parts of the vulkan pipeline
-	VkDevice& GetDeviceHandle();
-	VkPhysicalDevice& GetPhysicalDeviceHandle();
-	VkDeviceMemory& GetStagingBufferMemoryHandle();
-	VkBuffer& GetStagingBufferHandle();
-	VkCommandPool& GetCommandPool();
-	
-	VkQueue& GetGraphicsQueueHandle();
-	u32 GetGraphicsQueueFamily(); // Get the index of the queue family that we are using as the graphics queue
-
-	// Add a new object to render. This returns a pointer handler that is used to update this objects position etc at runtime
-	void* AddNewObject(Texture* texture, Mesh* mesh);
-	void SetObjectPos(void* pHandle, const Mat4f& modelMatrix);
+	// Add object from an svg file
+	RendererObject* AddObjectFromSVG(const char* pFileName);
 }

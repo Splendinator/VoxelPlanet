@@ -125,12 +125,13 @@
       <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>DomImport.lib;DomLog.lib;DomWindow.lib;Graphics.lib;tensorflow.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DomImport.lib;DomLog.lib;DomWindow.lib;DomUtils.lib;Graphics.lib;tensorflow.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <StackReserveSize>16777216</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
@@ -145,6 +146,7 @@
     <ClCompile Include="PlanetGenerate.cpp" />
     <ClCompile Include="OLD_Renderer.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RendererObject.cpp" />
     <ClCompile Include="ResourceLoader.cpp" />
     <ClCompile Include="StbImageCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -152,7 +154,7 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VectorPrimitiveBase.cpp" />
     <ClCompile Include="VectorPrimitiveCircle.cpp" />
-    <ClCompile Include="VectorPrimitiveFactoryManager.cpp" />
+    <ClCompile Include="VectorArt.cpp" />
     <ClCompile Include="VectorPrimitiveFactoryBase.cpp" />
     <ClCompile Include="VectorPrimitiveFactoryCircle.cpp" />
     <ClCompile Include="VectorPrimitiveFactoryLayer.cpp" />
@@ -162,17 +164,19 @@
     <ClCompile Include="VectorPrimitiveShape.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ECS.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RendererObject.h" />
     <ClInclude Include="ResourceLoader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="tinyobj_loader.h" />
     <ClInclude Include="VectorPrimitiveBase.h" />
     <ClInclude Include="VectorPrimitiveCircle.h" />
-    <ClInclude Include="VectorPrimitiveFactoryManager.h" />
+    <ClInclude Include="VectorArt.h" />
     <ClInclude Include="VectorPrimitiveFactoryBase.h" />
     <ClInclude Include="VectorPrimitiveFactoryCircle.h" />
     <ClInclude Include="VectorPrimitiveFactoryLayer.h" />

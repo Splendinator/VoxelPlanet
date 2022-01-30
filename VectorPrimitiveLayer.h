@@ -10,6 +10,8 @@
 class VectorPrimitiveLayer : public VectorPrimitiveBase
 {
 public:
+	~VectorPrimitiveLayer();
+
 	//~ Begin VectorPrimitiveBase Interface
 	u32* Serialize(u32* pBuffer) override;
 	std::istream& PopulateFromFile(std::istream& stream) override;
