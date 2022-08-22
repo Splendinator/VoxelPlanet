@@ -16,8 +16,14 @@ void RendererObject::SetSize(float x, float y)
 	UpdateModelMatrix();
 }
 
+void RendererObject::SetRenderPriority(float inDepth)
+{
+	renderPriority = inDepth;
+	UpdateModelMatrix();
+}
+
 void RendererObject::UpdateModelMatrix()
 {
-	modelMatrix = Mat4f::getScale({ scaleX, scaleY, 1.0f }) * Mat4f::getTranslation({ posX, posY, 0.0f });
+	modelMatrix = Mat4f::getScale({ scaleX, scaleY, 1.0f}) * Mat4f::getTranslation({ posX, posY, -renderPriority });
 	modelMatrix.transpose();
 }

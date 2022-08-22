@@ -13,6 +13,7 @@ public:
 
 	void SetPosition(float x, float y);
 	void SetSize(float x, float y);
+	void SetRenderPriority(float inRenderPriority); // Render priority should be between 0 and 1, 1.0f rendering on top of 0.0f
 
 	Mat4f& GetModelMatrix() { return modelMatrix; }
 
@@ -26,6 +27,7 @@ private:
 	float posY = 0.0f;
 	float scaleX = 0.0f;
 	float scaleY = 0.0f;
+	float renderPriority = 0.0f;
 
 	Mat4f modelMatrix = Mat4f::Identity();
 };

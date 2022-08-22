@@ -13,6 +13,10 @@
 
 #include <vulkan/vulkan_win32.h>
 
+#ifdef DOMIMGUI
+#include "imgui_impl_vulkan.h"
+#endif //~ #ifdef DOMIMGUI
+
 namespace
 {
 	// Struct describing a single vertex
@@ -45,6 +49,7 @@ namespace
 	VkInstance CreateInstance();
 
 	void PrintDeviceMemoryInfo(VkPhysicalDevice inHandlePhysicalDevice);
+	uint32_t FindMemoryIndex(VkMemoryPropertyFlags memoryFlags, uint32_t memoryTypeBits = (uint32_t)-1);
 	VkPhysicalDevice PickPhysicalDevice(const dmut::HeapAllocSize<VkPhysicalDevice>& physicalDevices);
 	VkPhysicalDevice CreatePhysicalDevice();
 
@@ -84,13 +89,16 @@ namespace
 
 	VkCommandBuffer CreateCommandBuffer();
 
-	VkDeviceMemory CreateDeviceMemory(VkDeviceSize memorySize);
+	// memoryTypeBits are optional -- It is a bitfield that says which memory index we can use i.e 4th bit being 1 means we can use memory 4
+	VkDeviceMemory CreateDeviceMemory(VkDeviceSize memorySize, VkMemoryPropertyFlags memoryFlags, uint32_t memoryTypeBits = (uint32_t)-1);
+	VkDeviceMemory CreateDeviceMemoryFromImage(VkImage image);
+	void BindImageMemory(VkImage image, VkDeviceMemory memory);
 
-	VkImage CreateImage();
+	VkImage CreateImage(VkFormat format, uint32_t width, uint32_t height, VkImageUsageFlagBits usage);
 
-	VkImageView CreateImageView(VkImage inHandleImage);
+	VkImageView CreateImageView(VkImage inHandleImage, VkImageAspectFlags aspectMask, VkFormat format);
 
-	VkFramebuffer CreateFramebuffer(VkImageView inHandleImageView);
+	VkFramebuffer CreateFramebuffer(dmut::HeapAllocSize<VkImageView> inHandleImageViews);
 
 	void SubmitDrawCommand();
 
@@ -122,11 +130,14 @@ namespace
 	VkCommandBuffer handleCommandBuffer2 = VK_NULL_HANDLE;
 	VkDeviceMemory handleDeviceMemoryVertex = VK_NULL_HANDLE;
 	dmut::HeapAllocSize<VkImage> handleSwapChainImages;
-	VkDeviceMemory handleDeviceMemoryVectorBuffer = VK_NULL_HANDLE;
 	VkDeviceMemory handleDeviceMemoryViewBuffer = VK_NULL_HANDLE;
 	VkDeviceMemory handleDeviceMemoryProjectionBuffer = VK_NULL_HANDLE;
 	VkBuffer handleBufferView = VK_NULL_HANDLE;
 	VkBuffer handleBufferProjection = VK_NULL_HANDLE;
+	VkDeviceMemory handleDepthMemory = VK_NULL_HANDLE;
+	VkBuffer handleDepthBuffer = VK_NULL_HANDLE;
+	VkImage handleDepthImage = VK_NULL_HANDLE;
+	VkImageView handleDepthImageView = VK_NULL_HANDLE;
 
 	// Unused
 	VkBuffer handleStagingBuffer = VK_NULL_HANDLE;
@@ -137,6 +148,8 @@ namespace
 
 	// List of all rendered objects in the game
 	std::vector<RenderedObjectEntry> renderedObjects;
+
+	Mat4f viewMatrix = Mat4f::Identity();
 }
 
 namespace dmgf
@@ -160,10 +173,26 @@ namespace dmgf
 		handleVertextBuffer = CreateVertexBuffer();
 		handleRenderPass = CreateRenderPass();
 		DOMASSERT(handleSwapChainImages.GetSize() == 2, "We're fucked if this isn't 2, I can't be arsed to program a for loop");
-		handleImageView1 = CreateImageView(handleSwapChainImages[0]);
-		handleImageView2 = CreateImageView(handleSwapChainImages[1]);
-		handleFrameBuffer1 = CreateFramebuffer(handleImageView1);
-		handleFrameBuffer2 = CreateFramebuffer(handleImageView2);
+		
+		handleDepthImage = CreateImage(VkFormat::VK_FORMAT_D24_UNORM_S8_UINT, EXTENT_WIDTH, EXTENT_HEIGHT, VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+		handleDepthMemory = CreateDeviceMemoryFromImage(handleDepthImage);
+		BindImageMemory(handleDepthImage, handleDepthMemory);
+		handleDepthImageView = CreateImageView(handleDepthImage, VkImageAspectFlagBits::VK_IMAGE_ASPECT_DEPTH_BIT | VkImageAspectFlagBits::VK_IMAGE_ASPECT_STENCIL_BIT, VkFormat::VK_FORMAT_D24_UNORM_S8_UINT);
+		
+
+		handleImageView1 = CreateImageView(handleSwapChainImages[0], VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT, VkFormat::VK_FORMAT_B8G8R8A8_UNORM);
+		handleImageView2 = CreateImageView(handleSwapChainImages[1], VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT, VkFormat::VK_FORMAT_B8G8R8A8_UNORM);
+		
+		dmut::HeapAllocSize<VkImageView> frameBufferOneParams(2);
+		frameBufferOneParams[0] = handleImageView1;
+		frameBufferOneParams[1] = handleDepthImageView;
+		handleFrameBuffer1 = CreateFramebuffer(std::move(frameBufferOneParams));
+		
+		dmut::HeapAllocSize<VkImageView> frameBufferTwoParams(2);
+		frameBufferTwoParams[0] = handleImageView2;
+		frameBufferTwoParams[1] = handleDepthImageView;
+		handleFrameBuffer2 = CreateFramebuffer(std::move(frameBufferTwoParams));
+
 		handleDescriptorPool = CreateDescriptorPool();
 		handleDescriptorSetLayoutProjection = CreateDescriptorSetLayout(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 0); 
 		handleDescriptorSetLayoutView = CreateDescriptorSetLayout(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 1);       
@@ -175,31 +204,92 @@ namespace dmgf
 		handleCommandPool = CreateCommandPool();
 		handleCommandBuffer1 = CreateCommandBuffer();
 		handleCommandBuffer2 = CreateCommandBuffer();
-		handleDeviceMemoryVertexBuffer = CreateDeviceMemory(0x100); // #TODO: Query memory requirements with vkGetBufferMemoryRequirements() instead of hard coding 0x100
+		handleDeviceMemoryVertexBuffer = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT); // #TODO: Query memory requirements with vkGetBufferMemoryRequirements() instead of hard coding 0x100
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleVertextBuffer, handleDeviceMemoryVertexBuffer, 0), "BindVertexBuffer");
 
 		// View buffer
 		const size_t viewBufferSize = sizeof(Mat4f);
-		handleDeviceMemoryViewBuffer = CreateDeviceMemory(0x100);
+		handleDeviceMemoryViewBuffer = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		handleBufferView = CreateUniformBuffer(viewBufferSize);
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferView, handleDeviceMemoryViewBuffer, 0), "BindUniformBuffer");
 
 		// Projection buffer
 		const size_t projectionBufferSize = sizeof(Mat4f);
-		handleDeviceMemoryProjectionBuffer = CreateDeviceMemory(0x100);
+		handleDeviceMemoryProjectionBuffer = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		handleBufferProjection = CreateUniformBuffer(projectionBufferSize);
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferProjection, handleDeviceMemoryProjectionBuffer, 0), "BindUniformBuffer");
 		UpdateProjectionBuffer();
+
+#ifdef DOMIMGUI
+		
+		// Initialise
+		{
+			ImGui_ImplVulkan_InitInfo imGuiInitParams = {};
+			imGuiInitParams.Instance = handleInstance;
+			imGuiInitParams.PhysicalDevice = handlePhysicalDevice;
+			imGuiInitParams.Device = handleDevice;
+			imGuiInitParams.QueueFamily = deviceQueueFamilyIndex;
+			imGuiInitParams.Queue = handleGraphicsQueue;
+			imGuiInitParams.DescriptorPool = handleDescriptorPool;
+			imGuiInitParams.Subpass = 1;
+			imGuiInitParams.MinImageCount = 2;
+			imGuiInitParams.ImageCount = 2;
+			imGuiInitParams.MSAASamples = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
+
+			ImGui_ImplVulkan_Init(&imGuiInitParams, handleRenderPass);
+		}
+		
+		// Load font texture into memory with command buffer
+		{
+			VkCommandBufferBeginInfo beginInfo = {};
+			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+			beginInfo.flags = VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+			vkBeginCommandBuffer(handleCommandBuffer1, &beginInfo);
+			ImGui_ImplVulkan_CreateFontsTexture(handleCommandBuffer1);
+			vkEndCommandBuffer(handleCommandBuffer1);
+
+			VkSubmitInfo submitInfo = {};
+			submitInfo.pNext = nullptr;
+			submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+			submitInfo.commandBufferCount = 1;
+			submitInfo.pCommandBuffers = &handleCommandBuffer1;
+			submitInfo.waitSemaphoreCount = 0;
+			submitInfo.pWaitSemaphores = nullptr;
+			submitInfo.pWaitDstStageMask = nullptr;
+			submitInfo.signalSemaphoreCount = 0;
+			submitInfo.pSignalSemaphores = nullptr;
+
+			VkFence handleFence;
+			VkFenceCreateInfo fenceInfo;
+			fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+			fenceInfo.pNext = nullptr;
+			fenceInfo.flags = 0;
+			VulkanUtils::ErrorCheck(vkCreateFence(handleDevice, &fenceInfo, nullptr, &handleFence));
+			VulkanUtils::ErrorCheck(vkQueueSubmit(handleGraphicsQueue, 1, &submitInfo, handleFence));
+			vkWaitForFences(handleDevice, 1, &handleFence, true, UINT64_MAX);
+
+			ImGui_ImplVulkan_DestroyFontUploadObjects();
+		}
+#endif //~ #ifdef DOMIMGUI
 	}
 
 	void UnInit()
 	{
-		/// #TEMP: Tear down vector of RendererObjects
+#ifdef DOMIMGUI
+		ImGui_ImplVulkan_Shutdown();
+#endif //~ #ifdef DOMIMGUI
+
+		for (RenderedObjectEntry& entry : renderedObjects)
+		{
+			vkDestroyBuffer(handleDevice, entry.handleBuffer, nullptr);
+			vkFreeMemory(handleDevice, entry.handleDeviceMemory, nullptr);
+		}
+		
 		vkDestroyBuffer(handleDevice, handleBufferProjection, nullptr);
 		vkDestroyBuffer(handleDevice, handleBufferView, nullptr);
 		vkFreeMemory(handleDevice, handleDeviceMemoryProjectionBuffer, nullptr);
 		vkFreeMemory(handleDevice, handleDeviceMemoryViewBuffer, nullptr);
-		vkFreeMemory(handleDevice, handleDeviceMemoryVectorBuffer, nullptr);
 		vkFreeMemory(handleDevice, handleDeviceMemoryVertexBuffer, nullptr);
 		vkDestroyCommandPool(handleDevice, handleCommandPool, nullptr);
 		vkDestroyPipeline(handleDevice, handlePipeline, nullptr);
@@ -226,6 +316,38 @@ namespace dmgf
 	{
 		UpdateViewBuffer(deltaTime);
 		SubmitDrawCommand();
+#ifdef DOMIMGUI
+		ImGui_ImplVulkan_NewFrame();
+
+		///ImGui::Render();
+		///VkCommandBufferBeginInfo beginInfo = {};
+		///beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		///beginInfo.flags = VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+		///
+		///vkBeginCommandBuffer(handleCommandBuffer1, &beginInfo);
+		///ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), handleCommandBuffer1);
+		///vkEndCommandBuffer(handleCommandBuffer1);
+		///
+		///VkSubmitInfo submitInfo = {};
+		///submitInfo.pNext = nullptr;
+		///submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		///submitInfo.commandBufferCount = 1;
+		///submitInfo.pCommandBuffers = &handleCommandBuffer1;
+		///submitInfo.waitSemaphoreCount = 0;
+		///submitInfo.pWaitSemaphores = nullptr;
+		///submitInfo.pWaitDstStageMask = nullptr;
+		///submitInfo.signalSemaphoreCount = 0;
+		///submitInfo.pSignalSemaphores = nullptr;
+		///
+		///VkFence handleFence;
+		///VkFenceCreateInfo fenceInfo;
+		///fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+		///fenceInfo.pNext = nullptr;
+		///fenceInfo.flags = 0;
+		///VulkanUtils::ErrorCheck(vkCreateFence(handleDevice, &fenceInfo, nullptr, &handleFence));
+		///VulkanUtils::ErrorCheck(vkQueueSubmit(handleGraphicsQueue, 1, &submitInfo, handleFence));
+		///vkWaitForFences(handleDevice, 1, &handleFence, true, UINT64_MAX);
+#endif //~ #ifdef DOMIMGUI
 	}
 
 	RendererObject* AddObjectFromSVG(const char* pFileName)
@@ -248,7 +370,7 @@ namespace dmgf
 			// Set up vulkan handles (descriptor set + memory)
 			const size_t vectorBufferSize = sizeof(int) * 4 * 4096; // #TODO: Figure out how large the serialized vector art is
 			pEntry->handleDescriptorSet = CreateDescriptorSet(handleDescriptorSetLayoutVector);
-			pEntry->handleDeviceMemory = CreateDeviceMemory(vectorBufferSize);
+			pEntry->handleDeviceMemory = CreateDeviceMemory(vectorBufferSize, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 			pEntry->handleBuffer = CreateUniformBuffer(vectorBufferSize);
 			VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, pEntry->handleBuffer, pEntry->handleDeviceMemory, 0), "BindUniformBuffer");
 		}
@@ -259,7 +381,28 @@ namespace dmgf
 
 		pEntry->rendererObjects.emplace_back(std::make_unique<RendererObject>());
 		return pEntry->rendererObjects.back().get();
+	}
 
+
+	void RemoveObject(RendererObject* pRendererObject)
+	{
+		for (auto& renderedObject : renderedObjects)
+		{
+			for (auto it = renderedObject.rendererObjects.begin(); it != renderedObject.rendererObjects.end(); ++it)
+			{
+				if ((*it).get() == pRendererObject)
+				{
+					renderedObject.rendererObjects.erase(it);
+					return;
+				}
+			}
+		}
+	}
+
+	void SetCameraCenter(float x, float y)
+	{
+		viewMatrix = Mat4f::getTranslation({ -x, -y, 0.0f });
+		viewMatrix.transpose();
 	}
 }
 
@@ -337,11 +480,34 @@ namespace
 		}
 	}
 
+	uint32_t FindMemoryIndex(VkMemoryPropertyFlags memoryFlags, uint32_t memoryTypeBits /*= (uint32_t)-1*/)
+	{
+		VkPhysicalDeviceMemoryProperties memoryProperties;
+		vkGetPhysicalDeviceMemoryProperties(handlePhysicalDevice, &memoryProperties);
+
+		// See VkMemoryPropertyFlags for what the flags mean
+		for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; ++i)
+		{
+			if (!((1 << i) & memoryTypeBits))
+			{
+				// Not valid memory index
+				continue;
+			}
+			if ((memoryProperties.memoryTypes[i].propertyFlags & memoryFlags) == memoryFlags)
+			{
+				return i;
+			}
+		}
+
+		DOMLOG_WARN("Unable to find memory with flags", memoryFlags);
+		return VK_MAX_MEMORY_TYPES;
+	}
+
 	VkPhysicalDevice PickPhysicalDevice(const dmut::HeapAllocSize<VkPhysicalDevice>& physicalDevices)
 	{
 		DOMASSERT(physicalDevices.GetSize() > 0, "This isn't a text adventure game, you need a graphics card");
 
-		/// #TODO: Actually pick the best one
+		// #TODO: Actually pick the best one
 		return physicalDevices[0];
 	}
 
@@ -561,20 +727,37 @@ namespace
 
 	VkRenderPass CreateRenderPass()
 	{
-		VkAttachmentDescription attachment = {};
-		attachment.flags = 0;
-		attachment.format = VkFormat::VK_FORMAT_B8G8R8A8_UNORM;
-		attachment.samples = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
-		attachment.loadOp = VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR;
-		attachment.storeOp = VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE;
-		attachment.stencilLoadOp = VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		attachment.stencilStoreOp = VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachment.initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
-		attachment.finalLayout = VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		VkAttachmentDescription attachments[2] = {};
+		
+		// Colour Attachment
+		attachments[0].flags = 0;
+		attachments[0].format = VkFormat::VK_FORMAT_B8G8R8A8_UNORM;
+		attachments[0].samples = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
+		attachments[0].loadOp = VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR;
+		attachments[0].storeOp = VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE;
+		attachments[0].stencilLoadOp = VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		attachments[0].stencilStoreOp = VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		attachments[0].initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
+		attachments[0].finalLayout = VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		
+		// Depth Attachment
+		attachments[1].flags = 0;
+		attachments[1].format = VkFormat::VK_FORMAT_D24_UNORM_S8_UINT;
+		attachments[1].samples = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
+		attachments[1].loadOp = VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR;
+		attachments[1].storeOp = VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE;
+		attachments[1].stencilLoadOp = VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		attachments[1].stencilStoreOp = VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		attachments[1].initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
+		attachments[1].finalLayout = VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 		VkAttachmentReference colourAttachment = {};
 		colourAttachment.attachment = 0;
 		colourAttachment.layout = VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		VkAttachmentReference depthAttachment = {};
+		depthAttachment.attachment = 1;
+		depthAttachment.layout = VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 		VkSubpassDescription subpass = {};
 		subpass.flags = 0;
@@ -584,33 +767,63 @@ namespace
 		subpass.colorAttachmentCount = 1;
 		subpass.pColorAttachments = &colourAttachment;
 		subpass.pResolveAttachments = nullptr;
-		subpass.pDepthStencilAttachment = nullptr;
+		subpass.pDepthStencilAttachment = &depthAttachment;
 		subpass.preserveAttachmentCount = 0;
 		subpass.pPreserveAttachments = nullptr;
 
-		///VkSubpassDependency dependency = {};
-		///dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-		///dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
-		///dependency.srcStageMask = VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-		///dependency.dstStageMask = VkPipelineStageFlagBits::VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT;
-		///dependency.srcAccessMask = 0;
-		///dependency.dstAccessMask = VkAccessFlagBits::VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		///dependency.dependencyFlags = 0;
+#ifdef DOMIMGUI
+		// Second subpass for rendering ImGUI
+
+		VkSubpassDescription subpassImGui = {};
+		subpassImGui.flags = 0;
+		subpassImGui.pipelineBindPoint = VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpassImGui.inputAttachmentCount = 0;
+		subpassImGui.pInputAttachments = nullptr;
+		subpassImGui.colorAttachmentCount = 1;
+		subpassImGui.pColorAttachments = &colourAttachment;
+		subpassImGui.pResolveAttachments = nullptr;
+		subpassImGui.pDepthStencilAttachment = nullptr;
+		subpassImGui.preserveAttachmentCount = 0;
+		subpassImGui.pPreserveAttachments = nullptr;
+
+		VkSubpassDependency dependency = {};
+		dependency.srcSubpass = 0;
+		dependency.dstSubpass = 1;
+		dependency.srcStageMask = VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		dependency.dstStageMask = VkPipelineStageFlagBits::VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT;
+		dependency.srcAccessMask = 0;
+		dependency.dstAccessMask = VkAccessFlagBits::VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		dependency.dependencyFlags = 0;
+#endif //~ #ifdef DOMIMGUI
+
+		VkSubpassDescription subpasses[] = 
+		{ 
+			subpass
+#ifdef DOMIMGUI
+			, subpassImGui
+#endif //~ #ifdef DOMIMGUI
+		};
+
+		VkSubpassDependency dependencies[] =
+		{
+#ifdef DOMIMGUI
+			dependency
+#endif //~ #ifdef DOMIMGUI
+		};
 
 		VkRenderPassCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 		createInfo.pNext = nullptr;
 		createInfo.flags = 0;
-		createInfo.attachmentCount = 1;
-		createInfo.pAttachments = &attachment;
-		createInfo.subpassCount = 1;
-		createInfo.pSubpasses = &subpass;
-		createInfo.dependencyCount = 0;
-		createInfo.pDependencies = nullptr;
-
+		createInfo.attachmentCount = 2;
+		createInfo.pAttachments = attachments;
+		createInfo.subpassCount = DMUT_ARRAY_SIZE(subpasses);
+		createInfo.pSubpasses = subpasses;
+		createInfo.dependencyCount = DMUT_ARRAY_SIZE(dependencies);
+		createInfo.pDependencies = dependencies;
 
 		VkRenderPass returnedHandle = VK_NULL_HANDLE;
-		VulkanUtils::ErrorCheck(vkCreateRenderPass(handleDevice, &createInfo, nullptr, &returnedHandle), "RenderPass");
+ 		VulkanUtils::ErrorCheck(vkCreateRenderPass(handleDevice, &createInfo, nullptr, &returnedHandle), "RenderPass");
 		return returnedHandle;
 	}
 
@@ -619,6 +832,11 @@ namespace
 		VkDescriptorPoolSize poolSizes[] =
 		{
 			{ VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 100 }
+
+#ifdef DOMIMGUI
+			,
+			{ VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}
+#endif //~ #ifdef DOMIMGUI
 		};
 
 		VkDescriptorPoolCreateInfo createInfo = {};
@@ -706,7 +924,6 @@ namespace
 
 	void UpdateViewBuffer(float deltaTime)
 {
-		Mat4f viewMatrix = Mat4f::Identity();
 		void* pDeviceData = nullptr;
 		vkMapMemory(handleDevice, handleDeviceMemoryViewBuffer, 0, sizeof(Mat4f), 0, &pDeviceData);
 		memcpy(pDeviceData, &viewMatrix, sizeof(Mat4f));
@@ -952,41 +1169,69 @@ namespace
 		return returnedHandle;
 	}
 
-	VkDeviceMemory CreateDeviceMemory(VkDeviceSize memorySize)
+	VkDeviceMemory CreateDeviceMemory(VkDeviceSize memorySize, VkMemoryPropertyFlags memoryFlags, uint32_t memoryTypeBits /*= (uint32_t)-1*/)
 	{
 		VkMemoryAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		allocInfo.pNext = nullptr;
 		allocInfo.allocationSize = memorySize;
-		allocInfo.memoryTypeIndex = 8; // #TODO: Util function to pick the physical device memory that has certain flags (in this case 8 == HOST_VISIBLE)
+		allocInfo.memoryTypeIndex = FindMemoryIndex(memoryFlags);
 
 		VkDeviceMemory returnedHandle = VK_NULL_HANDLE;
 		VulkanUtils::ErrorCheck(vkAllocateMemory(handleDevice, &allocInfo, nullptr, &returnedHandle), "DeviceMemory");
 		return returnedHandle;
 	}
 
-	VkImage CreateImage()
+	VkDeviceMemory CreateDeviceMemoryFromImage(VkImage image)
 	{
-		// #TODO: Do this if we want textures
-		DOMASSERT(false, "Implement this cunt");
+		VkMemoryRequirements requirements = {};
+		vkGetImageMemoryRequirements(handleDevice, image, &requirements);
+
+		return CreateDeviceMemory(requirements.size, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, requirements.memoryTypeBits);
+	}
+
+	void BindImageMemory(VkImage image, VkDeviceMemory memory)
+	{
+		VulkanUtils::ErrorCheck(vkBindImageMemory(handleDevice, image, memory, 0));
+	}
+
+	VkImage CreateImage(VkFormat format, uint32_t width, uint32_t height, VkImageUsageFlagBits usage)
+	{
+		VkImageCreateInfo createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		createInfo.pNext = nullptr;
+		createInfo.flags = 0;
+		createInfo.imageType = VkImageType::VK_IMAGE_TYPE_2D;
+		createInfo.format = format;
+		createInfo.extent = {width, height, 1};
+		createInfo.mipLevels = 1;
+		createInfo.arrayLayers = 1;
+		createInfo.samples = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
+		createInfo.tiling = VkImageTiling::VK_IMAGE_TILING_OPTIMAL;
+		createInfo.usage = usage;
+		createInfo.sharingMode = VkSharingMode::VK_SHARING_MODE_EXCLUSIVE;
+		createInfo.queueFamilyIndexCount = 1;
+		createInfo.pQueueFamilyIndices = &deviceQueueFamilyIndex;
+		createInfo.initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
+
 		VkImage returnedHandle = VK_NULL_HANDLE;
-		///VulkanUtils::ErrorCheck(vkCreateImage(handleDevice, &createInfo, nullptr, &returnedHandle), "Image");
+		VulkanUtils::ErrorCheck(vkCreateImage(handleDevice, &createInfo, nullptr, &returnedHandle), "Image");
 		return returnedHandle;
 	}
 
-	VkImageView CreateImageView(VkImage inHandleImage)
+	VkImageView CreateImageView(VkImage inHandleImage, VkImageAspectFlags aspectMask, VkFormat format)
 	{
 		VkImageViewCreateInfo createInfo = {};
 
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		createInfo.image = inHandleImage;
 		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		createInfo.format = VkFormat::VK_FORMAT_B8G8R8A8_UNORM;
+		createInfo.format = format;
 		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
 		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
 		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
 		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.subresourceRange.aspectMask = VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT;
+		createInfo.subresourceRange.aspectMask = aspectMask;
 		createInfo.subresourceRange.baseMipLevel = 0;
 		createInfo.subresourceRange.levelCount = 1;
 		createInfo.subresourceRange.baseArrayLayer = 0;
@@ -997,14 +1242,14 @@ namespace
 		return returnedHandle;
 	}
 
-	VkFramebuffer CreateFramebuffer(VkImageView inHandleImageView)
+	VkFramebuffer CreateFramebuffer(dmut::HeapAllocSize<VkImageView> inHandleImageViews)
 	{
 		VkFramebufferCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		createInfo.pNext = NULL;
 		createInfo.renderPass = handleRenderPass;
-		createInfo.attachmentCount = 1;
-		createInfo.pAttachments = &inHandleImageView;
+		createInfo.attachmentCount = (uint32_t)inHandleImageViews.GetSize();
+		createInfo.pAttachments = inHandleImageViews.RawPtr();
 		createInfo.width = EXTENT_WIDTH;
 		createInfo.height = EXTENT_HEIGHT;
 		createInfo.layers = 1;
@@ -1032,7 +1277,11 @@ namespace
 		commandBufferBegin.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		VulkanUtils::ErrorCheck(vkBeginCommandBuffer(handleCommandBuffer, &commandBufferBegin));
 
-		VkClearValue clearValue = { 0.1f, 0.1f, 0.1f, 1.0f };
+		VkClearValue clearValues[2] =
+		{
+			{ 0.1f, 0.1f, 0.1f, 1.0f }, // Colour
+			{ 0.0f, 0 } // Depth
+		};
 
 		VkRenderPassBeginInfo renderPassBegin = {};
 		renderPassBegin.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -1043,8 +1292,8 @@ namespace
 		renderPassBegin.renderArea.offset.y = 0;
 		renderPassBegin.renderArea.extent.width = EXTENT_WIDTH;
 		renderPassBegin.renderArea.extent.height = EXTENT_HEIGHT;
-		renderPassBegin.clearValueCount = 1;
-		renderPassBegin.pClearValues = &clearValue;
+		renderPassBegin.clearValueCount = 2;
+		renderPassBegin.pClearValues = clearValues;
 		vkCmdBeginRenderPass(handleCommandBuffer, &renderPassBegin, VK_SUBPASS_CONTENTS_INLINE);
 
 		VkDeviceSize vertexBufferOffset = 0;
@@ -1083,7 +1332,14 @@ namespace
 				vkCmdDraw(handleCommandBuffer, DMUT_ARRAY_SIZE(quad), 1, 0, 0);
 			}
 		}
-		
+
+#ifdef DOMIMGUI
+		vkCmdNextSubpass(handleCommandBuffer, VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
+
+		ImGui::Render();
+		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), handleCommandBuffer);
+#endif //~ #ifdef DOMIMGUI
+
 		vkCmdEndRenderPass(handleCommandBuffer);
 		vkEndCommandBuffer(handleCommandBuffer);
 

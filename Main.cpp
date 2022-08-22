@@ -1,20 +1,17 @@
 #include "pch.h"
 
-#include "DomGraphics.h"
-
 #include "DomWindow/DomWindow.h"
 #include "DomLog/DomLog.h"
 
+#include "Game.h"
+#include "Renderer.h"
+
 #include <chrono>
 
-/// #TEMP: Turn on DOMIMGUI
 #ifdef DOMIMGUI
 #include <imgui.h>
 #include <imgui_impl_win32.h>
 #endif //~ #ifdef DOMIMGUI
-
-#include "Game.h"
-
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -25,10 +22,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 std::vector<tagMSG> messages;
 
+#ifdef DOMIMGUI
 void DomWindowMessageHook(tagMSG& msg)
 {
 	ImGui_ImplWin32_WndProcHandler(msg.hwnd, msg.message, msg.wParam, msg.lParam);
 }
+#endif //~ #ifdef DOMIMGUI
 
 // Get the delta time in seconds
 float GetDeltaTime()
@@ -36,7 +35,7 @@ float GetDeltaTime()
 	auto currentTime = std::chrono::system_clock::now().time_since_epoch();
 	static auto prevTime = currentTime;
 	
-	const float deltaTime = (currentTime - prevTime).count() / 10000000.f; /// #TODO: This magic number should be gathered from the std::ratio (Numberator / Denominator)s
+	const float deltaTime = (currentTime - prevTime).count() / 10000000.f; // #TODO: This magic number should be gathered from the std::ratio (Numberator / Denominator)s
 
 	prevTime = currentTime;
 

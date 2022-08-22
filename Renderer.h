@@ -5,6 +5,8 @@
 
 class RendererObject;
 
+// #TODO: Cull all the quads not on screen
+
 namespace dmgf
 {
 	// Initialise graphics -- Must be called after the window has been initialised.
@@ -18,4 +20,8 @@ namespace dmgf
 
 	// Add object from an svg file
 	RendererObject* AddObjectFromSVG(const char* pFileName);
+	
+	void RemoveObject(RendererObject* pRendererObject);
+
+	void SetCameraCenter(float x, float y);
 }

@@ -15,46 +15,48 @@
 #include <imgui.h>
 #include <time.h>
 
-/// #TEMP: Temp for testing ECS
+/// Temp headers, this stuff will be moved to the world gen system at some point I guess
+#include "ActionDeciderPlayer.h"
 #include "ECS.h"
 #include "Renderer.h"
+#include "RendererObject.h"
+#include "SystemAction.h"
+#include "SystemRender.h"
+#include "WorldGenerator.h"
+
 ECS ecs;
+WorldGenerator worldGenerator(ecs);
+
+EntityId playerEntity = 0;
 
 void Game::Init()
 {
+	// Register systems to ECS (order matters)
+	ecs.RegisterSystem(std::make_unique<SystemAction>()); // Control before render or player is 1 square behind for a frame
 	ecs.RegisterSystem(std::make_unique<SystemRender>());
 
+	// Create player entity
 	{
-		Entity& e = ecs.GetEntity(0);
-		e.components.AddComponent(EComponents::Mesh);
-		e.components.AddComponent(EComponents::Transform);
-		ecs.GetComponent<Mesh>(0).pRendererObject = dmgf::AddObjectFromSVG("C:/Users/Dominic/Desktop/Grass.svg");
-		ecs.GetComponent<Transform>(0).x = 2;
-		ecs.GetComponent<Transform>(0).y = 2;
+		Entity& e = ecs.GetEntity(playerEntity);
+		e.components.AddComponent(EComponents::ComponentMesh);
+		e.components.AddComponent(EComponents::ComponentTransform);
+		e.components.AddComponent(EComponents::ComponentAction);
+		ecs.GetComponent<ComponentMesh>(playerEntity).pRendererObject = dmgf::AddObjectFromSVG("C:/Users/Dominic/Desktop/Player.svg");
+		ecs.GetComponent<ComponentMesh>(playerEntity).pRendererObject->SetRenderPriority(0.0f);
+		ecs.GetComponent<ComponentTransform>(playerEntity).x = 10000;
+		ecs.GetComponent<ComponentTransform>(playerEntity).y = 10000;
+		ecs.GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;
+		ecs.GetComponent<ComponentAction>(playerEntity).energy = 100;
+		ecs.GetComponent<ComponentAction>(playerEntity).pActionDecider = new ActionDeciderPlayer;
 	}
-	{
-		Entity& e = ecs.GetEntity(1);
-		e.components.AddComponent(EComponents::Mesh);
-		///e.components.AddComponent(EComponents::Transform);
-	}
-	{
-		Entity& e = ecs.GetEntity(2);
-		///e.components.AddComponent(EComponents::Mesh);
-		e.components.AddComponent(EComponents::Transform);
-	}
-	{
-		Entity& e = ecs.GetEntity(3);
-		e.components.AddComponent(EComponents::Mesh);
-		e.components.AddComponent(EComponents::Transform);
-		ecs.GetComponent<Mesh>(3).pRendererObject = dmgf::AddObjectFromSVG("C:/Users/Dominic/Desktop/Grass.svg");
-		ecs.GetComponent<Transform>(3).x = 5;
-		ecs.GetComponent<Transform>(3).y = 5;
-	}
+
+	worldGenerator.SetCenter(0, 0, /*bInit =*/true);
 }
 
 void Game::UnInit()
 {
-
+	worldGenerator.Uninitialise();
+	ecs.Uninitialise();
 }
 
 #ifdef DOMIMGUI
@@ -85,6 +87,10 @@ void CreateImGuiWindow(float deltaTime)
 void GameplayTick(float deltaTime)
 {
 	ecs.Tick(deltaTime);
+	
+	ComponentTransform& transform = ecs.GetComponent<ComponentTransform>(playerEntity);
+	worldGenerator.SetCenter(transform.x, transform.y, false);
+	dmgf::SetCameraCenter((transform.x - 8) * SystemRender::GRID_SIZE, (transform.y - 4) * SystemRender::GRID_SIZE); // #TODO: Need a way to center camera based on screen size + zoom level
 }
 
 void Game::tick(float deltaTime)

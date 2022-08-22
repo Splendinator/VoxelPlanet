@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Archived">
       <UniqueIdentifier>{9b1b7301-2089-4767-9f16-8e893d513492}</UniqueIdentifier>
     </Filter>
@@ -28,20 +24,35 @@
     <Filter Include="ExternalCode">
       <UniqueIdentifier>{ff116285-adf4-4c08-affe-651dc253671c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders">
+    <Filter Include="Systems">
+      <UniqueIdentifier>{485f6529-f04f-43bf-a829-64af8c87b13a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\ECS">
+      <UniqueIdentifier>{3cc9f9ce-808d-407d-8cb6-27865779297f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\ECS\Systems">
+      <UniqueIdentifier>{b004a812-59db-4063-bdf9-7478f54d910a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\Shaders">
       <UniqueIdentifier>{6a8de722-72c8-4563-a2e8-e3894f103d2c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="VertexRender">
+    <Filter Include="Systems\WorldGen">
+      <UniqueIdentifier>{d9a2f4a5-6e75-4258-81f6-89cec50d25d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\VectorRenderer">
       <UniqueIdentifier>{30cc9d05-ba22-4880-a26a-e43d5a298162}</UniqueIdentifier>
     </Filter>
-    <Filter Include="VertexRender\VectorPrimitives">
+    <Filter Include="Systems\VectorRenderer\VectorPrimitives">
       <UniqueIdentifier>{ba01619d-8bb5-4a15-b6e9-7e39e38e1447}</UniqueIdentifier>
     </Filter>
-    <Filter Include="VertexRender\VectorPrimitives\Factories">
+    <Filter Include="Systems\VectorRenderer\VectorPrimitives\Factories">
       <UniqueIdentifier>{c91876b3-f581-4b3d-95e6-04160bcfe662}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ECS">
-      <UniqueIdentifier>{3cc9f9ce-808d-407d-8cb6-27865779297f}</UniqueIdentifier>
+    <Filter Include="Systems\WorldGen\ChunkGenerators">
+      <UniqueIdentifier>{76fed8e0-d723-49c5-b193-9586acdabd7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\ActionSystem">
+      <UniqueIdentifier>{6fedbcea-443f-416b-9ff2-ae1fa225e45d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -76,40 +87,76 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VectorPrimitiveBase.cpp">
-      <Filter>VertexRender\VectorPrimitives</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives</Filter>
     </ClCompile>
     <ClCompile Include="VectorPrimitiveCircle.cpp">
-      <Filter>VertexRender\VectorPrimitives</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives</Filter>
     </ClCompile>
     <ClCompile Include="VectorPrimitiveRectangle.cpp">
-      <Filter>VertexRender\VectorPrimitives</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives</Filter>
     </ClCompile>
     <ClCompile Include="VectorPrimitiveLayer.cpp">
-      <Filter>VertexRender\VectorPrimitives</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives</Filter>
     </ClCompile>
     <ClCompile Include="VectorPrimitiveShape.cpp">
-      <Filter>VertexRender\VectorPrimitives</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
-      <Filter>VertexRender</Filter>
+      <Filter>Systems\VectorRenderer</Filter>
     </ClCompile>
     <ClCompile Include="VectorPrimitiveFactoryBase.cpp">
-      <Filter>VertexRender\VectorPrimitives\Factories</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives\Factories</Filter>
     </ClCompile>
     <ClCompile Include="VectorPrimitiveFactoryCircle.cpp">
-      <Filter>VertexRender\VectorPrimitives\Factories</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives\Factories</Filter>
     </ClCompile>
     <ClCompile Include="VectorPrimitiveFactoryLayer.cpp">
-      <Filter>VertexRender\VectorPrimitives\Factories</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives\Factories</Filter>
     </ClCompile>
     <ClCompile Include="VectorPrimitiveFactoryRectangle.cpp">
-      <Filter>VertexRender\VectorPrimitives\Factories</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives\Factories</Filter>
     </ClCompile>
     <ClCompile Include="VectorArt.cpp">
-      <Filter>VertexRender\VectorPrimitives\Factories</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives\Factories</Filter>
     </ClCompile>
     <ClCompile Include="RendererObject.cpp">
-      <Filter>VertexRender</Filter>
+      <Filter>Systems\VectorRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemRender.cpp">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS.cpp">
+      <Filter>Systems\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="Chunk.cpp">
+      <Filter>Systems\WorldGen</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldGenerator.cpp">
+      <Filter>Systems\WorldGen</Filter>
+    </ClCompile>
+    <ClCompile Include="ChunkGeneratorGrass.cpp">
+      <Filter>Systems\WorldGen\ChunkGenerators</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionDeciderAI.cpp">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionDeciderBase.cpp">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionDeciderPlayer.cpp">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionHandlerBase.cpp">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionHandlerMove.cpp">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemAction.cpp">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemPhysics.cpp">
+      <Filter>Systems\ECS\Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -135,60 +182,111 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VectorPrimitiveBase.h">
-      <Filter>VertexRender\VectorPrimitives</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives</Filter>
     </ClInclude>
     <ClInclude Include="VectorPrimitiveCircle.h">
-      <Filter>VertexRender\VectorPrimitives</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives</Filter>
     </ClInclude>
     <ClInclude Include="VectorPrimitiveRectangle.h">
-      <Filter>VertexRender\VectorPrimitives</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives</Filter>
     </ClInclude>
     <ClInclude Include="VectorPrimitiveTypes.h">
-      <Filter>VertexRender\VectorPrimitives</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives</Filter>
     </ClInclude>
     <ClInclude Include="VectorPrimitiveLayer.h">
-      <Filter>VertexRender\VectorPrimitives</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives</Filter>
     </ClInclude>
     <ClInclude Include="VectorPrimitiveShape.h">
-      <Filter>VertexRender\VectorPrimitives</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives</Filter>
     </ClInclude>
     <ClInclude Include="VectorPrimitiveFactoryBase.h">
-      <Filter>VertexRender\VectorPrimitives\Factories</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives\Factories</Filter>
     </ClInclude>
     <ClInclude Include="VectorPrimitiveFactoryCircle.h">
-      <Filter>VertexRender\VectorPrimitives\Factories</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives\Factories</Filter>
     </ClInclude>
     <ClInclude Include="VectorPrimitiveFactoryLayer.h">
-      <Filter>VertexRender\VectorPrimitives\Factories</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives\Factories</Filter>
     </ClInclude>
     <ClInclude Include="VectorPrimitiveFactoryRectangle.h">
-      <Filter>VertexRender\VectorPrimitives\Factories</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives\Factories</Filter>
     </ClInclude>
     <ClInclude Include="VectorArt.h">
-      <Filter>VertexRender\VectorPrimitives\Factories</Filter>
+      <Filter>Systems\VectorRenderer\VectorPrimitives\Factories</Filter>
     </ClInclude>
     <ClInclude Include="RendererObject.h">
-      <Filter>VertexRender</Filter>
+      <Filter>Systems\VectorRenderer</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
-      <Filter>VertexRender</Filter>
+      <Filter>Systems\VectorRenderer</Filter>
     </ClInclude>
     <ClInclude Include="ECS.h">
-      <Filter>ECS</Filter>
+      <Filter>Systems\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Components.h">
+      <Filter>Systems\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Systems\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemBase.h">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemRender.h">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemCallback.h">
+      <Filter>Systems\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemCallbackBase.h">
+      <Filter>Systems\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Chunk.h">
+      <Filter>Systems\WorldGen</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldGenerator.h">
+      <Filter>Systems\WorldGen</Filter>
+    </ClInclude>
+    <ClInclude Include="ChunkGeneratorBase.h">
+      <Filter>Systems\WorldGen\ChunkGenerators</Filter>
+    </ClInclude>
+    <ClInclude Include="ChunkGeneratorGrass.h">
+      <Filter>Systems\WorldGen\ChunkGenerators</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionDeciderAI.h">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionDeciderBase.h">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionDeciderPlayer.h">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionHandlerBase.h">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionHandlerMove.h">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemPhysics.h">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemAction.h">
+      <Filter>Systems\ECS\Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Graphics\Shaders\ImGuiFrag.frag">
-      <Filter>Shaders</Filter>
+      <Filter>Systems\Shaders</Filter>
     </None>
     <None Include="..\Graphics\Shaders\ImGuiVert.vert">
-      <Filter>Shaders</Filter>
+      <Filter>Systems\Shaders</Filter>
     </None>
     <None Include="..\Graphics\Shaders\VectorFrag.frag">
-      <Filter>Shaders</Filter>
+      <Filter>Systems\Shaders</Filter>
     </None>
     <None Include="..\Graphics\Shaders\VectorVert.vert">
-      <Filter>Shaders</Filter>
+      <Filter>Systems\Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

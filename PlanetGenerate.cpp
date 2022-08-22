@@ -224,7 +224,7 @@ void GeneratePlanetCube(const Vec3f& dir, Mat4f rot, bool bCheckered, float begi
 
 	const Vec3f pos = dir * (PLANET_RADIUS + GenerateHeight(dir));
 
-	/// #TODO: This should scale between radiusScaleStart and radiusScaleEnd
+	// #TODO_OLD: This should scale between radiusScaleStart and radiusScaleEnd
 	const float radiusScale = (generatedHeight + 1.0f + PLANET_RADIUS) / PLANET_RADIUS;
 
 	const Vec3f colour = GenerateColour(generatedHeight, dir);
