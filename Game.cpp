@@ -21,8 +21,11 @@
 #include "Renderer.h"
 #include "RendererObject.h"
 #include "SystemAction.h"
+#include "SystemEntityMap.h"
+#include "SystemPhysics.h"
 #include "SystemRender.h"
 #include "WorldGenerator.h"
+#include "SystemDamage.h"
 
 ECS ecs;
 WorldGenerator worldGenerator(ecs);
@@ -32,8 +35,12 @@ EntityId playerEntity = 0;
 void Game::Init()
 {
 	// Register systems to ECS (order matters)
-	ecs.RegisterSystem(std::make_unique<SystemAction>()); // Control before render or player is 1 square behind for a frame
+	ecs.RegisterSystem(std::make_unique<SystemEntityMap>());
+	ecs.RegisterSystem(std::make_unique<SystemPhysics>());
+	ecs.RegisterSystem(std::make_unique<SystemAction>()); // Action before render or player is 1 square behind for a frame
+	ecs.RegisterSystem(std::make_unique<SystemDamage>());
 	ecs.RegisterSystem(std::make_unique<SystemRender>());
+	
 
 	// Create player entity
 	{
@@ -50,7 +57,7 @@ void Game::Init()
 		ecs.GetComponent<ComponentAction>(playerEntity).pActionDecider = new ActionDeciderPlayer;
 	}
 
-	worldGenerator.SetCenter(0, 0, /*bInit =*/true);
+	worldGenerator.SetCenter(10000, 10000, /*bInit =*/true);
 }
 
 void Game::UnInit()

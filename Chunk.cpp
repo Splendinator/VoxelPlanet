@@ -32,15 +32,6 @@ void Chunk::DeleteChunk(ECS* pEcs)
 {
 	for (EntityId entity : entities)
 	{
-		// Remove the mesh from the renderer
-		// #TODO: Do we want a generic destructor for components to allow for this to happen automatically? Without adding a virtual function with 8 byte overhead ideally
-		ComponentMesh mesh = pEcs->GetComponent<ComponentMesh>(entity);
-		if (mesh.pRendererObject)
-		{
-			dmgf::RemoveObject(mesh.pRendererObject);
-			mesh.pRendererObject = nullptr;
-		}
-
 		pEcs->DeleteEntity(entity);
 	}
 }

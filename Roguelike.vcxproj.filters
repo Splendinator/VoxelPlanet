@@ -158,6 +158,15 @@
     <ClCompile Include="SystemPhysics.cpp">
       <Filter>Systems\ECS\Systems</Filter>
     </ClCompile>
+    <ClCompile Include="SystemDamage.cpp">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemEntityMap.cpp">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionHandlerAttack.cpp">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -273,6 +282,15 @@
     </ClInclude>
     <ClInclude Include="SystemAction.h">
       <Filter>Systems\ECS\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemDamage.h">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemEntityMap.h">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionHandlerAttack.h">
+      <Filter>Systems\ActionSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

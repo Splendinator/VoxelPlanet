@@ -139,6 +139,7 @@
     <ClCompile Include="ActionDeciderAI.cpp" />
     <ClCompile Include="ActionDeciderBase.cpp" />
     <ClCompile Include="ActionDeciderPlayer.cpp" />
+    <ClCompile Include="ActionHandlerAttack.cpp" />
     <ClCompile Include="ActionHandlerBase.cpp" />
     <ClCompile Include="ActionHandlerMove.cpp" />
     <ClCompile Include="Chunk.cpp" />
@@ -160,6 +161,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SystemAction.cpp" />
+    <ClCompile Include="SystemDamage.cpp" />
+    <ClCompile Include="SystemEntityMap.cpp" />
     <ClCompile Include="SystemPhysics.cpp" />
     <ClCompile Include="SystemRender.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -179,6 +182,7 @@
     <ClInclude Include="ActionDeciderAI.h" />
     <ClInclude Include="ActionDeciderBase.h" />
     <ClInclude Include="ActionDeciderPlayer.h" />
+    <ClInclude Include="ActionHandlerAttack.h" />
     <ClInclude Include="ActionHandlerBase.h" />
     <ClInclude Include="ActionHandlerMove.h" />
     <ClInclude Include="Chunk.h" />
@@ -198,6 +202,8 @@
     <ClInclude Include="SystemBase.h" />
     <ClInclude Include="SystemCallback.h" />
     <ClInclude Include="SystemCallbackBase.h" />
+    <ClInclude Include="SystemDamage.h" />
+    <ClInclude Include="SystemEntityMap.h" />
     <ClInclude Include="SystemPhysics.h" />
     <ClInclude Include="SystemRender.h" />
     <ClInclude Include="Texture.h" />

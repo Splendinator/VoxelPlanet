@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DomMath/Vec2.h"
 #include "ECS.h"
 
 class Chunk;
@@ -15,9 +16,10 @@ public:
 	
 	WorldGenerator(ECS& inEcs) : ecs(inEcs) {}
 
+	void Uninitialise();
+
 	// Set the center of the world generator, world will generator around these coordinates (this is likely tied to player's location)
 	void SetCenter(int newX, int newY, bool bInit);
-	void Uninitialise();
 
 protected:
 

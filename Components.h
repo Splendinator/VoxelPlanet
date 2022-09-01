@@ -10,6 +10,8 @@ enum class EComponents
 	ComponentMesh,
 	ComponentTransform,
 	ComponentAction,
+	ComponentRigid,
+	ComponentHealth,
 };
 
 // Component to render something
@@ -31,4 +33,12 @@ struct ComponentAction
 	short maxEnergy = 0; // How often to take a turn, something with 50 max energy will take an action twice as often as something with 100 energy
 	short energy = 0;
 	ActionDeciderBase* pActionDecider = nullptr;
+};
+
+// Component to block movement onto it's tile
+struct ComponentRigid {};
+
+struct ComponentHealth
+{
+	int health = 0;
 };

@@ -13,6 +13,7 @@ class SystemAction : public SystemBase
 public:
 
 	void Tick(const SystemTickParams& params, const std::tuple<ComponentAction*>& components);
+	void OnEntityDeleted(const SystemEntityDeletionParams& params, const std::tuple<ComponentAction*>& components) {};
 
 protected:
 	

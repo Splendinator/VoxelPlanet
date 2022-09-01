@@ -20,9 +20,10 @@ ComponentName& AddComponent<ComponentName>(int entityId) { entities[entityId].co
 class ECS
 {
 
+	/// #TODO: We need to handle adding new component / removing components calling the appropriate functions like HandleEntityDeletion() and HandleEntityCreation() maybe
+
 public:
 	static constexpr int NUM_ENTITIES = 4096;
-	static constexpr int INVALID_ENTITY_ID = -1;
 
 	void RegisterSystem(std::unique_ptr<SystemBase>&& pSystem);
 	void RegisterSystemCallback(std::unique_ptr<SystemCallbackBase>&& pSystemCallback);
@@ -36,7 +37,10 @@ public:
 	// Get the next unused entity (entity with no components)
 	EntityId GetNextFreeEntity();
 
-	void DeleteEntity(EntityId entity) { GetEntity(entity).components.RemoveAllComponents(); };
+	void DeleteEntity(EntityId entity);;
+
+	template<typename T> 
+	T* GetSystem();
 
 	template<typename T>
 	T& GetComponent(EntityId entityId) { DOMASSERT(false, "This shouldn't be called! Are you missing a REGISTER_COMPONENT?"); }
@@ -50,6 +54,8 @@ public:
 	REGISTER_COMPONENT(ComponentMesh);
 	REGISTER_COMPONENT(ComponentTransform);
 	REGISTER_COMPONENT(ComponentAction);
+	REGISTER_COMPONENT(ComponentRigid);
+	REGISTER_COMPONENT(ComponentHealth);
 
 private:
 
@@ -63,4 +69,17 @@ template<typename THead, typename... TTail>
 bool ECS::EntityHasComponents(EntityId entityId) const
 {
 	return EntityHasComponents<THead>(entityId) && EntityHasComponents<TTail...>(entityId);
+}
+
+template<typename T>
+T* ECS::GetSystem()
+{
+	for (std::unique_ptr<SystemBase>& system : systems)
+	{
+		if (T* returnedSystem = dynamic_cast<T*>(system.get()))
+		{
+			return returnedSystem;
+		}
+	}
+	return nullptr;
 }

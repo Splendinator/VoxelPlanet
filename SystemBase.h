@@ -4,9 +4,17 @@
 
 class ECS;
 
+// Params passed to tick function
 struct SystemTickParams
 {
 	float deltaTime{};
+	EntityId entityId{};
+	ECS* pEcs{};
+};
+
+// Params passed to entity deletion function
+struct SystemEntityDeletionParams
+{
 	EntityId entityId{};
 	ECS* pEcs{};
 };

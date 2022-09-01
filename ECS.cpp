@@ -7,6 +7,7 @@ void ECS::RegisterSystem(std::unique_ptr<SystemBase>&& pSystem)
 	pSystem->Initialise(this);
 	systems.emplace_back(std::move(pSystem));
 }
+#pragma optimize( "", on )
 
 void ECS::RegisterSystemCallback(std::unique_ptr<SystemCallbackBase>&& pSystemCallback)
 {
@@ -15,6 +16,7 @@ void ECS::RegisterSystemCallback(std::unique_ptr<SystemCallbackBase>&& pSystemCa
 
 void ECS::Tick(float deltaTime)
 {
+	// #TODO: Need a way to only tick a entities if the component has changed, maybe just a bool in the base class of all components
 	for (std::unique_ptr<SystemCallbackBase>& callback : systemCallbacks)
 	{
 		callback->HandleCallbacks(this, deltaTime);
@@ -24,9 +26,9 @@ void ECS::Tick(float deltaTime)
 void ECS::Uninitialise()
 {
 	systemCallbacks.clear();
-	memset((void*)&systemCallbacks, 0, sizeof(systemCallbacks)); // #TODO: For some reason we get an error without this line here, maybe investigate later on if you can be arsed ever.
-
 	systems.clear();
+	
+	memset((void*)&systemCallbacks, 0, sizeof(systemCallbacks)); // #JANK: For some reason we get an error without this line here, maybe investigate later on if you can be arsed ever.
 }
 
 EntityId ECS::GetNextFreeEntity()
@@ -40,6 +42,16 @@ EntityId ECS::GetNextFreeEntity()
 		}
 	}
 
-	DOMLOG_WARN("Out of entitites! Increase NUM_ENTITIES!");
-	return ECS::INVALID_ENTITY_ID;
+
+	DOMLOG_ERROR("Out of entitites! Increase NUM_ENTITIES!");
+	return INVALID_ENTITY_ID;
+}
+
+void ECS::DeleteEntity(EntityId entity)
+{
+	for (std::unique_ptr<SystemCallbackBase>& callback : systemCallbacks)
+	{
+		callback->HandleEntityDeletion(this, entity);
+	}
+	GetEntity(entity).components.RemoveAllComponents();
 }

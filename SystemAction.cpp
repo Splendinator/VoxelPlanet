@@ -24,4 +24,6 @@ void SystemAction::Tick(const SystemTickParams& params, const std::tuple<Compone
 		pActionHandler->DoAction(*params.pEcs, params.entityId);
 		pActionHandler->Reset();
 	}
+
+	/// #TODO: Needs to take action points into account 
 }

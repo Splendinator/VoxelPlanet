@@ -37,6 +37,7 @@ protected:
 
 	//~ Begin SystemCallbackBase Interface
 	void DoCallback(ECS* pEcs, float deltaTime) override;
+	void DoEntityDeletion(ECS* pEcs, EntityId entity) override;
 	//~ End SystemCallbackBase Interface
 
 	TSystem* pSystem = nullptr;
@@ -60,5 +61,21 @@ void SystemCallback<TSystem, T...>::DoCallback(ECS* pEcs, float deltaTime)
 
 			pSystem->Tick(params, std::move(tuple));
 		}
+	}
+}
+
+template<typename TSystem, typename... T>
+void SystemCallback<TSystem, T...>::DoEntityDeletion(ECS* pEcs, EntityId entity)
+{
+	if (pEcs->EntityHasComponents<T...>(entity))
+	{
+		SystemEntityDeletionParams params = {};
+		params.pEcs = pEcs;
+		params.entityId = entity;
+		
+		std::tuple<T*...> tuple;
+		PopulateTuple<T...>(tuple, pEcs, entity);
+
+		pSystem->OnEntityDeleted(params, std::move(tuple));
 	}
 }

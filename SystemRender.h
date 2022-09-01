@@ -15,6 +15,7 @@ public:
 	static float GRID_SIZE;
 
 	void Tick(const SystemTickParams& params, const std::tuple<ComponentMesh*, ComponentTransform*>& components);
+	void OnEntityDeleted(const SystemEntityDeletionParams& params, const std::tuple<ComponentMesh*, ComponentTransform*>& components);
 
 protected:
 	//~ Begin SystemBase Interface

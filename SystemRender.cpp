@@ -2,6 +2,7 @@
 
 #include "Components.h"
 #include "ECS.h"
+#include "Renderer.h"
 #include "RendererObject.h"
 #include "SystemCallback.h"
 #include "SystemRender.h"
@@ -20,4 +21,14 @@ void SystemRender::Tick(const SystemTickParams& params, const std::tuple<Compone
 
 	pRendererObject->SetSize(GRID_SIZE, GRID_SIZE);
 	pRendererObject->SetPosition(GRID_SIZE * transform->x, GRID_SIZE * transform->y);
+}
+
+void SystemRender::OnEntityDeleted(const SystemEntityDeletionParams& params, const std::tuple<ComponentMesh*, ComponentTransform*>& components)
+{
+	// Remove the mesh from the renderer
+	if (RendererObject*& pRendererObject = std::get<ComponentMesh*>(components)->pRendererObject)
+	{
+		dmgf::RemoveObject(pRendererObject);
+		pRendererObject = nullptr;
+	}
 }

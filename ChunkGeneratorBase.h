@@ -20,13 +20,13 @@ public:
 		default:
 		{
 			DOMLOG_WARN("Added new layer with no handling?");
-			return ECS::INVALID_ENTITY_ID;
+			return INVALID_ENTITY_ID;
 		}
 		}
 	};
 
 protected:
 
-	virtual EntityId GetForeground(ECS* pEcs, int x, int y) { return ECS::INVALID_ENTITY_ID; };
-	virtual EntityId GetBackground(ECS* pEcs, int x, int y) { return ECS::INVALID_ENTITY_ID; };
+	virtual EntityId GetForeground(ECS* pEcs, int x, int y) { return INVALID_ENTITY_ID; };
+	virtual EntityId GetBackground(ECS* pEcs, int x, int y) { return INVALID_ENTITY_ID; };
 };

@@ -14,6 +14,9 @@ EntityId ChunkGeneratorGrass::GetForeground(ECS* pEcs, int x, int y)
 
 		ComponentMesh& mesh = pEcs->AddComponent<ComponentMesh>(entity);
 		ComponentTransform& transform = pEcs->AddComponent<ComponentTransform>(entity);
+		pEcs->AddComponent<ComponentRigid>(entity);
+		ComponentHealth& health = pEcs->AddComponent<ComponentHealth>(entity);
+		health.health = 100;
 
 		mesh.pRendererObject = pTreeRenderObject;
 		transform.x = x;
@@ -25,7 +28,7 @@ EntityId ChunkGeneratorGrass::GetForeground(ECS* pEcs, int x, int y)
 	}
 	else
 	{
-		return ECS::INVALID_ENTITY_ID;
+		return INVALID_ENTITY_ID;
 	}
 }
 
