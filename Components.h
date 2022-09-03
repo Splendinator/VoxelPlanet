@@ -41,4 +41,5 @@ struct ComponentRigid {};
 struct ComponentHealth
 {
 	int health = 0;
+	int maxHealth = 0;
 };

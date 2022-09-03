@@ -30,9 +30,35 @@ public:
 	
 	void Serialize(u32* pBuffer);
 
+	template<typename TClass>
+	TClass* FindPrimitiveByLabel(const std::string& label);
+
+	// Page dimensions are used to figure out size of primitives relative to the quad they are on.
+	// i.e if page width is 1000 units wide and you scale a primitive to be 500 units wide, it will be half the width of the quad.
+	u32 GetPageWidth() { return pageWidth; }
+	u32 GetPageHeight() { return pageHeight; }
+
 private:
+
+	VectorPrimitiveBase* FindPrimitiveByLabelInternal(const std::string& label);
+
 	std::unique_ptr<VectorPrimitiveLayer> pRootLayer;
 
 	u32 pageWidth = 0;
 	u32 pageHeight = 0;
 };
+
+template<typename TClass>
+TClass* VectorArt::FindPrimitiveByLabel(const std::string& label)
+{
+	if (VectorPrimitiveBase* pPrimitive = FindPrimitiveByLabelInternal(label))
+	{
+		TClass* pReturnedPrimitive = dynamic_cast<TClass*>(pPrimitive);
+		DOMLOG_WARN_IF(pReturnedPrimitive == nullptr, "Could not cast primitive '", label, "'to type:", typeid(TClass).name());
+		return pReturnedPrimitive;
+	}
+
+	DOMLOG_WARN("No label '", label, "' found.");
+
+	return nullptr;
+}

@@ -57,3 +57,8 @@ void VectorArt::Serialize(u32* pBuffer)
 
 	pRootLayer->Serialize(pBuffer);
 }
+
+VectorPrimitiveBase* VectorArt::FindPrimitiveByLabelInternal(const std::string& label)
+{
+	return pRootLayer->FindPrimitiveByLabel(label);
+}

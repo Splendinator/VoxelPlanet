@@ -54,6 +54,9 @@
     <Filter Include="Systems\ActionSystem">
       <UniqueIdentifier>{6fedbcea-443f-416b-9ff2-ae1fa225e45d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{6a897c7d-542b-47e9-832a-47227df22724}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -166,6 +169,12 @@
     </ClCompile>
     <ClCompile Include="ActionHandlerAttack.cpp">
       <Filter>Systems\ActionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemNameslate.cpp">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="FilePaths.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -291,6 +300,15 @@
     </ClInclude>
     <ClInclude Include="ActionHandlerAttack.h">
       <Filter>Systems\ActionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemNameslate.h">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="FilePaths.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPriorities.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -15,9 +15,12 @@ public:
 	//~ Begin VectorPrimitiveBase Interface
 	u32* Serialize(u32* pBuffer) override;
 	std::istream& PopulateFromFile(std::istream& stream) override;
+	VectorPrimitiveBase* FindPrimitiveByLabel(const std::string& label) override;
 	//~ End VectorPrimitiveBase Interface
 
 private:
+
+	std::string layerLabel; // This is the name of the layer in inkscape
 
 	std::vector<VectorPrimitiveBase*> children;
 };

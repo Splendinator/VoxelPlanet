@@ -14,6 +14,11 @@ public:
 	std::istream& PopulateFromFile(std::istream& stream) override;
 	//~ End VectorPrimitiveBase Interface
 
+	void SetWidth(u32 inWidth) { width = inWidth; };
+	void SetHeight(u32 inHeight) { height = inHeight; };
+	void SetX(u32 inX) { x = inX; };
+	void SetY(u32 inY) { y = inY; };
+
 private:
 	// Coorinates of top left
 	u32 x;

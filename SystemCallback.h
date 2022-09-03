@@ -50,7 +50,7 @@ void SystemCallback<TSystem, T...>::DoCallback(ECS* pEcs, float deltaTime)
 	params.deltaTime = deltaTime;
 	params.pEcs = pEcs;
 
-	for (EntityId i = 0; i < ECS::NUM_ENTITIES; ++i) // #TODO: This should probably cache a list of entities that updates if anything changes
+	for (EntityId i = 0; i < NUM_ENTITIES; ++i) // #TODO: This should probably cache a list of entities that updates if anything changes
 	{
 		if (pEcs->EntityHasComponents<T...>(i))
 		{

@@ -19,12 +19,9 @@ ComponentName& AddComponent<ComponentName>(int entityId) { entities[entityId].co
 
 class ECS
 {
-
 	/// #TODO: We need to handle adding new component / removing components calling the appropriate functions like HandleEntityDeletion() and HandleEntityCreation() maybe
 
 public:
-	static constexpr int NUM_ENTITIES = 4096;
-
 	void RegisterSystem(std::unique_ptr<SystemBase>&& pSystem);
 	void RegisterSystemCallback(std::unique_ptr<SystemCallbackBase>&& pSystemCallback);
 

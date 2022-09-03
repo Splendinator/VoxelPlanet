@@ -145,6 +145,7 @@
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkGeneratorGrass.cpp" />
     <ClCompile Include="ECS.cpp" />
+    <ClCompile Include="FilePaths.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="JumpGame.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="SystemAction.cpp" />
     <ClCompile Include="SystemDamage.cpp" />
     <ClCompile Include="SystemEntityMap.cpp" />
+    <ClCompile Include="SystemNameslate.cpp" />
     <ClCompile Include="SystemPhysics.cpp" />
     <ClCompile Include="SystemRender.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -191,11 +193,13 @@
     <ClInclude Include="Components.h" />
     <ClInclude Include="ECS.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="FilePaths.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RendererObject.h" />
+    <ClInclude Include="RenderPriorities.h" />
     <ClInclude Include="ResourceLoader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="SystemAction.h" />
@@ -204,6 +208,7 @@
     <ClInclude Include="SystemCallbackBase.h" />
     <ClInclude Include="SystemDamage.h" />
     <ClInclude Include="SystemEntityMap.h" />
+    <ClInclude Include="SystemNameslate.h" />
     <ClInclude Include="SystemPhysics.h" />
     <ClInclude Include="SystemRender.h" />
     <ClInclude Include="Texture.h" />

@@ -20,6 +20,9 @@ public:
 	// This should start reading from right after the associated tag. i.e reading in a circle will start after "<circle"
 	virtual std::istream& PopulateFromFile(std::istream& stream) = 0;
 
+	// This can be overwritten to find a primitive by its label. 
+	// This is used to search recursively for the first non-nullptr primitive with the given label.
+	virtual VectorPrimitiveBase* FindPrimitiveByLabel(const std::string& label) { return nullptr; };
 
 };
 

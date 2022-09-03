@@ -18,14 +18,19 @@
 /// Temp headers, this stuff will be moved to the world gen system at some point I guess
 #include "ActionDeciderPlayer.h"
 #include "ECS.h"
+#include "FilePaths.h"
 #include "Renderer.h"
 #include "RendererObject.h"
 #include "SystemAction.h"
+#include "SystemDamage.h"
 #include "SystemEntityMap.h"
+#include "SystemNameslate.h"
 #include "SystemPhysics.h"
 #include "SystemRender.h"
+#include "VectorArt.h"
+#include "VectorPrimitiveRectangle.h"
 #include "WorldGenerator.h"
-#include "SystemDamage.h"
+#include "RenderPriorities.h"
 
 ECS ecs;
 WorldGenerator worldGenerator(ecs);
@@ -39,6 +44,7 @@ void Game::Init()
 	ecs.RegisterSystem(std::make_unique<SystemPhysics>());
 	ecs.RegisterSystem(std::make_unique<SystemAction>()); // Action before render or player is 1 square behind for a frame
 	ecs.RegisterSystem(std::make_unique<SystemDamage>());
+	ecs.RegisterSystem(std::make_unique<SystemNameslate>());
 	ecs.RegisterSystem(std::make_unique<SystemRender>());
 	
 
@@ -48,17 +54,20 @@ void Game::Init()
 		e.components.AddComponent(EComponents::ComponentMesh);
 		e.components.AddComponent(EComponents::ComponentTransform);
 		e.components.AddComponent(EComponents::ComponentAction);
-		ecs.GetComponent<ComponentMesh>(playerEntity).pRendererObject = dmgf::AddObjectFromSVG("C:/Users/Dominic/Desktop/Player.svg");
-		ecs.GetComponent<ComponentMesh>(playerEntity).pRendererObject->SetRenderPriority(0.0f);
+		e.components.AddComponent(EComponents::ComponentHealth);
+		ecs.GetComponent<ComponentMesh>(playerEntity).pRendererObject = dmgf::AddObjectFromSVG(FilePath::VectorArt::player);
+		ecs.GetComponent<ComponentMesh>(playerEntity).pRendererObject->SetRenderPriority(RenderPriority::unit);
 		ecs.GetComponent<ComponentTransform>(playerEntity).x = 10000;
 		ecs.GetComponent<ComponentTransform>(playerEntity).y = 10000;
 		ecs.GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;
 		ecs.GetComponent<ComponentAction>(playerEntity).energy = 100;
 		ecs.GetComponent<ComponentAction>(playerEntity).pActionDecider = new ActionDeciderPlayer;
+		ecs.GetComponent<ComponentHealth>(playerEntity).health = 100;
+		ecs.GetComponent<ComponentHealth>(playerEntity).maxHealth = 100;
 	}
 
 	worldGenerator.SetCenter(10000, 10000, /*bInit =*/true);
-}
+}  
 
 void Game::UnInit()
 {

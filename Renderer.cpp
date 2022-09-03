@@ -30,7 +30,7 @@ namespace
 	struct RenderedObjectEntry
 	{
 		std::string fileName;
-		VectorArt vectorArt;
+		std::shared_ptr<VectorArt> pVectorArt;
 		VkDescriptorSet handleDescriptorSet = VK_NULL_HANDLE; // Descriptor set to bind
 		VkBuffer handleBuffer = VK_NULL_HANDLE; // Buffer big enough to hold serilized vector art
 		VkDeviceMemory handleDeviceMemory = VK_NULL_HANDLE; // Memory to hold buffer
@@ -101,6 +101,9 @@ namespace
 	VkFramebuffer CreateFramebuffer(dmut::HeapAllocSize<VkImageView> inHandleImageViews);
 
 	void SubmitDrawCommand();
+
+	// Clean up entry memory from vulkan
+	void CleanUpEntry(RenderedObjectEntry& entry);
 
 	Camera mainCamera;
 	VkInstance handleInstance = VK_NULL_HANDLE;
@@ -282,8 +285,7 @@ namespace dmgf
 
 		for (RenderedObjectEntry& entry : renderedObjects)
 		{
-			vkDestroyBuffer(handleDevice, entry.handleBuffer, nullptr);
-			vkFreeMemory(handleDevice, entry.handleDeviceMemory, nullptr);
+			CleanUpEntry(entry);
 		}
 		
 		vkDestroyBuffer(handleDevice, handleBufferProjection, nullptr);
@@ -365,7 +367,7 @@ namespace dmgf
 
 			pEntry = &renderedObjects.back();
 			pEntry->fileName = pFileName;
-			pEntry->vectorArt = VectorArt(pFileName);
+			pEntry->pVectorArt = std::make_shared<VectorArt>(pFileName);
 			
 			// Set up vulkan handles (descriptor set + memory)
 			const size_t vectorBufferSize = sizeof(int) * 4 * 4096; // #TODO: Figure out how large the serialized vector art is
@@ -384,15 +386,40 @@ namespace dmgf
 	}
 
 
+	RendererObject* AddObjectFromVectorArt(const std::shared_ptr<VectorArt>& vectorArt)
+	{
+		renderedObjects.resize(renderedObjects.size() + 1);
+		RenderedObjectEntry& pEntry = renderedObjects.back();
+		
+		pEntry.pVectorArt = vectorArt;
+	
+		const size_t vectorBufferSize = sizeof(int) * 4 * 4096; // #TODO: Figure out how large the serialized vector art is
+		pEntry.handleDescriptorSet = CreateDescriptorSet(handleDescriptorSetLayoutVector);
+		pEntry.handleDeviceMemory = CreateDeviceMemory(vectorBufferSize, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		pEntry.handleBuffer = CreateUniformBuffer(vectorBufferSize);
+		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, pEntry.handleBuffer, pEntry.handleDeviceMemory, 0), "BindUniformBuffer");
+		
+		pEntry.rendererObjects.emplace_back(std::make_unique<RendererObject>());
+		return pEntry.rendererObjects.back().get();
+	}
+
 	void RemoveObject(RendererObject* pRendererObject)
 	{
-		for (auto& renderedObject : renderedObjects)
+		for (auto renderObjectEntryIterator = renderedObjects.begin(); renderObjectEntryIterator != renderedObjects.end(); ++renderObjectEntryIterator)
 		{
-			for (auto it = renderedObject.rendererObjects.begin(); it != renderedObject.rendererObjects.end(); ++it)
+			for (auto renderedObjectIterator = renderObjectEntryIterator->rendererObjects.begin(); renderedObjectIterator != renderObjectEntryIterator->rendererObjects.end(); ++renderedObjectIterator)
 			{
-				if ((*it).get() == pRendererObject)
+				if ((*renderedObjectIterator).get() == pRendererObject)
 				{
-					renderedObject.rendererObjects.erase(it);
+					renderObjectEntryIterator->rendererObjects.erase(renderedObjectIterator);
+					
+					if (renderObjectEntryIterator->rendererObjects.size() == 0)
+					{
+						// If that was the last instance of this render entry, we remove the whole entry
+						CleanUpEntry(*renderObjectEntryIterator);
+						renderedObjects.erase(renderObjectEntryIterator);
+					}
+					
 					return;
 				}
 			}
@@ -829,9 +856,12 @@ namespace
 
 	VkDescriptorPool CreateDescriptorPool()
 	{
+		// Increase this if we need more things rendered
+		const int maxDescriptorSets = 256;
+
 		VkDescriptorPoolSize poolSizes[] =
 		{
-			{ VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 100 }
+			{ VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, maxDescriptorSets }
 
 #ifdef DOMIMGUI
 			,
@@ -842,7 +872,7 @@ namespace
 		VkDescriptorPoolCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		createInfo.pNext = nullptr;
-		createInfo.maxSets = 100;
+		createInfo.maxSets = maxDescriptorSets;
 		createInfo.poolSizeCount = DMUT_ARRAY_SIZE(poolSizes);
 		createInfo.pPoolSizes = poolSizes;
 
@@ -891,7 +921,7 @@ namespace
 	{
 		u32 data[4096] = {};
 
-		entry.vectorArt.Serialize(data);
+		entry.pVectorArt->Serialize(data);
 
 		void* pDeviceData = nullptr;
 		vkMapMemory(handleDevice, entry.handleDeviceMemory, 0, sizeof(data), 0, &pDeviceData);
@@ -1386,5 +1416,12 @@ namespace
 		vkDestroySemaphore(handleDevice, handleSemaphore, nullptr);
 
 		currentBuffer ^= 1;
+	}
+
+	void CleanUpEntry(RenderedObjectEntry& entry)
+	{
+		vkDestroyBuffer(handleDevice, entry.handleBuffer, nullptr);
+		vkFreeMemory(handleDevice, entry.handleDeviceMemory, nullptr);
+		vkFreeDescriptorSets(handleDevice, handleDescriptorPool, 1, &entry.handleDescriptorSet);
 	}
 }

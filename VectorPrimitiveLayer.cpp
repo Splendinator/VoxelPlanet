@@ -27,6 +27,8 @@ u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 
 std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 {
+	layerLabel = dmim::GetNextAttribute(stream, "inkscape:label");
+
 	struct FactoryEntry
 	{
 		std::string tag;
@@ -70,4 +72,25 @@ std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 	}
 
 	return stream;
+}
+
+VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveByLabel(const std::string& label)
+{
+	// Label found
+	if (label == layerLabel)
+	{
+		DOMLOG_ERROR_IF(children.size() > 1, "Found correct label but there's more than one child. Returning first");
+		return children[0];
+	}
+	
+	// Search children recursively
+	for (VectorPrimitiveBase* child : children)
+	{
+		if (VectorPrimitiveBase* pFound = child->FindPrimitiveByLabel(label))
+		{
+			return pFound;
+		}
+	}
+
+	return nullptr;
 }
