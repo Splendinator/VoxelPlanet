@@ -2,6 +2,7 @@
 
 #include "DomMath/Mat4.h"
 #include "DomUtils/DomUtils.h"
+#include "DomUtils/Pointers.h"
 
 class RendererObject;
 class VectorArt;
@@ -10,6 +11,12 @@ class VectorArt;
 
 namespace dmgf
 {
+	enum class ERenderObjectType
+	{
+		InGame,		// Rendered as an in-game object subject to camera movement
+		HUD			// Rendered as a HUD object, stuck to the screen
+	};
+
 	// Initialise graphics -- Must be called after the window has been initialised.
 	void Init();
 
@@ -20,12 +27,16 @@ namespace dmgf
 	void Tick(float deltaTime);
 
 	// Add object from an svg file. Objects from the same file will share the same vector art
-	RendererObject* AddObjectFromSVG(const char* pFileName);
+	TransientPtr<RendererObject> AddObjectFromSVG(const char* pFileName, ERenderObjectType renderObjectType = ERenderObjectType::InGame);
 
 	// Add object from vector art. This is used if you want to mess with the vector art mid-game (scale primitives etc.)
-	RendererObject* AddObjectFromVectorArt(const std::shared_ptr<VectorArt>& vectorArt);
+	TransientPtr<RendererObject> AddObjectFromVectorArt(const std::shared_ptr<VectorArt>& vectorArt, ERenderObjectType renderObjectType = ERenderObjectType::InGame);
 	
-	void RemoveObject(RendererObject* pRendererObject);
+	void RemoveObject(TransientPtr<RendererObject> pRendererObject);
 
 	void SetCameraCenter(float x, float y);
+	void SetCameraZoom(float zoom);
+
+	float GetScreenWidth();
+	float GetScreenHeight();
 }

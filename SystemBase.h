@@ -10,6 +10,7 @@ struct SystemTickParams
 	float deltaTime{};
 	EntityId entityId{};
 	ECS* pEcs{};
+	int frame{};
 };
 
 // Params passed to entity deletion function
@@ -36,6 +37,9 @@ public:
 
 
 	void Initialise(ECS* pEcs) { InitialiseInternal(pEcs); };
+
+	// Called before any system callbacks
+	virtual void PreTick(SystemTickParams tickParams) {};
 
 protected:
 	

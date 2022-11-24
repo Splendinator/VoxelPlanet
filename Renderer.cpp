@@ -77,9 +77,11 @@ namespace
 
 	VkDescriptorSet CreateDescriptorSet(VkDescriptorSetLayout layout);
 
-	void UpdateVectorBuffer(RenderedObjectEntry& entry);
-	void UpdateViewBuffer(float deltaTime);
-	void UpdateProjectionBuffer();
+	void UpdateVectorBuffer(RenderedObjectEntry& entry); // Update the buffer with the vector art data
+	void UpdateViewBuffer(float deltaTime); // Update the view buffer with the view matrix 
+	void UpdateProjectionBuffer(); // Update the projection buffer with the projection matrix
+	void UpdateViewBufferHUD(); // Update the HUD view buffer with the view matrix for HUD objects
+	void UpdateProjectionBufferHUD(); // Update the HUD projection buffer with the projection matrix for HUD objects
 
 	VkPipelineLayout CreatePipelineLayout();
 
@@ -105,7 +107,7 @@ namespace
 	// Clean up entry memory from vulkan
 	void CleanUpEntry(RenderedObjectEntry& entry);
 
-	Camera mainCamera;
+	/// #TEMP: Not using this 3d camera implementation Camera mainCamera;
 	VkInstance handleInstance = VK_NULL_HANDLE;
 	VkPhysicalDevice handlePhysicalDevice = VK_NULL_HANDLE;
 	VkSurfaceKHR handleSurface = VK_NULL_HANDLE;
@@ -120,8 +122,23 @@ namespace
 	VkDescriptorSetLayout handleDescriptorSetLayoutProjection = VK_NULL_HANDLE; // Updated once at start
 	VkDescriptorSetLayout handleDescriptorSetLayoutView = VK_NULL_HANDLE; // Updated once per frame 
 	VkDescriptorSetLayout handleDescriptorSetLayoutVector = VK_NULL_HANDLE; // Updated once per vector art
-	VkDescriptorSet handleDescriptorSetProjection = VK_NULL_HANDLE;
-	VkDescriptorSet handleDescriptorSetView = VK_NULL_HANDLE;
+	
+	VkDescriptorSet handleDescriptorSetProjection = VK_NULL_HANDLE; // Projection used for in-game objects
+	VkDeviceMemory handleDeviceMemoryProjectionBuffer = VK_NULL_HANDLE;
+	VkBuffer handleBufferProjection = VK_NULL_HANDLE;
+	
+	VkDescriptorSet handleDescriptorSetView = VK_NULL_HANDLE; // View used for in-game objects
+	VkDeviceMemory handleDeviceMemoryViewBuffer = VK_NULL_HANDLE;
+	VkBuffer handleBufferView = VK_NULL_HANDLE;
+	
+	VkDescriptorSet handleDescriptorSetProjectionHUD = VK_NULL_HANDLE; // Projection used for HUD objects
+	VkDeviceMemory handleDeviceMemoryProjectionBufferHUD = VK_NULL_HANDLE;
+	VkBuffer handleBufferProjectionHUD = VK_NULL_HANDLE;
+
+	VkDescriptorSet handleDescriptorSetViewHUD = VK_NULL_HANDLE; // View used for HUD objects
+	VkDeviceMemory handleDeviceMemoryViewBufferHUD = VK_NULL_HANDLE;
+	VkBuffer handleBufferViewHUD = VK_NULL_HANDLE;
+	
 	VkPipelineLayout handlePipelineLayout = VK_NULL_HANDLE;
 	VkPipeline handlePipeline = VK_NULL_HANDLE;
 	VkCommandPool handleCommandPool = VK_NULL_HANDLE;
@@ -133,10 +150,6 @@ namespace
 	VkCommandBuffer handleCommandBuffer2 = VK_NULL_HANDLE;
 	VkDeviceMemory handleDeviceMemoryVertex = VK_NULL_HANDLE;
 	dmut::HeapAllocSize<VkImage> handleSwapChainImages;
-	VkDeviceMemory handleDeviceMemoryViewBuffer = VK_NULL_HANDLE;
-	VkDeviceMemory handleDeviceMemoryProjectionBuffer = VK_NULL_HANDLE;
-	VkBuffer handleBufferView = VK_NULL_HANDLE;
-	VkBuffer handleBufferProjection = VK_NULL_HANDLE;
 	VkDeviceMemory handleDepthMemory = VK_NULL_HANDLE;
 	VkBuffer handleDepthBuffer = VK_NULL_HANDLE;
 	VkImage handleDepthImage = VK_NULL_HANDLE;
@@ -149,14 +162,36 @@ namespace
 	uint32_t deviceQueueFamilyIndex = 0;
 	const char* pShaderPath = "../Graphics/Shaders/CompiledShaders"; // compiled SPIRV files
 
-	// List of all rendered objects in the game
-	std::vector<RenderedObjectEntry> renderedObjects;
+	// List of all rendered objects in the game, one per ERenderObjectType
+	std::vector<RenderedObjectEntry> renderedObjectsInGame;	// In game objects
+	std::vector<RenderedObjectEntry> renderedObjectsHUD;	// HUD Objects
 
 	Mat4f viewMatrix = Mat4f::Identity();
 }
 
 namespace dmgf
 {
+	template<typename TPredicate>
+	void ForEachRenderedObjectList(TPredicate Predicate)
+	{
+		Predicate(renderedObjectsInGame);
+		Predicate(renderedObjectsHUD);
+	}
+
+	std::vector<RenderedObjectEntry>& GetRenderedObjectsList(ERenderObjectType renderObjectType)
+	{
+		switch (renderObjectType)
+		{
+		case ERenderObjectType::InGame:
+			return renderedObjectsInGame;
+		case ERenderObjectType::HUD:
+			return renderedObjectsHUD;
+		default:
+			DOMLOG_ERROR("You fucked it, add a new vector");
+			return renderedObjectsInGame;
+		}
+	}
+
 	void Init()
 	{
 #ifndef DOMRELEASE
@@ -202,6 +237,10 @@ namespace dmgf
 		handleDescriptorSetLayoutVector = CreateDescriptorSetLayout(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, 0); 
 		handleDescriptorSetView = CreateDescriptorSet(handleDescriptorSetLayoutView);
 		handleDescriptorSetProjection = CreateDescriptorSet(handleDescriptorSetLayoutProjection);
+		handleDescriptorSetViewHUD = CreateDescriptorSet(handleDescriptorSetLayoutView);
+		handleDescriptorSetProjectionHUD = CreateDescriptorSet(handleDescriptorSetLayoutProjection);
+		handleDescriptorSetViewHUD = CreateDescriptorSet(handleDescriptorSetLayoutView);
+		handleDescriptorSetProjectionHUD = CreateDescriptorSet(handleDescriptorSetLayoutProjection);
 		handlePipelineLayout = CreatePipelineLayout();
 		handlePipeline = CreatePipeline();
 		handleCommandPool = CreateCommandPool();
@@ -210,18 +249,33 @@ namespace dmgf
 		handleDeviceMemoryVertexBuffer = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT); // #TODO: Query memory requirements with vkGetBufferMemoryRequirements() instead of hard coding 0x100
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleVertextBuffer, handleDeviceMemoryVertexBuffer, 0), "BindVertexBuffer");
 
-		// View buffer
+		// View buffer (in-game)
 		const size_t viewBufferSize = sizeof(Mat4f);
 		handleDeviceMemoryViewBuffer = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		handleBufferView = CreateUniformBuffer(viewBufferSize);
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferView, handleDeviceMemoryViewBuffer, 0), "BindUniformBuffer");
 
-		// Projection buffer
+		// Projection buffer (in-game)
 		const size_t projectionBufferSize = sizeof(Mat4f);
 		handleDeviceMemoryProjectionBuffer = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		handleBufferProjection = CreateUniformBuffer(projectionBufferSize);
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferProjection, handleDeviceMemoryProjectionBuffer, 0), "BindUniformBuffer");
 		UpdateProjectionBuffer();
+
+		// View buffer (HUD)
+		const size_t viewBufferSizeHUD = sizeof(Mat4f);
+		handleDeviceMemoryViewBufferHUD = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		handleBufferViewHUD = CreateUniformBuffer(viewBufferSizeHUD);
+		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferViewHUD, handleDeviceMemoryViewBufferHUD, 0), "BindUniformBuffer");
+		UpdateViewBufferHUD();
+		
+		// Projection buffer (HUD)
+		const size_t projectionBufferSizeHUD = sizeof(Mat4f);
+		handleDeviceMemoryProjectionBufferHUD = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		handleBufferProjectionHUD = CreateUniformBuffer(projectionBufferSizeHUD);
+		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferProjectionHUD, handleDeviceMemoryProjectionBufferHUD, 0), "BindUniformBuffer");
+		UpdateProjectionBufferHUD();
+		
 
 #ifdef DOMIMGUI
 		
@@ -283,15 +337,29 @@ namespace dmgf
 		ImGui_ImplVulkan_Shutdown();
 #endif //~ #ifdef DOMIMGUI
 
-		for (RenderedObjectEntry& entry : renderedObjects)
+		auto CleanUpRenderedObjects = [](std::vector<RenderedObjectEntry>& renderedObjects)
 		{
-			CleanUpEntry(entry);
-		}
-		
+			for (RenderedObjectEntry& entry : renderedObjects)
+			{
+				CleanUpEntry(entry);
+			}
+			renderedObjects.clear();
+		};
+		ForEachRenderedObjectList(CleanUpRenderedObjects);
+	
+		vkDestroyBuffer(handleDevice, handleDepthBuffer, nullptr);
+		vkFreeMemory(handleDevice, handleDepthMemory, nullptr);
+		vkDestroyImageView(handleDevice, handleDepthImageView, nullptr);
+		vkDestroyImage(handleDevice, handleDepthImage, nullptr);
+
 		vkDestroyBuffer(handleDevice, handleBufferProjection, nullptr);
 		vkDestroyBuffer(handleDevice, handleBufferView, nullptr);
+		vkDestroyBuffer(handleDevice, handleBufferProjectionHUD, nullptr);
+		vkDestroyBuffer(handleDevice, handleBufferViewHUD, nullptr);
 		vkFreeMemory(handleDevice, handleDeviceMemoryProjectionBuffer, nullptr);
 		vkFreeMemory(handleDevice, handleDeviceMemoryViewBuffer, nullptr);
+		vkFreeMemory(handleDevice, handleDeviceMemoryProjectionBufferHUD, nullptr);
+		vkFreeMemory(handleDevice, handleDeviceMemoryViewBufferHUD, nullptr);
 		vkFreeMemory(handleDevice, handleDeviceMemoryVertexBuffer, nullptr);
 		vkDestroyCommandPool(handleDevice, handleCommandPool, nullptr);
 		vkDestroyPipeline(handleDevice, handlePipeline, nullptr);
@@ -309,9 +377,9 @@ namespace dmgf
 		vkDestroyShaderModule(handleDevice, handleShaderVertex, nullptr);
 		vkDestroyShaderModule(handleDevice, handleShaderFragment, nullptr);
 		vkDestroySwapchainKHR(handleDevice, handleSwapChain, nullptr);
-		vkDestroyDevice(handleDevice, nullptr);
+		vkDestroyDevice(handleDevice, nullptr); // #JANK: When destroying the device we get a warning about a VKFence still being in use.
 		vkDestroySurfaceKHR(handleInstance, handleSurface, nullptr);
-		vkDestroyInstance(handleInstance, nullptr);
+		vkDestroyInstance(handleInstance, nullptr); 
 	}
 
 	void Tick(float deltaTime)
@@ -352,8 +420,10 @@ namespace dmgf
 #endif //~ #ifdef DOMIMGUI
 	}
 
-	RendererObject* AddObjectFromSVG(const char* pFileName)
+	TransientPtr<RendererObject> AddObjectFromSVG(const char* pFileName, ERenderObjectType renderObjectType /*= ERenderObjectType::InGame*/)
 	{
+		std::vector<RenderedObjectEntry>& renderedObjects = GetRenderedObjectsList(renderObjectType);
+
 		auto result = std::find_if(renderedObjects.begin(), renderedObjects.end(), [pFileName](RenderedObjectEntry& entry)
 			{
 				return entry.fileName == pFileName;
@@ -386,8 +456,10 @@ namespace dmgf
 	}
 
 
-	RendererObject* AddObjectFromVectorArt(const std::shared_ptr<VectorArt>& vectorArt)
+	TransientPtr<RendererObject> AddObjectFromVectorArt(const std::shared_ptr<VectorArt>& vectorArt, ERenderObjectType renderObjectType /*= ERenderObjectType::InGame*/)
 	{
+		std::vector<RenderedObjectEntry>& renderedObjects = GetRenderedObjectsList(renderObjectType);
+
 		renderedObjects.resize(renderedObjects.size() + 1);
 		RenderedObjectEntry& pEntry = renderedObjects.back();
 		
@@ -403,34 +475,74 @@ namespace dmgf
 		return pEntry.rendererObjects.back().get();
 	}
 
-	void RemoveObject(RendererObject* pRendererObject)
+	void RemoveObject(TransientPtr<RendererObject> pRendererObject)
 	{
-		for (auto renderObjectEntryIterator = renderedObjects.begin(); renderObjectEntryIterator != renderedObjects.end(); ++renderObjectEntryIterator)
+		auto RemoveObjectFromList = [pRendererObject](std::vector<RenderedObjectEntry>& renderedObjects)
 		{
-			for (auto renderedObjectIterator = renderObjectEntryIterator->rendererObjects.begin(); renderedObjectIterator != renderObjectEntryIterator->rendererObjects.end(); ++renderedObjectIterator)
+			for (auto renderObjectEntryIterator = renderedObjects.begin(); renderObjectEntryIterator != renderedObjects.end(); ++renderObjectEntryIterator)
 			{
-				if ((*renderedObjectIterator).get() == pRendererObject)
+				for (auto renderedObjectIterator = renderObjectEntryIterator->rendererObjects.begin(); renderedObjectIterator != renderObjectEntryIterator->rendererObjects.end(); ++renderedObjectIterator)
 				{
-					renderObjectEntryIterator->rendererObjects.erase(renderedObjectIterator);
-					
-					if (renderObjectEntryIterator->rendererObjects.size() == 0)
+					if ((*renderedObjectIterator).get() == pRendererObject.Get())
 					{
-						// If that was the last instance of this render entry, we remove the whole entry
-						CleanUpEntry(*renderObjectEntryIterator);
-						renderedObjects.erase(renderObjectEntryIterator);
+						renderObjectEntryIterator->rendererObjects.erase(renderedObjectIterator);
+
+						if (renderObjectEntryIterator->rendererObjects.size() == 0)
+						{
+							// If that was the last instance of this render entry, we remove the whole entry
+							CleanUpEntry(*renderObjectEntryIterator);
+							renderedObjects.erase(renderObjectEntryIterator);
+						}
+
+						return;
 					}
-					
-					return;
 				}
 			}
-		}
+		};
+
+		ForEachRenderedObjectList(RemoveObjectFromList);
+	}
+
+	struct CameraData
+	{
+		float x = 0.0f, y = 0.0f;
+		float zoom = 1.0f;
+	} cameraData;
+
+	void RefreshViewMatrix()
+	{
+		const float inverseZoom = 1.0f / cameraData.zoom;
+		const float cameraX = EXTENT_WIDTH * inverseZoom * 0.5f - cameraData.x;
+		const float cameraY = EXTENT_HEIGHT * inverseZoom * 0.5f - cameraData.y;
+		viewMatrix = dmma::generateTranslation({ cameraX, cameraY, 0.0f}) * dmma::generateScale({cameraData.zoom, cameraData.zoom, 1.0f});
+		viewMatrix.transpose();
 	}
 
 	void SetCameraCenter(float x, float y)
 	{
-		viewMatrix = Mat4f::getTranslation({ -x, -y, 0.0f });
-		viewMatrix.transpose();
+		cameraData.x = x;
+		cameraData.y = y;
+
+		RefreshViewMatrix();
 	}
+
+	void SetCameraZoom(float zoom)
+	{
+		cameraData.zoom = zoom;
+
+		RefreshViewMatrix();
+	}
+
+	float GetScreenWidth()
+	{
+		return EXTENT_WIDTH;
+	}
+
+	float GetScreenHeight()
+	{
+		return EXTENT_HEIGHT;
+	}
+
 }
 
 namespace
@@ -857,7 +969,7 @@ namespace
 	VkDescriptorPool CreateDescriptorPool()
 	{
 		// Increase this if we need more things rendered
-		const int maxDescriptorSets = 256;
+		const int maxDescriptorSets = 1024; // #TODO: This can be lowered a lot once we cull shit off-screen. Right now it's showing every health bar for every enemy in the game.
 
 		VkDescriptorPoolSize poolSizes[] =
 		{
@@ -872,6 +984,7 @@ namespace
 		VkDescriptorPoolCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		createInfo.pNext = nullptr;
+		createInfo.flags = VkDescriptorPoolCreateFlagBits::VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 		createInfo.maxSets = maxDescriptorSets;
 		createInfo.poolSizeCount = DMUT_ARRAY_SIZE(poolSizes);
 		createInfo.pPoolSizes = poolSizes;
@@ -953,7 +1066,7 @@ namespace
 	}
 
 	void UpdateViewBuffer(float deltaTime)
-{
+	{
 		void* pDeviceData = nullptr;
 		vkMapMemory(handleDevice, handleDeviceMemoryViewBuffer, 0, sizeof(Mat4f), 0, &pDeviceData);
 		memcpy(pDeviceData, &viewMatrix, sizeof(Mat4f));
@@ -975,6 +1088,7 @@ namespace
 		descriptorSetWrite.pImageInfo = nullptr;
 		descriptorSetWrite.pBufferInfo = &descriptorBufferInfo;
 		descriptorSetWrite.pTexelBufferView = nullptr;
+
 		vkUpdateDescriptorSets(handleDevice, 1, &descriptorSetWrite, 0, nullptr);
 	}
 
@@ -997,6 +1111,67 @@ namespace
 		descriptorSetWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorSetWrite.pNext = nullptr;
 		descriptorSetWrite.dstSet = handleDescriptorSetProjection;
+		descriptorSetWrite.dstBinding = 0;
+		descriptorSetWrite.dstArrayElement = 0;
+		descriptorSetWrite.descriptorCount = 1;
+		descriptorSetWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorSetWrite.pImageInfo = nullptr;
+		descriptorSetWrite.pBufferInfo = &descriptorBufferInfo;
+		descriptorSetWrite.pTexelBufferView = nullptr;
+		
+		vkUpdateDescriptorSets(handleDevice, 1, &descriptorSetWrite, 0, nullptr);
+	}
+
+	void UpdateViewBufferHUD()
+	{
+		Mat4f viewMatrixHUD = Mat4f::Identity(); // Identity view matrix because the HUD shouldn't ever move
+
+		void* pDeviceData = nullptr;
+		vkMapMemory(handleDevice, handleDeviceMemoryViewBufferHUD, 0, sizeof(Mat4f), 0, &pDeviceData);
+		memcpy(pDeviceData, &viewMatrixHUD, sizeof(Mat4f));
+		vkUnmapMemory(handleDevice, handleDeviceMemoryViewBufferHUD);
+
+		VkDescriptorBufferInfo descriptorBufferInfo = {};
+		descriptorBufferInfo.buffer = handleBufferViewHUD;
+		descriptorBufferInfo.offset = 0;
+		descriptorBufferInfo.range = VK_WHOLE_SIZE;
+
+		VkWriteDescriptorSet descriptorSetWrite = {};
+		descriptorSetWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorSetWrite.pNext = nullptr;
+		descriptorSetWrite.dstSet = handleDescriptorSetViewHUD;
+		descriptorSetWrite.dstBinding = 1;
+		descriptorSetWrite.dstArrayElement = 0;
+		descriptorSetWrite.descriptorCount = 1;
+		descriptorSetWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorSetWrite.pImageInfo = nullptr;
+		descriptorSetWrite.pBufferInfo = &descriptorBufferInfo;
+		descriptorSetWrite.pTexelBufferView = nullptr;
+		
+		vkUpdateDescriptorSets(handleDevice, 1, &descriptorSetWrite, 0, nullptr);
+	}
+
+	void UpdateProjectionBufferHUD()
+	{
+		// #JANK: This is the same as the in-game projection matrix because it's a 2D game but in-case we ever go 3D I guess I'll have this function
+
+		Mat4f projectionMatrix = dmma::generateOrthoganol(0, EXTENT_WIDTH, 0, EXTENT_HEIGHT, 0.0f, 1.0f);
+		projectionMatrix.transpose();
+
+		void* pDeviceData = nullptr;
+		vkMapMemory(handleDevice, handleDeviceMemoryProjectionBufferHUD, 0, sizeof(Mat4f), 0, &pDeviceData);
+		*((Mat4f*)pDeviceData) = projectionMatrix;
+		vkUnmapMemory(handleDevice, handleDeviceMemoryProjectionBufferHUD);
+
+		VkDescriptorBufferInfo descriptorBufferInfo = {};
+		descriptorBufferInfo.buffer = handleBufferProjectionHUD;
+		descriptorBufferInfo.offset = 0;
+		descriptorBufferInfo.range = VK_WHOLE_SIZE;
+
+		VkWriteDescriptorSet descriptorSetWrite = {};
+		descriptorSetWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorSetWrite.pNext = nullptr;
+		descriptorSetWrite.dstSet = handleDescriptorSetProjectionHUD;
 		descriptorSetWrite.dstBinding = 0;
 		descriptorSetWrite.dstArrayElement = 0;
 		descriptorSetWrite.descriptorCount = 1;
@@ -1148,7 +1323,7 @@ namespace
 		vertexInputInfo.vertexAttributeDescriptionCount = 2;
 		vertexInputInfo.pVertexAttributeDescriptions = vertexAttributeDescriptions;
 
-		///// The actual create structure
+		// The actual create structure
 		VkGraphicsPipelineCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		createInfo.stageCount = 2;
@@ -1331,17 +1506,17 @@ namespace
 		vkCmdBindVertexBuffers(handleCommandBuffer, 0, 1, &handleVertextBuffer, &vertexBufferOffset);
 		vkCmdBindPipeline(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipeline);
 
-		vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 0, 1, &handleDescriptorSetProjection, 0, nullptr);
-		vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 1, 1, &handleDescriptorSetView, 0, nullptr);
+		const float sNum = 0.0f;
+		const float bNum = 1.0f;
 
 		Vertex quad[6] =
 		{
-			{ 0.0f,  0.0f, 0.0f,       0.0f, 0.0f},
-			{ 1.0f,  0.0f, 0.0f,       1.0f, 0.0f},
-			{ 0.0f,  1.0f, 0.0f,       0.0f, 1.0f},
-			{ 1.0f,  0.0f, 0.0f,       1.0f, 0.0f},
-			{ 1.0f,  1.0f, 0.0f,       1.0f, 1.0f},
-			{ 0.0f,  1.0f, 0.0f,       0.0f, 1.0f}
+			{ sNum,  sNum, sNum,       sNum, sNum},
+			{ bNum,  sNum, sNum,       bNum, sNum},
+			{ sNum,  bNum, sNum,       sNum, bNum},
+			{ bNum,  sNum, sNum,       bNum, sNum},
+			{ bNum,  bNum, sNum,       bNum, bNum},
+			{ sNum,  bNum, sNum,       sNum, bNum}
 		};
 
 		void* pDeviceData = nullptr;
@@ -1349,18 +1524,37 @@ namespace
 		memcpy(pDeviceData, quad, sizeof(quad));
 		vkUnmapMemory(handleDevice, handleDeviceMemoryVertexBuffer);
 
-		for (auto& renderObject : renderedObjects)
+		auto RenderObjects = [handleCommandBuffer](std::vector<RenderedObjectEntry>& inRenderObjects)
 		{
-			UpdateVectorBuffer(renderObject);
-			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 2, 1, &renderObject.handleDescriptorSet, 0, nullptr);
-
-			for (auto& rendererObject : renderObject.rendererObjects)
+			for (auto& renderObject : inRenderObjects)
 			{
-				Mat4f modelMatrix = rendererObject->GetModelMatrix();
-				vkCmdPushConstants(handleCommandBuffer, handlePipelineLayout, VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Mat4f), &modelMatrix);
+				UpdateVectorBuffer(renderObject);
+				vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 2, 1, &renderObject.handleDescriptorSet, 0, nullptr);
 
-				vkCmdDraw(handleCommandBuffer, DMUT_ARRAY_SIZE(quad), 1, 0, 0);
+				for (auto& rendererObject : renderObject.rendererObjects)
+				{
+					Mat4f modelMatrix = rendererObject->GetModelMatrix();
+					vkCmdPushConstants(handleCommandBuffer, handlePipelineLayout, VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Mat4f), &modelMatrix);
+
+					vkCmdDraw(handleCommandBuffer, DMUT_ARRAY_SIZE(quad), 1, 0, 0);
+				}
 			}
+		};
+
+		// Render all in-game objects
+		{
+			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 0, 1, &handleDescriptorSetProjection, 0, nullptr);
+			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 1, 1, &handleDescriptorSetView, 0, nullptr);
+
+			RenderObjects(renderedObjectsInGame);
+		}
+
+		// Render all HUD objects
+		{
+			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 0, 1, &handleDescriptorSetProjectionHUD, 0, nullptr);
+			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 1, 1, &handleDescriptorSetViewHUD, 0, nullptr);
+
+			RenderObjects(renderedObjectsHUD);
 		}
 
 #ifdef DOMIMGUI

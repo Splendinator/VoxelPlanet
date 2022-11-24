@@ -16,11 +16,26 @@ void ECS::RegisterSystemCallback(std::unique_ptr<SystemCallbackBase>&& pSystemCa
 
 void ECS::Tick(float deltaTime)
 {
-	// #TODO: Need a way to only tick a entities if the component has changed, maybe just a bool in the base class of all components
+	// #TODO: Need a way to only tick a entities if the component has changed, maybe just a bool in the base class of all components?
+
+	// System Pre-Tick
+	SystemTickParams params;
+	params.pEcs = this;
+	params.entityId = INVALID_ENTITY_ID;
+	params.deltaTime = deltaTime;
+	params.frame = frame;
+	for (std::unique_ptr<SystemBase>& pSystem : systems)
+	{
+		pSystem->PreTick(params);
+	}
+
+	// System Callbacks
 	for (std::unique_ptr<SystemCallbackBase>& callback : systemCallbacks)
 	{
-		callback->HandleCallbacks(this, deltaTime);
+		callback->HandleCallbacks(this, deltaTime, frame);
 	}
+
+	++frame;
 }
 
 void ECS::Uninitialise()

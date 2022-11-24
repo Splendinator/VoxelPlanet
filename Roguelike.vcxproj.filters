@@ -57,6 +57,15 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{6a897c7d-542b-47e9-832a-47227df22724}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Systems\UI">
+      <UniqueIdentifier>{576410fc-8680-43ad-996f-db317f80f937}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\UI\HUD">
+      <UniqueIdentifier>{4d1494ae-c56b-45d4-a997-431b8cb67346}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\UI\UIObjects">
+      <UniqueIdentifier>{9538aa9c-843c-4b23-8519-986bbd8f243f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -175,6 +184,39 @@
     </ClCompile>
     <ClCompile Include="FilePaths.cpp">
       <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionHandlerWait.cpp">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemCleanUp.cpp">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="HUD.cpp">
+      <Filter>Systems\UI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="HUDObjectBase.cpp">
+      <Filter>Systems\UI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="HUDObjectHealth.cpp">
+      <Filter>Systems\UI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="HUDAnchorPoint.cpp">
+      <Filter>Systems\UI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="UIObjectContainer.cpp">
+      <Filter>Systems\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UICanvas.cpp">
+      <Filter>Systems\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIUtils.cpp">
+      <Filter>Systems\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIObjectBase.cpp">
+      <Filter>Systems\UI\UIObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="UIObjectProgressBar.cpp">
+      <Filter>Systems\UI\UIObjects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -309,6 +351,39 @@
     </ClInclude>
     <ClInclude Include="RenderPriorities.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionHandlerWait.h">
+      <Filter>Systems\ActionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemCleanUp.h">
+      <Filter>Systems\ECS\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="HUD.h">
+      <Filter>Systems\UI\HUD</Filter>
+    </ClInclude>
+    <ClInclude Include="HUDObjectBase.h">
+      <Filter>Systems\UI\HUD</Filter>
+    </ClInclude>
+    <ClInclude Include="HUDObjectHealth.h">
+      <Filter>Systems\UI\HUD</Filter>
+    </ClInclude>
+    <ClInclude Include="HUDAnchorPoint.h">
+      <Filter>Systems\UI\HUD</Filter>
+    </ClInclude>
+    <ClInclude Include="UIObjectContainer.h">
+      <Filter>Systems\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UICanvas.h">
+      <Filter>Systems\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIUtils.h">
+      <Filter>Systems\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIObjectProgressBar.h">
+      <Filter>Systems\UI\UIObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="UIObjectBase.h">
+      <Filter>Systems\UI\UIObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -8,5 +8,7 @@ namespace FilePath
 		extern const char* tree;
 		extern const char* healthBar;
 		extern const char* player;
+		extern const char* enemy;
+		extern const char* dirt;
 	}
 }

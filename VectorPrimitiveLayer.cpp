@@ -74,7 +74,7 @@ std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 	return stream;
 }
 
-VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveByLabel(const std::string& label)
+VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveByLabelInternal(const std::string& label)
 {
 	// Label found
 	if (label == layerLabel)
@@ -86,7 +86,7 @@ VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveByLabel(const std::strin
 	// Search children recursively
 	for (VectorPrimitiveBase* child : children)
 	{
-		if (VectorPrimitiveBase* pFound = child->FindPrimitiveByLabel(label))
+		if (VectorPrimitiveBase* pFound = child->FindPrimitiveByLabelInternal(label))
 		{
 			return pFound;
 		}

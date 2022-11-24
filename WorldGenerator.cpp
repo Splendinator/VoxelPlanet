@@ -4,7 +4,6 @@
 #include "Renderer.h"
 #include "WorldGenerator.h"
 
-// WorldGenerator
 void WorldGenerator::SetCenter(int newX, int newY, bool bInit)
 {
 	// #JANK: Negative numbers are a bit fucked, right now we spawn at (20000, 20000) to avoid this

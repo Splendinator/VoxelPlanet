@@ -1,10 +1,13 @@
 #include "SystemBase.h"
 
-class RendererObject;
-class VectorPrimitiveRectangle;
+#include "DomUtils/Pointers.h"
+#include "UICanvas.h"
+
+class UIObjectProgressBar;
 struct ComponentHealth;
 struct ComponentTransform;
 
+// Nameslate UI
 class HealthBarNameslate
 {
 public:
@@ -12,14 +15,19 @@ public:
 	void Uninit();
 	void SetPos(int x, int y);
 	void SetHealth(int health, int maxHealth);
-
-	bool IsInitialised() const { return pHealthBarProgress != nullptr; }
 	
+	bool IsInitialised() { return canvas.get() != nullptr; }
+
 protected:
-	VectorPrimitiveRectangle* pHealthBarProgress = nullptr;
-	RendererObject* pHealthBarRenderObject = nullptr;
+	std::unique_ptr<UICanvas> canvas;
+	
+	TransientPtr<UIObjectProgressBar> pHealthBarProgress = nullptr;
 };
 
+/** SystemNameslate
+*
+* System to render nameslates above units with health
+*/
 class SystemNameslate : public SystemBase
 {
 

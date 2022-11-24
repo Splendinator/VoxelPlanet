@@ -15,7 +15,7 @@ public:
 	//~ Begin VectorPrimitiveBase Interface
 	u32* Serialize(u32* pBuffer) override;
 	std::istream& PopulateFromFile(std::istream& stream) override;
-	VectorPrimitiveBase* FindPrimitiveByLabel(const std::string& label) override;
+	VectorPrimitiveBase* FindPrimitiveByLabelInternal(const std::string& label) override;
 	//~ End VectorPrimitiveBase Interface
 
 private:

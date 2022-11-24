@@ -4,59 +4,55 @@
 
 #include "Components.h"
 #include "FilePaths.h"
-#include "Renderer.h"
 #include "RendererObject.h"
 #include "SystemCallback.h"
 #include "SystemRender.h"
-#include "VectorArt.h"
+#include "UIObjectProgressBar.h"
 #include "VectorPrimitiveRectangle.h"
-#include "RenderPriorities.h"
-
-// Width of health bar when at full health, populated when reading in file
-static u32 healthBarTotalWidth = 0;
 
 // HealthBarNameslate
 void HealthBarNameslate::Init()
 {
-	std::shared_ptr<VectorArt> pVectorArt = std::make_shared<VectorArt>(FilePath::VectorArt::healthBar);
-
-	pHealthBarProgress = pVectorArt->FindPrimitiveByLabel<VectorPrimitiveRectangle>("Foreground");
-	pHealthBarRenderObject = dmgf::AddObjectFromVectorArt(pVectorArt);
-
-	pHealthBarRenderObject->SetRenderPriority(RenderPriority::UI);
-
 	const float healthBarWidth = SystemRender::GRID_SIZE * 0.8f;
 	const float healthBarHeight = healthBarWidth * 0.08f;
-	pHealthBarRenderObject->SetSize(healthBarWidth, healthBarHeight);
 
-	healthBarTotalWidth = pVectorArt->GetPageWidth();
+	UICanvasInitParams initParams;
+	initParams.sizeX = healthBarWidth;
+	initParams.sizeY = healthBarHeight;
+	initParams.filePath = FilePath::VectorArt::healthBar;
+	initParams.renderPriority = RenderPriority::UI;
+	initParams.type = dmgf::ERenderObjectType::InGame;
+
+	canvas = std::make_unique<UICanvas>(initParams);
+
+	pHealthBarProgress = canvas->GetUIObject<UIObjectProgressBar>();
 }
 
 void HealthBarNameslate::Uninit()
 {
+	canvas->Uninit();
+	canvas.release();
+
 	pHealthBarProgress = nullptr;
-	dmgf::RemoveObject(pHealthBarRenderObject);
-	pHealthBarRenderObject = nullptr;
 }
 
 void HealthBarNameslate::SetPos(int x, int y)
 {
-	DOMASSERT(IsInitialised(), "Should be initialised");
+	DOMASSERT(canvas, "Not initialised");
 
 	const float XOffset = SystemRender::GRID_SIZE * 0.1f;
 	const float YOffset = SystemRender::GRID_SIZE * 0.1f;
 
-	pHealthBarRenderObject->SetPosition(XOffset + SystemRender::GRID_SIZE * x, YOffset + SystemRender::GRID_SIZE * y);
+	canvas->SetPosition(XOffset + SystemRender::GRID_SIZE * x, YOffset + SystemRender::GRID_SIZE * y);
 }
 
 void HealthBarNameslate::SetHealth(int health, int maxHealth)
 {
-	DOMASSERT(IsInitialised(), "Should be initialised");
-	
-	const float healthFrac = (float)health / (float)maxHealth;
-	const u32 healthBarWidth = (u32)((float)healthBarTotalWidth * healthFrac);
+	DOMASSERT(pHealthBarProgress, "Not initialised");
 
-	pHealthBarProgress->SetWidth(healthBarWidth);
+	const float healthFrac = (float)health / (float)maxHealth;
+	
+	pHealthBarProgress->SetProgressFrac(healthFrac);
 }
 
 // SystemNameslate

@@ -5,7 +5,7 @@ struct ComponentTransform;
 
 class SystemPhysics : public SystemBase
 {
-	static constexpr int GRID_SIZE = 256;
+	static constexpr int GRID_SIZE = 128;
 
 public:
 	

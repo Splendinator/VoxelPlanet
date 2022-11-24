@@ -29,12 +29,13 @@ public:
 
 	void Uninitialise();
 
+	/// #TEMP: This needs making private, outside systems should use EntityID instead
 	Entity& GetEntity(EntityId entityId) { return entities[entityId]; }
 
 	// Get the next unused entity (entity with no components)
 	EntityId GetNextFreeEntity();
 
-	void DeleteEntity(EntityId entity);;
+	void DeleteEntity(EntityId entity);
 
 	template<typename T> 
 	T* GetSystem();
@@ -48,11 +49,16 @@ public:
 	template<typename T>
 	T& AddComponent(EntityId entityId) { DOMASSERT(false, "This shouldn't be called! Are you missing a REGISTER_COMPONENT?"); }
 
+	template<typename T>
+	void ForEachEntity(const T& predicate) { for (EntityId e = 0; e < NUM_ENTITIES; ++e) { predicate(e); } }
+
+
 	REGISTER_COMPONENT(ComponentMesh);
 	REGISTER_COMPONENT(ComponentTransform);
 	REGISTER_COMPONENT(ComponentAction);
 	REGISTER_COMPONENT(ComponentRigid);
 	REGISTER_COMPONENT(ComponentHealth);
+	REGISTER_COMPONENT(ComponentFaction);
 
 private:
 
@@ -60,6 +66,8 @@ private:
 	std::vector<std::unique_ptr<SystemCallbackBase>> systemCallbacks;
 
 	Entity entities[NUM_ENTITIES];
+
+	int frame = 0; // The frame we are on, useful for debug or systems that want to do something different on the first frame. Is '0' for the first frame
 };
 
 template<typename THead, typename... TTail>

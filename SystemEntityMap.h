@@ -12,7 +12,7 @@ struct EntityList
 
 	void Reset();
 	void AddEntity(EntityId newEntity);
-	void RemoveEntity(EntityId oldEntity);
+	void TryRemoveEntity(EntityId oldEntity);
 	bool Contains(EntityId entity) const;
 
 	EntityId entities[HASH_MAP_NUM_ENTITIES];

@@ -10,18 +10,23 @@
 #include "DomMath/Vec3.h"
 #include "DomUtils/DomUtils.h"
 #include "DomWindow/DomWindow.h"
+#include "HUD.h"
 #include "ResourceLoader.h"
+#include "WorldGenerator.h"
 
 #include <imgui.h>
 #include <time.h>
 
 /// Temp headers, this stuff will be moved to the world gen system at some point I guess
 #include "ActionDeciderPlayer.h"
+#include "Components.h"
 #include "ECS.h"
 #include "FilePaths.h"
+#include "RenderPriorities.h"
 #include "Renderer.h"
 #include "RendererObject.h"
 #include "SystemAction.h"
+#include "SystemCleanUp.h"
 #include "SystemDamage.h"
 #include "SystemEntityMap.h"
 #include "SystemNameslate.h"
@@ -29,24 +34,25 @@
 #include "SystemRender.h"
 #include "VectorArt.h"
 #include "VectorPrimitiveRectangle.h"
-#include "WorldGenerator.h"
-#include "RenderPriorities.h"
+#include "ActionDeciderAI.h"
 
 ECS ecs;
 WorldGenerator worldGenerator(ecs);
+HUD hud(ecs);
+
 
 EntityId playerEntity = 0;
 
 void Game::Init()
 {
 	// Register systems to ECS (order matters)
+	ecs.RegisterSystem(std::make_unique<SystemAction>());
 	ecs.RegisterSystem(std::make_unique<SystemEntityMap>());
 	ecs.RegisterSystem(std::make_unique<SystemPhysics>());
-	ecs.RegisterSystem(std::make_unique<SystemAction>()); // Action before render or player is 1 square behind for a frame
 	ecs.RegisterSystem(std::make_unique<SystemDamage>());
 	ecs.RegisterSystem(std::make_unique<SystemNameslate>());
 	ecs.RegisterSystem(std::make_unique<SystemRender>());
-	
+	ecs.RegisterSystem(std::make_unique<SystemCleanUp>());
 
 	// Create player entity
 	{
@@ -55,6 +61,8 @@ void Game::Init()
 		e.components.AddComponent(EComponents::ComponentTransform);
 		e.components.AddComponent(EComponents::ComponentAction);
 		e.components.AddComponent(EComponents::ComponentHealth);
+		e.components.AddComponent(EComponents::ComponentFaction);
+		e.components.AddComponent(EComponents::ComponentRigid);
 		ecs.GetComponent<ComponentMesh>(playerEntity).pRendererObject = dmgf::AddObjectFromSVG(FilePath::VectorArt::player);
 		ecs.GetComponent<ComponentMesh>(playerEntity).pRendererObject->SetRenderPriority(RenderPriority::unit);
 		ecs.GetComponent<ComponentTransform>(playerEntity).x = 10000;
@@ -62,15 +70,21 @@ void Game::Init()
 		ecs.GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;
 		ecs.GetComponent<ComponentAction>(playerEntity).energy = 100;
 		ecs.GetComponent<ComponentAction>(playerEntity).pActionDecider = new ActionDeciderPlayer;
-		ecs.GetComponent<ComponentHealth>(playerEntity).health = 100;
-		ecs.GetComponent<ComponentHealth>(playerEntity).maxHealth = 100;
+		ecs.GetComponent<ComponentHealth>(playerEntity).health = 10000;
+		ecs.GetComponent<ComponentHealth>(playerEntity).maxHealth = 10000;
+		ecs.GetComponent<ComponentFaction>(playerEntity).factionFlags = ComponentFaction::EFactionFlags::Player;
 	}
 
+	// Set random seed based off time
+	srand((unsigned int)time(NULL));
 	worldGenerator.SetCenter(10000, 10000, /*bInit =*/true);
+
+	hud.Initialise(playerEntity);
 }  
 
 void Game::UnInit()
 {
+	hud.Uninitialise();
 	worldGenerator.Uninitialise();
 	ecs.Uninitialise();
 }
@@ -106,7 +120,23 @@ void GameplayTick(float deltaTime)
 	
 	ComponentTransform& transform = ecs.GetComponent<ComponentTransform>(playerEntity);
 	worldGenerator.SetCenter(transform.x, transform.y, false);
-	dmgf::SetCameraCenter((transform.x - 8) * SystemRender::GRID_SIZE, (transform.y - 4) * SystemRender::GRID_SIZE); // #TODO: Need a way to center camera based on screen size + zoom level
+	dmgf::SetCameraCenter(transform.x * SystemRender::GRID_SIZE + SystemRender::GRID_SIZE * 0.5f, transform.y * SystemRender::GRID_SIZE + SystemRender::GRID_SIZE * 0.5f);
+	hud.Tick(deltaTime);
+
+	// Zoom
+	{
+		static float zoom = 1.0f;
+		static float zoomSpeed = 1.0f;
+		if (dmwi::isHeld(dmwi::Button::PLUS))
+		{
+			zoom += zoomSpeed * deltaTime;
+		}
+		if (dmwi::isHeld(dmwi::Button::SUB))
+		{
+			zoom -= zoomSpeed * deltaTime;
+		}
+		dmgf::SetCameraZoom(zoom);
+	}
 }
 
 void Game::tick(float deltaTime)

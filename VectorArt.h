@@ -38,9 +38,9 @@ public:
 	u32 GetPageWidth() { return pageWidth; }
 	u32 GetPageHeight() { return pageHeight; }
 
-private:
+	VectorPrimitiveLayer* GetRootLayer() { return pRootLayer.get(); }
 
-	VectorPrimitiveBase* FindPrimitiveByLabelInternal(const std::string& label);
+private:
 
 	std::unique_ptr<VectorPrimitiveLayer> pRootLayer;
 
@@ -51,14 +51,5 @@ private:
 template<typename TClass>
 TClass* VectorArt::FindPrimitiveByLabel(const std::string& label)
 {
-	if (VectorPrimitiveBase* pPrimitive = FindPrimitiveByLabelInternal(label))
-	{
-		TClass* pReturnedPrimitive = dynamic_cast<TClass*>(pPrimitive);
-		DOMLOG_WARN_IF(pReturnedPrimitive == nullptr, "Could not cast primitive '", label, "'to type:", typeid(TClass).name());
-		return pReturnedPrimitive;
-	}
-
-	DOMLOG_WARN("No label '", label, "' found.");
-
-	return nullptr;
+	return pRootLayer->FindPrimitiveByLabel<TClass>(label);
 }

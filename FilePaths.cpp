@@ -12,5 +12,7 @@ namespace FilePath
 		const char* tree = VECTOR_ART_DIRECTORY("Tree");
 		const char* healthBar = VECTOR_ART_DIRECTORY("HealthBar");
 		const char* player = VECTOR_ART_DIRECTORY("Player");
+		const char* enemy = VECTOR_ART_DIRECTORY("Enemy");
+		const char* dirt = VECTOR_ART_DIRECTORY("Dirt");
 	}
 }

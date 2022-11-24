@@ -29,7 +29,7 @@ void EntityList::AddEntity(EntityId newEntity)
 	DOMLOG_ERROR("Failed to add entity, need to increase HASH_MAP_NUM_ENTITIES");
 }
 
-void EntityList::RemoveEntity(EntityId oldEntity)
+void EntityList::TryRemoveEntity(EntityId oldEntity)
 {
 	for (EntityId& entity : entities)
 	{
@@ -39,8 +39,6 @@ void EntityList::RemoveEntity(EntityId oldEntity)
 			return;
 		}
 	}
-
-	DOMLOG_WARN("Removing entity that doesn't exist (", oldEntity, ")");
 }
 
 bool EntityList::Contains(EntityId entity) const
@@ -76,26 +74,31 @@ const EntityList& SystemEntityMap::GetEntities(int x, int y) const
 
 void SystemEntityMap::Tick(const SystemTickParams& params, const std::tuple<ComponentTransform*>& components)
 {
-	// #TODO: This needs to handle transform components moving
+	ComponentTransform* pTransformComponent = std::get<ComponentTransform*>(components);
 	
-	const int hashX = GetHashX(std::get<ComponentTransform*>(components)->x);
-	const int hashY = GetHashY(std::get<ComponentTransform*>(components)->y);
-	
-	EntityList& entityList = entityMap[hashX][hashY];
-	if (!entityList.Contains(params.entityId))
+	if (pTransformComponent->x != pTransformComponent->lastX || pTransformComponent->y != pTransformComponent->lastY)
 	{
-		entityList.AddEntity(params.entityId);
-	}
+		const int oldHashX = GetHashX(pTransformComponent->lastX);
+		const int oldHashY = GetHashY(pTransformComponent->lastY);
+		const int newHashX = GetHashX(pTransformComponent->x);
+		const int newHashY = GetHashY(pTransformComponent->y);
+		
+		entityMap[oldHashX][oldHashY].TryRemoveEntity(params.entityId);
+		entityMap[newHashX][newHashY].AddEntity(params.entityId);
+	}	
 }
 
 void SystemEntityMap::OnEntityDeleted(const SystemEntityDeletionParams& params, const std::tuple<ComponentTransform*>& components)
 {
-	const int hashX = GetHashX(std::get<ComponentTransform*>(components)->x);
-	const int hashY = GetHashY(std::get<ComponentTransform*>(components)->y);
+	ComponentTransform* pTransformComponent = std::get<ComponentTransform*>(components);
 
-	EntityList& entityList = entityMap[hashX][hashY];
-	
-	entityList.RemoveEntity(params.entityId);
+	const int oldHashX = GetHashX(pTransformComponent->lastX);
+	const int oldHashY = GetHashY(pTransformComponent->lastY);
+	const int newHashX = GetHashX(pTransformComponent->x);
+	const int newHashY = GetHashY(pTransformComponent->y);
+
+	entityMap[oldHashX][oldHashY].TryRemoveEntity(params.entityId);
+	entityMap[newHashX][newHashY].TryRemoveEntity(params.entityId);
 }
 
 int SystemEntityMap::GetHashX(int x) const

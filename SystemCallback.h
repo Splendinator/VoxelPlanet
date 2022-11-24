@@ -36,7 +36,7 @@ protected:
 	};
 
 	//~ Begin SystemCallbackBase Interface
-	void DoCallback(ECS* pEcs, float deltaTime) override;
+	void DoCallback(ECS* pEcs, float deltaTime, int frame) override;
 	void DoEntityDeletion(ECS* pEcs, EntityId entity) override;
 	//~ End SystemCallbackBase Interface
 
@@ -44,11 +44,12 @@ protected:
 };
 
 template<typename TSystem, typename... T>
-void SystemCallback<TSystem, T...>::DoCallback(ECS* pEcs, float deltaTime)
+void SystemCallback<TSystem, T...>::DoCallback(ECS* pEcs, float deltaTime, int frame)
 {
 	SystemTickParams params;
 	params.deltaTime = deltaTime;
 	params.pEcs = pEcs;
+	params.frame = frame;
 
 	for (EntityId i = 0; i < NUM_ENTITIES; ++i) // #TODO: This should probably cache a list of entities that updates if anything changes
 	{
