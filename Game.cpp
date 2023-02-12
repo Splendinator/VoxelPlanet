@@ -21,6 +21,7 @@
 #include "ActionDeciderPlayer.h"
 #include "Components.h"
 #include "ECS.h"
+#include "ImGuiEditor.h"
 #include "FilePaths.h"
 #include "RenderPriorities.h"
 #include "Renderer.h"
@@ -36,6 +37,10 @@
 #include "VectorPrimitiveRectangle.h"
 #include "ActionDeciderAI.h"
 
+#ifdef DOMIMGUI
+ImGuiEditor imGuiEditor;
+#endif //~ DOMIMGUI
+
 ECS ecs;
 WorldGenerator worldGenerator(ecs);
 HUD hud(ecs);
@@ -43,8 +48,16 @@ HUD hud(ecs);
 
 EntityId playerEntity = 0;
 
+constexpr int WORLD_START_X = 10000;
+constexpr int WORLD_START_Y = 10000;
+
 void Game::Init()
 {
+#ifdef DOMIMGUI
+	imGuiEditor.Init();
+#endif //~ DOMIMGUI
+	
+
 	// Register systems to ECS (order matters)
 	ecs.RegisterSystem(std::make_unique<SystemAction>());
 	ecs.RegisterSystem(std::make_unique<SystemEntityMap>());
@@ -65,19 +78,19 @@ void Game::Init()
 		e.components.AddComponent(EComponents::ComponentRigid);
 		ecs.GetComponent<ComponentMesh>(playerEntity).pRendererObject = dmgf::AddObjectFromSVG(FilePath::VectorArt::player);
 		ecs.GetComponent<ComponentMesh>(playerEntity).pRendererObject->SetRenderPriority(RenderPriority::unit);
-		ecs.GetComponent<ComponentTransform>(playerEntity).x = 10000;
-		ecs.GetComponent<ComponentTransform>(playerEntity).y = 10000;
+		ecs.GetComponent<ComponentTransform>(playerEntity).x = WORLD_START_X;
+		ecs.GetComponent<ComponentTransform>(playerEntity).y = WORLD_START_Y;
 		ecs.GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;
 		ecs.GetComponent<ComponentAction>(playerEntity).energy = 100;
 		ecs.GetComponent<ComponentAction>(playerEntity).pActionDecider = new ActionDeciderPlayer;
-		ecs.GetComponent<ComponentHealth>(playerEntity).health = 10000;
-		ecs.GetComponent<ComponentHealth>(playerEntity).maxHealth = 10000;
+		ecs.GetComponent<ComponentHealth>(playerEntity).health = 1000;
+		ecs.GetComponent<ComponentHealth>(playerEntity).maxHealth = 1000;
 		ecs.GetComponent<ComponentFaction>(playerEntity).factionFlags = ComponentFaction::EFactionFlags::Player;
 	}
 
 	// Set random seed based off time
 	srand((unsigned int)time(NULL));
-	worldGenerator.SetCenter(10000, 10000, /*bInit =*/true);
+	worldGenerator.SetCenter(WORLD_START_X, WORLD_START_Y, /*bInit =*/true);
 
 	hud.Initialise(playerEntity);
 }  
@@ -87,6 +100,10 @@ void Game::UnInit()
 	hud.Uninitialise();
 	worldGenerator.Uninitialise();
 	ecs.Uninitialise();
+
+#ifdef DOMIMGUI
+	imGuiEditor.Uninit();
+#endif //~ DOMIMGUI
 }
 
 #ifdef DOMIMGUI
@@ -125,8 +142,8 @@ void GameplayTick(float deltaTime)
 
 	// Zoom
 	{
-		static float zoom = 1.0f;
-		static float zoomSpeed = 1.0f;
+		static float zoom = 64.f / SystemRender::GRID_SIZE;
+		static float zoomSpeed = 64.f / SystemRender::GRID_SIZE;
 		if (dmwi::isHeld(dmwi::Button::PLUS))
 		{
 			zoom += zoomSpeed * deltaTime;
@@ -143,6 +160,8 @@ void Game::tick(float deltaTime)
 {
 #ifdef DOMIMGUI
 	CreateImGuiWindow(deltaTime);
+	imGuiEditor.Tick();
 #endif //~ #ifdef DOMIMGUI
 	GameplayTick(deltaTime);
+
 }

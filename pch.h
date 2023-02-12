@@ -2,6 +2,7 @@
 
 // MY HEADERS
 #include "DomLog/DomLog.h"
+#include "ImGuiEditorMacros.h"
 
 // EXTERNAL
 #include "stb_image.h"
@@ -12,6 +13,10 @@
 #include <unordered_map>
 #include <map>
 #include <vector>
+#include <stack>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 // IMGUI
 #include <imgui.h>
@@ -23,3 +28,4 @@
 #define WIN32_LEAN_AND_MEAN  
 #define NOMINMAX
 #include <Windows.h>
+

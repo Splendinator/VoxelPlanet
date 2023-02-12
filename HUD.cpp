@@ -19,7 +19,7 @@ HUD::HUD(ECS& inEcs) : ecs(inEcs)
 		initParams.screenAnchorPoint = HUDAnchorPoint(EHUDAnchorPoint::TopLeft, screenEdgePadding);
 		initParams.hudAnchorPoint = HUDAnchorPoint(EHUDAnchorPoint::TopLeft);
 		initParams.sizeX = 400.0f;
-		initParams.sizeY = 100.0f;
+		initParams.sizeY = 400.f * 0.08f;
 		initParams.filePath = FilePath::VectorArt::healthBar;
 
 		pHudObjects[0] = new HUDObjectHealth(initParams);

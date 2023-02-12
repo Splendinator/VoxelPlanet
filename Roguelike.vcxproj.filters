@@ -66,6 +66,18 @@
     <Filter Include="Systems\UI\UIObjects">
       <UniqueIdentifier>{9538aa9c-843c-4b23-8519-986bbd8f243f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Systems\ImGUIEditor">
+      <UniqueIdentifier>{e7aa329f-2493-4356-9a59-75ecb3907e6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\ImGUIEditor\Tokens">
+      <UniqueIdentifier>{f0e919f8-e9c5-413b-9f71-183dab013ef2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\ImGUIEditor\Tokens\Factories">
+      <UniqueIdentifier>{a8519a02-00aa-45a5-94c9-25b5d5fb320b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\ImGUIEditor\Tokens\Tokens">
+      <UniqueIdentifier>{000e408f-a346-432b-a9dc-80744167455e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -217,6 +229,30 @@
     </ClCompile>
     <ClCompile Include="UIObjectProgressBar.cpp">
       <Filter>Systems\UI\UIObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuiEditor.cpp">
+      <Filter>Systems\ImGUIEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeParseTokenFactoryBase.cpp">
+      <Filter>Systems\ImGUIEditor\Tokens\Factories</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeParseTokenFactoryClass.cpp">
+      <Filter>Systems\ImGUIEditor\Tokens\Factories</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeParseTokenBase.cpp">
+      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeParseTokenClass.cpp">
+      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeParseTokenFactoryProperty.cpp">
+      <Filter>Systems\ImGUIEditor\Tokens\Factories</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeParseTokenPropertyBase.cpp">
+      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeParseTokenPropertyFloat.cpp">
+      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -384,6 +420,33 @@
     </ClInclude>
     <ClInclude Include="UIObjectBase.h">
       <Filter>Systems\UI\UIObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiEditor.h">
+      <Filter>Systems\ImGUIEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiEditorMacros.h">
+      <Filter>Systems\ImGUIEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeParseTokenFactoryClass.h">
+      <Filter>Systems\ImGUIEditor\Tokens\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeParseTokenFactoryBase.h">
+      <Filter>Systems\ImGUIEditor\Tokens\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeParseTokenClass.h">
+      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeParseTokenBase.h">
+      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeParseTokenFactoryProperty.h">
+      <Filter>Systems\ImGUIEditor\Tokens\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeParseTokenPropertyBase.h">
+      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeParseTokenPropertyFloat.h">
+      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

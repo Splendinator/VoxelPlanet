@@ -145,6 +145,13 @@
     <ClCompile Include="ActionHandlerWait.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkGeneratorGrass.cpp" />
+    <ClCompile Include="CodeParseTokenBase.cpp" />
+    <ClCompile Include="CodeParseTokenClass.cpp" />
+    <ClCompile Include="CodeParseTokenFactoryBase.cpp" />
+    <ClCompile Include="CodeParseTokenFactoryClass.cpp" />
+    <ClCompile Include="CodeParseTokenFactoryProperty.cpp" />
+    <ClCompile Include="CodeParseTokenPropertyBase.cpp" />
+    <ClCompile Include="CodeParseTokenPropertyFloat.cpp" />
     <ClCompile Include="ECS.cpp" />
     <ClCompile Include="FilePaths.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -152,6 +159,7 @@
     <ClCompile Include="HUDAnchorPoint.cpp" />
     <ClCompile Include="HUDObjectBase.cpp" />
     <ClCompile Include="HUDObjectHealth.cpp" />
+    <ClCompile Include="ImGuiEditor.cpp" />
     <ClCompile Include="JumpGame.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -202,6 +210,12 @@
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="ChunkGeneratorBase.h" />
     <ClInclude Include="ChunkGeneratorGrass.h" />
+    <ClInclude Include="CodeParseTokenBase.h" />
+    <ClInclude Include="CodeParseTokenClass.h" />
+    <ClInclude Include="CodeParseTokenFactoryClass.h" />
+    <ClInclude Include="CodeParseTokenFactoryProperty.h" />
+    <ClInclude Include="CodeParseTokenPropertyBase.h" />
+    <ClInclude Include="CodeParseTokenPropertyFloat.h" />
     <ClInclude Include="Components.h" />
     <ClInclude Include="ECS.h" />
     <ClInclude Include="Entity.h" />
@@ -211,6 +225,8 @@
     <ClInclude Include="HUDAnchorPoint.h" />
     <ClInclude Include="HUDObjectBase.h" />
     <ClInclude Include="HUDObjectHealth.h" />
+    <ClInclude Include="ImGuiEditor.h" />
+    <ClInclude Include="ImGuiEditorMacros.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Renderer.h" />
@@ -230,6 +246,7 @@
     <ClInclude Include="SystemRender.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="tinyobj_loader.h" />
+    <ClInclude Include="CodeParseTokenFactoryBase.h" />
     <ClInclude Include="UICanvas.h" />
     <ClInclude Include="UIObjectBase.h" />
     <ClInclude Include="UIObjectContainer.h" />

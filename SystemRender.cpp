@@ -7,7 +7,7 @@
 #include "SystemCallback.h"
 #include "SystemRender.h"
 
-float SystemRender::GRID_SIZE = 64.f;
+float SystemRender::GRID_SIZE = 1.0f;
 
 void SystemRender::InitialiseInternal(ECS* pEcs)
 {
