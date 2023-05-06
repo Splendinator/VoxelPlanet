@@ -4,138 +4,81 @@
 
 #include "ImGuiEditor.h"
 
-#include "DomImport/DomImport.h"
-
 #include <filesystem>
 
-#include "CodeParseTokenBase.h"
-#include "CodeParseTokenFactoryBase.h"
-#include "CodeParseTokenFactoryClass.h"
-#include "CodeParseTokenFactoryProperty.h"
-
-static std::string codeFilesBaseDirectory = "C:\\Users\\Dominic\\Desktop\\ImGuiEditorTest"; /// #TEMP: Change this to the project directory once tested
-static std::string editorTypesOutputFile = "EditorTypes.txt";
+#include "DomImport/DomImport.h"
+#include "EditorTypeBase.h"
+#include "EditorTypeFactoryBase.h"
+#include "EditorTypeFactoryClass.h"
+#include "ImGuiEditorGlobals.h"
 
 /// #TEMP: PRAGMA
 #pragma optimize( "", off )
 void ImGuiEditor::Init()
-{
-	std::vector<std::string> codeFiles = GetCodeFilesInDirectory(codeFilesBaseDirectory);
-	
-	// Gather all tokens
-	std::vector<CodeParseTokenBase*> allTokens;
-	for (const std::string& codeFile : codeFiles)
-	{
-		Parse(codeFile, allTokens);
-	}
-
-	// Write to file
-	std::ofstream outputFile(codeFilesBaseDirectory + "\\" + editorTypesOutputFile);
-	for (CodeParseTokenBase* token : allTokens)
-	{
-		token->WriteToFile(outputFile);
-		outputFile << std::endl;
-	}
+{	
+	CreateTemplateTypes(ImGuiEditorGlobals::codeFilesBaseDirectory + "\\" + ImGuiEditorGlobals::editorTypesOutputFile);
 }
 
 void ImGuiEditor::Uninit()
 {
-
+	
 }
 
 void ImGuiEditor::Tick()
 {
-
-}
-
-std::vector<std::string> ImGuiEditor::GetCodeFilesInDirectory(const std::string& directory)
-{
-	std::vector<std::string> codeFiles;
-
-	for (const auto& entry : std::filesystem::directory_iterator(directory))
+	ImGui::SetWindowPos({ 0,0 }, ImGuiCond_FirstUseEver);
+	ImGui::SetWindowSize({ 400,400 }, ImGuiCond_FirstUseEver);
+	ImGui::Begin("Editor");
+	
+	for (const auto& typePair : templateTypes)
 	{
-		if (entry.is_regular_file())
-		{
-			const std::string extension = entry.path().extension().string();
-			if (extension == ".cpp" || extension == ".h")
-			{
-				codeFiles.push_back(entry.path().string());
-			}
-		}
-		else if (entry.is_directory())
-		{
-			std::vector<std::string> subDirectoryCodeFiles = GetCodeFilesInDirectory(entry.path().string());
-			codeFiles.insert(codeFiles.end(), subDirectoryCodeFiles.begin(), subDirectoryCodeFiles.end());
-		}
+		typePair.second->DrawImGUI();
 	}
-
-	return codeFiles;
+	
+	ImGui::End();
 }
 
-void ImGuiEditor::Parse(std::string codeFile, std::vector<CodeParseTokenBase*>& allTokens)
+void ImGuiEditor::CreateTemplateTypes(const std::string& typesFile)
 {
-	dmut::HeapAllocSize<char> code = dmim::importText(codeFile.c_str());
-	std::stringstream stream(code.RawPtr());
+	std::ifstream inputFile(typesFile);
+
+	EditorTypeFactoryClass editorTypeFactoryClass;
 	
-	// Set up token factories
-	CodeParseTokenFactoryClass codeParseTokenFactoryClass;
-	CodeParseTokenFactoryProperty codeParseTokenFactoryPropertyClass;
-	
-	codeParseTokenFactoryPropertyClass.SetRequiredPrecedingToken(&codeParseTokenFactoryClass);
-	
-	CodeParseTokenFactoryBase* pFactories[] =
+	EditorTypeFactoryBase* pEditorTypeFactories[] = 
 	{
-		&codeParseTokenFactoryClass,
-		&codeParseTokenFactoryPropertyClass
+		&editorTypeFactoryClass
 	};
 
-	// Parse code
-	std::stack<CodeParseTokenFactoryBase*> activeScopedFactories; // Token factories that are currently active (i.e. we are inside a class, struct, etc)
-	
-	while (!stream.eof())
+	while (!inputFile.eof())
 	{
 		std::string nextString;
-		stream >> nextString;
+		inputFile >> nextString;
 
-		// Check for end of scope
-		if (!activeScopedFactories.empty())
+		if (nextString == "")
 		{
-			CodeParseTokenFactoryBase* pScopedTokenType = activeScopedFactories.top();
-			std::string endString = pScopedTokenType->GetEndString();
+			// Edge case - last line of file
+			continue;
+		}
 
-			if (nextString.size() >= endString.size() && nextString.substr(0, endString.size()) == endString)
+		bool bFoundType = false;
+		for (EditorTypeFactoryBase* pEditorFactory : pEditorTypeFactories)
+		{
+			if (pEditorFactory->GetKeyword() == nextString)
 			{
-				activeScopedFactories.pop();
-				continue;
+				EditorTypeBase* pEditorType = pEditorFactory->CreateType(inputFile);
+
+				DOMLOG_ERROR_IF(pEditorType == nullptr, "Failed to create editor type for type", pEditorFactory->GetKeyword());
+				DOMLOG_ERROR_IF(pEditorType->name == "", "Editor type created with no name", pEditorFactory->GetKeyword());
+
+				bFoundType = true;
+				templateTypes.insert({ pEditorType->name, pEditorType });
+
+				break;
 			}
 		}
 
-		// Check factories
-		for (CodeParseTokenFactoryBase* pFactory : pFactories)
-		{
-			if (pFactory->CanFactoryBeUsed(activeScopedFactories) && pFactory->IsKeyword(nextString))
-			{
-				CodeParseTokenBase* pToken = pFactory->CreateToken(nextString, stream);
-				if (pToken)
-				{
-					allTokens.push_back(pToken);
-					
-					if (pFactory->IsScopedTokenType())
-					{
-						activeScopedFactories.push(pFactory);
-					}
-
-					break;
-				}
-				else
-				{
-					DOMLOG_ERROR("Cannot create token for keyword:", nextString, "in file", codeFile);
-				}
-			}
-		}
+		DOMLOG_ERROR_IF(!bFoundType, "Failed to find editor type factory for keyword", nextString);
 	}
-
-	DOMLOG_ERROR_IF(!activeScopedFactories.empty(), "Scoped factories not detecting end of scope?")
 }
 
 #endif //~ DOMIMGUI

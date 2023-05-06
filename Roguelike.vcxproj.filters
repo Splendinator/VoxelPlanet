@@ -69,14 +69,20 @@
     <Filter Include="Systems\ImGUIEditor">
       <UniqueIdentifier>{e7aa329f-2493-4356-9a59-75ecb3907e6b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Systems\ImGUIEditor\Tokens">
-      <UniqueIdentifier>{f0e919f8-e9c5-413b-9f71-183dab013ef2}</UniqueIdentifier>
+    <Filter Include="Systems\ImGUIEditor\Types">
+      <UniqueIdentifier>{39e79ab0-869b-451d-80e5-24ab1a4efffb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Systems\ImGUIEditor\Tokens\Factories">
-      <UniqueIdentifier>{a8519a02-00aa-45a5-94c9-25b5d5fb320b}</UniqueIdentifier>
+    <Filter Include="Systems\ImGUIEditor\Types\EditorTypes">
+      <UniqueIdentifier>{d41c7bfd-41ff-49d8-b430-b6d94cdabe18}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Systems\ImGUIEditor\Tokens\Tokens">
-      <UniqueIdentifier>{000e408f-a346-432b-a9dc-80744167455e}</UniqueIdentifier>
+    <Filter Include="Systems\ImGUIEditor\Types\EditorFactories">
+      <UniqueIdentifier>{ecc375c4-a709-473d-a920-c0d8f4cc8b97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\ImGUIEditor\Types\PropertyFactories">
+      <UniqueIdentifier>{12416d26-b8d3-477c-aadd-9c8c79913107}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\ImGUIEditor\Types\PropertyTypes">
+      <UniqueIdentifier>{48bb4fb8-9e40-4f6f-b5bb-86b03213ea54}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -233,26 +239,32 @@
     <ClCompile Include="ImGuiEditor.cpp">
       <Filter>Systems\ImGUIEditor</Filter>
     </ClCompile>
-    <ClCompile Include="CodeParseTokenFactoryBase.cpp">
-      <Filter>Systems\ImGUIEditor\Tokens\Factories</Filter>
+    <ClCompile Include="EditorTypeFactoryBase.cpp">
+      <Filter>Systems\ImGUIEditor\Types\EditorFactories</Filter>
     </ClCompile>
-    <ClCompile Include="CodeParseTokenFactoryClass.cpp">
-      <Filter>Systems\ImGUIEditor\Tokens\Factories</Filter>
+    <ClCompile Include="EditorTypeFactoryPropertiesBase.cpp">
+      <Filter>Systems\ImGUIEditor\Types\EditorFactories</Filter>
     </ClCompile>
-    <ClCompile Include="CodeParseTokenBase.cpp">
-      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    <ClCompile Include="EditorTypeFactoryClass.cpp">
+      <Filter>Systems\ImGUIEditor\Types\EditorFactories</Filter>
     </ClCompile>
-    <ClCompile Include="CodeParseTokenClass.cpp">
-      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    <ClCompile Include="EditorTypeBase.cpp">
+      <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
     </ClCompile>
-    <ClCompile Include="CodeParseTokenFactoryProperty.cpp">
-      <Filter>Systems\ImGUIEditor\Tokens\Factories</Filter>
+    <ClCompile Include="EditorTypeClass.cpp">
+      <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
     </ClCompile>
-    <ClCompile Include="CodeParseTokenPropertyBase.cpp">
-      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    <ClCompile Include="EditorTypePropertiesBase.cpp">
+      <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
     </ClCompile>
-    <ClCompile Include="CodeParseTokenPropertyFloat.cpp">
-      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    <ClCompile Include="ImGuiEditorGlobals.cpp">
+      <Filter>Systems\ImGUIEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorTypePropertyFloat.cpp">
+      <Filter>Systems\ImGUIEditor\Types\PropertyTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorTypePropertyFactoryFloat.cpp">
+      <Filter>Systems\ImGUIEditor\Types\PropertyFactories</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -427,26 +439,38 @@
     <ClInclude Include="ImGuiEditorMacros.h">
       <Filter>Systems\ImGUIEditor</Filter>
     </ClInclude>
-    <ClInclude Include="CodeParseTokenFactoryClass.h">
-      <Filter>Systems\ImGUIEditor\Tokens\Factories</Filter>
+    <ClInclude Include="EditorTypeFactoryBase.h">
+      <Filter>Systems\ImGUIEditor\Types\EditorFactories</Filter>
     </ClInclude>
-    <ClInclude Include="CodeParseTokenFactoryBase.h">
-      <Filter>Systems\ImGUIEditor\Tokens\Factories</Filter>
+    <ClInclude Include="EditorTypeFactoryPropertiesBase.h">
+      <Filter>Systems\ImGUIEditor\Types\EditorFactories</Filter>
     </ClInclude>
-    <ClInclude Include="CodeParseTokenClass.h">
-      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    <ClInclude Include="EditorTypeFactoryClass.h">
+      <Filter>Systems\ImGUIEditor\Types\EditorFactories</Filter>
     </ClInclude>
-    <ClInclude Include="CodeParseTokenBase.h">
-      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    <ClInclude Include="EditorTypeBase.h">
+      <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
     </ClInclude>
-    <ClInclude Include="CodeParseTokenFactoryProperty.h">
-      <Filter>Systems\ImGUIEditor\Tokens\Factories</Filter>
+    <ClInclude Include="EditorTypeClass.h">
+      <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
     </ClInclude>
-    <ClInclude Include="CodeParseTokenPropertyBase.h">
-      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    <ClInclude Include="EditorTypePropertiesBase.h">
+      <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
     </ClInclude>
-    <ClInclude Include="CodeParseTokenPropertyFloat.h">
-      <Filter>Systems\ImGUIEditor\Tokens\Tokens</Filter>
+    <ClInclude Include="ImGuiEditorGlobals.h">
+      <Filter>Systems\ImGUIEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorTypePropertyFactoryBase.h">
+      <Filter>Systems\ImGUIEditor\Types\PropertyFactories</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorTypePropertyBase.h">
+      <Filter>Systems\ImGUIEditor\Types\PropertyTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorTypePropertyFloat.h">
+      <Filter>Systems\ImGUIEditor\Types\PropertyTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorTypePropertyFactoryFloat.h">
+      <Filter>Systems\ImGUIEditor\Types\PropertyFactories</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

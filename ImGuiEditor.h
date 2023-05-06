@@ -1,6 +1,7 @@
 #pragma once
 
 class CodeParseTokenBase;
+class EditorTypeBase;
 
 /** ImGuiEditor
 *
@@ -17,7 +18,11 @@ public:
 
 private:
 	
-	static std::vector<std::string> GetCodeFilesInDirectory(const std::string& directory);
+	// Generate template types. see templateTypes
+	void CreateTemplateTypes(const std::string& typesFile);
 
-	void Parse(std::string codeFile, std::vector<CodeParseTokenBase*>& allTokens);
+	// This map will contain a single instance of each type (the key being it's name) and all of the EditorTypes will have default values.
+	// i.e "SpellFireball" -> "EditorTypeClass(SpellFireball) with all the default numbers"
+	std::unordered_map<std::string, EditorTypeBase*> templateTypes;
+
 };

@@ -45,7 +45,6 @@ ECS ecs;
 WorldGenerator worldGenerator(ecs);
 HUD hud(ecs);
 
-
 EntityId playerEntity = 0;
 
 constexpr int WORLD_START_X = 10000;
@@ -56,7 +55,6 @@ void Game::Init()
 #ifdef DOMIMGUI
 	imGuiEditor.Init();
 #endif //~ DOMIMGUI
-	
 
 	// Register systems to ECS (order matters)
 	ecs.RegisterSystem(std::make_unique<SystemAction>());
