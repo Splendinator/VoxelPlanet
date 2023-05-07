@@ -10,3 +10,11 @@ void EditorTypeClass::DrawImGUI()
 		ImGui::TreePop();
 	}
 }
+
+EditorTypeBase* EditorTypeClass::DeepCopy()
+{
+	EditorTypeClass* pCopy = new EditorTypeClass();
+	pCopy->name = name;
+	DeepCopyProperties(pCopy);
+	return pCopy;
+}

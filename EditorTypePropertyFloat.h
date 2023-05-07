@@ -13,6 +13,7 @@ public:
 
 	//~ Begin EditorTypePropertyBase Interface
 	void DrawImGUI() override;
+	EditorTypePropertyBase* DeepCopy() override;
 	//~ End EditorTypePropertyBase Interface
 
 protected:

@@ -21,9 +21,8 @@ void EditorWindowCreateNewFolder::CreateNewFolderWindow()
 	// Add a text input field to specify the folder name
 	ImGui::InputText("Folder Name", folderNameBuffer, sizeof(folderNameBuffer));
 
-	// Check whether it's a duplicate
+	// Check whether it's valid
 	std::string newFolderName(folderNameBuffer);
-	fs::path newFolderPath = targetFilePath / newFolderName;
 	std::string errorMessage = GetErrorMessage(newFolderName);
 
 	// Show a red warning text if there's an error

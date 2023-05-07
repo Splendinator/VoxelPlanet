@@ -90,6 +90,9 @@
     <Filter Include="Systems\ImGUIEditor\Actions">
       <UniqueIdentifier>{395278c6-08f3-4dde-b999-70252dcbee20}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Systems\ImGUIEditor\Assets">
+      <UniqueIdentifier>{30f0a681-c173-4ba0-888e-a45c4024e683}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -289,6 +292,18 @@
     </ClCompile>
     <ClCompile Include="EditorWindowActionQueue.cpp">
       <Filter>Systems\ImGUIEditor\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorWindowCreateAsset.cpp">
+      <Filter>Systems\ImGUIEditor\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorAssetBase.cpp">
+      <Filter>Systems\ImGUIEditor\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorAssetClass.cpp">
+      <Filter>Systems\ImGUIEditor\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorActionCreateAsset.cpp">
+      <Filter>Systems\ImGUIEditor\Actions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -513,6 +528,18 @@
     </ClInclude>
     <ClInclude Include="EditorWindowActionQueue.h">
       <Filter>Systems\ImGUIEditor\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorWindowCreateAsset.h">
+      <Filter>Systems\ImGUIEditor\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorAssetBase.h">
+      <Filter>Systems\ImGUIEditor\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorAssetClass.h">
+      <Filter>Systems\ImGUIEditor\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorActionCreateAsset.h">
+      <Filter>Systems\ImGUIEditor\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

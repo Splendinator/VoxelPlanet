@@ -12,6 +12,7 @@ public:
 
 	//~ Begin EditorTypeBase Interface
 	void DrawImGUI() override;
+	EditorTypeBase* DeepCopy() override;
 	//~ End EditorTypeBase Interface
 
 protected:

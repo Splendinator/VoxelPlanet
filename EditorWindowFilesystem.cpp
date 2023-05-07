@@ -2,6 +2,7 @@
 
 #include "EditorWindowFilesystem.h"
 
+#include "EditorWindowCreateAsset.h"
 #include "EditorWindowCreateNewFolder.h"
 #include "ImGuiEditor.h"
 #include "ImGuiEditorGlobals.h"
@@ -33,7 +34,7 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 				const std::string extension = entry.path().extension().string();
 				if (extension == ImGuiEditorGlobals::assetExtension)
 				{
-					/// #TEMP: Draw Asset
+					ImGui::Text("%s (asset)", entry.path().filename().string().c_str());
 				}
 			}
 			else if (entry.is_directory())
@@ -42,9 +43,14 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 			}
 		}
 		
-		if(ImGui::Button("Create New Folder"))
+		if(ImGui::Button("Create Folder"))
 		{
 			pEditor->AddWindow(std::make_unique<EditorWindowCreateNewFolder>(path));
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Create Asset"))
+		{
+			pEditor->AddWindow(std::make_unique<EditorWindowCreateAsset>(path));
 		}
 		
 		ImGui::TreePop();

@@ -12,6 +12,8 @@ class EditorTypePropertiesBase : public EditorTypeBase
 {
 public:
 
+	virtual ~EditorTypePropertiesBase();
+
 	// List of properties
 	std::vector<EditorTypePropertyBase*> pProperties;
 
@@ -20,6 +22,9 @@ public:
 	//~ End EditorTypeBase Interface
 	
 protected:
+
+	// Deep copy these properties to pOther
+	void DeepCopyProperties(EditorTypePropertiesBase* pOther);
 
 private:
 
