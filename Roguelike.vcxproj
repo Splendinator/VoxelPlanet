@@ -155,6 +155,8 @@
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkGeneratorGrass.cpp" />
     <ClCompile Include="ECS.cpp" />
+    <ClCompile Include="EditorActionBase.cpp" />
+    <ClCompile Include="EditorActionCreateNewFolder.cpp" />
     <ClCompile Include="EditorTypeBase.cpp" />
     <ClCompile Include="EditorTypeClass.cpp" />
     <ClCompile Include="EditorTypeFactoryBase.cpp" />
@@ -163,6 +165,10 @@
     <ClCompile Include="EditorTypePropertiesBase.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryFloat.cpp" />
     <ClCompile Include="EditorTypePropertyFloat.cpp" />
+    <ClCompile Include="EditorWindowActionQueue.cpp" />
+    <ClCompile Include="EditorWindowBase.cpp" />
+    <ClCompile Include="EditorWindowCreateNewFolder.cpp" />
+    <ClCompile Include="EditorWindowFilesystem.cpp" />
     <ClCompile Include="FilePaths.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="HUD.cpp" />
@@ -223,6 +229,8 @@
     <ClInclude Include="ChunkGeneratorGrass.h" />
     <ClInclude Include="Components.h" />
     <ClInclude Include="ECS.h" />
+    <ClInclude Include="EditorActionBase.h" />
+    <ClInclude Include="EditorActionCreateNewFolder.h" />
     <ClInclude Include="EditorTypeBase.h" />
     <ClInclude Include="EditorTypeClass.h" />
     <ClInclude Include="EditorTypeFactoryBase.h" />
@@ -232,6 +240,10 @@
     <ClInclude Include="EditorTypePropertyFactoryBase.h" />
     <ClInclude Include="EditorTypePropertyFactoryFloat.h" />
     <ClInclude Include="EditorTypePropertyFloat.h" />
+    <ClInclude Include="EditorWindowActionQueue.h" />
+    <ClInclude Include="EditorWindowBase.h" />
+    <ClInclude Include="EditorWindowCreateNewFolder.h" />
+    <ClInclude Include="EditorWindowFilesystem.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="FilePaths.h" />
     <ClInclude Include="Game.h" />

@@ -25,7 +25,7 @@ std::vector<tagMSG> messages;
 #ifdef DOMIMGUI
 void DomWindowMessageHook(tagMSG& msg)
 {
-	ImGui_ImplWin32_WndProcHandler(msg.hwnd, msg.message, msg.wParam, msg.lParam);
+	messages.push_back(msg);
 }
 #endif //~ #ifdef DOMIMGUI
 
@@ -75,6 +75,11 @@ void domMain()
 		float deltaTime = GetDeltaTime();
 
 #ifdef DOMIMGUI
+		for (tagMSG& message : messages)
+		{
+			ImGui_ImplWin32_WndProcHandler(message.hwnd, message.message, message.wParam, message.lParam);
+		}
+		messages.clear();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 #endif //~ #ifdef DOMIMGUI

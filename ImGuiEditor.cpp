@@ -4,19 +4,26 @@
 
 #include "ImGuiEditor.h"
 
-#include <filesystem>
-
 #include "DomImport/DomImport.h"
+#include "EditorActionBase.h"
 #include "EditorTypeBase.h"
 #include "EditorTypeFactoryBase.h"
 #include "EditorTypeFactoryClass.h"
+#include "EditorWindowActionQueue.h"
+#include "EditorWindowFilesystem.h"
 #include "ImGuiEditorGlobals.h"
+
+#include <filesystem>
 
 /// #TEMP: PRAGMA
 #pragma optimize( "", off )
+
 void ImGuiEditor::Init()
 {	
 	CreateTemplateTypes(ImGuiEditorGlobals::codeFilesBaseDirectory + "\\" + ImGuiEditorGlobals::editorTypesOutputFile);
+
+	AddWindow(std::make_shared<EditorWindowFilesystem>(std::filesystem::path(ImGuiEditorGlobals::editorBaseDirectory)));
+	AddWindow(std::make_shared<EditorWindowActionQueue>(executedActions, executedActionsIndex));
 }
 
 void ImGuiEditor::Uninit()
@@ -26,16 +33,71 @@ void ImGuiEditor::Uninit()
 
 void ImGuiEditor::Tick()
 {
-	ImGui::SetWindowPos({ 0,0 }, ImGuiCond_FirstUseEver);
-	ImGui::SetWindowSize({ 400,400 }, ImGuiCond_FirstUseEver);
-	ImGui::Begin("Editor");
-	
-	for (const auto& typePair : templateTypes)
+	for (std::shared_ptr<EditorWindowBase>& pWindow : shownWindows)
 	{
-		typePair.second->DrawImGUI();
+		if (pWindow)
+		{
+			pWindow->Draw();
+		}
 	}
-	
-	ImGui::End();
+}
+
+void ImGuiEditor::AddWindow(const std::shared_ptr<EditorWindowBase>& pWindow)
+{
+	pWindow->Init(*this);
+
+	shownWindows.push_back(pWindow);
+}
+
+void ImGuiEditor::RemoveWindow(EditorWindowBase* pWindow)
+{
+	for (auto it = shownWindows.begin(); it != shownWindows.end(); ++it)
+	{
+		if (it->get() == pWindow)
+		{
+			shownWindows.erase(it);
+			return;
+		}
+	}
+}
+
+void ImGuiEditor::DoAction(const std::shared_ptr<EditorActionBase>& pAction)
+{
+	// Remove all actions after the current action (i.e if you undo 4 times then do an action, you can't re-do the 4 actions you undid so we remove them)
+	while (executedActionsIndex < executedActions.size() - 1)
+	{
+		executedActions.pop_back();
+	}
+
+	if (pAction->TryExecuteAction())
+	{
+		executedActions.push_back(pAction);
+		executedActionsIndex = static_cast<int>(executedActions.size())-1;
+	}
+}
+
+void ImGuiEditor::Undo()
+{
+	if (executedActionsIndex > -1)
+	{
+		executedActions[executedActionsIndex]->Undo();
+		--executedActionsIndex;
+	}
+}
+
+void ImGuiEditor::Redo()
+{
+	if (static_cast<int>(executedActions.size()) - 1 > executedActionsIndex)
+	{
+		if (executedActions[executedActionsIndex + 1]->TryExecuteAction())
+		{
+			++executedActionsIndex;
+		}
+		else
+		{
+			DOMLOG_ERROR("Cannot re-do an action? Something wrong?")
+		}
+	}
 }
 
 void ImGuiEditor::CreateTemplateTypes(const std::string& typesFile)
@@ -82,4 +144,5 @@ void ImGuiEditor::CreateTemplateTypes(const std::string& typesFile)
 }
 
 #endif //~ DOMIMGUI
+
 #pragma optimize( "", on )

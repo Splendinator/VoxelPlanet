@@ -84,6 +84,12 @@
     <Filter Include="Systems\ImGUIEditor\Types\PropertyTypes">
       <UniqueIdentifier>{48bb4fb8-9e40-4f6f-b5bb-86b03213ea54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Systems\ImGUIEditor\Windows">
+      <UniqueIdentifier>{c096e6b7-0269-4635-8e05-549f57280afe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\ImGUIEditor\Actions">
+      <UniqueIdentifier>{395278c6-08f3-4dde-b999-70252dcbee20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -265,6 +271,24 @@
     </ClCompile>
     <ClCompile Include="EditorTypePropertyFactoryFloat.cpp">
       <Filter>Systems\ImGUIEditor\Types\PropertyFactories</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorWindowFilesystem.cpp">
+      <Filter>Systems\ImGUIEditor\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorWindowCreateNewFolder.cpp">
+      <Filter>Systems\ImGUIEditor\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorWindowBase.cpp">
+      <Filter>Systems\ImGUIEditor\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorActionBase.cpp">
+      <Filter>Systems\ImGUIEditor\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorActionCreateNewFolder.cpp">
+      <Filter>Systems\ImGUIEditor\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorWindowActionQueue.cpp">
+      <Filter>Systems\ImGUIEditor\Windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -471,6 +495,24 @@
     </ClInclude>
     <ClInclude Include="EditorTypePropertyFactoryFloat.h">
       <Filter>Systems\ImGUIEditor\Types\PropertyFactories</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorWindowFilesystem.h">
+      <Filter>Systems\ImGUIEditor\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorWindowBase.h">
+      <Filter>Systems\ImGUIEditor\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorWindowCreateNewFolder.h">
+      <Filter>Systems\ImGUIEditor\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorActionBase.h">
+      <Filter>Systems\ImGUIEditor\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorActionCreateNewFolder.h">
+      <Filter>Systems\ImGUIEditor\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorWindowActionQueue.h">
+      <Filter>Systems\ImGUIEditor\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

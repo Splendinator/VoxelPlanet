@@ -4,6 +4,7 @@
 
 #include "EditorTypePropertiesBase.h"
 #include "EditorTypePropertyFactoryFloat.h"
+#include "ImGuiEditorGlobals.h"
 
 void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, EditorTypePropertiesBase* pEditorTypeProperties)
 {
@@ -18,7 +19,7 @@ void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, 
 		std::string keyword;
 		
 		stream >> keyword;
-		if(keyword == ImGuiEditorGlobals::DelimiterString)
+		if(keyword == ImGuiEditorGlobals::delimiterString)
 		{
 			// End of properties
 			break;
