@@ -27,5 +27,5 @@ private:
 	ImGuiEditor& editor;
 
 	// Pointer to the created asset. Only valid if the action was executed.
-	EditorAssetClass* pCreatedAsset = nullptr;
+	std::weak_ptr<EditorAssetBase> pCreatedAsset;
 };

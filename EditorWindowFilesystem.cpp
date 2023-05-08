@@ -4,6 +4,7 @@
 
 #include "EditorWindowCreateAsset.h"
 #include "EditorWindowCreateNewFolder.h"
+#include "EditorWindowEditAsset.h"
 #include "ImGuiEditor.h"
 #include "ImGuiEditorGlobals.h"
 
@@ -13,13 +14,7 @@ namespace fs = std::filesystem;
 
 void EditorWindowFilesystem::Draw()
 {
-	ImGui::SetWindowPos({ 0,0 }, ImGuiCond_FirstUseEver);
-	ImGui::SetWindowSize({ 400,400 }, ImGuiCond_FirstUseEver);
-	ImGui::Begin("Editor");
-
 	DrawDirectory(rootDirectory);
-
-	ImGui::End();
 }
 
 void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
@@ -34,7 +29,24 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 				const std::string extension = entry.path().extension().string();
 				if (extension == ImGuiEditorGlobals::assetExtension)
 				{
-					ImGui::Text("%s (asset)", entry.path().filename().string().c_str());
+					std::string assetName = entry.path().filename().string();
+					ImGui::PushID(assetName.c_str());
+					ImGui::Text("%s", assetName.c_str());
+					ImGui::SameLine();
+					if (ImGui::Button("Edit"))
+					{
+						assetName = assetName.substr(0, assetName.size() - ImGuiEditorGlobals::assetExtension.size()); // Get rid of extension
+						std::weak_ptr<EditorAssetBase> pAsset = pEditor->FindAsset(assetName);
+						if (!pAsset.expired())
+						{
+							pEditor->AddWindow(std::make_unique<EditorWindowEditAsset>(pAsset, entry.path()));
+						}
+						else
+						{
+							DOMLOG_ERROR("Asset not found", assetName);
+						}
+					}
+					ImGui::PopID();
 				}
 			}
 			else if (entry.is_directory())

@@ -6,7 +6,7 @@ struct ComponentFaction;
 
 /** ActionDeciderAI
 *
-* This class is used for #TEMP
+* This class is used for deciding what action an AI will take
 */
 class ActionDeciderAI : public ActionDeciderBase
 {

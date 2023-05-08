@@ -8,9 +8,8 @@ EditorTypePropertyBase* EditorTypePropertyFactoryFloat::CreateType(std::ifstream
 {
 	std::string propertyName;
 	float value;
-	std::string unused; // this is for the f at the end of "5.0f"
 
-	stream >> propertyName >> value >> unused;
+	stream >> propertyName >> value;
 
 	return new EditorTypePropertyFloat(propertyName, value);
 }

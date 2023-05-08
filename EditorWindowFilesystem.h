@@ -14,11 +14,12 @@ public:
 
 	EditorWindowFilesystem(const std::filesystem::path& inDirectory) : rootDirectory(inDirectory) {}
 
-	//~ Begin EditorWindowBase Interface
-	virtual void Draw() override;
-	//~ End EditorWindowBase Interface
-
 protected:
+	//~ Begin EditorWindowBase Interface
+	std::string GetWindowName() const override { return "Editor"; }
+	void Draw() override;
+	bool CanCloseOnRequest() const override { return false; }
+	//~ End EditorWindowBase Interface
 
 	void DrawDirectory(const std::filesystem::path& path);
 

@@ -9,8 +9,6 @@
 
 #include <limits>
 
-/// #TEMP: PRAGMA
-#pragma optimize( "", off )
 ActionHandlerBase* ActionDeciderAI::DecideAction(ECS& ecs, EntityId actor)
 {
 	if (ecs.EntityHasComponents<ComponentTransform, ComponentFaction>(actor))
@@ -77,4 +75,3 @@ bool ActionDeciderAI::IsWarringFactions(const ComponentFaction& faction, const C
 	// #TODO: We'll have a whole proper system for this later with rep points and all sorts of crazy shit
 	return faction.factionFlags != otherFaction.factionFlags;
 }
-#pragma optimize( "", on )

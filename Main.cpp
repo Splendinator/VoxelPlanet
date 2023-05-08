@@ -20,12 +20,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	return dmwi::entryPoint(hInstance, hPrevInstance, pCmdLine, nCmdShow);
 }
 
-std::vector<tagMSG> messages;
-
 #ifdef DOMIMGUI
+// Buffers for the window messages, they come in on a different thread so we try and prevent read/write collisions
+std::vector<tagMSG> windowMessageBufferOne;
+std::vector<tagMSG> windowMessageBufferTwo;
+std::vector<tagMSG>* volatile  pCurrentWindowMessageBuffer = &windowMessageBufferOne;
+
 void DomWindowMessageHook(tagMSG& msg)
 {
-	messages.push_back(msg);
+	pCurrentWindowMessageBuffer->push_back(msg);
 }
 #endif //~ #ifdef DOMIMGUI
 
@@ -40,6 +43,11 @@ float GetDeltaTime()
 	prevTime = currentTime;
 
 	return deltaTime;
+}
+
+bool ShouldCloseWindow()
+{
+	return dmwi::isPressed(dmwi::Button::ESC) && Game::CanClose();
 }
 
 void domMain()
@@ -70,22 +78,24 @@ void domMain()
 	dmgf::Init();
 	Game::Init();
 
-	while (!dmwi::isPressed(dmwi::Button::ESC))
+	while (!ShouldCloseWindow())
 	{
 		float deltaTime = GetDeltaTime();
 
 #ifdef DOMIMGUI
-		for (tagMSG& message : messages)
+		std::vector<tagMSG>* pBuffer = pCurrentWindowMessageBuffer;
+		pCurrentWindowMessageBuffer = (pCurrentWindowMessageBuffer == &windowMessageBufferOne) ? &windowMessageBufferTwo : &windowMessageBufferOne;
+		for (tagMSG& message : *pBuffer)
 		{
 			ImGui_ImplWin32_WndProcHandler(message.hwnd, message.message, message.wParam, message.lParam);
 		}
-		messages.clear();
+		pBuffer->clear();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 #endif //~ #ifdef DOMIMGUI
 
 		dmwi::tick();
-		Game::tick(deltaTime);
+		Game::Tick(deltaTime);
 		dmgf::Tick(deltaTime);
 	}
 

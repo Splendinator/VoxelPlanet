@@ -7,8 +7,6 @@
 
 void EditorWindowActionQueue::Draw()
 {
-	ImGui::Begin("Action Queue", nullptr);
-
 	auto DrawUndoRedoButtons = [this]()
 	{
 		if (ImGui::Button("Undo"))
@@ -52,6 +50,4 @@ void EditorWindowActionQueue::Draw()
 		// If no current action, just draw undo redo buttons at the bottom
 		DrawUndoRedoButtons();
 	}
-
-	ImGui::End();
 }

@@ -75,9 +75,6 @@
     <Filter Include="Systems\ImGUIEditor\Types\EditorTypes">
       <UniqueIdentifier>{d41c7bfd-41ff-49d8-b430-b6d94cdabe18}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Systems\ImGUIEditor\Types\EditorFactories">
-      <UniqueIdentifier>{ecc375c4-a709-473d-a920-c0d8f4cc8b97}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Systems\ImGUIEditor\Types\PropertyFactories">
       <UniqueIdentifier>{12416d26-b8d3-477c-aadd-9c8c79913107}</UniqueIdentifier>
     </Filter>
@@ -90,8 +87,14 @@
     <Filter Include="Systems\ImGUIEditor\Actions">
       <UniqueIdentifier>{395278c6-08f3-4dde-b999-70252dcbee20}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Systems\ImGUIEditor\Assets">
+    <Filter Include="Systems\ImGUIEditor\Types\EditorTypeFactories">
+      <UniqueIdentifier>{ecc375c4-a709-473d-a920-c0d8f4cc8b97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\ImGUIEditor\Types\Assets">
       <UniqueIdentifier>{30f0a681-c173-4ba0-888e-a45c4024e683}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\ImGUIEditor\Types\AssetFactories">
+      <UniqueIdentifier>{4ccb0d7f-34d0-45a2-a36d-e7b5e6089e38}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -249,13 +252,13 @@
       <Filter>Systems\ImGUIEditor</Filter>
     </ClCompile>
     <ClCompile Include="EditorTypeFactoryBase.cpp">
-      <Filter>Systems\ImGUIEditor\Types\EditorFactories</Filter>
+      <Filter>Systems\ImGUIEditor\Types\EditorTypeFactories</Filter>
     </ClCompile>
     <ClCompile Include="EditorTypeFactoryPropertiesBase.cpp">
-      <Filter>Systems\ImGUIEditor\Types\EditorFactories</Filter>
+      <Filter>Systems\ImGUIEditor\Types\EditorTypeFactories</Filter>
     </ClCompile>
     <ClCompile Include="EditorTypeFactoryClass.cpp">
-      <Filter>Systems\ImGUIEditor\Types\EditorFactories</Filter>
+      <Filter>Systems\ImGUIEditor\Types\EditorTypeFactories</Filter>
     </ClCompile>
     <ClCompile Include="EditorTypeBase.cpp">
       <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
@@ -297,12 +300,24 @@
       <Filter>Systems\ImGUIEditor\Windows</Filter>
     </ClCompile>
     <ClCompile Include="EditorAssetBase.cpp">
-      <Filter>Systems\ImGUIEditor\Assets</Filter>
+      <Filter>Systems\ImGUIEditor\Types\Assets</Filter>
     </ClCompile>
     <ClCompile Include="EditorAssetClass.cpp">
-      <Filter>Systems\ImGUIEditor\Assets</Filter>
+      <Filter>Systems\ImGUIEditor\Types\Assets</Filter>
     </ClCompile>
     <ClCompile Include="EditorActionCreateAsset.cpp">
+      <Filter>Systems\ImGUIEditor\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorWindowEditAsset.cpp">
+      <Filter>Systems\ImGUIEditor\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorAssetFactoryBase.cpp">
+      <Filter>Systems\ImGUIEditor\Types\AssetFactories</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorAssetFactoryClass.cpp">
+      <Filter>Systems\ImGUIEditor\Types\AssetFactories</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorActionChangeProperty.cpp">
       <Filter>Systems\ImGUIEditor\Actions</Filter>
     </ClCompile>
   </ItemGroup>
@@ -479,13 +494,13 @@
       <Filter>Systems\ImGUIEditor</Filter>
     </ClInclude>
     <ClInclude Include="EditorTypeFactoryBase.h">
-      <Filter>Systems\ImGUIEditor\Types\EditorFactories</Filter>
+      <Filter>Systems\ImGUIEditor\Types\EditorTypeFactories</Filter>
     </ClInclude>
     <ClInclude Include="EditorTypeFactoryPropertiesBase.h">
-      <Filter>Systems\ImGUIEditor\Types\EditorFactories</Filter>
+      <Filter>Systems\ImGUIEditor\Types\EditorTypeFactories</Filter>
     </ClInclude>
     <ClInclude Include="EditorTypeFactoryClass.h">
-      <Filter>Systems\ImGUIEditor\Types\EditorFactories</Filter>
+      <Filter>Systems\ImGUIEditor\Types\EditorTypeFactories</Filter>
     </ClInclude>
     <ClInclude Include="EditorTypeBase.h">
       <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
@@ -533,12 +548,24 @@
       <Filter>Systems\ImGUIEditor\Windows</Filter>
     </ClInclude>
     <ClInclude Include="EditorAssetBase.h">
-      <Filter>Systems\ImGUIEditor\Assets</Filter>
+      <Filter>Systems\ImGUIEditor\Types\Assets</Filter>
     </ClInclude>
     <ClInclude Include="EditorAssetClass.h">
-      <Filter>Systems\ImGUIEditor\Assets</Filter>
+      <Filter>Systems\ImGUIEditor\Types\Assets</Filter>
     </ClInclude>
     <ClInclude Include="EditorActionCreateAsset.h">
+      <Filter>Systems\ImGUIEditor\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorWindowEditAsset.h">
+      <Filter>Systems\ImGUIEditor\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorAssetFactoryBase.h">
+      <Filter>Systems\ImGUIEditor\Types\AssetFactories</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorAssetFactoryClass.h">
+      <Filter>Systems\ImGUIEditor\Types\AssetFactories</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorActionChangeProperty.h">
       <Filter>Systems\ImGUIEditor\Actions</Filter>
     </ClInclude>
   </ItemGroup>

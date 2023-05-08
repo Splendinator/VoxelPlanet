@@ -154,7 +154,7 @@ void GameplayTick(float deltaTime)
 	}
 }
 
-void Game::tick(float deltaTime)
+void Game::Tick(float deltaTime)
 {
 #ifdef DOMIMGUI
 	CreateImGuiWindow(deltaTime);
@@ -162,4 +162,9 @@ void Game::tick(float deltaTime)
 #endif //~ #ifdef DOMIMGUI
 	GameplayTick(deltaTime);
 
+}
+
+bool Game::CanClose()
+{
+	return !imGuiEditor.IsEditorShowing();
 }

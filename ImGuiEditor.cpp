@@ -8,6 +8,7 @@
 #include "DomWindow/DomWindow.h"
 #include "EditorActionBase.h"
 #include "EditorAssetBase.h"
+#include "EditorAssetFactoryClass.h"
 #include "EditorTypeBase.h"
 #include "EditorTypeFactoryBase.h"
 #include "EditorTypeFactoryClass.h"
@@ -15,12 +16,11 @@
 #include "EditorWindowFilesystem.h"
 #include "ImGuiEditorGlobals.h"
 
-/// #TEMP: PRAGMA
-#pragma optimize( "", off )
-
 void ImGuiEditor::Init()
 {	
 	CreateTemplateTypes(ImGuiEditorGlobals::codeFilesBaseDirectory + "\\" + ImGuiEditorGlobals::editorTypesOutputFile);
+
+	ImportAssets(ImGuiEditorGlobals::editorBaseDirectory);
 
 	AddWindow(std::make_shared<EditorWindowFilesystem>(std::filesystem::path(ImGuiEditorGlobals::editorBaseDirectory)));
 	AddWindow(std::make_shared<EditorWindowActionQueue>(executedActions, executedActionsIndex));
@@ -36,10 +36,6 @@ void ImGuiEditor::Uninit()
 	}	
 	templateTypes.clear();
 
-	for (auto& [key, value] : assets)
-	{
-		delete value;
-	}
 	assets.clear();
 }
 
@@ -52,7 +48,7 @@ void ImGuiEditor::Tick()
 		{
 			if (pWindow)
 			{
-				pWindow->Draw();
+				pWindow->DrawBase();
 			}
 		}
 
@@ -66,6 +62,18 @@ void ImGuiEditor::Tick()
 			else if (dmwi::isPressed(dmwi::Button::Y))
 			{
 				Redo();
+			}
+		}
+
+		// Close windows on ESC
+		if (dmwi::isPressed(dmwi::Button::ESC))
+		{
+			for (std::shared_ptr<EditorWindowBase>& pWindow : shownWindows)
+			{
+				if (pWindow && pWindow->ShouldCloseOnRequest())
+				{
+					RemoveWindow(pWindow.get());
+				}
 			}
 		}
 	}
@@ -84,17 +92,21 @@ void ImGuiEditor::AddWindow(const std::shared_ptr<EditorWindowBase>& pWindow)
 	
 	pWindow->Init(*this);
 
+	pWindow->OpenBase();
+
 	shownWindows.push_back(pWindow);
 }
 
 void ImGuiEditor::RemoveWindow(EditorWindowBase* pWindow)
 {
 	DOMLOG_ERROR_IF(!bEditorShowing, "Shouldn't do anything when editor isn't showing");
-	
+
 	for (auto it = shownWindows.begin(); it != shownWindows.end(); ++it)
 	{
 		if (it->get() == pWindow)
 		{
+			pWindow->CloseBase();
+			
 			shownWindows.erase(it);
 			return;
 		}
@@ -146,19 +158,18 @@ void ImGuiEditor::Redo()
 	}
 }
 
-void ImGuiEditor::AddAsset(EditorAssetBase* pAsset)
+void ImGuiEditor::AddAsset(std::shared_ptr<EditorAssetBase> pAsset)
 {
 	DOMLOG_ERROR_IF(!bEditorShowing, "Shouldn't do anything when editor isn't showing");
 
 	assets.insert({ pAsset->GetName(), pAsset });
 }
 
-void ImGuiEditor::RemoveAsset(EditorAssetBase* pAsset)
+void ImGuiEditor::RemoveAsset(std::shared_ptr<EditorAssetBase> pAsset)
 {
 	DOMLOG_ERROR_IF(!bEditorShowing, "Shouldn't do anything when editor isn't showing");
 
 	assets.erase(pAsset->GetName());
-	delete pAsset;
 }
 
 EditorTypeBase* ImGuiEditor::FindType(const std::string& typeName)
@@ -171,7 +182,7 @@ EditorTypeBase* ImGuiEditor::FindType(const std::string& typeName)
 	return nullptr;
 }
 
-std::vector<std::string> ImGuiEditor::GetAllTypes()
+std::vector<std::string> ImGuiEditor::GetAllTypes() const
 {
 	std::vector<std::string> types;
 	for (auto& [key, value] : templateTypes)
@@ -182,6 +193,17 @@ std::vector<std::string> ImGuiEditor::GetAllTypes()
 	std::sort(types.begin(), types.end());
 
 	return types;
+}
+
+std::weak_ptr<EditorAssetBase> ImGuiEditor::FindAsset(const std::string& typeName)
+{
+	auto it = assets.find(typeName);
+	if (it != assets.end())
+	{
+		return it->second;
+	}
+	
+	return {};
 }
 
 void ImGuiEditor::CreateTemplateTypes(const std::string& typesFile)
@@ -227,6 +249,48 @@ void ImGuiEditor::CreateTemplateTypes(const std::string& typesFile)
 	}
 }
 
-#endif //~ DOMIMGUI
+void ImGuiEditor::ImportAssets(const std::string& assetsDirectory)
+{
+	EditorAssetFactoryClass editorAssetFactoryClass(*this);
 
-#pragma optimize( "", on )
+	EditorAssetFactoryBase* pAssetFactories[] =
+	{
+		&editorAssetFactoryClass
+	};
+
+	std::filesystem::recursive_directory_iterator dirIter(assetsDirectory), end;
+
+	while (dirIter != end)
+	{
+		if (dirIter->is_regular_file() && dirIter->path().extension() == ImGuiEditorGlobals::assetExtension)
+		{
+			std::ifstream assetFile(dirIter->path());
+			if (assetFile.is_open())
+			{
+				std::string keyword;
+				assetFile >> keyword;
+				for (EditorAssetFactoryBase* pAssetFactory : pAssetFactories)
+				{
+					if (pAssetFactory->GetKeyword() == keyword)
+					{
+						AddAsset(pAssetFactory->CreateAsset(dirIter->path()));
+						break;
+					}
+				}
+			}
+		}
+
+		try
+		{
+			++dirIter;
+		}
+		catch (const std::filesystem::filesystem_error& e)
+		{
+			// This can fail due to permissions, etc.
+			DOMLOG_ERROR("Failed to iterate directory", e.what());
+			return;
+		}
+	}
+}
+
+#endif //~ DOMIMGUI

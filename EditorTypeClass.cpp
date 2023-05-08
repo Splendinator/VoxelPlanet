@@ -18,3 +18,16 @@ EditorTypeBase* EditorTypeClass::DeepCopy()
 	DeepCopyProperties(pCopy);
 	return pCopy;
 }
+
+void EditorTypeClass::ReadFromFile(std::ifstream& file)
+{
+	std::string unused;
+	file >> unused >> name;
+	EditorTypePropertiesBase::ReadFromFile(file);
+}
+
+void EditorTypeClass::WriteToFile(std::ofstream& file)
+{
+	file << "Class " << name << std::endl;
+	EditorTypePropertiesBase::WriteToFile(file);
+}

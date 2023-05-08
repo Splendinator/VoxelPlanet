@@ -156,10 +156,13 @@
     <ClCompile Include="ChunkGeneratorGrass.cpp" />
     <ClCompile Include="ECS.cpp" />
     <ClCompile Include="EditorActionBase.cpp" />
+    <ClCompile Include="EditorActionChangeProperty.cpp" />
     <ClCompile Include="EditorActionCreateAsset.cpp" />
     <ClCompile Include="EditorActionCreateNewFolder.cpp" />
     <ClCompile Include="EditorAssetBase.cpp" />
     <ClCompile Include="EditorAssetClass.cpp" />
+    <ClCompile Include="EditorAssetFactoryBase.cpp" />
+    <ClCompile Include="EditorAssetFactoryClass.cpp" />
     <ClCompile Include="EditorTypeBase.cpp" />
     <ClCompile Include="EditorTypeClass.cpp" />
     <ClCompile Include="EditorTypeFactoryBase.cpp" />
@@ -172,6 +175,7 @@
     <ClCompile Include="EditorWindowBase.cpp" />
     <ClCompile Include="EditorWindowCreateAsset.cpp" />
     <ClCompile Include="EditorWindowCreateNewFolder.cpp" />
+    <ClCompile Include="EditorWindowEditAsset.cpp" />
     <ClCompile Include="EditorWindowFilesystem.cpp" />
     <ClCompile Include="FilePaths.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -234,10 +238,13 @@
     <ClInclude Include="Components.h" />
     <ClInclude Include="ECS.h" />
     <ClInclude Include="EditorActionBase.h" />
+    <ClInclude Include="EditorActionChangeProperty.h" />
     <ClInclude Include="EditorActionCreateAsset.h" />
     <ClInclude Include="EditorActionCreateNewFolder.h" />
     <ClInclude Include="EditorAssetBase.h" />
     <ClInclude Include="EditorAssetClass.h" />
+    <ClInclude Include="EditorAssetFactoryBase.h" />
+    <ClInclude Include="EditorAssetFactoryClass.h" />
     <ClInclude Include="EditorTypeBase.h" />
     <ClInclude Include="EditorTypeClass.h" />
     <ClInclude Include="EditorTypeFactoryBase.h" />
@@ -251,6 +258,7 @@
     <ClInclude Include="EditorWindowBase.h" />
     <ClInclude Include="EditorWindowCreateAsset.h" />
     <ClInclude Include="EditorWindowCreateNewFolder.h" />
+    <ClInclude Include="EditorWindowEditAsset.h" />
     <ClInclude Include="EditorWindowFilesystem.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="FilePaths.h" />

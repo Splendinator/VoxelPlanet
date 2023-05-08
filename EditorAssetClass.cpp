@@ -2,11 +2,12 @@
 
 #include "EditorAssetClass.h"
 
-#include "EditorTypeBase.h"
+#include "EditorTypeClass.h"
 
-EditorAssetClass::EditorAssetClass(const std::string& assetName, EditorTypeBase* pEditorType) : EditorAssetBase(assetName)
+EditorAssetClass::EditorAssetClass(const std::string& assetName, EditorTypeClass* pEditorType, const std::filesystem::path& assetFilePath) : EditorAssetBase(assetName, assetFilePath)
 {
-	pEditorTypeInstance = pEditorType->DeepCopy();
+	pEditorTypeInstance = reinterpret_cast<EditorTypeClass *>(pEditorType->DeepCopy());
+	pEditorTypeInstance->onPropertyChanged.Add(onPropertyChangedDelegate);
 }
 
 EditorAssetClass::~EditorAssetClass()
@@ -24,7 +25,28 @@ void EditorAssetClass::Draw()
 	}
 }
 
+void EditorAssetClass::ReadFromFile(std::ifstream& file)
+{
+	std::string unused;
+	file >> unused >> name;
+
+	if (pEditorTypeInstance)
+	{
+		pEditorTypeInstance->ReadFromFile(file);
+	}
+}
+
+void EditorAssetClass::WriteToFile(std::ofstream& file)
+{
+	file << GetLabel() << " " << name << std::endl;
+
+	if (pEditorTypeInstance)
+	{
+		pEditorTypeInstance->WriteToFile(file);
+	}
+}
+
 std::string EditorAssetClass::GetLabel()
 {
-	return "Class";
+	return "Object";
 }

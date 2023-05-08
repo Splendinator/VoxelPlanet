@@ -42,4 +42,6 @@ void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, 
 			DOMLOG_ERROR("Cannot find property with keyword", keyword);
 		}
 	}
+
+	pEditorTypeProperties->OnPropertiesPopulated();
 }

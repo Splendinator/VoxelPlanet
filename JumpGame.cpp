@@ -385,7 +385,7 @@ void GameplayTick(float deltaTime)
 	ImGui::End();
 }
 
-void Game::tick(float deltaTime)
+void Game::Tick(float deltaTime)
 {
 	CreateImGuiWindow(deltaTime);
 	GameplayTick(deltaTime);
@@ -775,7 +775,7 @@ void GameplayTick(float deltaTime)
 	ImGui::End();
 }
 
-void Game::tick(float deltaTime)
+void Game::Tick(float deltaTime)
 {
 	CreateImGuiWindow(deltaTime);
 	GameplayTick(deltaTime);

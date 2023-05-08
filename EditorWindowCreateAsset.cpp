@@ -4,14 +4,13 @@
 
 #include "EditorActionCreateAsset.h"
 #include "ImGuiEditor.h"
+#include "ImGuiEditorGlobals.h"
 
 namespace fs = std::filesystem;
 
 void EditorWindowCreateAsset::Draw()
 {
-	ImGui::Begin("Create New Asset");
 	CreateNewAssetWindow();
-	ImGui::End();
 }
 
 void EditorWindowCreateAsset::CreateNewAssetWindow()
@@ -61,7 +60,7 @@ void EditorWindowCreateAsset::CreateNewAssetWindow()
 	else if (ImGui::Button("Create Asset")) 
 	{
 		pEditor->DoAction(std::make_unique<EditorActionCreateAsset>(targetFilePath, selectedClass, newAssetName, *pEditor));
-		Close();
+		RequestClose();
 	}
 }
 
@@ -75,7 +74,7 @@ std::string EditorWindowCreateAsset::GetErrorMessage(const std::string& assetNam
 	{
 		return "Invalid asset name";
 	}
-	if (fs::exists(targetFilePath / assetName))
+	if (fs::exists((targetFilePath / assetName).string() + ImGuiEditorGlobals::assetExtension))
 	{
 		return "Asset already exists";
 	}

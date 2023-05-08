@@ -15,8 +15,10 @@ public:
 
 	EditorWindowCreateNewFolder(const std::filesystem::path& filePath) : targetFilePath(filePath) {}
 
+protected:
 	//~ Begin EditorWindowBase Interface
 	virtual void Draw() override;
+	std::string GetWindowName() const override { return "Create Folder"; }
 	//~ End EditorWindowBase Interface
 
 private:

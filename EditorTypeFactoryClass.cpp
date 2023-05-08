@@ -19,5 +19,5 @@ EditorTypeBase* EditorTypeFactoryClass::CreateType(std::ifstream& stream)
 
 std::string EditorTypeFactoryClass::GetKeyword() const
 {
-	return "Object";
+	return "Class";
 }

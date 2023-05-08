@@ -9,9 +9,7 @@ namespace fs = std::filesystem;
 
 void EditorWindowCreateNewFolder::Draw()
 {
-	ImGui::Begin("Create New Folder");
 	CreateNewFolderWindow();
-	ImGui::End();
 }
 
 void EditorWindowCreateNewFolder::CreateNewFolderWindow()

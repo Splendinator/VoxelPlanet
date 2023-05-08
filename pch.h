@@ -2,6 +2,7 @@
 
 // MY HEADERS
 #include "DomLog/DomLog.h"
+#include "DomUtils/Delegate.h"
 #include "ImGuiEditorMacros.h"
 
 // EXTERNAL

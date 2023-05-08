@@ -107,7 +107,6 @@ namespace
 	// Clean up entry memory from vulkan
 	void CleanUpEntry(RenderedObjectEntry& entry);
 
-	/// #TEMP: Not using this 3d camera implementation Camera mainCamera;
 	VkInstance handleInstance = VK_NULL_HANDLE;
 	VkPhysicalDevice handlePhysicalDevice = VK_NULL_HANDLE;
 	VkSurfaceKHR handleSurface = VK_NULL_HANDLE;
