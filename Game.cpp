@@ -88,6 +88,7 @@ void Game::Init()
 
 	// Set random seed based off time
 	srand((unsigned int)time(NULL));
+
 	worldGenerator.SetCenter(WORLD_START_X, WORLD_START_Y, /*bInit =*/true);
 
 	hud.Initialise(playerEntity);

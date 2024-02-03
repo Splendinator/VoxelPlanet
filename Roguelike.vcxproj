@@ -223,6 +223,7 @@
     <ClCompile Include="VectorPrimitiveRectangle.cpp" />
     <ClCompile Include="VectorPrimitiveShape.cpp" />
     <ClCompile Include="WorldGenerator.cpp" />
+    <ClCompile Include="__Generated.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionDeciderAI.h" />
@@ -307,6 +308,7 @@
     <ClInclude Include="VectorPrimitiveShape.h" />
     <ClInclude Include="VectorPrimitiveTypes.h" />
     <ClInclude Include="WorldGenerator.h" />
+    <ClInclude Include="__Generated.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Graphics\Shaders\ImGuiFrag.frag" />

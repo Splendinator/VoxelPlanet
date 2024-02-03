@@ -43,7 +43,7 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 						}
 						else
 						{
-							DOMLOG_ERROR("Asset not found", assetName);
+							DOMLOG_ERROR("Asset not found / Asset file empty", assetName);
 						}
 					}
 					ImGui::PopID();

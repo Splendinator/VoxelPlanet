@@ -6,7 +6,7 @@
 
 EditorAssetClass::EditorAssetClass(const std::string& assetName, EditorTypeClass* pEditorType, const std::filesystem::path& assetFilePath) : EditorAssetBase(assetName, assetFilePath)
 {
-	pEditorTypeInstance = reinterpret_cast<EditorTypeClass *>(pEditorType->DeepCopy());
+	pEditorTypeInstance = static_cast<EditorTypeClass *>(pEditorType->DeepCopy());
 	pEditorTypeInstance->onPropertyChanged.Add(onPropertyChangedDelegate);
 }
 
@@ -44,6 +44,12 @@ void EditorAssetClass::WriteToFile(std::ofstream& file)
 	{
 		pEditorTypeInstance->WriteToFile(file);
 	}
+}
+
+const std::vector<EditorTypePropertyBase*>& EditorAssetClass::GetProperties()
+{
+	DOMASSERT(pEditorTypeInstance, "Trying to get properties when none exist yet");
+	return pEditorTypeInstance->pProperties;
 }
 
 std::string EditorAssetClass::GetLabel()

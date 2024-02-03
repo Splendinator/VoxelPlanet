@@ -248,27 +248,27 @@ namespace dmgf
 		handleDeviceMemoryVertexBuffer = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT); // #TODO: Query memory requirements with vkGetBufferMemoryRequirements() instead of hard coding 0x100
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleVertextBuffer, handleDeviceMemoryVertexBuffer, 0), "BindVertexBuffer");
 
-		// View buffer (in-game)
+		// View matrix buffer (in-game)
 		const size_t viewBufferSize = sizeof(Mat4f);
 		handleDeviceMemoryViewBuffer = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		handleBufferView = CreateUniformBuffer(viewBufferSize);
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferView, handleDeviceMemoryViewBuffer, 0), "BindUniformBuffer");
 
-		// Projection buffer (in-game)
+		// Projection matrix buffer (in-game)
 		const size_t projectionBufferSize = sizeof(Mat4f);
 		handleDeviceMemoryProjectionBuffer = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		handleBufferProjection = CreateUniformBuffer(projectionBufferSize);
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferProjection, handleDeviceMemoryProjectionBuffer, 0), "BindUniformBuffer");
 		UpdateProjectionBuffer();
 
-		// View buffer (HUD)
+		// View matrix buffer (HUD)
 		const size_t viewBufferSizeHUD = sizeof(Mat4f);
 		handleDeviceMemoryViewBufferHUD = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		handleBufferViewHUD = CreateUniformBuffer(viewBufferSizeHUD);
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferViewHUD, handleDeviceMemoryViewBufferHUD, 0), "BindUniformBuffer");
 		UpdateViewBufferHUD();
 		
-		// Projection buffer (HUD)
+		// Projection matrix buffer (HUD)
 		const size_t projectionBufferSizeHUD = sizeof(Mat4f);
 		handleDeviceMemoryProjectionBufferHUD = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		handleBufferProjectionHUD = CreateUniformBuffer(projectionBufferSizeHUD);
@@ -350,7 +350,6 @@ namespace dmgf
 		vkFreeMemory(handleDevice, handleDepthMemory, nullptr);
 		vkDestroyImageView(handleDevice, handleDepthImageView, nullptr);
 		vkDestroyImage(handleDevice, handleDepthImage, nullptr);
-
 		vkDestroyBuffer(handleDevice, handleBufferProjection, nullptr);
 		vkDestroyBuffer(handleDevice, handleBufferView, nullptr);
 		vkDestroyBuffer(handleDevice, handleBufferProjectionHUD, nullptr);
@@ -387,35 +386,6 @@ namespace dmgf
 		SubmitDrawCommand();
 #ifdef DOMIMGUI
 		ImGui_ImplVulkan_NewFrame();
-
-		///ImGui::Render();
-		///VkCommandBufferBeginInfo beginInfo = {};
-		///beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		///beginInfo.flags = VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-		///
-		///vkBeginCommandBuffer(handleCommandBuffer1, &beginInfo);
-		///ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), handleCommandBuffer1);
-		///vkEndCommandBuffer(handleCommandBuffer1);
-		///
-		///VkSubmitInfo submitInfo = {};
-		///submitInfo.pNext = nullptr;
-		///submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		///submitInfo.commandBufferCount = 1;
-		///submitInfo.pCommandBuffers = &handleCommandBuffer1;
-		///submitInfo.waitSemaphoreCount = 0;
-		///submitInfo.pWaitSemaphores = nullptr;
-		///submitInfo.pWaitDstStageMask = nullptr;
-		///submitInfo.signalSemaphoreCount = 0;
-		///submitInfo.pSignalSemaphores = nullptr;
-		///
-		///VkFence handleFence;
-		///VkFenceCreateInfo fenceInfo;
-		///fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-		///fenceInfo.pNext = nullptr;
-		///fenceInfo.flags = 0;
-		///VulkanUtils::ErrorCheck(vkCreateFence(handleDevice, &fenceInfo, nullptr, &handleFence));
-		///VulkanUtils::ErrorCheck(vkQueueSubmit(handleGraphicsQueue, 1, &submitInfo, handleFence));
-		///vkWaitForFences(handleDevice, 1, &handleFence, true, UINT64_MAX);
 #endif //~ #ifdef DOMIMGUI
 	}
 

@@ -3,6 +3,7 @@
 #include "EditorAssetBase.h"
 
 class EditorTypeClass;
+class EditorTypePropertyBase;
 
 /** EditorAssetClass
 *
@@ -20,6 +21,8 @@ public:
 	virtual void WriteToFile(std::ofstream& file) override;
 	//~ End EditorAssetBase Interface
 
+	const std::vector<EditorTypePropertyBase*>& GetProperties();
+	
 	// Unique label for this asset type. Used for identifying the asset type in the file.
 	std::string GetLabel();
 

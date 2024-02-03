@@ -1,5 +1,11 @@
 #include "pch.h"
 
+#include "EditorTypeClass.h"
+
+// #TEMP: Remove these
+#include "__Generated.h"
+#include "EditorAssetClass.h"
+
 #ifdef DOMIMGUI
 
 #include "ImGuiEditor.h"
@@ -16,17 +22,29 @@
 #include "EditorWindowFilesystem.h"
 #include "ImGuiEditorGlobals.h"
 
+// #TEMP: Optimisation
+#pragma optimize("", off)
 void ImGuiEditor::Init()
-{	
+{
 	CreateTemplateTypes(ImGuiEditorGlobals::codeFilesBaseDirectory + "\\" + ImGuiEditorGlobals::editorTypesOutputFile);
 
 	ImportAssets(ImGuiEditorGlobals::editorBaseDirectory);
 
+	// #TEMP: Remove
+	{
+		//auto assetPair = assets.find("TestAsset");
+		//auto functionPair = __Generated::stringToCreateClassFunction.find("TestClassTwoElectricBoogaloo");
+		////
+		//TestClassTwoElectricBoogaloo* Result = reinterpret_cast<TestClassTwoElectricBoogaloo*>(functionPair->second(assetPair->second.get()));
+		//Result = Result + 1; // #TODO: We have this working, just need to automatically generate the .generated file (and then add it to the project?)
+	}
+	
 	AddWindow(std::make_shared<EditorWindowFilesystem>(std::filesystem::path(ImGuiEditorGlobals::editorBaseDirectory)));
 	AddWindow(std::make_shared<EditorWindowActionQueue>(executedActions, executedActionsIndex));
 	
 	bEditorShowing = false; // Start with editor off
 }
+#pragma optimize("", on)
 
 void ImGuiEditor::Uninit()
 {
@@ -85,6 +103,7 @@ void ImGuiEditor::Tick()
 	}
 	
 }
+
 
 void ImGuiEditor::AddWindow(const std::shared_ptr<EditorWindowBase>& pWindow)
 {

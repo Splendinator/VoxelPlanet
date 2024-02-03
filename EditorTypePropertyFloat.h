@@ -19,6 +19,8 @@ public:
 	void ForceSetValue(const std::string& newValue) override;
 	//~ End EditorTypePropertyBase Interface
 
+	float GetValue() const {return value;}
+
 protected:
 	float value = 0.0f;
 };

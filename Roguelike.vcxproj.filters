@@ -96,6 +96,9 @@
     <Filter Include="Systems\ImGUIEditor\Types\AssetFactories">
       <UniqueIdentifier>{4ccb0d7f-34d0-45a2-a36d-e7b5e6089e38}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Generated">
+      <UniqueIdentifier>{d7989b56-b44f-4b32-83ec-0414db565fa8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -319,6 +322,9 @@
     </ClCompile>
     <ClCompile Include="EditorActionChangeProperty.cpp">
       <Filter>Systems\ImGUIEditor\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="__Generated.cpp">
+      <Filter>Generated</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -567,6 +573,9 @@
     </ClInclude>
     <ClInclude Include="EditorActionChangeProperty.h">
       <Filter>Systems\ImGUIEditor\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="__Generated.h">
+      <Filter>Generated</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

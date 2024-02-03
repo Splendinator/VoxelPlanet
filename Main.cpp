@@ -35,14 +35,12 @@ void DomWindowMessageHook(tagMSG& msg)
 // Get the delta time in seconds
 float GetDeltaTime()
 {
-	auto currentTime = std::chrono::system_clock::now().time_since_epoch();
+	auto currentTime = std::chrono::system_clock::now();
 	static auto prevTime = currentTime;
-	
-	const float deltaTime = (currentTime - prevTime).count() / 10000000.f; // #TODO: This magic number should be gathered from the std::ratio (Numberator / Denominator)s
 
+	const std::chrono::duration<float> deltaTimeDuration = currentTime - prevTime;
 	prevTime = currentTime;
-
-	return deltaTime;
+	return deltaTimeDuration.count();
 }
 
 bool ShouldCloseWindow()

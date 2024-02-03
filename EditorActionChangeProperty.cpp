@@ -5,6 +5,8 @@
 #include "EditorAssetBase.h"
 #include "EditorTypePropertyBase.h"
 
+// #TODO: if pAsset expires then this doesn't work any more. Need a way to delete actions if the asset is deleted
+
 void EditorActionChangeProperty::Undo()
 {
 	if (pAsset.expired())
@@ -25,8 +27,8 @@ bool EditorActionChangeProperty::TryExecuteAction()
 
 std::string EditorActionChangeProperty::GetDescription() const
 {
-	// TODO: Implement GetDescription functionality
-	return "Change Property " + pProperty->GetName() + " from " + previousValue + " to " + nextValue;
+	const std::string& name = pAsset.expired() ? "UNKNOWN" : pProperty->GetName();
+	return "Change Property " + name + " from " + previousValue + " to " + nextValue;
 }
 
 bool EditorActionChangeProperty::SetValue(const std::string& value)
