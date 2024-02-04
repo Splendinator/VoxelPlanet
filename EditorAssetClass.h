@@ -19,6 +19,7 @@ public:
 	virtual void Draw() override;
 	virtual void ReadFromFile(std::ifstream& file) override;
 	virtual void WriteToFile(std::ofstream& file) override;
+	virtual EditorTypeBase* GetEditorType() const;
 	//~ End EditorAssetBase Interface
 
 	const std::vector<EditorTypePropertyBase*>& GetProperties();

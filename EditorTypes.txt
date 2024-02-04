@@ -1,0 +1,4 @@
+Class SingleFloat
+float value 20
+object SingleFloat pNext nullptr
+;

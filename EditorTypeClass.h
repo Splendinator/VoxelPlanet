@@ -18,8 +18,4 @@ public:
 	virtual void WriteToFile(std::ofstream& file);
 	//~ End EditorTypeBase Interface
 
-protected:
-
-private:
-
 };

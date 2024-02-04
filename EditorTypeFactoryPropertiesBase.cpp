@@ -3,22 +3,28 @@
 #include "EditorTypeFactoryPropertiesBase.h"
 
 #include "EditorTypePropertiesBase.h"
+#include "EditorTypePropertyFactoryClass.h"
 #include "EditorTypePropertyFactoryFloat.h"
 #include "ImGuiEditorGlobals.h"
 
 void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, EditorTypePropertiesBase* pEditorTypeProperties)
 {
 	EditorTypePropertyFactoryFloat floatFactory;
+	EditorTypePropertyFactoryClass classFactory;
 	EditorTypePropertyFactoryBase* propertyFactories[] = 
 	{
-		&floatFactory
+		&floatFactory,
+		&classFactory
 	};
 
 	while (true)
 	{
 		std::string keyword;
-		
+
+		std::streampos preKeywordStreamPosition = stream.tellg();
+
 		stream >> keyword;
+		
 		if(keyword == ImGuiEditorGlobals::delimiterString)
 		{
 			// End of properties
@@ -30,6 +36,7 @@ void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, 
 		{
 			if (pFactory->GetLabel() == keyword)
 			{
+				stream.seekg(preKeywordStreamPosition); // Get the keyword in too to unify how EditorTypePropertyBase::ReadFromFile() does things
 				EditorTypePropertyBase* pProperty = pFactory->CreateType(stream);
 				pEditorTypeProperties->pProperties.push_back(pProperty);
 				bFound = true;

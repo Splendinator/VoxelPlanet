@@ -1,15 +1,10 @@
 #include "pch.h"
 
-#include "EditorTypeClass.h"
-
-// #TEMP: Remove these
-#include "__Generated.h"
-#include "EditorAssetClass.h"
-
 #ifdef DOMIMGUI
 
 #include "ImGuiEditor.h"
 
+#include "__Generated.h"
 #include "DomImport/DomImport.h"
 #include "DomWindow/DomWindow.h"
 #include "EditorActionBase.h"
@@ -29,22 +24,12 @@ void ImGuiEditor::Init()
 	CreateTemplateTypes(ImGuiEditorGlobals::codeFilesBaseDirectory + "\\" + ImGuiEditorGlobals::editorTypesOutputFile);
 
 	ImportAssets(ImGuiEditorGlobals::editorBaseDirectory);
-
-	// #TEMP: Remove
-	{
-		//auto assetPair = assets.find("TestAsset");
-		//auto functionPair = __Generated::stringToCreateClassFunction.find("TestClassTwoElectricBoogaloo");
-		////
-		//TestClassTwoElectricBoogaloo* Result = reinterpret_cast<TestClassTwoElectricBoogaloo*>(functionPair->second(assetPair->second.get()));
-		//Result = Result + 1; // #TODO: We have this working, just need to automatically generate the .generated file (and then add it to the project?)
-	}
 	
 	AddWindow(std::make_shared<EditorWindowFilesystem>(std::filesystem::path(ImGuiEditorGlobals::editorBaseDirectory)));
 	AddWindow(std::make_shared<EditorWindowActionQueue>(executedActions, executedActionsIndex));
 	
 	bEditorShowing = false; // Start with editor off
 }
-#pragma optimize("", on)
 
 void ImGuiEditor::Uninit()
 {
@@ -221,6 +206,8 @@ std::weak_ptr<EditorAssetBase> ImGuiEditor::FindAsset(const std::string& typeNam
 	{
 		return it->second;
 	}
+
+	DOMLOG_ERROR("Asset", typeName, "not found")
 	
 	return {};
 }
@@ -312,4 +299,23 @@ void ImGuiEditor::ImportAssets(const std::string& assetsDirectory)
 	}
 }
 
+void* ImGuiEditor::FindObjectInternal(const std::string& name)
+{
+	std::weak_ptr<EditorAssetBase> pAsset = FindAsset(name);
+
+	if (!pAsset.expired())
+	{
+		auto it = __Generated::stringToCreateClassFunction.find(pAsset.lock()->GetEditorType()->name);
+
+		if (it != __Generated::stringToCreateClassFunction.end())
+		{
+			return it->second(pAsset.lock().get());
+		}
+	}
+
+	DOMLOG_ERROR("Object", name, "not found");
+	return nullptr;
+}
+
 #endif //~ DOMIMGUI
+#pragma optimize("", on)

@@ -46,6 +46,11 @@ void EditorAssetClass::WriteToFile(std::ofstream& file)
 	}
 }
 
+EditorTypeBase* EditorAssetClass::GetEditorType() const
+{
+	return pEditorTypeInstance;
+}
+
 const std::vector<EditorTypePropertyBase*>& EditorAssetClass::GetProperties()
 {
 	DOMASSERT(pEditorTypeInstance, "Trying to get properties when none exist yet");

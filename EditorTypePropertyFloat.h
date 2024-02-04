@@ -9,6 +9,7 @@
 class EditorTypePropertyFloat : public EditorTypePropertyBase
 {
 public:
+	EditorTypePropertyFloat() : EditorTypePropertyBase() {}
 	EditorTypePropertyFloat(const std::string& propertyName, float inValue) : EditorTypePropertyBase(propertyName), value(inValue) {}
 
 	//~ Begin EditorTypePropertyBase Interface
@@ -19,7 +20,7 @@ public:
 	void ForceSetValue(const std::string& newValue) override;
 	//~ End EditorTypePropertyBase Interface
 
-	float GetValue() const {return value;}
+	float GetValue() const { return value; }
 
 protected:
 	float value = 0.0f;

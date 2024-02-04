@@ -18,7 +18,7 @@ public:
 protected:
 
 	//~ Begin HUDObjectBase Interface
-	void Init(UICanvas& canvas) override; // Should populate the canvas with UIObjects
+	void Init(UICanvas& canvas) override;
 	void Tick(ECS& ecs, EntityId player, float deltaTime) override;
 	//~ End HUDObjectBase Interface
 

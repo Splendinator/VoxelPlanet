@@ -6,12 +6,10 @@
 
 EditorTypePropertyBase* EditorTypePropertyFactoryFloat::CreateType(std::ifstream& stream)
 {
-	std::string propertyName;
-	float value;
+	EditorTypePropertyFloat* pPropertyFloat = new EditorTypePropertyFloat();
+	pPropertyFloat->ReadFromFile(stream);
 
-	stream >> propertyName >> value;
-
-	return new EditorTypePropertyFloat(propertyName, value);
+	return pPropertyFloat;
 }
 
 std::string EditorTypePropertyFactoryFloat::GetLabel()

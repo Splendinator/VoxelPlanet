@@ -40,13 +40,21 @@ public:
 
 	bool IsEditorShowing() const { return bEditorShowing; }
 
+	// Find the object with a given asset name. (i.e pass in "Health" and the object represented by Health.asset will be returned 
+	template<typename T>
+	T* FindObject(const std::string& name);
+
 private:
+
+	// #TODO: Need to seperate out asset management and imgui editor else the IMGUI_ENABLED ifdef will compile out assets
 	
 	// Generate template types. see templateTypes
 	void CreateTemplateTypes(const std::string& typesFile);
 
 	// Import assets from their files. see the assets map
 	void ImportAssets(const std::string& assetsDirectory);
+
+	void* FindObjectInternal(const std::string& name);
 
 	// This map will contain a single instance of each type (the key being it's name) and all of the EditorTypes will have default values.
 	// i.e "SpellFireball" -> "EditorTypeClass(SpellFireball) with all the default numbers"
@@ -65,3 +73,10 @@ private:
 	// Whether the editor is showing overlayed above the game -- if this is false don't do anything
 	bool bEditorShowing = true;
 };
+
+template <typename T>
+T* ImGuiEditor::FindObject(const std::string& name)
+{
+	// #TEMP: This needs to be a unique ptr or something, we need to figure out what's happening with object lifetimes (whether they're shared or instanced etc.)
+	return static_cast<T*>(FindObjectInternal(name));
+}

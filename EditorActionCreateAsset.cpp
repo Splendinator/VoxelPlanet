@@ -51,6 +51,11 @@ bool EditorActionCreateAsset::TryExecuteAction()
 	outFile.close();
 
 	std::shared_ptr<EditorAssetClass> pNewAsset = std::make_shared<EditorAssetClass>(assetName, pEditorTypeClass, assetFilePath);
+
+	// Write to file with default values
+	std::ofstream fileStream(assetFilePath);
+	pNewAsset->WriteToFile(fileStream);
+
 	pCreatedAsset = pNewAsset;
 	editor.AddAsset(pNewAsset);
 

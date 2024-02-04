@@ -2,6 +2,8 @@
 
 #include "EditorTypePropertyFloat.h"
 
+#include "WritePropertyToFileUtils.h"
+
 void EditorTypePropertyFloat::DrawImGUI()
 {
 	std::string oldValue = std::to_string(value);
@@ -25,7 +27,7 @@ void EditorTypePropertyFloat::ReadFromFile(std::ifstream& file)
 
 void EditorTypePropertyFloat::WriteToFile(std::ofstream& file)
 {
-	file << "float " << name << " " << value << std::endl;
+	PropertyFileUtils::WriteFloatToFile(file, name, value);
 }
 
 void EditorTypePropertyFloat::ForceSetValue(const std::string& newValue)

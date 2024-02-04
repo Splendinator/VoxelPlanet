@@ -18,7 +18,7 @@ void UIObjectProgressBar::Uninit()
 
 void UIObjectProgressBar::SetProgressFrac(float progressFrac)
 {
-	DOMASSERT(progressFrac >= 0.0f && progressFrac <= 1.0f, "Progress frac should be between 0.0 and 1.0");
+	progressFrac = std::clamp(progressFrac, 0.0f, 1.0f);
 
 	const u32 progressBarWidth = (u32)(progressBarTotalWidth * progressFrac);
 

@@ -16,6 +16,7 @@ struct OnPropertyChangedParams
 class EditorTypePropertyBase
 {
 public:
+	EditorTypePropertyBase() {}
 	EditorTypePropertyBase(const std::string& inName) : name(inName) {}
 	
 	virtual ~EditorTypePropertyBase() {};
@@ -31,7 +32,7 @@ public:
 	virtual EditorTypePropertyBase* DeepCopy() = 0;
 
 	// This should be overwritten to set the value based off a string of that value.
-	// This ***shouldn't*** call the onPropertyChanged delegate.
+	// This ***shouldn't*** call the onPropertyChanged delegate. It's used when setting the value in the editor
 	virtual void ForceSetValue(const std::string& newValue) = 0;
 
 	const std::string& GetName() { return name; }
