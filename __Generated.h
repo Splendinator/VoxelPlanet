@@ -1,7 +1,8 @@
 #pragma once
 EDITORIGNORE()
-class EditorAssetBase;
+class EditorTypePropertyBase;
 namespace __Generated
 {
-	extern std::unordered_map<std::string, void* (*)(EditorAssetBase*)> stringToCreateClassFunction;
+	// This works for both structs and classes.
+	extern std::unordered_map<std::string, void* (*)(const std::vector<EditorTypePropertyBase*>&)> stringToCreateObjectFunction;
 }

@@ -5,7 +5,8 @@ class EditorTypeBase;
 /** EditorTypeFactoryBase
 *
 * This class is the base class used to create editor types. See EditorType.
-* This creates editor types based off input
+* This creates editor types based off an input file.
+* This is currently only used to generate "template types". See ImGuiEditor::CreateTemplateTypes()
 */
 class EditorTypeFactoryBase
 {

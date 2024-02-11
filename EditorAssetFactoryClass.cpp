@@ -9,7 +9,7 @@
 
 std::string EditorAssetFactoryClass::GetKeyword() const
 {
-	return "Object";
+	return "Asset";
 }
 
 std::shared_ptr<EditorAssetBase> EditorAssetFactoryClass::CreateAsset(const std::filesystem::path& assetFilePath)
@@ -19,14 +19,14 @@ std::shared_ptr<EditorAssetBase> EditorAssetFactoryClass::CreateAsset(const std:
 	std::string className;
 
 	stream >> className;
-	DOMLOG_ERROR_IF(className != "Object", "Expecting Object");
+	DOMLOG_ERROR_IF(className != "Asset", "Expecting Object");
 
 	stream >> className >> className;
 	DOMLOG_ERROR_IF(className != "Class", "Expecting Class");
 
 	stream >> className;
 
-	EditorTypeBase* pFoundType = editor.FindType(className);
+	EditorTypeBase* pFoundType = editor.FindClassType(className);
 	if (!pFoundType)
 	{
 		DOMLOG_ERROR("No type found for", className);

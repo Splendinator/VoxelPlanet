@@ -59,5 +59,5 @@ const std::vector<EditorTypePropertyBase*>& EditorAssetClass::GetProperties()
 
 std::string EditorAssetClass::GetLabel()
 {
-	return "Object";
+	return "Asset";
 }

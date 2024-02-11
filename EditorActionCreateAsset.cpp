@@ -21,7 +21,7 @@ void EditorActionCreateAsset::Undo()
 
 bool EditorActionCreateAsset::TryExecuteAction()
 {
-	EditorTypeBase* pEditorType = editor.FindType(className);
+	EditorTypeBase* pEditorType = editor.FindClassType(className);
 	if (!pEditorType)
 	{
 		DOMLOG_ERROR("Class type not found");

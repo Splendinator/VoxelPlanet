@@ -13,6 +13,11 @@ namespace PropertyFileUtils
 	
 	inline void WriteClassToFile(std::ofstream& file, const std::string& propertyName, const std::string& className, const std::string& assetName = "")
 	{
-		file << "object " << className << " " << propertyName << " " << (assetName == "" ? "nullptr" : assetName) << std::endl;
+		file << "class " << className << " " << propertyName << " " << (assetName == "" ? "nullptr" : assetName) << std::endl;
+	};
+
+	inline void WriteStructToFile(std::ofstream& file, const std::string& propertyName, const std::string& structName)
+	{
+		file << "struct " << structName << " " << propertyName << std::endl;
 	}; 
 }

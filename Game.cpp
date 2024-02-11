@@ -67,7 +67,7 @@ void Game::Init()
 
 	// Create player entity
 	{
-		SingleFloat* health = imGuiEditor.FindObject<SingleFloat>("Health");
+		SingleFloat* health = imGuiEditor.FindObjectFromAsset<SingleFloat>("Health");
 		
 		Entity& e = ecs.GetEntity(playerEntity);
 		e.components.AddComponent(EComponents::ComponentMesh);
@@ -83,8 +83,8 @@ void Game::Init()
 		ecs.GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;
 		ecs.GetComponent<ComponentAction>(playerEntity).energy = 100;
 		ecs.GetComponent<ComponentAction>(playerEntity).pActionDecider = new ActionDeciderPlayer;
-		ecs.GetComponent<ComponentHealth>(playerEntity).health = (int)(health ? health->value : 100);
-		ecs.GetComponent<ComponentHealth>(playerEntity).maxHealth = (int)(health ? (health->pNext ? health->pNext->value : 100) : 100);
+		ecs.GetComponent<ComponentHealth>(playerEntity).health = health ? (int)health->floatStruct.a : 100;
+		ecs.GetComponent<ComponentHealth>(playerEntity).maxHealth = health ? (int)health->floatStruct.b : 100;
 		ecs.GetComponent<ComponentFaction>(playerEntity).factionFlags = ComponentFaction::EFactionFlags::Player;
 	}
 

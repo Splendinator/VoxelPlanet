@@ -5,16 +5,20 @@
 #include "EditorTypePropertiesBase.h"
 #include "EditorTypePropertyFactoryClass.h"
 #include "EditorTypePropertyFactoryFloat.h"
+#include "EditorTypePropertyFactoryStruct.h"
 #include "ImGuiEditorGlobals.h"
 
 void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, EditorTypePropertiesBase* pEditorTypeProperties)
 {
 	EditorTypePropertyFactoryFloat floatFactory;
 	EditorTypePropertyFactoryClass classFactory;
+	EditorTypePropertyFactoryStruct structFactory;
+
 	EditorTypePropertyFactoryBase* propertyFactories[] = 
 	{
 		&floatFactory,
-		&classFactory
+		&classFactory,
+		&structFactory,
 	};
 
 	while (true)

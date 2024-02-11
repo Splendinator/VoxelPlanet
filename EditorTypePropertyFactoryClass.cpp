@@ -14,5 +14,5 @@ EditorTypePropertyBase* EditorTypePropertyFactoryClass::CreateType(std::ifstream
 
 std::string EditorTypePropertyFactoryClass::GetLabel()
 {
-	return "object";	
+	return "class";	
 }

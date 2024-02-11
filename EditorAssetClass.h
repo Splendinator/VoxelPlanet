@@ -5,6 +5,8 @@
 class EditorTypeClass;
 class EditorTypePropertyBase;
 
+// #TODO: Do we even have multiple asset types? If not combine this with EditorAssetBase
+
 /** EditorAssetClass
 *
 * This class is used for handling assets that have an associated EditorTypeClass.

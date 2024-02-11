@@ -4,7 +4,8 @@ class EditorTypePropertyBase;
 
 /** EditorTypePropertyFactoryBase
 *
-* This class is used to generate editor property types
+* This class is used to generate editor property types.
+* These are only used when generating "template types" (See ImGuiEditor::CreateTemplateTypes())
 */
 class EditorTypePropertyFactoryBase
 {
@@ -15,9 +16,5 @@ public:
 	
 	// Should be overwritten to return the keyword for this type
 	virtual std::string GetLabel() = 0;
-
-protected:
-
-private:
 
 };

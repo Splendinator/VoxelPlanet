@@ -9,10 +9,12 @@
 #include "DomWindow/DomWindow.h"
 #include "EditorActionBase.h"
 #include "EditorAssetBase.h"
+#include "EditorAssetClass.h"
 #include "EditorAssetFactoryClass.h"
 #include "EditorTypeBase.h"
 #include "EditorTypeFactoryBase.h"
 #include "EditorTypeFactoryClass.h"
+#include "EditorTypeFactoryStruct.h"
 #include "EditorWindowActionQueue.h"
 #include "EditorWindowFilesystem.h"
 #include "ImGuiEditorGlobals.h"
@@ -33,11 +35,11 @@ void ImGuiEditor::Init()
 
 void ImGuiEditor::Uninit()
 {
-	for (auto& [key, value] : templateTypes)
+	for (auto& [key, value] : templateClassTypes)
 	{
 		delete value;
 	}	
-	templateTypes.clear();
+	templateClassTypes.clear();
 
 	assets.clear();
 }
@@ -176,27 +178,24 @@ void ImGuiEditor::RemoveAsset(std::shared_ptr<EditorAssetBase> pAsset)
 	assets.erase(pAsset->GetName());
 }
 
-EditorTypeBase* ImGuiEditor::FindType(const std::string& typeName)
+EditorTypeBase* ImGuiEditor::FindClassType(const std::string& typeName) const
 {
-	auto it = templateTypes.find(typeName);
-	if (it != templateTypes.end())
-	{
-		return it->second;
-	}
-	return nullptr;
+	return FindType(typeName, templateClassTypes);
 }
 
-std::vector<std::string> ImGuiEditor::GetAllTypes() const
+std::vector<std::string> ImGuiEditor::GetAllClassTypes() const
 {
-	std::vector<std::string> types;
-	for (auto& [key, value] : templateTypes)
-	{
-		types.push_back(key);
-	}
-	
-	std::sort(types.begin(), types.end());
+	return GetAllTypes(templateClassTypes);
+}
 
-	return types;
+EditorTypeBase* ImGuiEditor::FindStructType(const std::string& typeName) const
+{
+	return FindType(typeName, templateStructTypes);
+}
+
+std::vector<std::string> ImGuiEditor::GetAllStructTypes() const
+{
+	return GetAllTypes(templateStructTypes);
 }
 
 std::weak_ptr<EditorAssetBase> ImGuiEditor::FindAsset(const std::string& typeName)
@@ -215,12 +214,20 @@ std::weak_ptr<EditorAssetBase> ImGuiEditor::FindAsset(const std::string& typeNam
 void ImGuiEditor::CreateTemplateTypes(const std::string& typesFile)
 {
 	std::ifstream inputFile(typesFile);
-
-	EditorTypeFactoryClass editorTypeFactoryClass;
 	
-	EditorTypeFactoryBase* pEditorTypeFactories[] = 
+	struct EditorTypeToTemplateMap
 	{
-		&editorTypeFactoryClass
+		EditorTypeFactoryBase* pFactory;
+		std::unordered_map<std::string, EditorTypeBase*>& templateTypeMap; 
+	};
+	
+	EditorTypeFactoryClass editorTypeFactoryClass;
+	EditorTypeFactoryStruct editorTypeFactoryStruct;
+	
+	EditorTypeToTemplateMap editorTypeFactories[] = 
+	{
+		{ &editorTypeFactoryClass, templateClassTypes},
+		{ &editorTypeFactoryStruct, templateStructTypes},
 	};
 
 	while (!inputFile.eof())
@@ -235,17 +242,17 @@ void ImGuiEditor::CreateTemplateTypes(const std::string& typesFile)
 		}
 
 		bool bFoundType = false;
-		for (EditorTypeFactoryBase* pEditorFactory : pEditorTypeFactories)
+		for (EditorTypeToTemplateMap& editorTypeToTemplateMap : editorTypeFactories)
 		{
-			if (pEditorFactory->GetKeyword() == nextString)
+			if (editorTypeToTemplateMap.pFactory->GetKeyword() == nextString)
 			{
-				EditorTypeBase* pEditorType = pEditorFactory->CreateType(inputFile);
+				EditorTypeBase* pEditorType = editorTypeToTemplateMap.pFactory->CreateType(inputFile);
 
-				DOMLOG_ERROR_IF(pEditorType == nullptr, "Failed to create editor type for type", pEditorFactory->GetKeyword());
-				DOMLOG_ERROR_IF(pEditorType->name == "", "Editor type created with no name", pEditorFactory->GetKeyword());
+				DOMLOG_ERROR_IF(pEditorType == nullptr, "Failed to create editor type for type", editorTypeToTemplateMap.pFactory->GetKeyword());
+				DOMLOG_ERROR_IF(pEditorType->name == "", "Editor type created with no name", editorTypeToTemplateMap.pFactory->GetKeyword());
 
 				bFoundType = true;
-				templateTypes.insert({ pEditorType->name, pEditorType });
+				editorTypeToTemplateMap.templateTypeMap.insert({ pEditorType->name, pEditorType });
 
 				break;
 			}
@@ -299,22 +306,48 @@ void ImGuiEditor::ImportAssets(const std::string& assetsDirectory)
 	}
 }
 
-void* ImGuiEditor::FindObjectInternal(const std::string& name)
+void* ImGuiEditor::FindObjectFromAssetInternal(const std::string& name)
 {
 	std::weak_ptr<EditorAssetBase> pAsset = FindAsset(name);
-
+	
 	if (!pAsset.expired())
 	{
-		auto it = __Generated::stringToCreateClassFunction.find(pAsset.lock()->GetEditorType()->name);
+		EditorAssetClass* pClassAsset = dynamic_cast<EditorAssetClass*>(pAsset.lock().get());
+		DOMLOG_ERROR_IF(pClassAsset == nullptr, "Right now we only support class assets");
+		
+		auto it = __Generated::stringToCreateObjectFunction.find(pClassAsset->GetEditorType()->name);
 
-		if (it != __Generated::stringToCreateClassFunction.end())
+		if (it != __Generated::stringToCreateObjectFunction.end())
 		{
-			return it->second(pAsset.lock().get());
+			return it->second(pClassAsset->GetProperties());
 		}
 	}
 
 	DOMLOG_ERROR("Object", name, "not found");
 	return nullptr;
+}
+
+EditorTypeBase* ImGuiEditor::FindType(const std::string& typeName, const std::unordered_map<std::string, EditorTypeBase*>& templateTypes) const
+{
+	auto it = templateTypes.find(typeName);
+	if (it != templateClassTypes.end())
+	{
+		return it->second;
+	}
+	return nullptr;
+}
+
+std::vector<std::string> ImGuiEditor::GetAllTypes(const std::unordered_map<std::string, EditorTypeBase*>& templateTypes) const
+{
+	std::vector<std::string> types;
+	for (auto& [key, value] : templateTypes)
+	{
+		types.push_back(key);
+	}
+	
+	std::sort(types.begin(), types.end());
+
+	return types;
 }
 
 #endif //~ DOMIMGUI

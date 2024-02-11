@@ -25,5 +25,7 @@ public:
 protected:
 	std::string className; // name of the class of the asset
 	std::string assetName; // name of the actual asset
+	
+	char inputBuffer[128]; // input buffer for ImGUI InputText
 };
 

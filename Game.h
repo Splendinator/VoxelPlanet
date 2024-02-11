@@ -4,6 +4,19 @@
 
 class ImGuiEditor;
 
+// #TEMP: Remove these editor exposed stuff, just testing right now
+EDITORSTRUCT()
+struct FloatStruct
+{
+	EDITORBODY()
+	
+	EDITORPROPERTY()
+	float a;
+
+	EDITORPROPERTY()
+	float b = 1.0f;
+};
+
 EDITORCLASS()
 class SingleFloat
 {
@@ -14,6 +27,9 @@ class SingleFloat
 
 	EDITORPROPERTY()
 	SingleFloat* pNext = nullptr;
+
+	EDITORPROPERTY()
+	FloatStruct floatStruct;
 };
 
 namespace Game

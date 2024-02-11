@@ -28,13 +28,15 @@ public:
 	void Undo(); // Undo the last action
 	void Redo(); // Redo the last undone action if possible
 
-	// Add a new asset, className is the name of the class that this type will be (see templateTypes), assetName is the unique name of the asset to create
+	// Add a new asset, className is the name of the class that this type will be (see templateClassTypes), assetName is the unique name of the asset to create
 	void AddAsset(std::shared_ptr<EditorAssetBase> pAsset);
 	void RemoveAsset(std::shared_ptr<EditorAssetBase> pAsset);
 	
 	// Get the type of a specified class, should be the same as the C++ class name
-	EditorTypeBase* FindType(const std::string& typeName);
-	std::vector<std::string> GetAllTypes() const;
+	EditorTypeBase* FindClassType(const std::string& typeName) const;
+	std::vector<std::string> GetAllClassTypes() const;
+	EditorTypeBase* FindStructType(const std::string& typeName) const;
+	std::vector<std::string> GetAllStructTypes() const;
 
 	std::weak_ptr<EditorAssetBase> FindAsset(const std::string& typeName);
 
@@ -42,23 +44,28 @@ public:
 
 	// Find the object with a given asset name. (i.e pass in "Health" and the object represented by Health.asset will be returned 
 	template<typename T>
-	T* FindObject(const std::string& name);
+	T* FindObjectFromAsset(const std::string& name);
 
 private:
 
 	// #TODO: Need to seperate out asset management and imgui editor else the IMGUI_ENABLED ifdef will compile out assets
 	
-	// Generate template types. see templateTypes
+	// Generate template types. see templateClassTypes
 	void CreateTemplateTypes(const std::string& typesFile);
 
 	// Import assets from their files. see the assets map
 	void ImportAssets(const std::string& assetsDirectory);
 
-	void* FindObjectInternal(const std::string& name);
+	void* FindObjectFromAssetInternal(const std::string& name);
 
-	// This map will contain a single instance of each type (the key being it's name) and all of the EditorTypes will have default values.
+	// Find template types from a given type map (struct, class, enum)
+	EditorTypeBase* FindType(const std::string& typeName, const std::unordered_map<std::string, EditorTypeBase*>& templateTypes) const;
+	std::vector<std::string> GetAllTypes(const std::unordered_map<std::string, EditorTypeBase*>& templateTypes) const;
+
+	// This map will contain a single instance of each class type (the key being it's name) and all of the EditorTypes will have default values.
 	// i.e "SpellFireball" -> "EditorTypeClass(SpellFireball) with all the default numbers"
-	std::unordered_map<std::string, EditorTypeBase*> templateTypes;
+	std::unordered_map<std::string, EditorTypeBase*> templateClassTypes;
+	std::unordered_map<std::string, EditorTypeBase*> templateStructTypes;
 
 	// This map will contain names to their assets. so it might be "Fireball" to a fireball asset, etc.
 	std::unordered_map<std::string, std::shared_ptr<EditorAssetBase>> assets;
@@ -75,8 +82,8 @@ private:
 };
 
 template <typename T>
-T* ImGuiEditor::FindObject(const std::string& name)
+T* ImGuiEditor::FindObjectFromAsset(const std::string& name)
 {
 	// #TEMP: This needs to be a unique ptr or something, we need to figure out what's happening with object lifetimes (whether they're shared or instanced etc.)
-	return static_cast<T*>(FindObjectInternal(name));
+	return static_cast<T*>(FindObjectFromAssetInternal(name));
 }

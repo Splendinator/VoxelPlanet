@@ -5,6 +5,7 @@
 /** EditorTypeClass
 *
 * This class used for editor type classes. These are full classes with a list of properties, not a "reference to" a class
+* For classes, a class data asset is read in to popualate this
 */
 class EditorTypeClass : public EditorTypePropertiesBase
 {

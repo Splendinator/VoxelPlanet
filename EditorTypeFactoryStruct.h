@@ -1,12 +1,12 @@
-#pragma once
+﻿#pragma once
 
 #include "EditorTypeFactoryPropertiesBase.h"
 
-/** EditorTypeFactoryClass
+/** EditorTypeFactoryStruct
 *
-* This class is used for creating a class
+* This struct is used for creating a struct
 */
-class EditorTypeFactoryClass : public EditorTypeFactoryPropertiesBase
+class EditorTypeFactoryStruct : public EditorTypeFactoryPropertiesBase
 {
 public:
 

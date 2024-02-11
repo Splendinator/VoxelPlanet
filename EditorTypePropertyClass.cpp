@@ -9,8 +9,7 @@
 
 void EditorTypePropertyClass::DrawImGUI()
 {
-	static char inputBuffer[128];
-	if (ImGui::InputText("AssetName", &inputBuffer[0], 128, ImGuiInputTextFlags_NoUndoRedo))
+	if (ImGui::InputText(name.c_str(), &inputBuffer[0], 128, ImGuiInputTextFlags_NoUndoRedo))
 	{
 		onPropertyChanged.Invoke({ this, assetName, inputBuffer});	
 	}
@@ -23,7 +22,7 @@ EditorTypePropertyBase* EditorTypePropertyClass::DeepCopy()
 
 void EditorTypePropertyClass::ReadFromFile(std::ifstream& file)
 {
-	// Read in "object SingleFloat pNext nullptr"
+	// Read in "class SingleFloat pNext nullptr"
 	
 	std::string unused;
 	file >> unused >> className >> name >> unused;
@@ -31,6 +30,8 @@ void EditorTypePropertyClass::ReadFromFile(std::ifstream& file)
 	if (unused != "nullptr")
 	{
 		assetName = unused;
+		memcpy(inputBuffer, assetName.c_str(), assetName.size()); // Do we need a SetAssetName() that does this?
+		
 	}
 }
 
@@ -48,7 +49,7 @@ void* EditorTypePropertyClass::GetValue() const
 {
 	if (assetName != "")
 	{
-		return Game::Editor().FindObject<void>(assetName);
+		return Game::Editor().FindObjectFromAsset<void>(assetName);
 	}
 	return nullptr;
 }
