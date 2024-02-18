@@ -12,6 +12,11 @@ EditorTypePropertyBase* EditorTypePropertyFactoryFloat::CreateType(std::ifstream
 	return pPropertyFloat;
 }
 
+EditorTypePropertyBase* EditorTypePropertyFactoryFloat::CreateTemplateType()
+{
+	return new EditorTypePropertyFloat("float", 0.0f);
+}
+
 std::string EditorTypePropertyFactoryFloat::GetLabel()
 {
 	return "float";

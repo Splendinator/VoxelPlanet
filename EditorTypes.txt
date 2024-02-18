@@ -1,9 +1,4 @@
-Struct FloatStruct
-float a 0
-float b 1
-;
 Class SingleFloat
-float value 20
-class SingleFloat pNext nullptr
-struct FloatStruct floatStruct
+float x 0
+vector values float
 ;

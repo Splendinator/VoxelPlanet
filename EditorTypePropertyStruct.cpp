@@ -12,7 +12,6 @@ EditorTypePropertyBase(propertyName), structName(inStructName), pStructType(pInS
 	DOMASSERT(pInStructType);
 
 	onInternalStructPropertyChangedDelegate.Bind(this, &EditorTypePropertyStruct::OnInternalStructPropertyChanged);
-	
 	pStructType->onPropertyChanged.Add(onInternalStructPropertyChangedDelegate); // #TODO: Should remove on destruct but the pStructType will always be unique to this class.
 }
 
@@ -20,9 +19,10 @@ void EditorTypePropertyStruct::DrawImGUI()
 {
 	std::string imGuiTreeLabel = name + " (" + structName + ")";
 	
-	if (ImGui::TreeNode(imGuiTreeLabel.c_str()))
+	if (ImGui::TreeNodeEx(imGuiTreeLabel.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		pStructType->DrawImGUI();
+		ImGui::TreePop();
 	}
 }
 

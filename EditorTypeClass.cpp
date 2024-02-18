@@ -4,7 +4,7 @@
 
 void EditorTypeClass::DrawImGUI()
 {
-	if (ImGui::TreeNode(name.c_str()))
+	if (ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		EditorTypePropertiesBase::DrawImGUI();
 		ImGui::TreePop();

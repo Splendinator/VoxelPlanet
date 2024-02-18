@@ -4,6 +4,8 @@ class CodeParseTokenBase;
 class EditorActionBase;
 class EditorAssetBase;
 class EditorTypeBase;
+class EditorTypeClass;
+class EditorTypeStruct;
 class EditorWindowBase;
 
 /** ImGuiEditor
@@ -32,11 +34,12 @@ public:
 	void AddAsset(std::shared_ptr<EditorAssetBase> pAsset);
 	void RemoveAsset(std::shared_ptr<EditorAssetBase> pAsset);
 	
-	// Get the type of a specified class, should be the same as the C++ class name
-	EditorTypeBase* FindClassType(const std::string& typeName) const;
-	std::vector<std::string> GetAllClassTypes() const;
-	EditorTypeBase* FindStructType(const std::string& typeName) const;
-	std::vector<std::string> GetAllStructTypes() const;
+	// Get the type of a specified class, should be the same as the C++ class/struct/enum name
+	EditorTypeBase* FindTemplateType(const std::string& typeName) const; // Finds *all* types (struct/class/enum)
+	EditorTypeClass* FindClassTemplateType(const std::string& typeName) const;
+	std::vector<std::string> GetAllClassTemplateNames() const;
+	EditorTypeStruct* FindStructTemplateType(const std::string& typeName) const;
+	std::vector<std::string> GetAllStructTemplateNames() const;
 
 	std::weak_ptr<EditorAssetBase> FindAsset(const std::string& typeName);
 

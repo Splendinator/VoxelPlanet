@@ -21,17 +21,10 @@ void EditorActionCreateAsset::Undo()
 
 bool EditorActionCreateAsset::TryExecuteAction()
 {
-	EditorTypeBase* pEditorType = editor.FindClassType(className);
-	if (!pEditorType)
-	{
-		DOMLOG_ERROR("Class type not found");
-		return false;
-	}
-
-	EditorTypeClass* pEditorTypeClass = dynamic_cast<EditorTypeClass*>(pEditorType);
+	EditorTypeClass* pEditorTypeClass = editor.FindClassTemplateType(className);
 	if (!pEditorTypeClass)
 	{
-		DOMLOG_ERROR("Type found but it isn't a class");
+		DOMLOG_ERROR("Class", className, "not found");
 		return false;
 	}
 

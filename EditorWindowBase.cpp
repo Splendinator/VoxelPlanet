@@ -16,7 +16,7 @@ void EditorWindowBase::CloseBase()
 
 void EditorWindowBase::DrawBase()
 {
-	ImGui::Begin(GetWindowName().c_str(), nullptr);
+	ImGui::Begin(GetWindowName().c_str(), nullptr); // #JANK: There's a crash here for whatever the fuck reason. I don't know what it is.
 	bIsFocused = ImGui::IsWindowFocused();
 	Draw();
 	ImGui::End();

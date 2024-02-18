@@ -15,12 +15,10 @@ EditorTypePropertiesBase::~EditorTypePropertiesBase()
 
 void EditorTypePropertiesBase::DrawImGUI()
 {
-	ImGui::Indent();
 	for (EditorTypePropertyBase* pProperty : pProperties)
 	{
 		pProperty->DrawImGUI();
 	}
-	ImGui::Unindent();
 }
 
 void EditorTypePropertiesBase::ReadFromFile(std::ifstream& file)

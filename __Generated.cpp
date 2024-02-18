@@ -3,34 +3,35 @@
 #include "EditorTypePropertyClass.h"
 #include "EditorTypePropertyFloat.h"
 #include "EditorTypePropertyStruct.h"
+#include "EditorTypePropertyVector.h"
 #include "..\Roguelike\Game.h"
 
-void* FloatStruct::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+// SingleFloat
+void SingleFloat::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
-FloatStruct* pReturn = new FloatStruct;
-pReturn->a = static_cast<EditorTypePropertyFloat*>(properties[0])->GetValue();
-pReturn->b = static_cast<EditorTypePropertyFloat*>(properties[1])->GetValue();
-return pReturn;
+	SingleFloat* pSingleFloat = static_cast<SingleFloat*>(pObject);
+	pSingleFloat->x = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pSingleFloat->values.push_back(static_cast<EditorTypePropertyFloat*>(instancedProperty.get())->GetValue());
+		}
+	}
 }
 
 void* SingleFloat::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
 {
-SingleFloat* pReturn = new SingleFloat;
-pReturn->value = static_cast<EditorTypePropertyFloat*>(properties[0])->GetValue();
-pReturn->pNext = static_cast<SingleFloat*>(static_cast<EditorTypePropertyClass*>(properties[1])->GetValue());
-{
-FloatStruct* temp = static_cast<FloatStruct*>(static_cast<EditorTypePropertyStruct*>(properties[2])->GetValue());
-pReturn->floatStruct = *temp;
-delete temp;
-}
-return pReturn;
+	SingleFloat* pSingleFloat = new SingleFloat;
+	int propertyIndex = 0;
+	SingleFloat::InitFromPropertiesSubset(pSingleFloat, properties, propertyIndex);
+	return pSingleFloat;
 }
 
 namespace __Generated
 {
 	std::unordered_map<std::string, void* (*)(const std::vector<EditorTypePropertyBase*>&)> stringToCreateObjectFunction
 	{
-		{"FloatStruct", &FloatStruct::InitFromProperties},
 		{"SingleFloat", &SingleFloat::InitFromProperties},
 	};
 }

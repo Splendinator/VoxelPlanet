@@ -12,9 +12,11 @@
 #include "EditorAssetClass.h"
 #include "EditorAssetFactoryClass.h"
 #include "EditorTypeBase.h"
+#include "EditorTypeClass.h"
 #include "EditorTypeFactoryBase.h"
 #include "EditorTypeFactoryClass.h"
 #include "EditorTypeFactoryStruct.h"
+#include "EditorTypeStruct.h"
 #include "EditorWindowActionQueue.h"
 #include "EditorWindowFilesystem.h"
 #include "ImGuiEditorGlobals.h"
@@ -178,22 +180,41 @@ void ImGuiEditor::RemoveAsset(std::shared_ptr<EditorAssetBase> pAsset)
 	assets.erase(pAsset->GetName());
 }
 
-EditorTypeBase* ImGuiEditor::FindClassType(const std::string& typeName) const
+EditorTypeBase* ImGuiEditor::FindTemplateType(const std::string& typeName) const
 {
-	return FindType(typeName, templateClassTypes);
+	EditorTypeBase* pFoundType = nullptr;
+
+	pFoundType = FindClassTemplateType(typeName);
+	if (pFoundType)
+	{
+		return pFoundType;
+	}
+
+	pFoundType = FindStructTemplateType(typeName);
+	if (pFoundType)
+	{
+		return pFoundType;
+	}
+
+	// #TODO: Handle enums here too 
 }
 
-std::vector<std::string> ImGuiEditor::GetAllClassTypes() const
+EditorTypeClass* ImGuiEditor::FindClassTemplateType(const std::string& typeName) const
+{
+	return static_cast<EditorTypeClass*>(FindType(typeName, templateClassTypes));
+}
+
+std::vector<std::string> ImGuiEditor::GetAllClassTemplateNames() const
 {
 	return GetAllTypes(templateClassTypes);
 }
 
-EditorTypeBase* ImGuiEditor::FindStructType(const std::string& typeName) const
+EditorTypeStruct* ImGuiEditor::FindStructTemplateType(const std::string& typeName) const
 {
-	return FindType(typeName, templateStructTypes);
+	return static_cast<EditorTypeStruct*>(FindType(typeName, templateStructTypes));
 }
 
-std::vector<std::string> ImGuiEditor::GetAllStructTypes() const
+std::vector<std::string> ImGuiEditor::GetAllStructTemplateNames() const
 {
 	return GetAllTypes(templateStructTypes);
 }

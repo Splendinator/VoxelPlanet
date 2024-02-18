@@ -2,25 +2,16 @@
 
 #include "EditorTypeFactoryPropertiesBase.h"
 
+#include "EditorTypeClass.h"
 #include "EditorTypePropertiesBase.h"
-#include "EditorTypePropertyFactoryClass.h"
-#include "EditorTypePropertyFactoryFloat.h"
-#include "EditorTypePropertyFactoryStruct.h"
+#include "EditorTypePropertyBase.h"
+#include "EditorTypeUtils.h"
+#include "Game.h"
+#include "ImGuiEditor.h"
 #include "ImGuiEditorGlobals.h"
 
 void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, EditorTypePropertiesBase* pEditorTypeProperties)
 {
-	EditorTypePropertyFactoryFloat floatFactory;
-	EditorTypePropertyFactoryClass classFactory;
-	EditorTypePropertyFactoryStruct structFactory;
-
-	EditorTypePropertyFactoryBase* propertyFactories[] = 
-	{
-		&floatFactory,
-		&classFactory,
-		&structFactory,
-	};
-
 	while (true)
 	{
 		std::string keyword;
@@ -34,17 +25,41 @@ void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, 
 			// End of properties
 			break;
 		}
-		
+
 		bool bFound = false;
-		for (EditorTypePropertyFactoryBase* pFactory : propertyFactories)
+		
+		if (keyword == "Child")
 		{
-			if (pFactory->GetLabel() == keyword)
+			// Handle child classes by deep copying properties from their template object
+			std::string childClassName;
+			stream >> childClassName;
+
+			EditorTypeClass* baseClassTemplate = Game::Editor().FindClassTemplateType(childClassName);
+			DOMLOG_ERROR_IF(!baseClassTemplate, "Cannot find child class", childClassName);
+			
+			if (baseClassTemplate)
 			{
-				stream.seekg(preKeywordStreamPosition); // Get the keyword in too to unify how EditorTypePropertyBase::ReadFromFile() does things
-				EditorTypePropertyBase* pProperty = pFactory->CreateType(stream);
-				pEditorTypeProperties->pProperties.push_back(pProperty);
 				bFound = true;
-				break;
+				
+				for(EditorTypePropertyBase* pChildProperty : baseClassTemplate->pProperties)
+				{
+					pEditorTypeProperties->pProperties.push_back(pChildProperty->DeepCopy());
+				}
+			}
+		}
+		else
+		{
+			// Handle properties per-property
+			for (EditorTypePropertyFactoryBase* pFactory : EditorTypeUtils::propertyFactories)
+			{
+				if (pFactory->GetLabel() == keyword)
+				{
+					stream.seekg(preKeywordStreamPosition); // Get the keyword in too to unify how EditorTypePropertyBase::ReadFromFile() does things
+					EditorTypePropertyBase* pProperty = pFactory->CreateType(stream);
+					pEditorTypeProperties->pProperties.push_back(pProperty);
+					bFound = true;
+					break;
+				}
 			}
 		}
 

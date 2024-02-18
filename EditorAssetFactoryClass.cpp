@@ -25,18 +25,11 @@ std::shared_ptr<EditorAssetBase> EditorAssetFactoryClass::CreateAsset(const std:
 	DOMLOG_ERROR_IF(className != "Class", "Expecting Class");
 
 	stream >> className;
-
-	EditorTypeBase* pFoundType = editor.FindClassType(className);
-	if (!pFoundType)
-	{
-		DOMLOG_ERROR("No type found for", className);
-		return {};
-	}
-
-	EditorTypeClass* pEditorTypeClass = dynamic_cast<EditorTypeClass*>(pFoundType);
+	
+	EditorTypeClass* pEditorTypeClass = editor.FindClassTemplateType(className);
 	if (!pEditorTypeClass)
 	{
-		DOMLOG_ERROR("Type found for", className, "but it's not a class");
+		DOMLOG_ERROR("No class found for", className);
 		return {};
 	}
 	

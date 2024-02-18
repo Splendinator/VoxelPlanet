@@ -174,9 +174,12 @@
     <ClCompile Include="EditorTypePropertyFactoryClass.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryFloat.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryStruct.cpp" />
+    <ClCompile Include="EditorTypePropertyFactoryVector.cpp" />
     <ClCompile Include="EditorTypePropertyFloat.cpp" />
     <ClCompile Include="EditorTypePropertyStruct.cpp" />
+    <ClCompile Include="EditorTypePropertyVector.cpp" />
     <ClCompile Include="EditorTypeStruct.cpp" />
+    <ClCompile Include="EditorTypeUtils.cpp" />
     <ClCompile Include="EditorWindowActionQueue.cpp" />
     <ClCompile Include="EditorWindowBase.cpp" />
     <ClCompile Include="EditorWindowCreateAsset.cpp" />
@@ -340,9 +343,12 @@
     <ClInclude Include="EditorTypePropertyFactoryClass.h" />
     <ClInclude Include="EditorTypePropertyFactoryFloat.h" />
     <ClInclude Include="EditorTypePropertyFactoryStruct.h" />
+    <ClInclude Include="EditorTypePropertyFactoryVector.h" />
     <ClInclude Include="EditorTypePropertyFloat.h" />
     <ClInclude Include="EditorTypePropertyStruct.h" />
+    <ClInclude Include="EditorTypePropertyVector.h" />
     <ClInclude Include="EditorTypeStruct.h" />
+    <ClInclude Include="EditorTypeUtils.h" />
     <ClInclude Include="EditorWindowActionQueue.h" />
     <ClInclude Include="EditorWindowBase.h" />
     <ClInclude Include="EditorWindowCreateAsset.h" />

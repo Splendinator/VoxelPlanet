@@ -83,8 +83,8 @@ void Game::Init()
 		ecs.GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;
 		ecs.GetComponent<ComponentAction>(playerEntity).energy = 100;
 		ecs.GetComponent<ComponentAction>(playerEntity).pActionDecider = new ActionDeciderPlayer;
-		ecs.GetComponent<ComponentHealth>(playerEntity).health = health ? (int)health->floatStruct.a : 100;
-		ecs.GetComponent<ComponentHealth>(playerEntity).maxHealth = health ? (int)health->floatStruct.b : 100;
+		ecs.GetComponent<ComponentHealth>(playerEntity).health = health ? (int)health->values[0] : 100;
+		ecs.GetComponent<ComponentHealth>(playerEntity).maxHealth = health ? (int)health->values[1] : 100;
 		ecs.GetComponent<ComponentFaction>(playerEntity).factionFlags = ComponentFaction::EFactionFlags::Player;
 	}
 
