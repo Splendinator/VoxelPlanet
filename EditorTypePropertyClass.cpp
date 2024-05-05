@@ -20,6 +20,26 @@ EditorTypePropertyBase* EditorTypePropertyClass::DeepCopy()
 	return new EditorTypePropertyClass(name, className, assetName);
 }
 
+bool EditorTypePropertyClass::CanReadFromFile(std::ifstream& file) const
+{
+	std::string temp;
+
+	file >> temp;
+	if (temp != "class")
+	{
+		return false;
+	}
+
+	file >> temp;
+	if (temp != className)
+	{
+		return false;
+	}
+
+	file >> temp;
+	return temp == name;
+}
+
 void EditorTypePropertyClass::ReadFromFile(std::ifstream& file)
 {
 	// Read in "class SingleFloat pNext nullptr"

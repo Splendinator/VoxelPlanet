@@ -31,6 +31,26 @@ EditorTypePropertyBase* EditorTypePropertyStruct::DeepCopy()
 	return new EditorTypePropertyStruct(name, structName, static_cast<EditorTypeStruct*>(pStructType->DeepCopy()));
 }
 
+bool EditorTypePropertyStruct::CanReadFromFile(std::ifstream& file) const
+{
+	std::string temp;
+
+	file >> temp;
+	if (temp != "struct")
+	{
+		return false;
+	}
+
+	file >> temp;
+	if (temp != structName)
+	{
+		return false;
+	}
+
+	file >> temp;
+	return temp == name;
+}
+
 void EditorTypePropertyStruct::ReadFromFile(std::ifstream& file)
 {
 	std::string unused;

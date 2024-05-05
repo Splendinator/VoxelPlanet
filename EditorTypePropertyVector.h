@@ -13,6 +13,7 @@ public:
 
 	//~ Begin EditorTypePropertyBase Interface
 	void DrawImGUI() override;
+	bool CanReadFromFile(std::ifstream& file) const override;
 	void ReadFromFile(std::ifstream& file) override;
 	void WriteToFile(std::ofstream& file) override;
 	EditorTypePropertyBase* DeepCopy() override;

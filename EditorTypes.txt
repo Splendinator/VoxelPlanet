@@ -1,4 +1,7 @@
 Class SingleFloat
-float x 0
-vector values float
+float floatOne 0
+float floatTwo 0
+vector strings string
+vector integers int
+vector bools bool
 ;

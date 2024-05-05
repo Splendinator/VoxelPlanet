@@ -46,6 +46,12 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 							DOMLOG_ERROR("Asset not found / Asset file empty", assetName);
 						}
 					}
+					ImGui::SameLine();
+					if (ImGui::Button("Delete"))
+					{
+						// #TODO: make this an undoable action
+						std::remove(entry.path().string().c_str());
+					}
 					ImGui::PopID();
 				}
 			}

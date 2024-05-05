@@ -2,6 +2,9 @@
 #include "__Generated.h"
 #include "EditorTypePropertyClass.h"
 #include "EditorTypePropertyFloat.h"
+#include "EditorTypePropertyInt.h"
+#include "EditorTypePropertyBool.h"
+#include "EditorTypePropertyString.h"
 #include "EditorTypePropertyStruct.h"
 #include "EditorTypePropertyVector.h"
 #include "..\Roguelike\Game.h"
@@ -10,12 +13,27 @@
 void SingleFloat::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
 	SingleFloat* pSingleFloat = static_cast<SingleFloat*>(pObject);
-	pSingleFloat->x = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pSingleFloat->floatOne = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pSingleFloat->floatTwo = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
 	{
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pSingleFloat->values.push_back(static_cast<EditorTypePropertyFloat*>(instancedProperty.get())->GetValue());
+			pSingleFloat->strings.push_back(static_cast<EditorTypePropertyString*>(instancedProperty.get())->GetValue());
+		}
+	}
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pSingleFloat->integers.push_back(static_cast<EditorTypePropertyInt*>(instancedProperty.get())->GetValue());
+		}
+	}
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pSingleFloat->bools.push_back(static_cast<EditorTypePropertyBool*>(instancedProperty.get())->GetValue());
 		}
 	}
 }

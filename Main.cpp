@@ -52,7 +52,7 @@ void domMain()
 {
 	dmwi::createWindow({ "Roguelike", 1792, 1008 });
 	dmlg::initConsole();
-
+	
 #ifdef DOMIMGUI
 	if (ImGuiContext* context = ImGui::CreateContext())
 	{

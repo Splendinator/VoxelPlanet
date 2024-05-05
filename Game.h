@@ -4,7 +4,6 @@
 
 class ImGuiEditor;
 
-
 // #TEMP: Remove these editor exposed stuff, just testing right now
 EDITORCLASS()
 class SingleFloat
@@ -12,7 +11,19 @@ class SingleFloat
 	EDITORBODY()
 	
 	EDITORPROPERTY()
-	std::vector<float> values;
+	float floatOne;
+	
+	EDITORPROPERTY()
+	float floatTwo;
+	
+	EDITORPROPERTY()
+	std::vector<std::string> strings;
+
+	EDITORPROPERTY()
+	std::vector<int> integers;
+
+	EDITORPROPERTY()
+	std::vector<bool> bools;
 };
 
 namespace Game

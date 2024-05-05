@@ -33,6 +33,21 @@ void EditorTypePropertyVector::DrawImGUI()
 	}
 }
 
+bool EditorTypePropertyVector::CanReadFromFile(std::ifstream& file) const
+{
+	std::string temp;
+
+	file >> temp;
+	if (temp != "vector")
+	{
+		return false;
+	}
+
+	file >> temp;
+	return temp == name;
+}
+
+
 void EditorTypePropertyVector::ReadFromFile(std::ifstream& file)
 {
 	std::string temp;

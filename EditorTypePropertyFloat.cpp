@@ -18,6 +18,21 @@ EditorTypePropertyBase* EditorTypePropertyFloat::DeepCopy()
 	return new EditorTypePropertyFloat(name, value);
 }
 
+bool EditorTypePropertyFloat::CanReadFromFile(std::ifstream& file) const
+{
+	// Read in "float damage 2.0f"
+	std::string temp;
+
+	file >> temp;
+	if (temp != "float")
+	{
+		return false;
+	}
+
+	file >> temp;
+	return temp == name;
+}
+
 void EditorTypePropertyFloat::ReadFromFile(std::ifstream& file)
 {
 	// Read in "float damage 2.0f"

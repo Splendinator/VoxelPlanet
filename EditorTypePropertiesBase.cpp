@@ -23,9 +23,23 @@ void EditorTypePropertiesBase::DrawImGUI()
 
 void EditorTypePropertiesBase::ReadFromFile(std::ifstream& file)
 {
-	for (EditorTypePropertyBase* pProperty : pProperties)
+	while (file.peek() != ';')
 	{
-		pProperty->ReadFromFile(file);
+		std::streampos preCanReadCheckPosition = file.tellg();
+		for (EditorTypePropertyBase* pProperty : pProperties)
+		{
+			const bool bCanRead = pProperty->CanReadFromFile(file);
+			file.seekg(preCanReadCheckPosition); // Go back to before the read check so we can read normally
+			
+			if (bCanRead)
+			{
+				pProperty->ReadFromFile(file);
+				break;
+			}
+		}
+
+		std::string temp;
+		std::getline(file, temp); // Move on to next line (in the case of all properties failing this is needed)
 	}
 }
 
@@ -35,6 +49,7 @@ void EditorTypePropertiesBase::WriteToFile(std::ofstream& file)
 	{
 		pProperty->WriteToFile(file);
 	}
+	file << ';';
 }
 
 void EditorTypePropertiesBase::OnPropertiesPopulated()

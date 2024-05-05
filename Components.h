@@ -36,7 +36,7 @@ struct ComponentTransform
 // Component to take an action based off energy
 struct ComponentAction
 {
-	short maxEnergy = 0; // How often to take a turn, something with 50 max energy will take an action twice as often as something with 100 energy
+	short maxEnergy = 0; // How often to take a turn, something with 50 max energy will take an action twice as often as something with 100 max energy
 	short energy = 0;
 	ActionDeciderBase* pActionDecider = nullptr; // These are deleted by the SystemAction when the entity is deleted
 };

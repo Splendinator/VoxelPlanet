@@ -1,16 +1,16 @@
-#pragma once
+﻿#pragma once
 
 #include "EditorTypePropertyBase.h"
 
-/** EditorTypePropertyFloat
+/** EditorTypePropertyString
 *
-* This class is used to represent a float number property
+* This class is used to represent a string property
 */
-class EditorTypePropertyFloat : public EditorTypePropertyBase
+class EditorTypePropertyString : public EditorTypePropertyBase
 {
 public:
-	EditorTypePropertyFloat() : EditorTypePropertyBase() {}
-	EditorTypePropertyFloat(const std::string& propertyName, float inValue) : EditorTypePropertyBase(propertyName), value(inValue) {}
+	EditorTypePropertyString() : EditorTypePropertyBase() {}
+	EditorTypePropertyString(const std::string& propertyName, const std::string& inValue) : EditorTypePropertyBase(propertyName), value(inValue) {}
 
 	//~ Begin EditorTypePropertyBase Interface
 	void DrawImGUI() override;
@@ -21,8 +21,8 @@ public:
 	void ForceSetValue(const std::string& newValue) override;
 	//~ End EditorTypePropertyBase Interface
 
-	float GetValue() const { return value; }
+	std::string GetValue() const { return value; }
 
 protected:
-	float value = 0.0f;
+	std::string value = "";
 };
