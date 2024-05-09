@@ -13,6 +13,7 @@ HUD::HUD(ECS& inEcs) : ecs(inEcs)
 
 	pHudObjects.Alloc(NUM_HUD_OBJECTS);
 
+	// #TODO: This needs to be data driven
 	// Health bar
 	{
 		HUDInitParams initParams(ecs);

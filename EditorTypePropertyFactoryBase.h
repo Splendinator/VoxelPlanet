@@ -10,6 +10,7 @@ class EditorTypePropertyBase;
 class EditorTypePropertyFactoryBase
 {
 public:
+	virtual ~EditorTypePropertyFactoryBase() = default;
 
 	// Should be overwritten to create an editor property type from an input stream
 	virtual EditorTypePropertyBase* CreateType(std::ifstream& stream) = 0;

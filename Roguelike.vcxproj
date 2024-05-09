@@ -71,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>C:\Users\Dominic\Desktop\Big Folder of Userfulness\C++\My Libraries;$(SolutionDir)$(Platform)\$(Configuration)\;C:\VulkanSDK\1.2.198.1\Lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Users\Dominic\Desktop\TempGame\ImGui;C:\VulkanSDK\1.2.198.1\Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Dominic\Desktop\TempGame\ImGui;C:\VulkanSDK\1.2.198.1\Include;$(IncludePath);C:\Users\Dominic\Desktop\TempGame\Roguelike</IncludePath>
     <OutDir>$(SolutionDir)\Exe\</OutDir>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
@@ -121,7 +121,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Dominic\Desktop\Big Folder of Userfulness\C++\My Headers;C:\VulkanSDK\1.2.198.1\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Dominic\Desktop\Big Folder of Userfulness\C++\My Headers;C:\VulkanSDK\1.2.198.1\Include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;DOMIMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
@@ -154,18 +154,22 @@
     <ClCompile Include="ActionHandlerWait.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkGeneratorGrass.cpp" />
+    <ClCompile Include="DirectoryData.cpp" />
     <ClCompile Include="ECS.cpp" />
     <ClCompile Include="EditorActionBase.cpp" />
     <ClCompile Include="EditorActionChangeProperty.cpp" />
     <ClCompile Include="EditorActionCreateAsset.cpp" />
     <ClCompile Include="EditorActionCreateNewFolder.cpp" />
+    <ClCompile Include="EditorActionDeleteFile.cpp" />
     <ClCompile Include="EditorAssetBase.cpp" />
     <ClCompile Include="EditorAssetClass.cpp" />
     <ClCompile Include="EditorAssetFactoryBase.cpp" />
     <ClCompile Include="EditorAssetFactoryClass.cpp" />
     <ClCompile Include="EditorTypeBase.cpp" />
     <ClCompile Include="EditorTypeClass.cpp" />
+    <ClCompile Include="EditorTypeEnum.cpp" />
     <ClCompile Include="EditorTypeFactoryBase.cpp" />
+    <ClCompile Include="EditorTypeFactoryEnum.cpp" />
     <ClCompile Include="EditorTypeFactoryPropertiesBase.cpp" />
     <ClCompile Include="EditorTypeFactoryClass.cpp" />
     <ClCompile Include="EditorTypeFactoryStruct.cpp" />
@@ -174,6 +178,7 @@
     <ClCompile Include="EditorTypePropertyClass.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryBool.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryClass.cpp" />
+    <ClCompile Include="EditorTypePropertyFactoryEnum.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryFloat.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryInt.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryString.cpp" />
@@ -192,6 +197,7 @@
     <ClCompile Include="EditorWindowCreateNewFolder.cpp" />
     <ClCompile Include="EditorWindowEditAsset.cpp" />
     <ClCompile Include="EditorWindowFilesystem.cpp" />
+    <ClCompile Include="EditorTypePropertyEnum.cpp" />
     <ClCompile Include="FilePaths.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="HUD.cpp" />
@@ -221,6 +227,83 @@
     <ClCompile Include="SystemNameslate.cpp" />
     <ClCompile Include="SystemPhysics.cpp" />
     <ClCompile Include="SystemRender.cpp" />
+    <ClCompile Include="TextRenderSystem\Textbox.cpp" />
+    <ClCompile Include="TextRenderSystem\TextRenderSystem.cpp">
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>x64\Release\</BrowseInformationFile>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <CompileAs>Default</CompileAs>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>x64\Release\</ModuleDependenciesFile>
+      <ModuleOutputFile>x64\Release\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <Optimization>MaxSpeed</Optimization>
+      <ObjectFileName>x64\Release\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>x64\Release\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>x64\Release\Roguelike.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDll</RuntimeLibrary>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>x64\Release\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <SupportJustMyCode>false</SupportJustMyCode>
+      <TrackerLogDirectory>x64\Release\Roguelike.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <XMLDocumentationFileName>x64\Release\</XMLDocumentationFileName>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_MBCS;DOMIMGUI;_MBCS;</PreprocessorDefinitions>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Users\Dominic\Desktop\Big Folder of Userfulness\C++\My Headers;C:\VulkanSDK\1.2.198.1\Include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
+      <LinkCompiled>true</LinkCompiled>
+    </ClCompile>
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UICanvas.cpp" />
     <ClCompile Include="UIObjectBase.cpp" />
@@ -328,18 +411,22 @@
     <ClInclude Include="ChunkGeneratorBase.h" />
     <ClInclude Include="ChunkGeneratorGrass.h" />
     <ClInclude Include="Components.h" />
+    <ClInclude Include="DirectoryData.h" />
     <ClInclude Include="ECS.h" />
     <ClInclude Include="EditorActionBase.h" />
     <ClInclude Include="EditorActionChangeProperty.h" />
     <ClInclude Include="EditorActionCreateAsset.h" />
     <ClInclude Include="EditorActionCreateNewFolder.h" />
+    <ClInclude Include="EditorActionDeleteFile.h" />
     <ClInclude Include="EditorAssetBase.h" />
     <ClInclude Include="EditorAssetClass.h" />
     <ClInclude Include="EditorAssetFactoryBase.h" />
     <ClInclude Include="EditorAssetFactoryClass.h" />
     <ClInclude Include="EditorTypeBase.h" />
     <ClInclude Include="EditorTypeClass.h" />
+    <ClInclude Include="EditorTypeEnum.h" />
     <ClInclude Include="EditorTypeFactoryBase.h" />
+    <ClInclude Include="EditorTypeFactoryEnum.h" />
     <ClInclude Include="EditorTypeFactoryPropertiesBase.h" />
     <ClInclude Include="EditorTypeFactoryClass.h" />
     <ClInclude Include="EditorTypeFactoryStruct.h" />
@@ -349,6 +436,7 @@
     <ClInclude Include="EditorTypePropertyFactoryBase.h" />
     <ClInclude Include="EditorTypePropertyFactoryBool.h" />
     <ClInclude Include="EditorTypePropertyFactoryClass.h" />
+    <ClInclude Include="EditorTypePropertyFactoryEnum.h" />
     <ClInclude Include="EditorTypePropertyFactoryFloat.h" />
     <ClInclude Include="EditorTypePropertyFactoryInt.h" />
     <ClInclude Include="EditorTypePropertyFactoryString.h" />
@@ -368,6 +456,7 @@
     <ClInclude Include="EditorWindowEditAsset.h" />
     <ClInclude Include="EditorWindowFilesystem.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EditorTypePropertyEnum.h" />
     <ClInclude Include="FilePaths.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="EditorTypePropertyBase.h" />
@@ -395,6 +484,8 @@
     <ClInclude Include="SystemNameslate.h" />
     <ClInclude Include="SystemPhysics.h" />
     <ClInclude Include="SystemRender.h" />
+    <ClInclude Include="TextRenderSystem\Textbox.h" />
+    <ClInclude Include="TextRenderSystem\TextRenderSystem.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="tinyobj_loader.h" />
     <ClInclude Include="UICanvas.h" />

@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "EditorTypeEnum.h"
+
 #ifdef DOMIMGUI
 
 #include "ImGuiEditor.h"
@@ -16,13 +18,12 @@
 #include "EditorTypeFactoryBase.h"
 #include "EditorTypeFactoryClass.h"
 #include "EditorTypeFactoryStruct.h"
+#include "EditorTypeFactoryEnum.h"
 #include "EditorTypeStruct.h"
 #include "EditorWindowActionQueue.h"
 #include "EditorWindowFilesystem.h"
 #include "ImGuiEditorGlobals.h"
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
 void ImGuiEditor::Init()
 {
 	CreateTemplateTypes(ImGuiEditorGlobals::codeFilesBaseDirectory + "\\" + ImGuiEditorGlobals::editorTypesOutputFile);
@@ -219,7 +220,7 @@ std::vector<std::string> ImGuiEditor::GetAllStructTemplateNames() const
 	return GetAllTypes(templateStructTypes);
 }
 
-std::weak_ptr<EditorAssetBase> ImGuiEditor::FindAsset(const std::string& typeName)
+std::weak_ptr<EditorAssetBase> ImGuiEditor::FindAsset(const std::string& typeName) const
 {
 	auto it = assets.find(typeName);
 	if (it != assets.end())
@@ -230,6 +231,69 @@ std::weak_ptr<EditorAssetBase> ImGuiEditor::FindAsset(const std::string& typeNam
 	DOMLOG_ERROR("Asset", typeName, "not found")
 	
 	return {};
+}
+
+std::vector<std::weak_ptr<EditorAssetBase>> ImGuiEditor::GatherAssetsOfClass(const std::string& className) const
+{
+	std::vector<std::weak_ptr<EditorAssetBase>> gatheredAssets;
+	
+	for (auto& asset : assets)
+	{
+		if (EditorTypeClass* EditorClass = dynamic_cast<EditorTypeClass*>(asset.second->GetEditorType()))
+		{
+			if (EditorClass->name == className)
+			{
+				gatheredAssets.push_back(asset.second);
+			}
+		}
+	}
+
+	return gatheredAssets;
+}
+
+std::string ImGuiEditor::GetEnumValueNameFromValue(const std::string& enumName, int value) const
+{
+	auto it = templateEnumTypes.find(enumName);
+	if (it != templateEnumTypes.end())
+	{
+		EditorTypeEnum* pEnumType = static_cast<EditorTypeEnum*>(it->second);
+
+		for(EnumValueNameToValue& valueNameToValue : pEnumType->valueNamesToValues)
+		{
+			if (valueNameToValue.value == value)
+			{
+				return valueNameToValue.valueName;
+			}
+		}
+	}
+
+	DOMLOG_WARN("Cannot find enum value", enumName, value);
+	return "";
+}
+
+int ImGuiEditor::GetEnumValueFromValueName(const std::string& enumName, const std::string& valueName) const
+{
+	auto it = templateEnumTypes.find(enumName);
+	if (it != templateEnumTypes.end())
+	{
+		EditorTypeEnum* pEnumType = static_cast<EditorTypeEnum*>(it->second);
+
+		for(EnumValueNameToValue& valueNameToValue : pEnumType->valueNamesToValues)
+		{
+			if (valueNameToValue.valueName == valueName)
+			{
+				return valueNameToValue.value;
+			}
+		}
+	}
+
+	DOMLOG_WARN("Cannot find enum value", enumName, valueName);
+	return 0;
+}
+
+EditorTypeEnum* ImGuiEditor::FindEnumType(const std::string& enumName) const
+{
+	return static_cast<EditorTypeEnum*>(FindType(enumName, templateEnumTypes));
 }
 
 void ImGuiEditor::CreateTemplateTypes(const std::string& typesFile)
@@ -244,11 +308,13 @@ void ImGuiEditor::CreateTemplateTypes(const std::string& typesFile)
 	
 	EditorTypeFactoryClass editorTypeFactoryClass;
 	EditorTypeFactoryStruct editorTypeFactoryStruct;
+	EditorTypeFactoryEnum editorTypeFactoryEnum;
 	
 	EditorTypeToTemplateMap editorTypeFactories[] = 
 	{
 		{ &editorTypeFactoryClass, templateClassTypes},
 		{ &editorTypeFactoryStruct, templateStructTypes},
+{ &editorTypeFactoryEnum, templateEnumTypes},
 	};
 
 	while (!inputFile.eof())
@@ -307,8 +373,11 @@ void ImGuiEditor::ImportAssets(const std::string& assetsDirectory)
 				{
 					if (pAssetFactory->GetKeyword() == keyword)
 					{
-						AddAsset(pAssetFactory->CreateAsset(dirIter->path()));
-						break;
+						if (std::shared_ptr<EditorAssetBase> asset = pAssetFactory->CreateAsset(dirIter->path()))
+						{
+							AddAsset(asset);
+							break;
+						}
 					}
 				}
 			}
@@ -351,7 +420,7 @@ void* ImGuiEditor::FindObjectFromAssetInternal(const std::string& name)
 EditorTypeBase* ImGuiEditor::FindType(const std::string& typeName, const std::unordered_map<std::string, EditorTypeBase*>& templateTypes) const
 {
 	auto it = templateTypes.find(typeName);
-	if (it != templateClassTypes.end())
+	if (it != templateTypes.end())
 	{
 		return it->second;
 	}
@@ -372,4 +441,3 @@ std::vector<std::string> ImGuiEditor::GetAllTypes(const std::unordered_map<std::
 }
 
 #endif //~ DOMIMGUI
-#pragma optimize("", on)

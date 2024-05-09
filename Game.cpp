@@ -36,10 +36,13 @@
 #include "VectorArt.h"
 #include "VectorPrimitiveRectangle.h"
 #include "ActionDeciderAI.h"
+#include "TextRenderSystem/TextRenderSystem.h"
 
 #ifdef DOMIMGUI
 ImGuiEditor imGuiEditor;
 #endif //~ DOMIMGUI
+
+GameAssets* pGameAssets = nullptr;
 
 ECS ecs;
 WorldGenerator worldGenerator(ecs);
@@ -50,12 +53,20 @@ EntityId playerEntity = 0;
 constexpr int WORLD_START_X = 10000;
 constexpr int WORLD_START_Y = 10000;
 
+// #TEMP: Optimisation
+#pragma optimize("", off)
 void Game::Init()
 {
 #ifdef DOMIMGUI
 	imGuiEditor.Init();
 #endif //~ DOMIMGUI
 
+	pGameAssets = imGuiEditor.FindObjectFromAsset<GameAssets>("GameAssets");
+	if (pGameAssets)
+	{
+		pGameAssets->pTextRenderSystem->Init();
+	}
+	
 	// Register systems to ECS (order matters)
 	ecs.RegisterSystem(std::make_unique<SystemAction>());
 	ecs.RegisterSystem(std::make_unique<SystemEntityMap>());
@@ -67,8 +78,6 @@ void Game::Init()
 
 	// Create player entity
 	{
-		SingleFloat* health = imGuiEditor.FindObjectFromAsset<SingleFloat>("Health");
-		
 		Entity& e = ecs.GetEntity(playerEntity);
 		e.components.AddComponent(EComponents::ComponentMesh);
 		e.components.AddComponent(EComponents::ComponentTransform);
@@ -83,8 +92,8 @@ void Game::Init()
 		ecs.GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;
 		ecs.GetComponent<ComponentAction>(playerEntity).energy = 100;
 		ecs.GetComponent<ComponentAction>(playerEntity).pActionDecider = new ActionDeciderPlayer;
-		ecs.GetComponent<ComponentHealth>(playerEntity).health = health ? (int)health->floatOne : 100;
-		ecs.GetComponent<ComponentHealth>(playerEntity).maxHealth = health ? (int)health->floatTwo : 100;
+		ecs.GetComponent<ComponentHealth>(playerEntity).health = 100;
+		ecs.GetComponent<ComponentHealth>(playerEntity).maxHealth = 100;
 		ecs.GetComponent<ComponentFaction>(playerEntity).factionFlags = ComponentFaction::EFactionFlags::Player;
 	}
 
@@ -94,10 +103,16 @@ void Game::Init()
 	worldGenerator.SetCenter(WORLD_START_X, WORLD_START_Y, /*bInit =*/true);
 
 	hud.Initialise(playerEntity);
-}  
+}
+#pragma optimize("", on)
 
 void Game::UnInit()
 {
+	if (pGameAssets)
+	{
+		pGameAssets->pTextRenderSystem->Uninit();
+	}
+	
 	hud.Uninitialise();
 	worldGenerator.Uninitialise();
 	ecs.Uninitialise();
@@ -171,6 +186,8 @@ bool Game::CanClose()
 {
 	return !imGuiEditor.IsEditorShowing();
 }
+
+GameAssets& Game::GetGameAssets() { return *pGameAssets; }
 
 #ifdef DOMIMGUI
 ImGuiEditor& Game::Editor() { return imGuiEditor; };

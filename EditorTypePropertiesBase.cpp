@@ -49,7 +49,7 @@ void EditorTypePropertiesBase::WriteToFile(std::ofstream& file)
 	{
 		pProperty->WriteToFile(file);
 	}
-	file << ';';
+	file << ';' << '\n';
 }
 
 void EditorTypePropertiesBase::OnPropertiesPopulated()

@@ -3,8 +3,10 @@
 #include "EditorTypePropertyFactoryVector.h"
 
 #include "EditorTypeClass.h"
+#include "EditorTypeEnum.h"
 #include "EditorTypePropertyBase.h"
 #include "EditorTypePropertyClass.h"
+#include "EditorTypePropertyEnum.h"
 #include "EditorTypePropertyStruct.h"
 #include "EditorTypePropertyVector.h"
 #include "EditorTypeStruct.h"
@@ -12,6 +14,8 @@
 #include "Game.h"
 #include "ImGuiEditor.h"
 
+// #TEMP: Optimisation
+#pragma optimize("", off)
 EditorTypePropertyBase* EditorTypePropertyFactoryVector::CreateType(std::ifstream& stream)
 {
 	// "vector floatArray float"
@@ -52,13 +56,41 @@ EditorTypePropertyBase* EditorTypePropertyFactoryVector::CreateType(std::ifstrea
 			structPropertyName[0] = (char)std::tolower(structPropertyName[0]);
 			
 			const std::string& structName = dataType;
+
+			if (dataType == "EMyEnum")
+			{
+				for(int i = 0; i < 200; ++i)
+				{
+					DOMLOG_WARN(Game::Editor().FindStructTemplateType(dataType));
+				}
+			}
 			
 			pPropertyType = new EditorTypePropertyStruct(structPropertyName, structName, static_cast<EditorTypeStruct*>(pStruct->DeepCopy()));
 		}
-		// #TODO: Enums
+		else if (EditorTypeEnum* pEnum = Game::Editor().FindEnumType(dataType))
+		{
+			const std::string& enumName = dataType;
+
+			// "EMyEnum" -> "myEnum"
+			std::string enumPropertyName = dataType; 
+			if (enumPropertyName.size() >= 2)
+			{
+				enumPropertyName[1] = (char)std::tolower(enumPropertyName[1]);
+				enumPropertyName = enumPropertyName.substr(1);
+			}
+
+			int defaultValue = 0;
+			if (pEnum->valueNamesToValues.size() > 0)
+			{
+				defaultValue = pEnum->valueNamesToValues[0].value;
+			}
+			
+			pPropertyType = new EditorTypePropertyEnum(enumPropertyName, enumName, defaultValue);
+		}
 	}
 
 	DOMLOG_ERROR_IF(pPropertyType == nullptr, "Can't have a vector of", dataType);
 	
 	return new EditorTypePropertyVector(pPropertyType, propertyName);
 }
+#pragma optimize("", on)

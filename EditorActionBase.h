@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 /** EditorActionBase
 *
 * This class is used as the base class for editor actions that can be undoable and redoable.

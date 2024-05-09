@@ -5,6 +5,7 @@
 #include "EditorWindowCreateAsset.h"
 #include "EditorWindowCreateNewFolder.h"
 #include "EditorWindowEditAsset.h"
+#include "EditorActionDeleteFile.h"
 #include "ImGuiEditor.h"
 #include "ImGuiEditorGlobals.h"
 
@@ -49,8 +50,7 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 					ImGui::SameLine();
 					if (ImGui::Button("Delete"))
 					{
-						// #TODO: make this an undoable action
-						std::remove(entry.path().string().c_str());
+						pEditor->DoAction(std::make_shared<EditorActionDeleteFile>(entry.path()));
 					}
 					ImGui::PopID();
 				}

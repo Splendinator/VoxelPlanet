@@ -2,6 +2,7 @@
 
 #include "EditorTypePropertyClass.h"
 
+#include "EditorAssetBase.h"
 #include "Game.h"
 #include "ImGuiEditor.h"
 
@@ -9,9 +10,27 @@
 
 void EditorTypePropertyClass::DrawImGUI()
 {
-	if (ImGui::InputText(name.c_str(), &inputBuffer[0], 128, ImGuiInputTextFlags_NoUndoRedo))
+	if (ImGui::BeginCombo(name.c_str(), assetName.c_str()))
 	{
-		onPropertyChanged.Invoke({ this, assetName, inputBuffer});	
+		std::vector<std::weak_ptr<EditorAssetBase>> validAssets = Game::Editor().GatherAssetsOfClass(className);
+
+		auto RenderSelectable = [this](const std::string& selectableAssetName)
+		{
+			bool bIsSelected = selectableAssetName == assetName;
+			if (ImGui::Selectable(selectableAssetName.c_str(), &bIsSelected))
+			{
+				onPropertyChanged.Invoke({this, assetName, selectableAssetName});
+			}
+		};
+
+		RenderSelectable("nullptr");
+		for (auto validAsset : validAssets)
+		{
+			std::string selectableAssetName = validAsset.lock().get()->GetName().c_str();
+			RenderSelectable(selectableAssetName);
+		}
+
+		ImGui::EndCombo();
 	}
 }
 
@@ -47,12 +66,7 @@ void EditorTypePropertyClass::ReadFromFile(std::ifstream& file)
 	std::string unused;
 	file >> unused >> className >> name >> unused;
 
-	if (unused != "nullptr")
-	{
-		assetName = unused;
-		memcpy(inputBuffer, assetName.c_str(), assetName.size()); // Do we need a SetAssetName() that does this?
-		
-	}
+	assetName = unused;
 }
 
 void EditorTypePropertyClass::WriteToFile(std::ofstream& file)
@@ -67,7 +81,7 @@ void EditorTypePropertyClass::ForceSetValue(const std::string& newValue)
 
 void* EditorTypePropertyClass::GetValue() const
 {
-	if (assetName != "")
+	if (assetName != "nullptr" && assetName != "")
 	{
 		return Game::Editor().FindObjectFromAsset<void>(assetName);
 	}

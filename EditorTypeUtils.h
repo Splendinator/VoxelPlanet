@@ -2,6 +2,7 @@
 
 #include "EditorTypePropertyFactoryBool.h"
 #include "EditorTypePropertyFactoryClass.h"
+#include "EditorTypePropertyFactoryEnum.h"
 #include "EditorTypePropertyFactoryFloat.h"
 #include "EditorTypePropertyFactoryInt.h"
 #include "EditorTypePropertyFactoryString.h"
@@ -17,6 +18,7 @@ namespace EditorTypeUtils
 	static EditorTypePropertyFactoryClass classFactory;
 	static EditorTypePropertyFactoryStruct structFactory;
 	static EditorTypePropertyFactoryVector vectorFactory;
+	static EditorTypePropertyFactoryEnum enumFactory;
 
 	static EditorTypePropertyFactoryBase* propertyFactories[] = 
 	{
@@ -26,7 +28,8 @@ namespace EditorTypeUtils
 		&stringFactory,
 		&classFactory,
 		&structFactory,
-		&vectorFactory
+		&vectorFactory,
+		&enumFactory,
 	};
 
 }

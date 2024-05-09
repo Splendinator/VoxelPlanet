@@ -1,7 +1,28 @@
-Class SingleFloat
-float floatOne 0
-float floatTwo 0
-vector strings string
-vector integers int
-vector bools bool
+Struct TextRenderCharacterData
+string fileName ""
+int character 0
+;
+Struct TextboxParams
+string text ""
+float xPos 0
+float yPos 0
+float fontSize 0
+;
+Struct MyStruct
+int x 0
+;
+Enum EMyEnum
+Red 0
+Green 1
+;
+Class DirectoryData
+string fonts ""
+;
+Class TextRenderSystem
+vector characterDatas TextRenderCharacterData
+;
+Class GameAssets
+class TextRenderSystem pTextRenderSystem nullptr
+class DirectoryData pDirectoryData nullptr
+enum EMyEnum myEnum Green
 ;
