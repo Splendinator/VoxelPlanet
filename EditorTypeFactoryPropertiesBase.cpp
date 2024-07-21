@@ -34,6 +34,8 @@ void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, 
 			std::string childClassName;
 			stream >> childClassName;
 
+			pEditorTypeProperties->baseClasses.push_back(childClassName);
+
 			EditorTypeClass* baseClassTemplate = Game::Editor().FindClassTemplateType(childClassName);
 			DOMLOG_ERROR_IF(!baseClassTemplate, "Cannot find child class", childClassName);
 			

@@ -1,7 +1,10 @@
 #pragma once
+#include <DomMath/Vec2.h>
 
+EDITORENUM()
 enum class EHUDAnchorPoint
 {
+	NONE, 
 	TopLeft,
 	TopCenter,
 	TopRight,
@@ -18,15 +21,27 @@ enum class EHUDAnchorPoint
  * 
  * Class to say where a HUD object will sit on the screen
  */
-class HUDAnchorPoint
+EDITORSTRUCT()
+struct HUDAnchorPoint
 {
-public:
-	HUDAnchorPoint() : HUDAnchorPoint(EHUDAnchorPoint::TopLeft, 0.0f) {};
-	HUDAnchorPoint(EHUDAnchorPoint AnchorPoint, float padding = 0.0f); // Padding is a frac of the screen size
-	HUDAnchorPoint(float x, float y);
+	EDITORBODY()
 
+	// Get the anchor point, (0,0) = top left.
+	// Padding is percentage area around the screen HUD elements can't go.
+	Vec2f GetAnchorPoint(float padding) const;
+	float GetAnchorPointX(float padding) const;
+	float GetAnchorPointY(float padding) const;
+	
+private:
+	// If this is set, use these, else use the more fine-grained anchorX and anchorY
+	EDITORPROPERTY()
+	EHUDAnchorPoint anchorPoint = EHUDAnchorPoint::NONE;
+	
 	// Coordinates of the anchor point relative to screen size. i.e 0.5, 0.5 is the center of the screen.
+	EDITORPROPERTY()
 	float anchorX = 0.0f;
+
+	EDITORPROPERTY()
 	float anchorY = 0.0f;
 };
 

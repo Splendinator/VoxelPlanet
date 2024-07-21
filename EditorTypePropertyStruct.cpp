@@ -54,7 +54,7 @@ bool EditorTypePropertyStruct::CanReadFromFile(std::ifstream& file) const
 void EditorTypePropertyStruct::ReadFromFile(std::ifstream& file)
 {
 	std::string unused;
-	file >> unused >> structName >> name; // "Struct MyStruct myStruct"
+	file >> unused >> structName >> name; // "struct MyStruct myStruct"
 
 	pStructType->ReadFromFile(file);
 }

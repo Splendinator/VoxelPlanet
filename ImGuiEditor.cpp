@@ -233,15 +233,52 @@ std::weak_ptr<EditorAssetBase> ImGuiEditor::FindAsset(const std::string& typeNam
 	return {};
 }
 
-std::vector<std::weak_ptr<EditorAssetBase>> ImGuiEditor::GatherAssetsOfClass(const std::string& className) const
+// #TEMP: Optimisation
+#pragma optimize("", off)
+std::vector<std::weak_ptr<EditorAssetBase>> ImGuiEditor::GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses) const
 {
 	std::vector<std::weak_ptr<EditorAssetBase>> gatheredAssets;
+
+	std::vector<std::string> classNamesToGather = {className};
+
+	// Gather child classes (i.e "HUDObjectBase" should gather all HUDObjects "HUDObjectHealth" etc.)
+	if (bGatherChildClasses)
+	{
+		std::vector<std::string> classNamesOne = { className };
+		std::vector<std::string> classNamesTwo = {};
+		std::vector<std::string>* pLastVector = &classNamesOne;
+		std::vector<std::string>* pCurrentVector = &classNamesTwo;
+
+		// Repeatedly gather base classes one level at a time until all base classes have been gathered.  
+		while (pLastVector->size() > 0)
+		{
+			for (auto& it : templateClassTypes)
+			{
+				EditorTypeClass* pEditorClass = static_cast<EditorTypeClass*>(it.second);
+
+				if (std::find(classNamesToGather.begin(), classNamesToGather.end(), pEditorClass->name) == classNamesToGather.end())
+				{
+					for (std::string& baseClass : pEditorClass->baseClasses)
+					{
+						if (std::find(pLastVector->begin(), pLastVector->end(), baseClass) != pLastVector->end())
+						{
+							classNamesToGather.push_back(pEditorClass->name);
+							pCurrentVector->push_back(pEditorClass->name);
+						}
+					}
+				}
+			}
+
+			pLastVector->clear();
+			std::swap(pCurrentVector, pLastVector);
+		}
+	}
 	
 	for (auto& asset : assets)
 	{
-		if (EditorTypeClass* EditorClass = dynamic_cast<EditorTypeClass*>(asset.second->GetEditorType()))
+		if (EditorTypeClass* pEditorClass = dynamic_cast<EditorTypeClass*>(asset.second->GetEditorType()))
 		{
-			if (EditorClass->name == className)
+			if (std::find(classNamesToGather.begin(), classNamesToGather.end(), pEditorClass->name) != classNamesToGather.end())
 			{
 				gatheredAssets.push_back(asset.second);
 			}
@@ -250,6 +287,7 @@ std::vector<std::weak_ptr<EditorAssetBase>> ImGuiEditor::GatherAssetsOfClass(con
 
 	return gatheredAssets;
 }
+#pragma optimize("", on)
 
 std::string ImGuiEditor::GetEnumValueNameFromValue(const std::string& enumName, int value) const
 {
@@ -314,7 +352,7 @@ void ImGuiEditor::CreateTemplateTypes(const std::string& typesFile)
 	{
 		{ &editorTypeFactoryClass, templateClassTypes},
 		{ &editorTypeFactoryStruct, templateStructTypes},
-{ &editorTypeFactoryEnum, templateEnumTypes},
+		{ &editorTypeFactoryEnum, templateEnumTypes},
 	};
 
 	while (!inputFile.eof())

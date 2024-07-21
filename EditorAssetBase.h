@@ -5,7 +5,7 @@ struct OnPropertyChangedParams;
 
 /** EditorAssetBase
 *
-* This class is the base class for all editor assets. Assets are usually instances of types
+* This class is the base class for all editor assets (Classes, Textures, Models, etc.). Assets are usually instances of types
 */
 class EditorAssetBase
 {

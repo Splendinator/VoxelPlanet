@@ -18,7 +18,7 @@ EditorTypePropertyBase* EditorTypePropertyFactoryStruct::CreateType(std::ifstrea
 	EditorTypeStruct* structTemplate = Game::Editor().FindStructTemplateType(structName);
 	DOMLOG_ERROR_IF(structTemplate == nullptr, "Cannot find struct template object, are the assets being loaded in the wrong order?");
 	
-	return new EditorTypePropertyStruct(propertyName, structName, structTemplate);
+	return new EditorTypePropertyStruct(propertyName, structName, static_cast<EditorTypeStruct*>(structTemplate->DeepCopy()));
 }
 
 std::string EditorTypePropertyFactoryStruct::GetLabel()

@@ -27,7 +27,6 @@ struct TextboxParams
 	float fontSize;
 
 	// #TODO: Width etc.
-	// #TODO: Editor expose this likely.
 };
 
 EDITORSTRUCT()
@@ -53,7 +52,7 @@ class TextRenderSystem
 {
 	EDITORBODY()
 	
-	// data of each character
+	// Data of each character
 	EDITORPROPERTY()
 	std::vector<TextRenderCharacterData> characterDatas;
 	

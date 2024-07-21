@@ -33,9 +33,13 @@ public:
 	// List of properties
 	std::vector<EditorTypePropertyBase*> pProperties;
 
+	// Names of base classes if any. This will always be empty on deep copied versions as we only care about base classes on the template.
+	std::vector<std::string> baseClasses;
+	
 	// Fired when a property changes
 	DelegateList<const OnPropertyChangedParams&> onPropertyChanged;
 
+	
 protected:
 
 	// Deep copy these properties to pOther

@@ -6,7 +6,7 @@
 
 UICanvas::UICanvas(UICanvasInitParams& initParams)
 {
-	pVectorArt = std::make_shared<VectorArt>(initParams.filePath);
+	pVectorArt = std::make_shared<VectorArt>(initParams.filePath.c_str());
 
 	pRenderObject = dmgf::AddObjectFromVectorArt(pVectorArt, initParams.type);
 	pRenderObject->SetRenderPriority(initParams.renderPriority);

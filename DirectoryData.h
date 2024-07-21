@@ -13,4 +13,8 @@ class DirectoryData
 	// path to the font files
 	EDITORPROPERTY()
 	std::string fonts;
+
+	// path to the hudObject files
+	EDITORPROPERTY()
+	std::string hudObjects;
 };

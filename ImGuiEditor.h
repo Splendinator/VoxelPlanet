@@ -43,7 +43,7 @@ public:
 	std::vector<std::string> GetAllStructTemplateNames() const;
 
 	std::weak_ptr<EditorAssetBase> FindAsset(const std::string& typeName) const;
-	std::vector<std::weak_ptr<EditorAssetBase>> GatherAssetsOfClass(const std::string& className) const;
+	std::vector<std::weak_ptr<EditorAssetBase>> GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses) const;
 
 	// Enum utils
 	std::string GetEnumValueNameFromValue(const std::string& enumName, int value) const;

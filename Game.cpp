@@ -46,8 +46,6 @@ GameAssets* pGameAssets = nullptr;
 
 ECS ecs;
 WorldGenerator worldGenerator(ecs);
-HUD hud(ecs);
-
 EntityId playerEntity = 0;
 
 constexpr int WORLD_START_X = 10000;
@@ -60,12 +58,6 @@ void Game::Init()
 #ifdef DOMIMGUI
 	imGuiEditor.Init();
 #endif //~ DOMIMGUI
-
-	pGameAssets = imGuiEditor.FindObjectFromAsset<GameAssets>("GameAssets");
-	if (pGameAssets)
-	{
-		pGameAssets->pTextRenderSystem->Init();
-	}
 	
 	// Register systems to ECS (order matters)
 	ecs.RegisterSystem(std::make_unique<SystemAction>());
@@ -102,7 +94,18 @@ void Game::Init()
 
 	worldGenerator.SetCenter(WORLD_START_X, WORLD_START_Y, /*bInit =*/true);
 
-	hud.Initialise(playerEntity);
+	pGameAssets = imGuiEditor.FindObjectFromAsset<GameAssets>("GameAssets");
+	if (pGameAssets)
+	{
+		if (pGameAssets->pTextRenderSystem)
+		{
+			pGameAssets->pTextRenderSystem->Init();
+		}
+		if (pGameAssets->pHUD)
+		{
+			pGameAssets->pHUD->Initialise(ecs, playerEntity);
+		}
+	}
 }
 #pragma optimize("", on)
 
@@ -110,10 +113,17 @@ void Game::UnInit()
 {
 	if (pGameAssets)
 	{
-		pGameAssets->pTextRenderSystem->Uninit();
+		if (pGameAssets->pTextRenderSystem)
+		{
+			pGameAssets->pTextRenderSystem->Uninit();
+		}
+
+		if (pGameAssets->pHUD)
+		{
+			pGameAssets->pHUD->Uninitialise();
+		}
 	}
 	
-	hud.Uninitialise();
 	worldGenerator.Uninitialise();
 	ecs.Uninitialise();
 
@@ -150,11 +160,18 @@ void CreateImGuiWindow(float deltaTime)
 void GameplayTick(float deltaTime)
 {
 	ecs.Tick(deltaTime);
+
+	if (pGameAssets)
+	{
+		if (pGameAssets->pHUD)
+		{
+			pGameAssets->pHUD->Tick(deltaTime);
+		}
+	}
 	
 	ComponentTransform& transform = ecs.GetComponent<ComponentTransform>(playerEntity);
 	worldGenerator.SetCenter(transform.x, transform.y, false);
 	dmgf::SetCameraCenter(transform.x * SystemRender::GRID_SIZE + SystemRender::GRID_SIZE * 0.5f, transform.y * SystemRender::GRID_SIZE + SystemRender::GRID_SIZE * 0.5f);
-	hud.Tick(deltaTime);
 
 	// Zoom
 	{
@@ -170,6 +187,14 @@ void GameplayTick(float deltaTime)
 		}
 		dmgf::SetCameraZoom(zoom);
 	}
+
+	// Breakpoint
+	{
+		if (dmwi::isPressed(dmwi::Button::F11))
+		{
+			__debugbreak();
+		}
+	}
 }
 
 void Game::Tick(float deltaTime)
@@ -184,7 +209,7 @@ void Game::Tick(float deltaTime)
 
 bool Game::CanClose()
 {
-	return !imGuiEditor.IsEditorShowing();
+	return true;
 }
 
 GameAssets& Game::GetGameAssets() { return *pGameAssets; }

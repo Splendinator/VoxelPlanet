@@ -16,7 +16,7 @@ void EditorWindowBase::CloseBase()
 
 void EditorWindowBase::DrawBase()
 {
-	ImGui::Begin(GetWindowName().c_str(), nullptr); // #JANK: There's a crash here for whatever the fuck reason. I don't know what it is.
+	ImGui::Begin(GetWindowName().c_str(), nullptr); // #JANK: There's a crash here for whatever the fuck reason. I don't know what it is. Try stopping windows opening twice
 	bIsFocused = ImGui::IsWindowFocused();
 	Draw();
 	ImGui::End();

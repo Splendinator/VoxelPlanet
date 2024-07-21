@@ -9,11 +9,10 @@ class UIObjectProgressBar;
 *
 * This class is used to show the player's health on screen I suppose
 */
+EDITORCLASS()
 class HUDObjectHealth : public HUDObjectBase
 {
-public:
-
-	HUDObjectHealth(const HUDInitParams& initParams) : HUDObjectBase(initParams) {}
+	EDITORBODY()
 
 protected:
 

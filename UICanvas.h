@@ -20,7 +20,7 @@ struct UICanvasInitParams
 	dmgf::ERenderObjectType type = dmgf::ERenderObjectType::InGame;
 
 	// Vector art file path string (See FilePaths.h)
-	const char* filePath;
+	std::string filePath;
 };
 
 /** UICanvas

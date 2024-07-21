@@ -14,5 +14,4 @@ class EditorTypeFactoryPropertiesBase : public EditorTypeFactoryBase
 protected:
 
 	void PopulateProperties(std::ifstream& stream, EditorTypePropertiesBase* pEditorTypeProperties);
-
 };

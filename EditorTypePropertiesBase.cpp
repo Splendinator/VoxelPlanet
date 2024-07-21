@@ -4,6 +4,8 @@
 
 #include "EditorTypePropertyBase.h"
 
+// #TEMP: Optimisation
+#pragma optimize("", off)
 EditorTypePropertiesBase::~EditorTypePropertiesBase()
 {
 	for (EditorTypePropertyBase* pProperty : pProperties)
@@ -12,6 +14,7 @@ EditorTypePropertiesBase::~EditorTypePropertiesBase()
 	}
 	pProperties.clear();
 }
+#pragma optimize("", on)
 
 void EditorTypePropertiesBase::DrawImGUI()
 {
@@ -41,6 +44,8 @@ void EditorTypePropertiesBase::ReadFromFile(std::ifstream& file)
 		std::string temp;
 		std::getline(file, temp); // Move on to next line (in the case of all properties failing this is needed)
 	}
+
+	file.get(); // Get the ';'
 }
 
 void EditorTypePropertiesBase::WriteToFile(std::ofstream& file)

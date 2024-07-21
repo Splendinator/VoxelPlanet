@@ -2,25 +2,9 @@
 
 #include <vector>
 
-class TextRenderSystem;
 class DirectoryData;
-
-// #TEMP: Remove this
-EDITORENUM()
-enum class EMyEnum
-{
-	Red,
-	Green,
-};
-
-EDITORSTRUCT()
-struct MyStruct
-{
-	EDITORBODY()
-
-	EDITORPROPERTY()
-	int x;
-};
+class HUD;
+class TextRenderSystem;
 
 // This class will be the root data asset that references all other data assets directly or indirectly.
 // A single instance of this class is explicitly created when the game starts and any other classes it
@@ -39,10 +23,9 @@ public:
 	// Data of the relevant directories we're using
 	EDITORPROPERTY()
 	DirectoryData* pDirectoryData = nullptr;
-
-	// #TEMP: Remove
+	
 	EDITORPROPERTY()
-	EMyEnum myEnum = EMyEnum::Green;
+	HUD* pHUD = nullptr;
 };
 
 class ImGuiEditor;

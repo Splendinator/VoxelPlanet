@@ -2,21 +2,28 @@
 
 #include "HUDObjectBase.h"
 
-void HUDObjectBase::BaseInit(EntityId player)
+#include "DirectoryData.h"
+#include "Game.h"
+#include "HUD.h"
+
+void HUDObjectBase::BaseInit(EntityId player, const HUDObjectSharedInitParams& hudInitParams)
 {
 	controlledEntity = player;
 
+	pEcs = hudInitParams.pEcs;
+	
 	UICanvasInitParams initParams;
-	initParams.sizeX = hudInitParams.sizeX;
-	initParams.sizeY = hudInitParams.sizeY;
-	initParams.filePath = hudInitParams.filePath;
+	initParams.sizeX = sizeX;
+	initParams.sizeY = sizeY;
+	initParams.filePath = Game::GetGameAssets().pDirectoryData->hudObjects + fileName + ".svg";
 	initParams.renderPriority = RenderPriority::UI;
 	initParams.type = dmgf::ERenderObjectType::HUD;
 
 	uiCanvas = std::make_unique<UICanvas>(initParams);
 
-	const float absolutePositionX = hudInitParams.screenAnchorPoint.anchorX * dmgf::GetScreenWidth() - hudInitParams.hudAnchorPoint.anchorX * hudInitParams.sizeX;
-	const float absolutePositionY = hudInitParams.screenAnchorPoint.anchorY * dmgf::GetScreenHeight() - hudInitParams.hudAnchorPoint.anchorY * hudInitParams.sizeY;
+	Vec2f anchorPoint = screenAnchorPoint.GetAnchorPoint(hudInitParams.screenEdgePadding);
+	const float absolutePositionX = anchorPoint.x * dmgf::GetScreenWidth() - anchorPoint.x * sizeX;
+	const float absolutePositionY = anchorPoint.y * dmgf::GetScreenHeight() - anchorPoint.y * sizeY;
 	uiCanvas->SetPosition(absolutePositionX, absolutePositionY);
 
 	Init(*uiCanvas);
@@ -37,6 +44,6 @@ void HUDObjectBase::BaseTick(float deltaTime)
 {
 	if (controlledEntity != INVALID_ENTITY_ID)
 	{
-		Tick(hudInitParams.ecs, controlledEntity, deltaTime);
+		Tick(*pEcs, controlledEntity, deltaTime);
 	}
 }

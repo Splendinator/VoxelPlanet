@@ -21,8 +21,24 @@ void EditorWindowFilesystem::Draw()
 void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 {
 	std::string dirName = path.filename().string();
+
+	ImVec4 folderColour(0.7f, 0.7f, 0.7f, 1.0f);
+	ImGui::PushStyleColor(ImGuiCol_Text, folderColour);
 	if (ImGui::TreeNode(dirName.c_str()))
 	{
+		ImGui::PopStyleColor();
+
+		ImGui::SameLine();
+		if(ImGui::Button("Create Folder"))
+		{
+			pEditor->AddWindow(std::make_unique<EditorWindowCreateNewFolder>(path));
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Create Asset"))
+		{
+			pEditor->AddWindow(std::make_unique<EditorWindowCreateAsset>(path));
+		}
+		
 		for (const auto& entry : fs::directory_iterator(path))
 		{
 			if (entry.is_regular_file())
@@ -61,16 +77,12 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 			}
 		}
 		
-		if(ImGui::Button("Create Folder"))
-		{
-			pEditor->AddWindow(std::make_unique<EditorWindowCreateNewFolder>(path));
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Create Asset"))
-		{
-			pEditor->AddWindow(std::make_unique<EditorWindowCreateAsset>(path));
-		}
-		
 		ImGui::TreePop();
+
+		ImGui::Separator();
+	}
+	else
+	{
+		ImGui::PopStyleColor();
 	}
 }
