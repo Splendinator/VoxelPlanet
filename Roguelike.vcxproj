@@ -152,6 +152,7 @@
     <ClCompile Include="ActionHandlerBase.cpp" />
     <ClCompile Include="ActionHandlerMove.cpp" />
     <ClCompile Include="ActionHandlerWait.cpp" />
+    <ClCompile Include="AssetManager\AssetManager.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkGeneratorGrass.cpp" />
     <ClCompile Include="Core\GameInstance.cpp" />
@@ -411,6 +412,7 @@
     <ClInclude Include="ActionHandlerBase.h" />
     <ClInclude Include="ActionHandlerMove.h" />
     <ClInclude Include="ActionHandlerWait.h" />
+    <ClInclude Include="AssetManager\AssetManager.h" />
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="ChunkGeneratorBase.h" />
     <ClInclude Include="ChunkGeneratorGrass.h" />

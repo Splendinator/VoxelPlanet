@@ -11,7 +11,7 @@ enum class EClassMetadataFlags
 
 /** EditorTypeBase
 *
-* This class the base class for all editor types (class/struct/enum...).
+* This class the base class for all assetManager types (class/struct/enum...).
 * Editor types contain a list of properties and their values.
 * They are used for 2 things:
 * 1. On assets in the game to keep track of their properties (in this case they are instanced per asset)

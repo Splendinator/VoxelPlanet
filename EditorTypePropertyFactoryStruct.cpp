@@ -2,10 +2,10 @@
 
 #include "EditorTypePropertyFactoryStruct.h"
 
+#include "AssetManager/AssetManager.h"
 #include "EditorTypePropertyStruct.h"
 #include "EditorTypeStruct.h"
 #include "Game.h"
-#include "ImGuiEditor.h"
 
 EditorTypePropertyBase* EditorTypePropertyFactoryStruct::CreateType(std::ifstream& stream)
 {
@@ -15,7 +15,7 @@ EditorTypePropertyBase* EditorTypePropertyFactoryStruct::CreateType(std::ifstrea
 	std::string propertyName;
 	stream >> unused >> structName >> propertyName;
 	
-	EditorTypeStruct* structTemplate = Game::Editor().FindStructTemplateType(structName);
+	EditorTypeStruct* structTemplate = Game::GetAssetManager().FindStructTemplateType(structName);
 	DOMLOG_ERROR_IF(structTemplate == nullptr, "Cannot find struct template object, are the assets being loaded in the wrong order?");
 	
 	return new EditorTypePropertyStruct(propertyName, structName, static_cast<EditorTypeStruct*>(structTemplate->DeepCopy()));

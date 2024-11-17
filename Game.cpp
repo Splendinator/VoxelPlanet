@@ -2,34 +2,29 @@
 
 #include "Game.h"
 
-#include "DomWindow/DomWindow.h"
+#include "AssetManager/AssetManager.h"
 #include "Core/GameInstance.h"
+#include "DomWindow/DomWindow.h"
 #include "ImGuiEditor.h"
 #include <imgui.h>
 #include <time.h>
 
-#ifdef DOMIMGUI
-ImGuiEditor imGuiEditor;
-#endif //~ DOMIMGUI
-
+AssetManager assetManager;
 GameInstance* pGameInstance = nullptr;
 
 void Game::Init()
 {
-#ifdef DOMIMGUI
-	imGuiEditor.Init();
-#endif //~ DOMIMGUI
+	assetManager.Init();
 
 	// Set random seed based off time
 	srand((unsigned int)time(NULL));
 	
-	pGameInstance = imGuiEditor.FindObjectFromAsset<GameInstance>("GameInstance");
+	pGameInstance = assetManager.FindObjectFromAsset<GameInstance>("GameInstance");
 	if (pGameInstance)
 	{
 		pGameInstance->InitGameSystems();
 	}
 }
-#pragma optimize("", on)
 
 void Game::UnInit()
 {
@@ -37,10 +32,8 @@ void Game::UnInit()
 	{
 		pGameInstance->UnInitGameSystems();
 	}
-
-#ifdef DOMIMGUI
-	imGuiEditor.Uninit();
-#endif //~ DOMIMGUI
+	
+	assetManager.UnInit();
 }
 
 void GameplayTick(float deltaTime)
@@ -52,7 +45,7 @@ void GameplayTick(float deltaTime)
 }
 
 #ifdef DOMIMGUI
-// #TEMP: This is the FPS counter, will need removing / moving to an EditorWindow
+// #TEMP: This is the FPS counter, will need removing / moving to an EditorWindow.
 void CreateImGuiWindow(float deltaTime)
 {
 	static int numFrames = 0;
@@ -81,8 +74,8 @@ void Game::Tick(float deltaTime)
 {
 #ifdef DOMIMGUI
 	CreateImGuiWindow(deltaTime);
-	imGuiEditor.Tick(deltaTime);
 #endif //~ #ifdef DOMIMGUI
+	
 	GameplayTick(deltaTime);
 }
 
@@ -92,5 +85,5 @@ bool Game::CanClose()
 }
 
 #ifdef DOMIMGUI
-ImGuiEditor& Game::Editor() { return imGuiEditor; };
+AssetManager& Game::GetAssetManager() { return assetManager; };
 #endif

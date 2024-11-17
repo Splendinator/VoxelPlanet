@@ -2,7 +2,9 @@
 
 #include "EditorWindowCreateAsset.h"
 
+#include "AssetManager/AssetManager.h"
 #include "EditorActionCreateAsset.h"
+#include "Game.h"
 #include "ImGuiEditor.h"
 #include "ImGuiEditorGlobals.h"
 
@@ -19,7 +21,7 @@ void EditorWindowCreateAsset::CreateNewAssetWindow()
 	
 	// Search for the class
 	{
-		std::vector<std::string> allTypes = pEditor->GetAllClassTemplateNames(/*bIgnoreAbstract=*/true);
+		std::vector<std::string> allTypes = Game::GetAssetManager().GetAllClassTemplateNames(/*bIgnoreAbstract=*/true);
 
 		ImGui::PushItemWidth(-1);
 		ImGui::InputTextWithHint("Search", "Search Classes", searchBuffer, sizeof(searchBuffer));
@@ -59,7 +61,7 @@ void EditorWindowCreateAsset::CreateNewAssetWindow()
 	}
 	else if (ImGui::Button("Create Asset")) 
 	{
-		pEditor->DoAction(std::make_unique<EditorActionCreateAsset>(targetFilePath, selectedClass, newAssetName, *pEditor));
+		pEditor->DoAction(std::make_unique<EditorActionCreateAsset>(targetFilePath, selectedClass, newAssetName));
 		RequestClose();
 	}
 }

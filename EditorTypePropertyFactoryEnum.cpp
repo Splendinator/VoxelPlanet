@@ -2,9 +2,9 @@
 
 #include "EditorTypePropertyFactoryEnum.h"
 
+#include "AssetManager/AssetManager.h"
 #include "EditorTypePropertyEnum.h"
 #include "Game.h"
-#include "ImGuiEditor.h"
 
 EditorTypePropertyBase* EditorTypePropertyFactoryEnum::CreateType(std::ifstream& stream)
 {
@@ -16,7 +16,7 @@ EditorTypePropertyBase* EditorTypePropertyFactoryEnum::CreateType(std::ifstream&
 
 	stream >> enumName >> enumName >> propertyName >> enumValue;
 
-	return new EditorTypePropertyEnum(propertyName, enumName, Game::Editor().GetEnumValueFromValueName(enumName, enumValue));
+	return new EditorTypePropertyEnum(propertyName, enumName, Game::GetAssetManager().GetEnumValueFromValueName(enumName, enumValue));
 }
 
 std::string EditorTypePropertyFactoryEnum::GetLabel()

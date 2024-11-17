@@ -2,6 +2,7 @@
 
 #include "EditorTypePropertyFactoryVector.h"
 
+#include "AssetManager/AssetManager.h"
 #include "EditorTypeClass.h"
 #include "EditorTypeEnum.h"
 #include "EditorTypePropertyBase.h"
@@ -12,7 +13,6 @@
 #include "EditorTypeStruct.h"
 #include "EditorTypeUtils.h"
 #include "Game.h"
-#include "ImGuiEditor.h"
 
 // #TEMP: Optimisation
 #pragma optimize("", off)
@@ -40,7 +40,7 @@ EditorTypePropertyBase* EditorTypePropertyFactoryVector::CreateType(std::ifstrea
 	// Second case: it's a user defined type and we need to find it in the template types array then wrap a relevant property around it
 	if (pPropertyType == nullptr)
 	{
-		if (EditorTypeClass* pClass = Game::Editor().FindClassTemplateType(dataType))
+		if (EditorTypeClass* pClass = Game::GetAssetManager().FindClassTemplateType(dataType))
 		{
 			// Class -- Make a property with a sensible default name and nullptr
 			const std::string& classPropertyName = "p" + dataType;
@@ -48,7 +48,7 @@ EditorTypePropertyBase* EditorTypePropertyFactoryVector::CreateType(std::ifstrea
 			const std::string& assetName = "nullptr";
 			pPropertyType = new EditorTypePropertyClass(classPropertyName, className, assetName);
 		}
-		else if (EditorTypeStruct* pStruct = Game::Editor().FindStructTemplateType(dataType))
+		else if (EditorTypeStruct* pStruct = Game::GetAssetManager().FindStructTemplateType(dataType))
 		{
 			// Struct -- Make a property with sensible name and template values  
 
@@ -61,13 +61,13 @@ EditorTypePropertyBase* EditorTypePropertyFactoryVector::CreateType(std::ifstrea
 			{
 				for(int i = 0; i < 200; ++i)
 				{
-					DOMLOG_WARN(Game::Editor().FindStructTemplateType(dataType));
+					DOMLOG_WARN(Game::GetAssetManager().FindStructTemplateType(dataType));
 				}
 			}
 			
 			pPropertyType = new EditorTypePropertyStruct(structPropertyName, structName, static_cast<EditorTypeStruct*>(pStruct->DeepCopy()));
 		}
-		else if (EditorTypeEnum* pEnum = Game::Editor().FindEnumType(dataType))
+		else if (EditorTypeEnum* pEnum = Game::GetAssetManager().FindEnumType(dataType))
 		{
 			const std::string& enumName = dataType;
 

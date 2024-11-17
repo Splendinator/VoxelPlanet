@@ -2,9 +2,10 @@
 
 #include "EditorActionCreateAsset.h"
 
+#include "AssetManager/AssetManager.h"
 #include "EditorAssetClass.h"
 #include "EditorTypeClass.h"
-#include "ImGuiEditor.h"
+#include "Game.h"
 #include "ImGuiEditorGlobals.h"
 
 void EditorActionCreateAsset::Undo()
@@ -14,14 +15,14 @@ void EditorActionCreateAsset::Undo()
 		std::filesystem::path assetFilePath = targetPath / (assetName + ImGuiEditorGlobals::assetExtension);
 		std::filesystem::remove(assetFilePath);
 		
-		editor.RemoveAsset(pCreatedAsset.lock());
+		Game::GetAssetManager().RemoveAsset(pCreatedAsset.lock());
 		pCreatedAsset.reset();
 	}
 }
 
 bool EditorActionCreateAsset::TryExecuteAction()
 {
-	EditorTypeClass* pEditorTypeClass = editor.FindClassTemplateType(className);
+	EditorTypeClass* pEditorTypeClass = Game::GetAssetManager().FindClassTemplateType(className);
 	if (!pEditorTypeClass)
 	{
 		DOMLOG_ERROR("Class", className, "not found");
@@ -50,7 +51,7 @@ bool EditorActionCreateAsset::TryExecuteAction()
 	pNewAsset->WriteToFile(fileStream);
 
 	pCreatedAsset = pNewAsset;
-	editor.AddAsset(pNewAsset);
+	Game::GetAssetManager().AddAsset(pNewAsset);
 
 	return true;
 }

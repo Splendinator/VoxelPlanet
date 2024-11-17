@@ -2,10 +2,9 @@
 
 #include "EditorAssetFactoryClass.h"
 
+#include "AssetManager/AssetManager.h"
 #include "EditorAssetClass.h"
 #include "EditorTypeClass.h"
-#include "ImGuiEditor.h"
-
 
 std::string EditorAssetFactoryClass::GetKeyword() const
 {
@@ -14,7 +13,7 @@ std::string EditorAssetFactoryClass::GetKeyword() const
 
 std::shared_ptr<EditorAssetBase> EditorAssetFactoryClass::CreateAsset(const std::filesystem::path& assetFilePath)
 {
-	// We need to find the class name so we can get the correct template type from the editor
+	// We need to find the class name so we can get the correct template type from the assetManager
 	std::ifstream stream(assetFilePath);
 	std::string className;
 
@@ -26,7 +25,7 @@ std::shared_ptr<EditorAssetBase> EditorAssetFactoryClass::CreateAsset(const std:
 
 	stream >> className;
 	
-	EditorTypeClass* pEditorTypeClass = editor.FindClassTemplateType(className);
+	EditorTypeClass* pEditorTypeClass = assetManager.FindClassTemplateType(className);
 	if (!pEditorTypeClass)
 	{
 		DOMLOG_ERROR("No class found for", className);

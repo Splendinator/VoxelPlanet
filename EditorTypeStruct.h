@@ -4,7 +4,7 @@
 
 /** EditorTypeStruct
 *
-* This class used for editor type structs. These are full structs with a list of properties, not a "reference to" a struct.
+* This class used for assetManager type structs. These are full structs with a list of properties, not a "reference to" a struct.
 * For structs, this class is only used internally by EditorPropertyTypeStruct. (i.e used to inline struct properties in class assets)
 * This is slightly different from how EditorTypeClass is used. 
 */

@@ -2,9 +2,9 @@
 
 #include "EditorTypePropertiesBase.h"
 
+#include "AssetManager/AssetManager.h"
 #include "EditorTypePropertyBase.h"
 #include "Game.h"
-#include "ImGuiEditor.h"
 
 EditorTypePropertiesBase::~EditorTypePropertiesBase()
 {
@@ -112,7 +112,7 @@ EClassMetadataFlags EditorTypePropertiesBase::GetChildInstancedOrSingletonFlag()
 	
 	for (const std::string& baseClass : baseClasses)
 	{
-		EditorTypePropertiesBase* pBaseClass = static_cast<EditorTypePropertiesBase*>(Game::Editor().FindTemplateType(baseClass));
+		EditorTypePropertiesBase* pBaseClass = static_cast<EditorTypePropertiesBase*>(Game::GetAssetManager().FindTemplateType(baseClass));
 		DOMASSERT(pBaseClass);
 
 		EClassMetadataFlags foundFlag = pBaseClass->GetChildInstancedOrSingletonFlag();

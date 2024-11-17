@@ -148,6 +148,9 @@ Child GameSystem
 vector characterDatas TextRenderCharacterData
 class DirectoryData pDirectoryData nullptr
 ;
+Class ImGuiEditor
+Child GameSystem
+;
 Struct HUDAnchorPoint
 enum EHUDAnchorPoint anchorPoint NONE
 float anchorX 0

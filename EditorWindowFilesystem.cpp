@@ -2,10 +2,12 @@
 
 #include "EditorWindowFilesystem.h"
 
+#include "AssetManager/AssetManager.h"
+#include "EditorActionDeleteFile.h"
 #include "EditorWindowCreateAsset.h"
 #include "EditorWindowCreateNewFolder.h"
 #include "EditorWindowEditAsset.h"
-#include "EditorActionDeleteFile.h"
+#include "Game.h"
 #include "ImGuiEditor.h"
 #include "ImGuiEditorGlobals.h"
 
@@ -53,7 +55,7 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 					if (ImGui::Button("Edit"))
 					{
 						assetName = assetName.substr(0, assetName.size() - ImGuiEditorGlobals::assetExtension.size()); // Get rid of extension
-						std::weak_ptr<EditorAssetBase> pAsset = pEditor->FindAsset(assetName);
+						std::weak_ptr<EditorAssetBase> pAsset = Game::GetAssetManager().FindAsset(assetName);
 						if (!pAsset.expired())
 						{
 							pEditor->AddWindow(std::make_unique<EditorWindowEditAsset>(pAsset, entry.path()));

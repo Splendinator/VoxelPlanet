@@ -16,6 +16,7 @@
 #include "..\Roguelike\HUDAnchorPoint.h"
 #include "..\Roguelike\HUDObjectBase.h"
 #include "..\Roguelike\HUDObjectHealth.h"
+#include "..\Roguelike\ImGuiEditor.h"
 #include "..\Roguelike\Input\InputKey.h"
 #include "..\Roguelike\Input\KeybindData.h"
 #include "..\Roguelike\TextRenderSystem\TextRenderSystem.h"
@@ -191,6 +192,21 @@ void* TextRenderSystem::InitFromProperties(const std::vector<EditorTypePropertyB
 	return pTextRenderSystem;
 }
 
+// ImGuiEditor
+void ImGuiEditor::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ImGuiEditor* pImGuiEditor = static_cast<ImGuiEditor*>(pObject);
+	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pImGuiEditor), properties, propertyIndex);
+}
+
+void* ImGuiEditor::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ImGuiEditor* pImGuiEditor = new ImGuiEditor;
+	int propertyIndex = 0;
+	ImGuiEditor::InitFromPropertiesSubset(pImGuiEditor, properties, propertyIndex);
+	return pImGuiEditor;
+}
+
 // HUDAnchorPoint
 void HUDAnchorPoint::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -308,6 +324,7 @@ namespace __Generated
 		{"GameInstance", &GameInstance::InitFromProperties},
 		{"WorldGenerator", &WorldGenerator::InitFromProperties},
 		{"TextRenderSystem", &TextRenderSystem::InitFromProperties},
+		{"ImGuiEditor", &ImGuiEditor::InitFromProperties},
 		{"HUDAnchorPoint", &HUDAnchorPoint::InitFromProperties},
 		{"ECS", &ECS::InitFromProperties},
 		{"HUDObjectBase", &HUDObjectBase::InitFromProperties},

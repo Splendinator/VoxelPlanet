@@ -9,7 +9,7 @@
 class EditorAssetFactoryClass : public EditorAssetFactoryBase
 {
 public:
-	EditorAssetFactoryClass(ImGuiEditor& inEditor) : EditorAssetFactoryBase(inEditor) {}
+	EditorAssetFactoryClass(AssetManager& inAssetManager) : EditorAssetFactoryBase(inAssetManager) {}
 
 	//~ Begin EditorAssetFactoryBase Interface
 	virtual std::string GetKeyword() const override;

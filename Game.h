@@ -1,13 +1,6 @@
 #pragma once
 
-#include <vector>
-
-class KeybindData;
-class MenuSystem;
-class DirectoryData;
-class HUD;
-class TextRenderSystem;
-class ImGuiEditor;
+class AssetManager;
 
 namespace Game
 {
@@ -18,7 +11,7 @@ namespace Game
 	bool CanClose();
 
 #ifdef DOMIMGUI
-	ImGuiEditor& Editor();
+	AssetManager& GetAssetManager();
 #endif
 }
 

@@ -1,8 +1,9 @@
 #include "EditorActionBase.h"
 
-#include "ImGuiEditor.h"
 #include <string>
 
+class AssetManager;
+class EditorAssetBase;
 class EditorAssetClass;
 
 /** EditorActionCreateAsset
@@ -12,8 +13,8 @@ class EditorAssetClass;
 class EditorActionCreateAsset : public EditorActionBase
 {
 public:
-	EditorActionCreateAsset(const std::filesystem::path& inTargetPath, const std::string& inClassName, const std::string& inAssetName, ImGuiEditor& inEditor) : 
-		targetPath(inTargetPath), className(inClassName), assetName(inAssetName), editor(inEditor) {}
+	EditorActionCreateAsset(const std::filesystem::path& inTargetPath, const std::string& inClassName, const std::string& inAssetName) : 
+		targetPath(inTargetPath), className(inClassName), assetName(inAssetName) {}
 
 	//~ Begin EditorActionBase Interface
 	virtual void Undo() override;
@@ -25,7 +26,6 @@ private:
 	std::filesystem::path targetPath;
 	std::string className;
 	std::string assetName;
-	ImGuiEditor& editor;
 
 	// Pointer to the created asset. Only valid if the action was executed.
 	std::weak_ptr<EditorAssetBase> pCreatedAsset;

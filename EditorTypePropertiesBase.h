@@ -8,7 +8,7 @@ struct OnPropertyChangedParams;
 
 /** EditorTypePropertiesBase
 *
-* This class is used as a base class for any editor type that wants a list of properties.
+* This class is used as a base class for any assetManager type that wants a list of properties.
 * EditorTypeProperties (classes and structs) are deep copied and *also* used to represent actual instances of classes, not just the template object (CDO)
 */
 class EditorTypePropertiesBase : public EditorTypeBase
@@ -18,7 +18,7 @@ public:
 
 	virtual ~EditorTypePropertiesBase();
 	
-	// Draw the properties to ImGUI so we can edit them in the editor.
+	// Draw the properties to ImGUI so we can edit them in the assetManager.
 	virtual void DrawImGUI();
 
 	// Read and write from a file
@@ -31,8 +31,8 @@ public:
 	// Make sure to call this when you're finished setting pPropeties
 	void OnPropertiesPopulated();
 
-	// Fires when the metadataFlags are updated on the template editor type only.
-	// Non-template editor types will just copy the metadata flags from the template.
+	// Fires when the metadataFlags are updated on the template assetManager type only.
+	// Non-template assetManager types will just copy the metadata flags from the template.
 	// This can be used to do any post processing on metadata flags, e.g inheriting flags from children.
 	void OnTemplateMetadataFlagsPopulated();
 

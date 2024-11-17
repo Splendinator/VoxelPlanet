@@ -1,16 +1,16 @@
 #pragma once
 
+class AssetManager;
 class EditorAssetBase;
-class ImGuiEditor;
 
 /** EditorAssetFactoryBase
 *
-* This class is the base interface for creating different types of editor assets from an input file stream.
+* This class is the base interface for creating different types of assetManager assets from an input file stream.
 */
 class EditorAssetFactoryBase
 {
 public:
-	EditorAssetFactoryBase(ImGuiEditor& inEditor) : editor(inEditor) {}
+	EditorAssetFactoryBase(AssetManager& inAssetManager) : assetManager(inAssetManager) {}
 	virtual ~EditorAssetFactoryBase() {}
 
 	virtual std::string GetKeyword() const = 0;
@@ -18,5 +18,5 @@ public:
 
 protected:
 
-	ImGuiEditor& editor;
+	AssetManager& assetManager;
 };

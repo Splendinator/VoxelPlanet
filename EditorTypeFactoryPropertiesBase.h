@@ -7,7 +7,7 @@ class EditorTypePropertyBase;
 
 /** EditorTypeFactoryPropertiesBase
 *
-* This class is used as a base class for creating any editor type that wants a list of properties.
+* This class is used as a base class for creating any assetManager type that wants a list of properties.
 */
 class EditorTypeFactoryPropertiesBase : public EditorTypeFactoryBase
 {

@@ -2,12 +2,12 @@
 
 #include "EditorTypeFactoryPropertiesBase.h"
 
+#include "AssetManager/AssetManager.h"
 #include "EditorTypeClass.h"
 #include "EditorTypePropertiesBase.h"
 #include "EditorTypePropertyBase.h"
 #include "EditorTypeUtils.h"
 #include "Game.h"
-#include "ImGuiEditor.h"
 #include "ImGuiEditorGlobals.h"
 
 void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, EditorTypePropertiesBase* pEditorTypeProperties)
@@ -66,7 +66,7 @@ void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, 
 
 			pEditorTypeProperties->baseClasses.push_back(childClassName);
 
-			EditorTypeClass* baseClassTemplate = Game::Editor().FindClassTemplateType(childClassName);
+			EditorTypeClass* baseClassTemplate = Game::GetAssetManager().FindClassTemplateType(childClassName);
 			DOMLOG_ERROR_IF(!baseClassTemplate, "Cannot find child class", childClassName);
 			
 			if (baseClassTemplate)

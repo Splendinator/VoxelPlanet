@@ -2,18 +2,18 @@
 
 #include "EditorTypePropertyEnum.h"
 
+#include "AssetManager/AssetManager.h"
 #include "EditorTypeEnum.h"
 #include "Game.h"
-#include "ImGuiEditor.h"
 #include "WritePropertyToFileUtils.h"
 
 
 void EditorTypePropertyEnum::DrawImGUI()
 {
-	std::string currentValue = Game::Editor().GetEnumValueNameFromValue(enumName, value);
+	std::string currentValue = Game::GetAssetManager().GetEnumValueNameFromValue(enumName, value);
 	if (ImGui::BeginCombo(name.c_str(), currentValue.c_str()))
 	{
-		EditorTypeEnum* pThisEnum = Game::Editor().FindEnumType(enumName);
+		EditorTypeEnum* pThisEnum = Game::GetAssetManager().FindEnumType(enumName);
 		DOMASSERT(pThisEnum);
 
 		auto RenderSelectable = [this, currentValue](const std::string& enumValueName)
@@ -66,10 +66,10 @@ void EditorTypePropertyEnum::ReadFromFile(std::ifstream& file)
 	std::string unused;
 	file >> unused >> enumName >> name >> value;
 
-	if (Game::Editor().GetEnumValueNameFromValue(enumName, value) == "")
+	if (Game::GetAssetManager().GetEnumValueNameFromValue(enumName, value) == "")
 	{
 		DOMLOG_WARN("Can't find enum value", enumName, value, "so setting to default")
-		value = Game::Editor().FindEnumType(enumName)->valueNamesToValues[0].value;
+		value = Game::GetAssetManager().FindEnumType(enumName)->valueNamesToValues[0].value;
 	}
 }
 
@@ -81,5 +81,5 @@ void EditorTypePropertyEnum::WriteToFile(std::ofstream& file)
 
 void EditorTypePropertyEnum::ForceSetValue(const std::string& newValue)
 {
-	value = Game::Editor().GetEnumValueFromValueName(enumName, newValue);
+	value = Game::GetAssetManager().GetEnumValueFromValueName(enumName, newValue);
 }
