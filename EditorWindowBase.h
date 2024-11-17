@@ -22,6 +22,9 @@ public:
 	// Whether this window should close if requested
 	bool ShouldCloseOnRequest() const;
 
+	// Text that will appear on the window, Two windows with the same name can't be open at the same time. The old one will close.
+	virtual std::string GetWindowName() const = 0;
+	
 protected:
 
 	// Set up anything that needs to be set up
@@ -32,9 +35,6 @@ protected:
 
 	// Children override this to draw what you want
 	virtual void Draw() = 0;
-
-	// Text that will appear on the window
-	virtual std::string GetWindowName() const = 0;
 	
 	// Whether this window can close by pressing ESC
 	virtual bool CanCloseOnRequest() const { return true; }

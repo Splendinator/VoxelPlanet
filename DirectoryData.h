@@ -5,7 +5,7 @@
  * Just a nice centralised place to hold directories to things like textures etc.
  * All file paths are relative to project's base
  */
-EDITORCLASS()
+EDITORCLASS(Singleton)
 class DirectoryData
 {
 	EDITORBODY()

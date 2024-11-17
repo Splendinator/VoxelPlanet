@@ -206,6 +206,7 @@
     <ClCompile Include="HUDObjectHealth.cpp" />
     <ClCompile Include="ImGuiEditor.cpp" />
     <ClCompile Include="ImGuiEditorGlobals.cpp" />
+    <ClCompile Include="Input\KeybindData.cpp" />
     <ClCompile Include="JumpGame.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -310,6 +311,7 @@
     <ClCompile Include="UIObjectContainer.cpp" />
     <ClCompile Include="UIObjectProgressBar.cpp" />
     <ClCompile Include="UIUtils.cpp" />
+    <ClCompile Include="UI\Menu\MenuSystem.cpp" />
     <ClCompile Include="VectorPrimitiveBase.cpp" />
     <ClCompile Include="VectorPrimitiveCircle.cpp" />
     <ClCompile Include="VectorArt.cpp" />
@@ -467,6 +469,8 @@
     <ClInclude Include="ImGuiEditor.h" />
     <ClInclude Include="ImGuiEditorGlobals.h" />
     <ClInclude Include="ImGuiEditorMacros.h" />
+    <ClInclude Include="Input\InputKey.h" />
+    <ClInclude Include="Input\KeybindData.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Renderer.h" />
@@ -493,6 +497,7 @@
     <ClInclude Include="UIObjectContainer.h" />
     <ClInclude Include="UIObjectProgressBar.h" />
     <ClInclude Include="UIUtils.h" />
+    <ClInclude Include="UI\Menu\MenuSystem.h" />
     <ClInclude Include="VectorPrimitiveBase.h" />
     <ClInclude Include="VectorPrimitiveCircle.h" />
     <ClInclude Include="VectorArt.h" />
@@ -507,6 +512,7 @@
     <ClInclude Include="WorldGenerator.h" />
     <ClInclude Include="WritePropertyToFileUtils.h" />
     <ClInclude Include="__Generated.h" />
+    <ClInclude Include="AaaaHeaderToolTest.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Graphics\Shaders\ImGuiFrag.frag" />

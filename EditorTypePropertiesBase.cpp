@@ -3,9 +3,9 @@
 #include "EditorTypePropertiesBase.h"
 
 #include "EditorTypePropertyBase.h"
+#include "Game.h"
+#include "ImGuiEditor.h"
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
 EditorTypePropertiesBase::~EditorTypePropertiesBase()
 {
 	for (EditorTypePropertyBase* pProperty : pProperties)
@@ -14,7 +14,6 @@ EditorTypePropertiesBase::~EditorTypePropertiesBase()
 	}
 	pProperties.clear();
 }
-#pragma optimize("", on)
 
 void EditorTypePropertiesBase::DrawImGUI()
 {
@@ -65,16 +64,63 @@ void EditorTypePropertiesBase::OnPropertiesPopulated()
 	}
 }
 
+void EditorTypePropertiesBase::OnTemplateMetadataFlagsPopulated()
+{
+	// We want to inherit Singleton/Abstract from the base
+	{
+		const bool bInstanced = HasMetadataFlag(EClassMetadataFlags::Instanced);
+		const bool bSingleton = HasMetadataFlag(EClassMetadataFlags::Singleton);
+		DOMLOG_ERROR_IF(bInstanced && bSingleton, "Can't be both singleton and instanced.");
+		
+		if (!bInstanced && !bSingleton)
+		{
+			// No explicit flag set, try and derrive from child, or default to instanced
+			
+			const EClassMetadataFlags derrivedFlag = GetChildInstancedOrSingletonFlag();
+			AddMetadataFlag(derrivedFlag == EClassMetadataFlags::None ? EClassMetadataFlags::Instanced : derrivedFlag);
+		}
+	}
+}
+
 void EditorTypePropertiesBase::DeepCopyProperties(EditorTypePropertiesBase* pOther)
 {
 	for (EditorTypePropertyBase* pProperty : pProperties)
 	{
 		pOther->pProperties.push_back(pProperty->DeepCopy());
 	}
+
+	pOther->metadataFlags = metadataFlags;
+
 	pOther->OnPropertiesPopulated();
 }
 
 void EditorTypePropertiesBase::OnPropertyChanged(const OnPropertyChangedParams& params)
 {
 	onPropertyChanged.Invoke(params);
+}
+
+EClassMetadataFlags EditorTypePropertiesBase::GetChildInstancedOrSingletonFlag()
+{
+	if (HasMetadataFlag(EClassMetadataFlags::Instanced))
+	{
+		return EClassMetadataFlags::Instanced;
+	}
+	if (HasMetadataFlag(EClassMetadataFlags::Singleton))
+	{
+		return EClassMetadataFlags::Singleton;
+	}
+	
+	for (const std::string& baseClass : baseClasses)
+	{
+		EditorTypePropertiesBase* pBaseClass = static_cast<EditorTypePropertiesBase*>(Game::Editor().FindTemplateType(baseClass));
+		DOMASSERT(pBaseClass);
+
+		EClassMetadataFlags foundFlag = pBaseClass->GetChildInstancedOrSingletonFlag();
+		if (foundFlag != EClassMetadataFlags::None)
+		{
+			return foundFlag;
+		}
+	}
+
+	return EClassMetadataFlags::None;
 }

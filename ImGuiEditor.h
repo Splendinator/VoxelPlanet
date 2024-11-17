@@ -30,17 +30,16 @@ public:
 	void DoAction(const std::shared_ptr<EditorActionBase>& pAction);
 	void Undo(); // Undo the last action
 	void Redo(); // Redo the last undone action if possible
-
-	// Add a new asset, className is the name of the class that this type will be (see templateClassTypes), assetName is the unique name of the asset to create
+	
 	void AddAsset(std::shared_ptr<EditorAssetBase> pAsset);
 	void RemoveAsset(std::shared_ptr<EditorAssetBase> pAsset);
 	
 	// Get the type of a specified class, should be the same as the C++ class/struct/enum name
 	EditorTypeBase* FindTemplateType(const std::string& typeName) const; // Finds *all* types (struct/class/enum)
 	EditorTypeClass* FindClassTemplateType(const std::string& typeName) const;
-	std::vector<std::string> GetAllClassTemplateNames() const;
+	std::vector<std::string> GetAllClassTemplateNames(bool bIgnoreAbstract) const;
 	EditorTypeStruct* FindStructTemplateType(const std::string& typeName) const;
-	std::vector<std::string> GetAllStructTemplateNames() const;
+	std::vector<std::string> GetAllStructTemplateNames(bool bIgnoreAbstract) const;
 
 	std::weak_ptr<EditorAssetBase> FindAsset(const std::string& typeName) const;
 	std::vector<std::weak_ptr<EditorAssetBase>> GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses) const;
@@ -70,7 +69,9 @@ private:
 
 	// Find template types from a given type map (struct, class, enum)
 	EditorTypeBase* FindType(const std::string& typeName, const std::unordered_map<std::string, EditorTypeBase*>& templateTypes) const;
-	std::vector<std::string> GetAllTypes(const std::unordered_map<std::string, EditorTypeBase*>& templateTypes) const;
+
+	// Get all types from a given map type. bIgnoreAbstract to ignore any with the EClassMetadata::Abstract flag
+	std::vector<std::string> GetAllTypes(const std::unordered_map<std::string, EditorTypeBase*>& templateTypes, bool bIgnoreAbstract) const;
 
 	// This map will contain a single instance of each class type (the key being it's name) and all of the EditorTypes will have default values.
 	// i.e "SpellFireball" -> "EditorTypeClass(SpellFireball) with all the default numbers"
@@ -80,6 +81,9 @@ private:
 
 	// This map will contain names to their assets. so it might be "Fireball" to a fireball asset, etc.
 	std::unordered_map<std::string, std::shared_ptr<EditorAssetBase>> assets;
+
+	// #TEMP: Comment
+	std::unordered_map<EditorAssetBase*, void*> singletonMap;
 	
 	// A list of windows currently showing.
 	std::vector<std::shared_ptr<EditorWindowBase>> shownWindows;
@@ -95,6 +99,5 @@ private:
 template <typename T>
 T* ImGuiEditor::FindObjectFromAsset(const std::string& name)
 {
-	// #TEMP: This needs to be a unique ptr or something, we need to figure out what's happening with object lifetimes (whether they're shared or instanced etc.)
 	return static_cast<T*>(FindObjectFromAssetInternal(name));
 }

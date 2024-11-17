@@ -5,6 +5,8 @@
 /** EditorTypePropertyClass
 *
 * This class is used to represent a class property (MyClass* pMyClass = nullptr)
+* Classes are either instanced, meaning two pointers to the same data asset will result in two *copies* of the same class, not two pointers to same class.
+* or they can be singletons 
 */
 class EditorTypePropertyClass : public EditorTypePropertyBase
 {

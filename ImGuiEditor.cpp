@@ -91,13 +91,22 @@ void ImGuiEditor::Tick()
 	{
 		bEditorShowing = !bEditorShowing;
 	}
-	
 }
-
 
 void ImGuiEditor::AddWindow(const std::shared_ptr<EditorWindowBase>& pWindow)
 {
 	DOMLOG_ERROR_IF(!bEditorShowing, "Shouldn't do anything when editor isn't showing");
+
+	// #JANK: I got a weird ass never before seen crash in domMain()/wWinMain() when I added this code. No idea what the fuck, but if it happens again remove this?
+	// Remove any windows with the same name (ImGUI can't handle multiple windows with the same name and will just render everything on one window)
+	for (auto it = shownWindows.begin(); it != shownWindows.end(); ++it)
+	{
+		if (it->get()->GetWindowName() == pWindow->GetWindowName())
+		{
+			RemoveWindow(it->get());
+			break;
+		}
+	}
 	
 	pWindow->Init(*this);
 
@@ -109,7 +118,7 @@ void ImGuiEditor::AddWindow(const std::shared_ptr<EditorWindowBase>& pWindow)
 void ImGuiEditor::RemoveWindow(EditorWindowBase* pWindow)
 {
 	DOMLOG_ERROR_IF(!bEditorShowing, "Shouldn't do anything when editor isn't showing");
-
+	
 	for (auto it = shownWindows.begin(); it != shownWindows.end(); ++it)
 	{
 		if (it->get() == pWindow)
@@ -196,8 +205,9 @@ EditorTypeBase* ImGuiEditor::FindTemplateType(const std::string& typeName) const
 	{
 		return pFoundType;
 	}
-
-	// #TODO: Handle enums here too 
+	
+	DOMASSERT(false); // #TODO: Handle enums here too 
+	return nullptr;
 }
 
 EditorTypeClass* ImGuiEditor::FindClassTemplateType(const std::string& typeName) const
@@ -205,9 +215,9 @@ EditorTypeClass* ImGuiEditor::FindClassTemplateType(const std::string& typeName)
 	return static_cast<EditorTypeClass*>(FindType(typeName, templateClassTypes));
 }
 
-std::vector<std::string> ImGuiEditor::GetAllClassTemplateNames() const
+std::vector<std::string> ImGuiEditor::GetAllClassTemplateNames(bool bIgnoreAbstract) const
 {
-	return GetAllTypes(templateClassTypes);
+	return GetAllTypes(templateClassTypes, bIgnoreAbstract);
 }
 
 EditorTypeStruct* ImGuiEditor::FindStructTemplateType(const std::string& typeName) const
@@ -215,9 +225,9 @@ EditorTypeStruct* ImGuiEditor::FindStructTemplateType(const std::string& typeNam
 	return static_cast<EditorTypeStruct*>(FindType(typeName, templateStructTypes));
 }
 
-std::vector<std::string> ImGuiEditor::GetAllStructTemplateNames() const
+std::vector<std::string> ImGuiEditor::GetAllStructTemplateNames(bool bIgnoreAbstract) const
 {
-	return GetAllTypes(templateStructTypes);
+	return GetAllTypes(templateStructTypes, bIgnoreAbstract);
 }
 
 std::weak_ptr<EditorAssetBase> ImGuiEditor::FindAsset(const std::string& typeName) const
@@ -233,8 +243,6 @@ std::weak_ptr<EditorAssetBase> ImGuiEditor::FindAsset(const std::string& typeNam
 	return {};
 }
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
 std::vector<std::weak_ptr<EditorAssetBase>> ImGuiEditor::GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses) const
 {
 	std::vector<std::weak_ptr<EditorAssetBase>> gatheredAssets;
@@ -287,7 +295,6 @@ std::vector<std::weak_ptr<EditorAssetBase>> ImGuiEditor::GatherAssetsOfClass(con
 
 	return gatheredAssets;
 }
-#pragma optimize("", on)
 
 std::string ImGuiEditor::GetEnumValueNameFromValue(const std::string& enumName, int value) const
 {
@@ -441,13 +448,35 @@ void* ImGuiEditor::FindObjectFromAssetInternal(const std::string& name)
 	if (!pAsset.expired())
 	{
 		EditorAssetClass* pClassAsset = dynamic_cast<EditorAssetClass*>(pAsset.lock().get());
-		DOMLOG_ERROR_IF(pClassAsset == nullptr, "Right now we only support class assets");
-		
-		auto it = __Generated::stringToCreateObjectFunction.find(pClassAsset->GetEditorType()->name);
+		DOMLOG_ERROR_IF(pClassAsset == nullptr, "Right now we only support class assets");		
 
-		if (it != __Generated::stringToCreateObjectFunction.end())
+		if (pClassAsset->GetEditorType()->HasMetadataFlag(EClassMetadataFlags::Instanced))
 		{
-			return it->second(pClassAsset->GetProperties());
+			// Instanced -- Always create a new object using the __generated cpp function
+			auto it = __Generated::stringToCreateObjectFunction.find(pClassAsset->GetEditorType()->name);
+			if (it != __Generated::stringToCreateObjectFunction.end())
+			{
+				return it->second(pClassAsset->GetProperties());
+			}
+		}
+		else
+		{
+			// Singleton -- Create a new object using the __generated cpp function the first time, then always return that.
+			
+			DOMASSERT(pClassAsset->GetEditorType()->HasMetadataFlag(EClassMetadataFlags::Singleton)) // Must have at least 1 instancing flag
+
+			auto foundSingleton = singletonMap.find(pClassAsset);
+			if (foundSingleton == singletonMap.end())
+			{
+				auto it = __Generated::stringToCreateObjectFunction.find(pClassAsset->GetEditorType()->name);
+				if (it != __Generated::stringToCreateObjectFunction.end())
+				{
+					void* newSingleton = it->second(pClassAsset->GetProperties());
+					singletonMap.emplace(pClassAsset, newSingleton);
+					return newSingleton;
+				}
+			}
+			return foundSingleton->second;
 		}
 	}
 
@@ -465,12 +494,15 @@ EditorTypeBase* ImGuiEditor::FindType(const std::string& typeName, const std::un
 	return nullptr;
 }
 
-std::vector<std::string> ImGuiEditor::GetAllTypes(const std::unordered_map<std::string, EditorTypeBase*>& templateTypes) const
+std::vector<std::string> ImGuiEditor::GetAllTypes(const std::unordered_map<std::string, EditorTypeBase*>& templateTypes, bool bIgnoreAbstract) const
 {
 	std::vector<std::string> types;
 	for (auto& [key, value] : templateTypes)
 	{
-		types.push_back(key);
+		if (!bIgnoreAbstract || !value->HasMetadataFlag(EClassMetadataFlags::Abstract))
+		{
+			types.push_back(key);
+		}
 	}
 	
 	std::sort(types.begin(), types.end());

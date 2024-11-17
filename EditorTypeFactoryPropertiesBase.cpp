@@ -27,8 +27,38 @@ void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, 
 		}
 
 		bool bFound = false;
-		
-		if (keyword == "Child")
+
+		if (keyword == "meta")
+		{
+			// Handle metadata
+
+			bFound = true;
+			
+			stream >> keyword;
+			
+			struct KeywordToFlag
+			{
+				std::string keyword;
+				EClassMetadataFlags flag;
+			};
+
+			KeywordToFlag keywordsToFlags[] =
+				{
+					{"Abstract", EClassMetadataFlags::Abstract},
+					{"Instanced", EClassMetadataFlags::Instanced},
+					{"Singleton", EClassMetadataFlags::Singleton},
+				};
+
+			for (const KeywordToFlag& keywordToFlag : keywordsToFlags)
+			{
+				if (keyword == keywordToFlag.keyword)
+				{
+					pEditorTypeProperties->AddMetadataFlag(keywordToFlag.flag);
+					break;
+				}
+			}
+		}
+		else if (keyword == "Child")
 		{
 			// Handle child classes by deep copying properties from their template object
 			std::string childClassName;
@@ -72,4 +102,5 @@ void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, 
 	}
 
 	pEditorTypeProperties->OnPropertiesPopulated();
+	pEditorTypeProperties->OnTemplateMetadataFlagsPopulated();
 }

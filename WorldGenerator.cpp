@@ -18,7 +18,7 @@ void WorldGenerator::SetCenter(int newX, int newY, bool bInit)
 	const int minChunkY = effectiveY / Chunk::CHUNK_SIZE - NUM_CHUNKS;
 	const int maxChunkY = minChunkY + (CHUNK_SQUARE_SIZE - 1);
 
-	// Delete old chunks
+	// Delete chunks that are now out of range
 	bool bDeletedChunks = bInit;
 	if (!bInit)
 	{

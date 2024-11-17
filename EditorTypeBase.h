@@ -1,6 +1,13 @@
 #pragma once
 
-struct OnPropertyChangedParams;
+// Class metadata flags that can go inside EDITORCLASS() or EDITORSTRUCT()
+enum class EClassMetadataFlags
+{
+	None = 0,
+	Abstract = 1 << 0,	// Cannot make data assets of this class
+	Instanced = 1 << 1,	// When there's multiple pointers to the same data asset each one will resolve to pointing to their own instance of that object   
+	Singleton = 1 << 2, // When there's multiple pointers to the same data asset each one will resolve to the same object
+};
 
 /** EditorTypeBase
 *
@@ -15,9 +22,16 @@ class EditorTypeBase
 public:
 	EditorTypeBase() {};
 	virtual ~EditorTypeBase() {};
+
+	bool HasMetadataFlag(EClassMetadataFlags flag);
+	void AddMetadataFlag(EClassMetadataFlags flag);
 	
 	// #TODO: Make this protected
 	// Name of this type. (e.g the name of the class)
 	std::string name;
 
+	// Engine level metadata flags
+	EClassMetadataFlags metadataFlags = EClassMetadataFlags::None;
+	
+	
 };

@@ -2,6 +2,8 @@
 
 #include <vector>
 
+class KeybindData;
+class MenuSystem;
 class DirectoryData;
 class HUD;
 class TextRenderSystem;
@@ -23,9 +25,18 @@ public:
 	// Data of the relevant directories we're using
 	EDITORPROPERTY()
 	DirectoryData* pDirectoryData = nullptr;
-	
+
+	// Data driven keybinds
+	EDITORPROPERTY()
+	KeybindData* pKeybindData = nullptr;
+
+	// In-game HUD
 	EDITORPROPERTY()
 	HUD* pHUD = nullptr;
+
+	// Menu system
+	EDITORPROPERTY()
+	MenuSystem* pMenuSystem = nullptr;
 };
 
 class ImGuiEditor;

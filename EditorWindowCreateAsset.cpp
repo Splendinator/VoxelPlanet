@@ -19,7 +19,7 @@ void EditorWindowCreateAsset::CreateNewAssetWindow()
 	
 	// Search for the class
 	{
-		std::vector<std::string> allTypes = pEditor->GetAllClassTemplateNames();
+		std::vector<std::string> allTypes = pEditor->GetAllClassTemplateNames(/*bIgnoreAbstract=*/true);
 
 		ImGui::PushItemWidth(-1);
 		ImGui::InputTextWithHint("Search", "Search Classes", searchBuffer, sizeof(searchBuffer));

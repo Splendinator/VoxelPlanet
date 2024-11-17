@@ -4,7 +4,13 @@
 #define EDITORIGNORE()
 
 // Goes above classes that the editor should know about
-#define EDITORCLASS()
+// Has these parameters:
+// Abstract - This class cannot be created in the editor as an asset. Useful for classes that just want to be used as base classes like interfaces
+// Instanced/Singleton - This describes how the class will be handled when instantiated in-game.
+//	Instanced - Three pointers to the same asset will create 3 identical objects
+//	Singleton - Three pointers to the same asset will create 1 shared object and all point to it.
+//	If neither Instanced/Singleton are in the macro then it will use the base class / engine default
+#define EDITORCLASS(...)
 
 // Goes above structs that the editor should know about
 #define EDITORSTRUCT()
@@ -22,8 +28,8 @@ static void InitFromPropertiesSubset(void* pClass, const std::vector<EditorTypeP
 
 namespace ImGuiEditorMacros
 {
-	static std::string editorClassString = "EDITORCLASS()";
-	static std::string editorStructString = "EDITORSTRUCT()";
+	static std::string editorClassString = "EDITORCLASS(";
+	static std::string editorStructString = "EDITORSTRUCT(";
 	static std::string editorEnumString = "EDITORENUM()";
 	static std::string editorPropertyString = "EDITORPROPERTY()";
 	static std::string editorIgnoreFileString = "EDITORIGNORE()";

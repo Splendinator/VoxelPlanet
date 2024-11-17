@@ -14,7 +14,26 @@
 #include "..\Roguelike\HUDAnchorPoint.h"
 #include "..\Roguelike\HUDObjectBase.h"
 #include "..\Roguelike\HUDObjectHealth.h"
+#include "..\Roguelike\Input\InputKey.h"
+#include "..\Roguelike\Input\KeybindData.h"
 #include "..\Roguelike\TextRenderSystem\TextRenderSystem.h"
+#include "..\Roguelike\UI\Menu\MenuSystem.h"
+
+#pragma warning( disable : 4189 )
+
+// MenuSystem
+void MenuSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MenuSystem* pMenuSystem = static_cast<MenuSystem*>(pObject);
+}
+
+void* MenuSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MenuSystem* pMenuSystem = new MenuSystem;
+	int propertyIndex = 0;
+	MenuSystem::InitFromPropertiesSubset(pMenuSystem, properties, propertyIndex);
+	return pMenuSystem;
+}
 
 // TextRenderCharacterData
 void TextRenderCharacterData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
@@ -50,6 +69,20 @@ void* TextboxParams::InitFromProperties(const std::vector<EditorTypePropertyBase
 	return pTextboxParams;
 }
 
+// KeybindData
+void KeybindData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	KeybindData* pKeybindData = static_cast<KeybindData*>(pObject);
+}
+
+void* KeybindData::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	KeybindData* pKeybindData = new KeybindData;
+	int propertyIndex = 0;
+	KeybindData::InitFromPropertiesSubset(pKeybindData, properties, propertyIndex);
+	return pKeybindData;
+}
+
 // HUDObjectSharedInitParams
 void HUDObjectSharedInitParams::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -71,7 +104,9 @@ void GameAssets::InitFromPropertiesSubset(void* pObject, const std::vector<Edito
 	GameAssets* pGameAssets = static_cast<GameAssets*>(pObject);
 	pGameAssets->pTextRenderSystem = static_cast<TextRenderSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pGameAssets->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pGameAssets->pKeybindData = static_cast<KeybindData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pGameAssets->pHUD = static_cast<HUD*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pGameAssets->pMenuSystem = static_cast<MenuSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 }
 
 void* GameAssets::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -208,8 +243,10 @@ namespace __Generated
 {
 	std::unordered_map<std::string, void* (*)(const std::vector<EditorTypePropertyBase*>&)> stringToCreateObjectFunction
 	{
+		{"MenuSystem", &MenuSystem::InitFromProperties},
 		{"TextRenderCharacterData", &TextRenderCharacterData::InitFromProperties},
 		{"TextboxParams", &TextboxParams::InitFromProperties},
+		{"KeybindData", &KeybindData::InitFromProperties},
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::InitFromProperties},
 		{"GameAssets", &GameAssets::InitFromProperties},
 		{"DirectoryData", &DirectoryData::InitFromProperties},

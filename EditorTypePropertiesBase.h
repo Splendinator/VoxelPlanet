@@ -5,6 +5,7 @@
 class EditorTypePropertyBase;
 struct OnPropertyChangedParams;
 
+
 /** EditorTypePropertiesBase
 *
 * This class is used as a base class for any editor type that wants a list of properties.
@@ -30,6 +31,11 @@ public:
 	// Make sure to call this when you're finished setting pPropeties
 	void OnPropertiesPopulated();
 
+	// Fires when the metadataFlags are updated on the template editor type only.
+	// Non-template editor types will just copy the metadata flags from the template.
+	// This can be used to do any post processing on metadata flags, e.g inheriting flags from children.
+	void OnTemplateMetadataFlagsPopulated();
+
 	// List of properties
 	std::vector<EditorTypePropertyBase*> pProperties;
 
@@ -39,13 +45,16 @@ public:
 	// Fired when a property changes
 	DelegateList<const OnPropertyChangedParams&> onPropertyChanged;
 
-	
 protected:
 
 	// Deep copy these properties to pOther
 	void DeepCopyProperties(EditorTypePropertiesBase* pOther);
 
 	void OnPropertyChanged(const OnPropertyChangedParams& params);
+
+	// Recursively scan children template objects for the first of either Instanced or Singleton.
+	// If none are found we return EClassMetadataFlags::None
+	EClassMetadataFlags GetChildInstancedOrSingletonFlag(); 
 
 	DelegateClass<EditorTypePropertiesBase, const OnPropertyChangedParams&> onPropertyChangedDelegate;
 
