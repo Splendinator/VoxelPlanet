@@ -2,22 +2,26 @@
 
 #include "HUD.h"
 
+#include "ECS.h"
 #include "FilePaths.h"
 #include "HUDObjectHealth.h"
 
-void HUD::Initialise(ECS& ecs, EntityId player)
+void HUD::Init()
 {
-	hudObjectSharedInitParams.pEcs = &ecs;
-	for(HUDObjectBase* pHudObject : pHudObjects)
+	if (pEcs)
 	{
-		if (pHudObject)
+		hudObjectSharedInitParams.pEcs = pEcs;
+		for(HUDObjectBase* pHudObject : pHudObjects)
 		{
-			pHudObject->BaseInit(player, hudObjectSharedInitParams);
+			if (pHudObject)
+			{
+				pHudObject->BaseInit(pEcs->GetPlayerEntityId(), hudObjectSharedInitParams, pDirectoryData);
+			}
 		}
 	}
 }
 
-void HUD::Uninitialise()
+void HUD::UnInit()
 {
 	for(HUDObjectBase* pHudObject : pHudObjects)
 	{

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/GameSystem.h"
+
 #include "Components.h"
 #include "Entity.h"
 #include "SystemBase.h"
@@ -17,21 +19,24 @@ bool EntityHasComponents<ComponentName>(int entityId) const { return entities[en
 template<>\
 ComponentName& AddComponent<ComponentName>(int entityId) { entities[entityId].components.AddComponent(EComponents::##ComponentName); return GetComponent<ComponentName>(entityId); }
 
-class ECS
+EDITORCLASS()
+class ECS : public GameSystem
 {
+	EDITORBODY()
+
 	/// #TODO: We need to handle adding new component / removing components calling the appropriate functions like HandleEntityDeletion() and HandleEntityCreation() maybe
 
 public:
+	
+	//~ Begin GameSystem Interface
+	void Init() override;
+	void Tick(float deltaTime);
+	void UnInit();
+	//~ End GameSystem Interface
+
 	void RegisterSystem(std::unique_ptr<SystemBase>&& pSystem);
 	void RegisterSystemCallback(std::unique_ptr<SystemCallbackBase>&& pSystemCallback);
-
-	void Tick(float deltaTime);
-
-	void Uninitialise();
-
-	/// #TEMP: This needs making private, outside systems should use EntityID instead
-	Entity& GetEntity(EntityId entityId) { return entities[entityId]; }
-
+	
 	// Get the next unused entity (entity with no components)
 	EntityId GetNextFreeEntity();
 
@@ -52,6 +57,7 @@ public:
 	template<typename T>
 	void ForEachEntity(const T& predicate) { for (EntityId e = 0; e < NUM_ENTITIES; ++e) { predicate(e); } }
 
+	EntityId GetPlayerEntityId() const {return playerEntity;}
 
 	REGISTER_COMPONENT(ComponentMesh);
 	REGISTER_COMPONENT(ComponentTransform);
@@ -62,10 +68,14 @@ public:
 
 private:
 
+	Entity& GetEntity(EntityId entityId) { return entities[entityId]; }
+	
 	std::vector<std::unique_ptr<SystemBase>> systems;
 	std::vector<std::unique_ptr<SystemCallbackBase>> systemCallbacks;
 
 	Entity entities[NUM_ENTITIES];
+
+	EntityId playerEntity = 0;
 
 	int frame = 0; // The frame we are on, useful for debug or systems that want to do something different on the first frame. Is '0' for the first frame
 };

@@ -3,11 +3,43 @@
 #include "Chunk.h"
 #include "Renderer.h"
 #include "WorldGenerator.h"
+#include "SystemRender.h"
+
+#include "DomWindow/DomWindow.h"
+
+void WorldGenerator::Init()
+{
+	// #JANK: Negative numbers are a bit fucked, right now we spawn at (20000, 20000) to avoid this
+	SetCenter(WORLD_START_X, WORLD_START_Y, /*bInit =*/true);
+}
+
+void WorldGenerator::Tick(float deltaTime)
+{
+	// #TODO: This stuff should be moved to a CameraSystem or something
+	if (pEcs)
+	{
+		ComponentTransform& transform = pEcs->GetComponent<ComponentTransform>(pEcs->GetPlayerEntityId());
+		SetCenter(transform.x, transform.y, false);
+		dmgf::SetCameraCenter(transform.x * SystemRender::GRID_SIZE + SystemRender::GRID_SIZE * 0.5f, transform.y * SystemRender::GRID_SIZE + SystemRender::GRID_SIZE * 0.5f);
+	}
+	// Zoom
+	{
+		static float zoom = 64.f / SystemRender::GRID_SIZE;
+		static float zoomSpeed = 64.f / SystemRender::GRID_SIZE;
+		if (dmwi::isHeld(dmwi::Button::PLUS))
+		{
+			zoom += zoomSpeed * deltaTime;
+		}
+		if (dmwi::isHeld(dmwi::Button::SUB))
+		{
+			zoom -= zoomSpeed * deltaTime;
+		}
+		dmgf::SetCameraZoom(zoom);
+	}
+}
 
 void WorldGenerator::SetCenter(int newX, int newY, bool bInit)
 {
-	// #JANK: Negative numbers are a bit fucked, right now we spawn at (20000, 20000) to avoid this
-
 	// Effective coords that we will use as the center coords
 	const int effectiveX = newX;
 	const int effectiveY = newY;
@@ -32,7 +64,7 @@ void WorldGenerator::SetCenter(int newX, int newY, bool bInit)
 				chunkY > maxChunkY ||
 				chunkY < minChunkY)
 			{
-				pChunk->DeleteChunk(&ecs);
+				pChunk->DeleteChunk(pEcs);
 				delete pChunk;
 				pChunk = nullptr;
 				bDeletedChunks = true;
@@ -68,7 +100,7 @@ void WorldGenerator::SetCenter(int newX, int newY, bool bInit)
 				const int newIndex = GetNewIndex(x, y);
 				if (pNewChunks[newIndex] == nullptr)
 				{
-					pNewChunks[newIndex] = new Chunk(&ecs, x, y);
+					pNewChunks[newIndex] = new Chunk(pEcs, x, y);
 				}
 			}
 		}
@@ -77,11 +109,11 @@ void WorldGenerator::SetCenter(int newX, int newY, bool bInit)
 	}
 }
 
-void WorldGenerator::Uninitialise()
+void WorldGenerator::UnInit()
 {
 	for (Chunk*& pChunk : pChunks)
 	{
-		pChunk->DeleteChunk(&ecs);
+		pChunk->DeleteChunk(pEcs);
 		delete pChunk;
 		pChunk = nullptr;
 	}

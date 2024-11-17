@@ -1,5 +1,10 @@
 #pragma once
 
+// #TODO: Need to seperate out asset management and imgui editor else the IMGUI_ENABLED ifdef will compile out assets
+// #TODO: When we do this make the ImGuiEditor just another GameSystem in the GameInstance
+
+#include "Core/GameSystem.h"
+
 class CodeParseTokenBase;
 class EditorActionBase;
 class EditorAssetBase;
@@ -15,14 +20,16 @@ class EditorWindowBase;
 *
 * It reads in all the code files in the project and parses them for classes, structs, enums, etc and lets you edit them.
 */
-class ImGuiEditor
+class ImGuiEditor : public GameSystem
 {
 public:
-	ImGuiEditor() {};
+	ImGuiEditor() {}
 
+	//~ Begin GameSystem Interface
 	void Init();
+	void Tick(float deltaTime);
 	void Uninit();
-	void Tick();
+	//~ End GameSystem Interface
 	
 	void AddWindow(const std::shared_ptr<EditorWindowBase>& pWindow);
 	void RemoveWindow(EditorWindowBase* pWindow);
@@ -56,8 +63,6 @@ public:
 	T* FindObjectFromAsset(const std::string& name);
 
 private:
-
-	// #TODO: Need to seperate out asset management and imgui editor else the IMGUI_ENABLED ifdef will compile out assets
 	
 	// Generate template types. see templateClassTypes
 	void CreateTemplateTypes(const std::string& typesFile);

@@ -154,6 +154,8 @@
     <ClCompile Include="ActionHandlerWait.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkGeneratorGrass.cpp" />
+    <ClCompile Include="Core\GameInstance.cpp" />
+    <ClCompile Include="Core\GameSystem.cpp" />
     <ClCompile Include="DirectoryData.cpp" />
     <ClCompile Include="ECS.cpp" />
     <ClCompile Include="EditorActionBase.cpp" />
@@ -413,6 +415,8 @@
     <ClInclude Include="ChunkGeneratorBase.h" />
     <ClInclude Include="ChunkGeneratorGrass.h" />
     <ClInclude Include="Components.h" />
+    <ClInclude Include="Core\GameInstance.h" />
+    <ClInclude Include="Core\GameSystem.h" />
     <ClInclude Include="DirectoryData.h" />
     <ClInclude Include="ECS.h" />
     <ClInclude Include="EditorActionBase.h" />

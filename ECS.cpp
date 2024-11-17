@@ -2,6 +2,18 @@
 
 #include "ECS.h"
 
+#include "ActionDeciderPlayer.h"
+#include "FilePaths.h"
+#include "RendererObject.h"
+#include "SystemAction.h"
+#include "SystemCleanUp.h"
+#include "SystemDamage.h"
+#include "SystemEntityMap.h"
+#include "SystemNameslate.h"
+#include "SystemPhysics.h"
+#include "SystemRender.h"
+#include "WorldGenerator.h"
+
 void ECS::RegisterSystem(std::unique_ptr<SystemBase>&& pSystem)
 {
 	pSystem->Initialise(this);
@@ -14,10 +26,43 @@ void ECS::RegisterSystemCallback(std::unique_ptr<SystemCallbackBase>&& pSystemCa
 	systemCallbacks.emplace_back(std::move(pSystemCallback));
 }
 
+void ECS::Init()
+{
+	// Register systems to ECS (order matters)
+	RegisterSystem(std::make_unique<SystemAction>());
+	RegisterSystem(std::make_unique<SystemEntityMap>());
+	RegisterSystem(std::make_unique<SystemPhysics>());
+	RegisterSystem(std::make_unique<SystemDamage>());
+	RegisterSystem(std::make_unique<SystemNameslate>());
+	RegisterSystem(std::make_unique<SystemRender>());
+	RegisterSystem(std::make_unique<SystemCleanUp>());
+	
+	// Create player entity
+	{
+		Entity& e = GetEntity(playerEntity);
+		e.components.AddComponent(EComponents::ComponentMesh);
+		e.components.AddComponent(EComponents::ComponentTransform);
+		e.components.AddComponent(EComponents::ComponentAction);
+		e.components.AddComponent(EComponents::ComponentHealth);
+		e.components.AddComponent(EComponents::ComponentFaction);
+		e.components.AddComponent(EComponents::ComponentRigid);
+		GetComponent<ComponentMesh>(playerEntity).pRendererObject = dmgf::AddObjectFromSVG(FilePath::VectorArt::player);
+		GetComponent<ComponentMesh>(playerEntity).pRendererObject->SetRenderPriority(RenderPriority::unit);
+		GetComponent<ComponentTransform>(playerEntity).x = WORLD_START_X;
+		GetComponent<ComponentTransform>(playerEntity).y = WORLD_START_Y;
+		GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;
+		GetComponent<ComponentAction>(playerEntity).energy = 100;
+		GetComponent<ComponentAction>(playerEntity).pActionDecider = new ActionDeciderPlayer;
+		GetComponent<ComponentHealth>(playerEntity).health = 100;
+		GetComponent<ComponentHealth>(playerEntity).maxHealth = 100;
+		GetComponent<ComponentFaction>(playerEntity).factionFlags = ComponentFaction::EFactionFlags::Player;
+	}
+}
+
 void ECS::Tick(float deltaTime)
 {
 	// #TODO: Need a way to only tick a entities if the component has changed, maybe just a bool in the base class of all components?
-
+	
 	// System Pre-Tick
 	SystemTickParams params;
 	params.pEcs = this;
@@ -38,7 +83,7 @@ void ECS::Tick(float deltaTime)
 	++frame;
 }
 
-void ECS::Uninitialise()
+void ECS::UnInit()
 {
 	systemCallbacks.clear();
 	systems.clear();

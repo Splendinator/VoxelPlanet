@@ -34,6 +34,10 @@ void ImGuiEditor::Init()
 	AddWindow(std::make_shared<EditorWindowActionQueue>(executedActions, executedActionsIndex));
 	
 	bEditorShowing = false; // Start with editor off
+
+	// #JANK: If we ever resize this vector mid way through a loop (e.g clicking a button on one window to open a second window) then the game crashes.
+	// #JANK: I can't be arsed to add a frame delay or whatever so I'm just reserving 10
+	shownWindows.reserve(10); 
 }
 
 void ImGuiEditor::Uninit()
@@ -47,7 +51,7 @@ void ImGuiEditor::Uninit()
 	assets.clear();
 }
 
-void ImGuiEditor::Tick()
+void ImGuiEditor::Tick(float deltaTime)
 {
 	if (bEditorShowing)
 	{

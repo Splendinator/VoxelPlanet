@@ -8,8 +8,10 @@
 #include "EditorTypePropertyStruct.h"
 #include "EditorTypePropertyVector.h"
 #include "EditorTypePropertyEnum.h"
+#include "..\Roguelike\Core\GameInstance.h"
+#include "..\Roguelike\Core\GameSystem.h"
 #include "..\Roguelike\DirectoryData.h"
-#include "..\Roguelike\Game.h"
+#include "..\Roguelike\ECS.h"
 #include "..\Roguelike\HUD.h"
 #include "..\Roguelike\HUDAnchorPoint.h"
 #include "..\Roguelike\HUDObjectBase.h"
@@ -18,6 +20,7 @@
 #include "..\Roguelike\Input\KeybindData.h"
 #include "..\Roguelike\TextRenderSystem\TextRenderSystem.h"
 #include "..\Roguelike\UI\Menu\MenuSystem.h"
+#include "..\Roguelike\WorldGenerator.h"
 
 #pragma warning( disable : 4189 )
 
@@ -98,25 +101,6 @@ void* HUDObjectSharedInitParams::InitFromProperties(const std::vector<EditorType
 	return pHUDObjectSharedInitParams;
 }
 
-// GameAssets
-void GameAssets::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	GameAssets* pGameAssets = static_cast<GameAssets*>(pObject);
-	pGameAssets->pTextRenderSystem = static_cast<TextRenderSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-	pGameAssets->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-	pGameAssets->pKeybindData = static_cast<KeybindData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-	pGameAssets->pHUD = static_cast<HUD*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-	pGameAssets->pMenuSystem = static_cast<MenuSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-}
-
-void* GameAssets::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	GameAssets* pGameAssets = new GameAssets;
-	int propertyIndex = 0;
-	GameAssets::InitFromPropertiesSubset(pGameAssets, properties, propertyIndex);
-	return pGameAssets;
-}
-
 // DirectoryData
 void DirectoryData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -133,10 +117,62 @@ void* DirectoryData::InitFromProperties(const std::vector<EditorTypePropertyBase
 	return pDirectoryData;
 }
 
+// GameSystem
+void GameSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	GameSystem* pGameSystem = static_cast<GameSystem*>(pObject);
+}
+
+void* GameSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	GameSystem* pGameSystem = new GameSystem;
+	int propertyIndex = 0;
+	GameSystem::InitFromPropertiesSubset(pGameSystem, properties, propertyIndex);
+	return pGameSystem;
+}
+
+// GameInstance
+void GameInstance::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	GameInstance* pGameInstance = static_cast<GameInstance*>(pObject);
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pGameInstance->pGameSystems.push_back(static_cast<GameSystem*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
+		}
+	}
+}
+
+void* GameInstance::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	GameInstance* pGameInstance = new GameInstance;
+	int propertyIndex = 0;
+	GameInstance::InitFromPropertiesSubset(pGameInstance, properties, propertyIndex);
+	return pGameInstance;
+}
+
+// WorldGenerator
+void WorldGenerator::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	WorldGenerator* pWorldGenerator = static_cast<WorldGenerator*>(pObject);
+	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pWorldGenerator), properties, propertyIndex);
+	pWorldGenerator->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* WorldGenerator::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	WorldGenerator* pWorldGenerator = new WorldGenerator;
+	int propertyIndex = 0;
+	WorldGenerator::InitFromPropertiesSubset(pWorldGenerator, properties, propertyIndex);
+	return pWorldGenerator;
+}
+
 // TextRenderSystem
 void TextRenderSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
 	TextRenderSystem* pTextRenderSystem = static_cast<TextRenderSystem*>(pObject);
+	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pTextRenderSystem), properties, propertyIndex);
 	{
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
@@ -144,6 +180,7 @@ void TextRenderSystem::InitFromPropertiesSubset(void* pObject, const std::vector
 			pTextRenderSystem->characterDatas.push_back(*static_cast<TextRenderCharacterData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
 		}
 	}
+	pTextRenderSystem->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 }
 
 void* TextRenderSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -169,6 +206,21 @@ void* HUDAnchorPoint::InitFromProperties(const std::vector<EditorTypePropertyBas
 	int propertyIndex = 0;
 	HUDAnchorPoint::InitFromPropertiesSubset(pHUDAnchorPoint, properties, propertyIndex);
 	return pHUDAnchorPoint;
+}
+
+// ECS
+void ECS::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ECS* pECS = static_cast<ECS*>(pObject);
+	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pECS), properties, propertyIndex);
+}
+
+void* ECS::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ECS* pECS = new ECS;
+	int propertyIndex = 0;
+	ECS::InitFromPropertiesSubset(pECS, properties, propertyIndex);
+	return pECS;
 }
 
 // HUDObjectBase
@@ -202,6 +254,9 @@ void* HUDObjectBase::InitFromProperties(const std::vector<EditorTypePropertyBase
 void HUD::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
 	HUD* pHUD = static_cast<HUD*>(pObject);
+	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pHUD), properties, propertyIndex);
+	pHUD->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pHUD->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	{
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
@@ -248,10 +303,13 @@ namespace __Generated
 		{"TextboxParams", &TextboxParams::InitFromProperties},
 		{"KeybindData", &KeybindData::InitFromProperties},
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::InitFromProperties},
-		{"GameAssets", &GameAssets::InitFromProperties},
 		{"DirectoryData", &DirectoryData::InitFromProperties},
+		{"GameSystem", &GameSystem::InitFromProperties},
+		{"GameInstance", &GameInstance::InitFromProperties},
+		{"WorldGenerator", &WorldGenerator::InitFromProperties},
 		{"TextRenderSystem", &TextRenderSystem::InitFromProperties},
 		{"HUDAnchorPoint", &HUDAnchorPoint::InitFromProperties},
+		{"ECS", &ECS::InitFromProperties},
 		{"HUDObjectBase", &HUDObjectBase::InitFromProperties},
 		{"HUD", &HUD::InitFromProperties},
 		{"HUDObjectHealth", &HUDObjectHealth::InitFromProperties},

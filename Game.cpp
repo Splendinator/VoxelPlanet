@@ -2,137 +2,57 @@
 
 #include "Game.h"
 
-#include "../Graphics/Camera.h"
-#include "DomLog/DomLog.h"
-#include "DomMath/Constants.h"
-#include "DomMath/Constexpr.h"
-#include "DomMath/Math.h"
-#include "DomMath/Vec3.h"
-#include "DomUtils/DomUtils.h"
 #include "DomWindow/DomWindow.h"
-#include "HUD.h"
-#include "ResourceLoader.h"
-#include "WorldGenerator.h"
-
+#include "Core/GameInstance.h"
+#include "ImGuiEditor.h"
 #include <imgui.h>
 #include <time.h>
-
-/// Temp headers, this stuff will be moved to the world gen system at some point I guess
-#include "ActionDeciderPlayer.h"
-#include "Components.h"
-#include "ECS.h"
-#include "ImGuiEditor.h"
-#include "FilePaths.h"
-#include "RenderPriorities.h"
-#include "Renderer.h"
-#include "RendererObject.h"
-#include "SystemAction.h"
-#include "SystemCleanUp.h"
-#include "SystemDamage.h"
-#include "SystemEntityMap.h"
-#include "SystemNameslate.h"
-#include "SystemPhysics.h"
-#include "SystemRender.h"
-#include "VectorArt.h"
-#include "VectorPrimitiveRectangle.h"
-#include "ActionDeciderAI.h"
-#include "TextRenderSystem/TextRenderSystem.h"
 
 #ifdef DOMIMGUI
 ImGuiEditor imGuiEditor;
 #endif //~ DOMIMGUI
 
-GameAssets* pGameAssets = nullptr;
+GameInstance* pGameInstance = nullptr;
 
-ECS ecs;
-WorldGenerator worldGenerator(ecs);
-EntityId playerEntity = 0;
-
-constexpr int WORLD_START_X = 10000;
-constexpr int WORLD_START_Y = 10000;
-
-// #TEMP: Optimisation
-#pragma optimize("", off)
 void Game::Init()
 {
 #ifdef DOMIMGUI
 	imGuiEditor.Init();
 #endif //~ DOMIMGUI
-	
-	// Register systems to ECS (order matters)
-	ecs.RegisterSystem(std::make_unique<SystemAction>());
-	ecs.RegisterSystem(std::make_unique<SystemEntityMap>());
-	ecs.RegisterSystem(std::make_unique<SystemPhysics>());
-	ecs.RegisterSystem(std::make_unique<SystemDamage>());
-	ecs.RegisterSystem(std::make_unique<SystemNameslate>());
-	ecs.RegisterSystem(std::make_unique<SystemRender>());
-	ecs.RegisterSystem(std::make_unique<SystemCleanUp>());
-
-	// Create player entity
-	{
-		Entity& e = ecs.GetEntity(playerEntity);
-		e.components.AddComponent(EComponents::ComponentMesh);
-		e.components.AddComponent(EComponents::ComponentTransform);
-		e.components.AddComponent(EComponents::ComponentAction);
-		e.components.AddComponent(EComponents::ComponentHealth);
-		e.components.AddComponent(EComponents::ComponentFaction);
-		e.components.AddComponent(EComponents::ComponentRigid);
-		ecs.GetComponent<ComponentMesh>(playerEntity).pRendererObject = dmgf::AddObjectFromSVG(FilePath::VectorArt::player);
-		ecs.GetComponent<ComponentMesh>(playerEntity).pRendererObject->SetRenderPriority(RenderPriority::unit);
-		ecs.GetComponent<ComponentTransform>(playerEntity).x = WORLD_START_X;
-		ecs.GetComponent<ComponentTransform>(playerEntity).y = WORLD_START_Y;
-		ecs.GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;
-		ecs.GetComponent<ComponentAction>(playerEntity).energy = 100;
-		ecs.GetComponent<ComponentAction>(playerEntity).pActionDecider = new ActionDeciderPlayer;
-		ecs.GetComponent<ComponentHealth>(playerEntity).health = 100;
-		ecs.GetComponent<ComponentHealth>(playerEntity).maxHealth = 100;
-		ecs.GetComponent<ComponentFaction>(playerEntity).factionFlags = ComponentFaction::EFactionFlags::Player;
-	}
 
 	// Set random seed based off time
 	srand((unsigned int)time(NULL));
-
-	worldGenerator.SetCenter(WORLD_START_X, WORLD_START_Y, /*bInit =*/true);
-
-	pGameAssets = imGuiEditor.FindObjectFromAsset<GameAssets>("GameAssets");
-	if (pGameAssets)
+	
+	pGameInstance = imGuiEditor.FindObjectFromAsset<GameInstance>("GameInstance");
+	if (pGameInstance)
 	{
-		if (pGameAssets->pTextRenderSystem)
-		{
-			pGameAssets->pTextRenderSystem->Init();
-		}
-		if (pGameAssets->pHUD)
-		{
-			pGameAssets->pHUD->Initialise(ecs, playerEntity);
-		}
+		pGameInstance->InitGameSystems();
 	}
 }
 #pragma optimize("", on)
 
 void Game::UnInit()
 {
-	if (pGameAssets)
+	if (pGameInstance)
 	{
-		if (pGameAssets->pTextRenderSystem)
-		{
-			pGameAssets->pTextRenderSystem->Uninit();
-		}
-
-		if (pGameAssets->pHUD)
-		{
-			pGameAssets->pHUD->Uninitialise();
-		}
+		pGameInstance->UnInitGameSystems();
 	}
-	
-	worldGenerator.Uninitialise();
-	ecs.Uninitialise();
 
 #ifdef DOMIMGUI
 	imGuiEditor.Uninit();
 #endif //~ DOMIMGUI
 }
 
+void GameplayTick(float deltaTime)
+{
+	if (pGameInstance)
+	{
+		pGameInstance->TickGameSystems(deltaTime);
+	}
+}
+
 #ifdef DOMIMGUI
+// #TEMP: This is the FPS counter, will need removing / moving to an EditorWindow
 void CreateImGuiWindow(float deltaTime)
 {
 	static int numFrames = 0;
@@ -157,62 +77,19 @@ void CreateImGuiWindow(float deltaTime)
 }
 #endif //~ #ifdef DOMIMGUI
 
-void GameplayTick(float deltaTime)
-{
-	ecs.Tick(deltaTime);
-
-	if (pGameAssets)
-	{
-		if (pGameAssets->pHUD)
-		{
-			pGameAssets->pHUD->Tick(deltaTime);
-		}
-	}
-	
-	ComponentTransform& transform = ecs.GetComponent<ComponentTransform>(playerEntity);
-	worldGenerator.SetCenter(transform.x, transform.y, false);
-	dmgf::SetCameraCenter(transform.x * SystemRender::GRID_SIZE + SystemRender::GRID_SIZE * 0.5f, transform.y * SystemRender::GRID_SIZE + SystemRender::GRID_SIZE * 0.5f);
-
-	// Zoom
-	{
-		static float zoom = 64.f / SystemRender::GRID_SIZE;
-		static float zoomSpeed = 64.f / SystemRender::GRID_SIZE;
-		if (dmwi::isHeld(dmwi::Button::PLUS))
-		{
-			zoom += zoomSpeed * deltaTime;
-		}
-		if (dmwi::isHeld(dmwi::Button::SUB))
-		{
-			zoom -= zoomSpeed * deltaTime;
-		}
-		dmgf::SetCameraZoom(zoom);
-	}
-
-	// Breakpoint
-	{
-		if (dmwi::isPressed(dmwi::Button::F11))
-		{
-			__debugbreak();
-		}
-	}
-}
-
 void Game::Tick(float deltaTime)
 {
 #ifdef DOMIMGUI
 	CreateImGuiWindow(deltaTime);
-	imGuiEditor.Tick();
+	imGuiEditor.Tick(deltaTime);
 #endif //~ #ifdef DOMIMGUI
 	GameplayTick(deltaTime);
-
 }
 
 bool Game::CanClose()
 {
-	return true;
+	return dmwi::isHeld(dmwi::Button::SHIFT) && dmwi::isPressed(dmwi::Button::ESC);
 }
-
-GameAssets& Game::GetGameAssets() { return *pGameAssets; }
 
 #ifdef DOMIMGUI
 ImGuiEditor& Game::Editor() { return imGuiEditor; };

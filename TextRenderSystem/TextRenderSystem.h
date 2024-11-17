@@ -2,6 +2,9 @@
 
 #include <array>
 
+#include "Core/GameSystem.h"
+
+class DirectoryData;
 class Textbox;
 class VectorArt;
 
@@ -48,16 +51,21 @@ struct TextRenderCharacterData
  * System used to render text on-screen in the game
  */
 EDITORCLASS()
-class TextRenderSystem
+class TextRenderSystem : public GameSystem
 {
 	EDITORBODY()
 	
 	// Data of each character
 	EDITORPROPERTY()
 	std::vector<TextRenderCharacterData> characterDatas;
-	
-	void Init();
-	void Uninit();
+
+	EDITORPROPERTY()
+	DirectoryData* pDirectoryData = nullptr;
+
+	//~ Begin GameSystem Interface
+	void Init() override;
+	void UnInit() override;
+	//~ End GameSystem Interface
 
 	TextboxHandle AddTextbox(const TextboxParams& textboxParams);
 	void RemoveTextbox(TextboxHandle handle);

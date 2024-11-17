@@ -4,6 +4,7 @@
 #include "HUDAnchorPoint.h"
 #include "UICanvas.h"
 
+class DirectoryData;
 class ECS;
 struct HUDObjectSharedInitParams;
 
@@ -18,7 +19,7 @@ class HUDObjectBase
 
 public:
 	
-	void BaseInit(EntityId player, const HUDObjectSharedInitParams& hudInitParams);
+	void BaseInit(EntityId player, const HUDObjectSharedInitParams& hudInitParams, DirectoryData* pDirectoryData);
 	void BaseUninit();
 	void BaseTick(float deltaTime);
 

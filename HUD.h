@@ -1,9 +1,10 @@
 #pragma once
 
+#include "Core/GameSystem.h"
+
 #include "ECSTypes.h"
 
-#include "DomUtils/HeapAlloc.h"
-
+class DirectoryData;
 class ECS;
 class HUDObjectBase;
 
@@ -25,17 +26,24 @@ struct HUDObjectSharedInitParams
 * 
 */
 EDITORCLASS()
-class HUD
+class HUD : public GameSystem
 {
 	EDITORBODY()
 	
 public:
-
-	void Initialise(ECS& ecs, EntityId player);
-	void Uninitialise();
+	//~ Begin GameSystem Interface
+	void Init();
+	void UnInit();
 	void Tick(float deltaTime);
+	//~ End GameSystem Interface
 
 private:
+
+	EDITORPROPERTY()
+	DirectoryData* pDirectoryData = nullptr;
+
+	EDITORPROPERTY()
+	ECS* pEcs = nullptr;
 	
 	EDITORPROPERTY()
 	std::vector<HUDObjectBase*> pHudObjects;

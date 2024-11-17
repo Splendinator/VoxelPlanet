@@ -10,22 +10,22 @@
 void TextRenderSystem::Init()
 {
 	std::string baseDirectory = "./";
-	if (Game::GetGameAssets().pDirectoryData)
+	if (pDirectoryData)
 	{
-		baseDirectory = Game::GetGameAssets().pDirectoryData->fonts;
-	}
+		baseDirectory = pDirectoryData->fonts;
 	
-	for (const TextRenderCharacterData& characterData : characterDatas)
-	{
-		DOMLOG_ERROR_IF(characterData.character > 128 || characterData.character < 0, characterData.character, "is out of range for ascii character", characterData.fileName);
-
-		characterVectorArtMap[characterData.character] = std::make_shared<VectorArt>((baseDirectory + characterData.fileName + ".svg").c_str());
+		for (const TextRenderCharacterData& characterData : characterDatas)
+		{
+			DOMLOG_ERROR_IF(characterData.character > 128 || characterData.character < 0, characterData.character, "is out of range for ascii character", characterData.fileName);
+		
+			characterVectorArtMap[characterData.character] = std::make_shared<VectorArt>((baseDirectory + characterData.fileName + ".svg").c_str());
+		}
+		characterDatas.clear(); // Don't need this once loaded into our hashmap
 	}
-	characterDatas.clear(); // Don't need this once loaded into our hashmap
 	
 }
 
-void TextRenderSystem::Uninit()
+void TextRenderSystem::UnInit()
 {
 	for (Textbox*& pTextbox : textboxes)
 	{

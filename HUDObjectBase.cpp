@@ -6,7 +6,7 @@
 #include "Game.h"
 #include "HUD.h"
 
-void HUDObjectBase::BaseInit(EntityId player, const HUDObjectSharedInitParams& hudInitParams)
+void HUDObjectBase::BaseInit(EntityId player, const HUDObjectSharedInitParams& hudInitParams, DirectoryData* pDirectoryData)
 {
 	controlledEntity = player;
 
@@ -15,7 +15,7 @@ void HUDObjectBase::BaseInit(EntityId player, const HUDObjectSharedInitParams& h
 	UICanvasInitParams initParams;
 	initParams.sizeX = sizeX;
 	initParams.sizeY = sizeY;
-	initParams.filePath = Game::GetGameAssets().pDirectoryData->hudObjects + fileName + ".svg";
+	initParams.filePath = pDirectoryData->hudObjects + fileName + ".svg";
 	initParams.renderPriority = RenderPriority::UI;
 	initParams.type = dmgf::ERenderObjectType::HUD;
 

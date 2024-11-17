@@ -1,23 +1,30 @@
 #pragma once
 
-#include "DomMath/Vec2.h"
-#include "ECS.h"
+#include "Core/GameSystem.h"
+
+constexpr int WORLD_START_X = 10000;
+constexpr int WORLD_START_Y = 10000;
 
 class Chunk;
+class ECS;
 
 /** WorldGenerator
 *
 * This class is used to generate the open world of the game.
 * It handles loading chunks in and out of memory, and generating the terrain
 */
-class WorldGenerator
+EDITORCLASS()
+class WorldGenerator : public GameSystem
 {
-public:
+	EDITORBODY()
 	
-	WorldGenerator(ECS& inEcs) : ecs(inEcs) {}
-
-	void Uninitialise();
-
+public:
+	//~ Begin GameSystem Interface
+	void Init() override;
+	void Tick(float deltaTime) override;
+	void UnInit() override;
+	//~ End GameSystem Interface
+	
 	// Set the center of the world generator, world will generator around these coordinates (this is likely tied to player's location)
 	void SetCenter(int newX, int newY, bool bInit);
 
@@ -29,7 +36,8 @@ private:
 	static constexpr int NUM_CHUNKS = 3; 
 	static constexpr int CHUNK_SQUARE_SIZE = NUM_CHUNKS * 2 + 1;
 
-	ECS& ecs;
+	EDITORPROPERTY()
+	ECS* pEcs = nullptr;
 
 	Chunk* pChunks[CHUNK_SQUARE_SIZE * CHUNK_SQUARE_SIZE];
 

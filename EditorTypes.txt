@@ -127,25 +127,34 @@ COUNT 10
 Struct HUDObjectSharedInitParams
 float screenEdgePadding 0.05
 ;
-Class GameAssets
-class TextRenderSystem pTextRenderSystem nullptr
-class DirectoryData pDirectoryData nullptr
-class KeybindData pKeybindData nullptr
-class HUD pHUD nullptr
-class MenuSystem pMenuSystem nullptr
-;
 Class DirectoryData
 meta Singleton
 string fonts ""
 string hudObjects ""
 ;
+Class GameSystem
+meta Abstract
+meta Singleton
+;
+Class GameInstance
+vector pGameSystems GameSystem
+;
+Class WorldGenerator
+Child GameSystem
+class ECS pEcs nullptr
+;
 Class TextRenderSystem
+Child GameSystem
 vector characterDatas TextRenderCharacterData
+class DirectoryData pDirectoryData nullptr
 ;
 Struct HUDAnchorPoint
 enum EHUDAnchorPoint anchorPoint NONE
 float anchorX 0
 float anchorY 0
+;
+Class ECS
+Child GameSystem
 ;
 Class HUDObjectBase
 struct HUDAnchorPoint screenAnchorPoint
@@ -155,6 +164,9 @@ float sizeX 0
 float sizeY 0
 ;
 Class HUD
+Child GameSystem
+class DirectoryData pDirectoryData nullptr
+class ECS pEcs nullptr
 vector pHudObjects HUDObjectBase
 struct HUDObjectSharedInitParams hudObjectSharedInitParams
 ;

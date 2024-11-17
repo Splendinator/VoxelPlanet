@@ -45,7 +45,7 @@ float GetDeltaTime()
 
 bool ShouldCloseWindow()
 {
-	return dmwi::isHeld(dmwi::Button::SHIFT) && dmwi::isPressed(dmwi::Button::ESC) && Game::CanClose();
+	return Game::CanClose();
 }
 
 void domMain()
