@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "Input/InputSystem.h"
+
 #ifdef DOMIMGUI
 
 #include "ImGuiEditor.h"
@@ -71,6 +73,18 @@ void ImGuiEditor::Tick(float deltaTime)
 	if (dmwi::isPressed(dmwi::Button::F7))
 	{
 		bEditorShowing = !bEditorShowing;
+
+		if (pInputSystem && pEditorInputContext)
+		{
+			if (bEditorShowing)
+			{
+				pInputSystem->PushInputContext(pEditorInputContext);		
+			}
+			else
+			{
+				pInputSystem->PopInputContext(pEditorInputContext);
+			}
+		}
 	}
 }
 

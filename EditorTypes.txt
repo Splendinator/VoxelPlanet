@@ -1,5 +1,3 @@
-Class MenuSystem
-;
 Struct TextRenderCharacterData
 string fileName ""
 int character 0
@@ -10,16 +8,14 @@ float xPos 0
 float yPos 0
 float fontSize 0
 ;
-Class KeybindData
-;
 Enum EInputKey
-UNBOUND 0
+NONE 0
 BACKSPACE 8
 TAB 9
 ENTER 13
 SHIFT 16
 CTRL 17
-RALT 18
+ALT 18
 CAPS 20
 ESC 27
 SPACE 32
@@ -111,6 +107,14 @@ EQUALS 187
 DASH 189
 TILDE 223
 ;
+Class InputActionBase
+meta Abstract
+meta Singleton
+enum EInputKey baseKey NONE
+bool bCtrl false
+bool bShift false
+bool bAlt false
+;
 Enum EHUDAnchorPoint
 NONE 0
 TopLeft 1
@@ -143,13 +147,34 @@ Class WorldGenerator
 Child GameSystem
 class ECS pEcs nullptr
 ;
+Class MenuSystem
+Child GameSystem
+class InputSystem pInputSystem nullptr
+class InputContext pMenuInputContext nullptr
+class InputActionBase pOpenMenuAction nullptr
+class InputActionBase pCloseMenuAction nullptr
+;
 Class TextRenderSystem
 Child GameSystem
 vector characterDatas TextRenderCharacterData
 class DirectoryData pDirectoryData nullptr
 ;
+Class InputSystem
+Child GameSystem
+class InputContext pDefaultInputContext nullptr
+;
+Class InputContext
+meta Singleton
+int priority 0
+vector pInputActions InputActionBase
+;
+Class InputActionPress
+Child InputActionBase
+;
 Class ImGuiEditor
 Child GameSystem
+class InputSystem pInputSystem nullptr
+class InputContext pEditorInputContext nullptr
 ;
 Struct HUDAnchorPoint
 enum EHUDAnchorPoint anchorPoint NONE
@@ -160,6 +185,7 @@ Class ECS
 Child GameSystem
 ;
 Class HUDObjectBase
+meta Abstract
 struct HUDAnchorPoint screenAnchorPoint
 struct HUDAnchorPoint hudAnchorPoint
 string fileName ""

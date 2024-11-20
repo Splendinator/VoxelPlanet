@@ -10,5 +10,9 @@ public:
 	virtual void Init() {}
 	virtual void Tick(float deltaTime) {}
 	virtual void UnInit() {}
+
+#ifdef DOMIMGUI
+	virtual void DrawImGui(float deltaTime) {}
+#endif
 	
 };

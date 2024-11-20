@@ -15,10 +15,16 @@ public:
 	void TickGameSystems(float deltaTime);
 	void UnInitGameSystems();
 
+#ifdef DOMIMGUI
+	void TickImGui(float deltaTime);
+#endif
+
 private:
 
 	// Vector of game systems, the systems will initialise in the order that they are in the array.
 	// so if, for example, the world generator needs an ECS in order to spawn entities into the world then the world generator should go after the ECS.
 	EDITORPROPERTY()
 	std::vector<GameSystem*> pGameSystems;
+
+	bool bShowingImGui = false;
 };

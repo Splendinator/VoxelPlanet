@@ -17,27 +17,15 @@
 #include "..\Roguelike\HUDObjectBase.h"
 #include "..\Roguelike\HUDObjectHealth.h"
 #include "..\Roguelike\ImGuiEditor.h"
+#include "..\Roguelike\Input\InputAction.h"
+#include "..\Roguelike\Input\InputContext.h"
 #include "..\Roguelike\Input\InputKey.h"
-#include "..\Roguelike\Input\KeybindData.h"
+#include "..\Roguelike\Input\InputSystem.h"
 #include "..\Roguelike\TextRenderSystem\TextRenderSystem.h"
 #include "..\Roguelike\UI\Menu\MenuSystem.h"
 #include "..\Roguelike\WorldGenerator.h"
 
 #pragma warning( disable : 4189 )
-
-// MenuSystem
-void MenuSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	MenuSystem* pMenuSystem = static_cast<MenuSystem*>(pObject);
-}
-
-void* MenuSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	MenuSystem* pMenuSystem = new MenuSystem;
-	int propertyIndex = 0;
-	MenuSystem::InitFromPropertiesSubset(pMenuSystem, properties, propertyIndex);
-	return pMenuSystem;
-}
 
 // TextRenderCharacterData
 void TextRenderCharacterData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
@@ -73,18 +61,22 @@ void* TextboxParams::InitFromProperties(const std::vector<EditorTypePropertyBase
 	return pTextboxParams;
 }
 
-// KeybindData
-void KeybindData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+// InputActionBase
+void InputActionBase::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
-	KeybindData* pKeybindData = static_cast<KeybindData*>(pObject);
+	InputActionBase* pInputActionBase = static_cast<InputActionBase*>(pObject);
+	pInputActionBase->baseKey = static_cast<EInputKey>(static_cast<EditorTypePropertyEnum*>(properties[propertyIndex++])->GetValue());
+	pInputActionBase->bCtrl = static_cast<EditorTypePropertyBool*>(properties[propertyIndex++])->GetValue();
+	pInputActionBase->bShift = static_cast<EditorTypePropertyBool*>(properties[propertyIndex++])->GetValue();
+	pInputActionBase->bAlt = static_cast<EditorTypePropertyBool*>(properties[propertyIndex++])->GetValue();
 }
 
-void* KeybindData::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+void* InputActionBase::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
 {
-	KeybindData* pKeybindData = new KeybindData;
+	InputActionBase* pInputActionBase = new InputActionBase;
 	int propertyIndex = 0;
-	KeybindData::InitFromPropertiesSubset(pKeybindData, properties, propertyIndex);
-	return pKeybindData;
+	InputActionBase::InitFromPropertiesSubset(pInputActionBase, properties, propertyIndex);
+	return pInputActionBase;
 }
 
 // HUDObjectSharedInitParams
@@ -169,6 +161,25 @@ void* WorldGenerator::InitFromProperties(const std::vector<EditorTypePropertyBas
 	return pWorldGenerator;
 }
 
+// MenuSystem
+void MenuSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MenuSystem* pMenuSystem = static_cast<MenuSystem*>(pObject);
+	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pMenuSystem), properties, propertyIndex);
+	pMenuSystem->pInputSystem = static_cast<InputSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuSystem->pMenuInputContext = static_cast<InputContext*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuSystem->pOpenMenuAction = static_cast<InputActionBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuSystem->pCloseMenuAction = static_cast<InputActionBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* MenuSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MenuSystem* pMenuSystem = new MenuSystem;
+	int propertyIndex = 0;
+	MenuSystem::InitFromPropertiesSubset(pMenuSystem, properties, propertyIndex);
+	return pMenuSystem;
+}
+
 // TextRenderSystem
 void TextRenderSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -192,11 +203,66 @@ void* TextRenderSystem::InitFromProperties(const std::vector<EditorTypePropertyB
 	return pTextRenderSystem;
 }
 
+// InputSystem
+void InputSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	InputSystem* pInputSystem = static_cast<InputSystem*>(pObject);
+	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pInputSystem), properties, propertyIndex);
+	pInputSystem->pDefaultInputContext = static_cast<InputContext*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* InputSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	InputSystem* pInputSystem = new InputSystem;
+	int propertyIndex = 0;
+	InputSystem::InitFromPropertiesSubset(pInputSystem, properties, propertyIndex);
+	return pInputSystem;
+}
+
+// InputContext
+void InputContext::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	InputContext* pInputContext = static_cast<InputContext*>(pObject);
+	pInputContext->priority = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pInputContext->pInputActions.push_back(static_cast<InputActionBase*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
+		}
+	}
+}
+
+void* InputContext::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	InputContext* pInputContext = new InputContext;
+	int propertyIndex = 0;
+	InputContext::InitFromPropertiesSubset(pInputContext, properties, propertyIndex);
+	return pInputContext;
+}
+
+// InputActionPress
+void InputActionPress::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	InputActionPress* pInputActionPress = static_cast<InputActionPress*>(pObject);
+	InputActionBase::InitFromPropertiesSubset(static_cast<InputActionBase*>(pInputActionPress), properties, propertyIndex);
+}
+
+void* InputActionPress::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	InputActionPress* pInputActionPress = new InputActionPress;
+	int propertyIndex = 0;
+	InputActionPress::InitFromPropertiesSubset(pInputActionPress, properties, propertyIndex);
+	return pInputActionPress;
+}
+
 // ImGuiEditor
 void ImGuiEditor::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
 	ImGuiEditor* pImGuiEditor = static_cast<ImGuiEditor*>(pObject);
 	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pImGuiEditor), properties, propertyIndex);
+	pImGuiEditor->pInputSystem = static_cast<InputSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pImGuiEditor->pEditorInputContext = static_cast<InputContext*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 }
 
 void* ImGuiEditor::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -314,16 +380,19 @@ namespace __Generated
 {
 	std::unordered_map<std::string, void* (*)(const std::vector<EditorTypePropertyBase*>&)> stringToCreateObjectFunction
 	{
-		{"MenuSystem", &MenuSystem::InitFromProperties},
 		{"TextRenderCharacterData", &TextRenderCharacterData::InitFromProperties},
 		{"TextboxParams", &TextboxParams::InitFromProperties},
-		{"KeybindData", &KeybindData::InitFromProperties},
+		{"InputActionBase", &InputActionBase::InitFromProperties},
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::InitFromProperties},
 		{"DirectoryData", &DirectoryData::InitFromProperties},
 		{"GameSystem", &GameSystem::InitFromProperties},
 		{"GameInstance", &GameInstance::InitFromProperties},
 		{"WorldGenerator", &WorldGenerator::InitFromProperties},
+		{"MenuSystem", &MenuSystem::InitFromProperties},
 		{"TextRenderSystem", &TextRenderSystem::InitFromProperties},
+		{"InputSystem", &InputSystem::InitFromProperties},
+		{"InputContext", &InputContext::InitFromProperties},
+		{"InputActionPress", &InputActionPress::InitFromProperties},
 		{"ImGuiEditor", &ImGuiEditor::InitFromProperties},
 		{"HUDAnchorPoint", &HUDAnchorPoint::InitFromProperties},
 		{"ECS", &ECS::InitFromProperties},

@@ -12,7 +12,7 @@ struct HUDObjectSharedInitParams;
 *
 * Base HUDobject. HUDObjects render HUD to the screen.
 */
-EDITORCLASS()
+EDITORCLASS(Abstract)
 class HUDObjectBase
 {
 	EDITORBODY()

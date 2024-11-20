@@ -6,6 +6,10 @@ class EditorTypeClass;
 class EditorTypeStruct;
 class EditorTypeEnum;
 
+/** Asset Manager
+ *
+ * This class is responsible for eveything assets: reading them in, instantiating objects from them, etc.
+ */
 class AssetManager
 {
 public:
@@ -34,6 +38,10 @@ public:
 	// Find the object with a given asset name. (i.e pass in "Health" and the object represented by Health.asset will be returned 
 	template<typename T>
 	T* FindObjectFromAsset(const std::string& name);
+
+	// Get editor name from object if possible, this is slow so just use it for debug.
+	// Right now this can only be done for singleton objects
+	std::string FindNameFromObject(void* pObject);
 	
 private:
 	

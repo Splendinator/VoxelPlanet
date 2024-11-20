@@ -209,7 +209,9 @@
     <ClCompile Include="HUDObjectHealth.cpp" />
     <ClCompile Include="ImGuiEditor.cpp" />
     <ClCompile Include="ImGuiEditorGlobals.cpp" />
-    <ClCompile Include="Input\KeybindData.cpp" />
+    <ClCompile Include="Input\InputAction.cpp" />
+    <ClCompile Include="Input\InputContext.cpp" />
+    <ClCompile Include="Input\InputSystem.cpp" />
     <ClCompile Include="JumpGame.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -475,8 +477,10 @@
     <ClInclude Include="ImGuiEditor.h" />
     <ClInclude Include="ImGuiEditorGlobals.h" />
     <ClInclude Include="ImGuiEditorMacros.h" />
+    <ClInclude Include="Input\InputAction.h" />
+    <ClInclude Include="Input\InputContext.h" />
     <ClInclude Include="Input\InputKey.h" />
-    <ClInclude Include="Input\KeybindData.h" />
+    <ClInclude Include="Input\InputSystem.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Renderer.h" />

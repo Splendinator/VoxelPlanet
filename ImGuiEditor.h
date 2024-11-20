@@ -4,12 +4,13 @@
 
 class EditorActionBase;
 class EditorWindowBase;
+class InputContext;
+class InputSystem;
 
 /** ImGuiEditor
 *
-* This class is used to edit the game in using ImGui. 
-*
-* It reads in all the code files in the project and parses them for classes, structs, enums, etc and lets you edit them.
+* This class is used to edit assets in-game in using ImGui.
+* The ImGui editor is editor exposed which is fucking stupid but it makes me happy.
 */
 EDITORCLASS()
 class ImGuiEditor : public GameSystem
@@ -35,6 +36,14 @@ public:
 	bool IsEditorShowing() const { return bEditorShowing; }
 
 private:
+
+	// Input system
+	EDITORPROPERTY()
+	InputSystem* pInputSystem = nullptr;
+
+	// Input context to push while editor is open
+	EDITORPROPERTY()
+	InputContext* pEditorInputContext = nullptr;
 	
 	// A list of windows currently showing.
 	std::vector<std::shared_ptr<EditorWindowBase>> shownWindows;

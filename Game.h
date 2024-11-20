@@ -9,9 +9,7 @@ namespace Game
 	void Tick(float deltaTime);
 	
 	bool CanClose();
-
-#ifdef DOMIMGUI
+	
 	AssetManager& GetAssetManager();
-#endif
 }
 

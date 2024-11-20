@@ -4,9 +4,9 @@
 // This is a 1-to-1 mapping of the enum in DomWindow.h but this one is editor exposed
 // #TODO: Should this have mouse keys on too?
 EDITORENUM()
-enum EInputKey
+enum class EInputKey
 {
-	UNBOUND = 0,
+	NONE = 0,
 	
 	BACKSPACE = 8,
 	TAB = 9,
@@ -14,7 +14,7 @@ enum EInputKey
 	
 	SHIFT = 16,
 	CTRL = 17,
-	RALT = 18,
+	ALT = 18, 
 	CAPS = 20,
 	ESC = 27,
 	SPACE = 32,

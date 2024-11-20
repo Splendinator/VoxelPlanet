@@ -64,7 +64,7 @@ EditorTypeBase* AssetManager::FindTemplateType(const std::string& typeName) cons
 		return pFoundType;
 	}
 	
-	DOMASSERT(false); // #TODO: Handle enums here too 
+	DOMASSERT(false) // #TODO: Handle enums here too if we ever want them
 	return nullptr;
 }
 
@@ -197,6 +197,19 @@ int AssetManager::GetEnumValueFromValueName(const std::string& enumName, const s
 EditorTypeEnum* AssetManager::FindEnumType(const std::string& enumName) const
 {
 	return static_cast<EditorTypeEnum*>(FindType(enumName, templateEnumTypes));
+}
+
+std::string AssetManager::FindNameFromObject(void* pObject)
+{
+	for (auto it : singletonMap)
+	{
+		if (it.second == pObject)
+		{
+			return it.first->GetName();
+		}
+	}
+	
+	return "";
 }
 
 void AssetManager::CreateTemplateTypes(const std::string& typesFile)

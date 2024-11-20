@@ -5,7 +5,6 @@
 #include "AssetManager/AssetManager.h"
 #include "Core/GameInstance.h"
 #include "DomWindow/DomWindow.h"
-#include "ImGuiEditor.h"
 #include <imgui.h>
 #include <time.h>
 
@@ -41,6 +40,10 @@ void GameplayTick(float deltaTime)
 	if (pGameInstance)
 	{
 		pGameInstance->TickGameSystems(deltaTime);
+
+#ifdef DOMIMGUI
+		pGameInstance->TickImGui(deltaTime);
+#endif
 	}
 }
 
@@ -84,6 +87,4 @@ bool Game::CanClose()
 	return dmwi::isHeld(dmwi::Button::SHIFT) && dmwi::isPressed(dmwi::Button::ESC);
 }
 
-#ifdef DOMIMGUI
 AssetManager& Game::GetAssetManager() { return assetManager; };
-#endif
