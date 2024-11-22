@@ -25,7 +25,6 @@ namespace PropertyFileUtils
 	{
 		file << "bool " << propertyName << " " << std::boolalpha << value << std::endl;
 	};
-
 	
 	inline void WriteClassToFile(std::ofstream& file, const std::string& propertyName, const std::string& className, const std::string& assetName = "")
 	{
@@ -35,5 +34,10 @@ namespace PropertyFileUtils
 	inline void WriteStructToFile(std::ofstream& file, const std::string& propertyName, const std::string& structName)
 	{
 		file << "struct " << structName << " " << propertyName << std::endl;
+	};
+
+	inline void WriteInstancedAssetPtrToFile(std::ofstream& file, const std::string& propertyName, const std::string& className, const std::string& assetName = "")
+	{
+		file << "instancedassetptr " << className << " " << propertyName << " " << (assetName == "" ? "nullptr" : assetName) << std::endl;
 	}; 
 }

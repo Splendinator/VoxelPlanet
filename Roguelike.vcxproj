@@ -153,6 +153,7 @@
     <ClCompile Include="ActionHandlerMove.cpp" />
     <ClCompile Include="ActionHandlerWait.cpp" />
     <ClCompile Include="AssetManager\AssetManager.cpp" />
+    <ClCompile Include="AssetManager\InstancedAssetPtr.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkGeneratorGrass.cpp" />
     <ClCompile Include="Core\GameInstance.cpp" />
@@ -183,11 +184,13 @@
     <ClCompile Include="EditorTypePropertyFactoryClass.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryEnum.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryFloat.cpp" />
+    <ClCompile Include="EditorTypePropertyFactoryInstancedAssetPtr.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryInt.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryString.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryStruct.cpp" />
     <ClCompile Include="EditorTypePropertyFactoryVector.cpp" />
     <ClCompile Include="EditorTypePropertyFloat.cpp" />
+    <ClCompile Include="EditorTypePropertyInstancedAssetPtr.cpp" />
     <ClCompile Include="EditorTypePropertyInt.cpp" />
     <ClCompile Include="EditorTypePropertyString.cpp" />
     <ClCompile Include="EditorTypePropertyStruct.cpp" />
@@ -316,6 +319,7 @@
     <ClCompile Include="UIObjectContainer.cpp" />
     <ClCompile Include="UIObjectProgressBar.cpp" />
     <ClCompile Include="UIUtils.cpp" />
+    <ClCompile Include="UI\Menu\MenuScreenBase.cpp" />
     <ClCompile Include="UI\Menu\MenuSystem.cpp" />
     <ClCompile Include="VectorPrimitiveBase.cpp" />
     <ClCompile Include="VectorPrimitiveCircle.cpp" />
@@ -415,6 +419,7 @@
     <ClInclude Include="ActionHandlerMove.h" />
     <ClInclude Include="ActionHandlerWait.h" />
     <ClInclude Include="AssetManager\AssetManager.h" />
+    <ClInclude Include="AssetManager\InstancedAssetPtr.h" />
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="ChunkGeneratorBase.h" />
     <ClInclude Include="ChunkGeneratorGrass.h" />
@@ -448,11 +453,13 @@
     <ClInclude Include="EditorTypePropertyFactoryClass.h" />
     <ClInclude Include="EditorTypePropertyFactoryEnum.h" />
     <ClInclude Include="EditorTypePropertyFactoryFloat.h" />
+    <ClInclude Include="EditorTypePropertyFactoryInstancedAssetPtr.h" />
     <ClInclude Include="EditorTypePropertyFactoryInt.h" />
     <ClInclude Include="EditorTypePropertyFactoryString.h" />
     <ClInclude Include="EditorTypePropertyFactoryStruct.h" />
     <ClInclude Include="EditorTypePropertyFactoryVector.h" />
     <ClInclude Include="EditorTypePropertyFloat.h" />
+    <ClInclude Include="EditorTypePropertyInstancedAssetPtr.h" />
     <ClInclude Include="EditorTypePropertyInt.h" />
     <ClInclude Include="EditorTypePropertyString.h" />
     <ClInclude Include="EditorTypePropertyStruct.h" />
@@ -507,6 +514,7 @@
     <ClInclude Include="UIObjectContainer.h" />
     <ClInclude Include="UIObjectProgressBar.h" />
     <ClInclude Include="UIUtils.h" />
+    <ClInclude Include="UI\Menu\MenuScreenBase.h" />
     <ClInclude Include="UI\Menu\MenuSystem.h" />
     <ClInclude Include="VectorPrimitiveBase.h" />
     <ClInclude Include="VectorPrimitiveCircle.h" />

@@ -1,9 +1,12 @@
 ﻿#pragma once
 
+#include "AssetManager/InstancedAssetPtr.h"
+
 #include "Core/GameSystem.h"
 
 #include "Input/InputAction.h"
 
+class MenuScreenBase;
 class InputContext;
 class InputSystem;
 
@@ -36,13 +39,13 @@ private:
 	EDITORPROPERTY()
 	InputActionBase* pCloseMenuAction = nullptr;
 
+	// Base menu screen to open
+	EDITORPROPERTY()
+	TInstancedAssetPtr<MenuScreenBase> pBaseMenuScreen;
+	
 	void OpenMenu(OnInputActionDelegateParams Params);
 	void CloseMenu(OnInputActionDelegateParams Params);
 	
-	// #TODO: Needs a editor exposed TAssetPtr<UMenuScreenBase> that allows for dynamic spawning of a *NON SINGLETON* class.
-	// #TODO: It will also handle deleting in the destructor so no need for garbage collection system.
-	// #TODO: If we want to in the future we can make it a smart pointer with reference count.
-
 	DelegateClass<MenuSystem, OnInputActionDelegateParams> OpenMenuDelegate;
 	DelegateClass<MenuSystem, OnInputActionDelegateParams> CloseMenuDelegate;
 };

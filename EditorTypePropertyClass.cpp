@@ -83,7 +83,7 @@ void* EditorTypePropertyClass::GetValue() const
 {
 	if (assetName != "nullptr" && assetName != "")
 	{
-		return Game::GetAssetManager().FindObjectFromAsset<void>(assetName);
+		return Game::GetAssetManager().LoadObjectFromAssetName<void>(assetName);
 	}
 	return nullptr;
 }

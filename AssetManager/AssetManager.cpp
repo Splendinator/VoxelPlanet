@@ -36,15 +36,11 @@ void AssetManager::UnInit()
 
 void AssetManager::AddAsset(std::shared_ptr<EditorAssetBase> pAsset)
 {
-	//DOMLOG_ERROR_IF(!bEditorShowing, "Shouldn't do anything when ditor isn't showing");
-
 	assets.insert({ pAsset->GetName(), pAsset });
 }
 
 void AssetManager::RemoveAsset(std::shared_ptr<EditorAssetBase> pAsset)
 {
-	//DOMLOG_ERROR_IF(!bEditorShowing, "Shouldn't do anything when editor isn't showing");
-
 	assets.erase(pAsset->GetName());
 }
 
@@ -88,20 +84,20 @@ std::vector<std::string> AssetManager::GetAllStructTemplateNames(bool bIgnoreAbs
 	return GetAllTypes(templateStructTypes, bIgnoreAbstract);
 }
 
-std::weak_ptr<EditorAssetBase> AssetManager::FindAsset(const std::string& typeName) const
+std::weak_ptr<EditorAssetBase> AssetManager::FindAsset(const std::string& assetName) const
 {
-	auto it = assets.find(typeName);
+	auto it = assets.find(assetName);
 	if (it != assets.end())
 	{
 		return it->second;
 	}
 
-	DOMLOG_ERROR("Asset", typeName, "not found")
+	DOMLOG_ERROR("Asset", assetName, "not found")
 	
 	return {};
 }
 
-std::vector<std::weak_ptr<EditorAssetBase>> AssetManager::GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses) const
+std::vector<std::weak_ptr<EditorAssetBase>> AssetManager::GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses, bool bOnlyGatherInstanced) const
 {
 	std::vector<std::weak_ptr<EditorAssetBase>> gatheredAssets;
 
@@ -146,7 +142,10 @@ std::vector<std::weak_ptr<EditorAssetBase>> AssetManager::GatherAssetsOfClass(co
 		{
 			if (std::find(classNamesToGather.begin(), classNamesToGather.end(), pEditorClass->name) != classNamesToGather.end())
 			{
-				gatheredAssets.push_back(asset.second);
+				if (!bOnlyGatherInstanced || pEditorClass->HasMetadataFlag(EClassMetadataFlags::Instanced))
+				{
+					gatheredAssets.push_back(asset.second);
+				}
 			}
 		}
 	}
@@ -312,13 +311,11 @@ void AssetManager::ImportAssets(const std::string& assetsDirectory)
 	}
 }
 
-void* AssetManager::FindObjectFromAssetInternal(const std::string& name)
+void* AssetManager::LoadObjectFromAssetInternal(EditorAssetBase* pAsset)
 {
-	std::weak_ptr<EditorAssetBase> pAsset = FindAsset(name);
-	
-	if (!pAsset.expired())
+	if (pAsset)
 	{
-		EditorAssetClass* pClassAsset = dynamic_cast<EditorAssetClass*>(pAsset.lock().get());
+		EditorAssetClass* pClassAsset = dynamic_cast<EditorAssetClass*>(pAsset);
 		DOMLOG_ERROR_IF(pClassAsset == nullptr, "Right now we only support class assets");		
 
 		if (pClassAsset->GetEditorType()->HasMetadataFlag(EClassMetadataFlags::Instanced))
@@ -351,7 +348,7 @@ void* AssetManager::FindObjectFromAssetInternal(const std::string& name)
 		}
 	}
 
-	DOMLOG_ERROR("Object", name, "not found");
+	DOMLOG_ERROR("Object", pAsset ? pAsset->GetName() : "<none>", "not found");
 	return nullptr;
 }
 

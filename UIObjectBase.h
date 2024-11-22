@@ -6,7 +6,7 @@ class VectorPrimitiveBase;
 
 // Base UIObject class
 // UI Objects wrap around a subset of a UICanvas and provide easy usage
-// For example UIObjectProgressBar will wrap around	a single VectorPrimitiveRectangle and provide a simple interface to set the progress
+// For example UIObjectProgressBar will wrap around	a single VectorPrimitiveRectangle and provide a simple interface to set the progress (width)
 class UIObjectBase : public UIObjectContainer
 {
 public:

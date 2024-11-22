@@ -8,6 +8,7 @@
 #include "EditorTypePropertyStruct.h"
 #include "EditorTypePropertyVector.h"
 #include "EditorTypePropertyEnum.h"
+#include "EditorTypePropertyInstancedAssetPtr.h"
 #include "..\Roguelike\Core\GameInstance.h"
 #include "..\Roguelike\Core\GameSystem.h"
 #include "..\Roguelike\DirectoryData.h"
@@ -22,10 +23,27 @@
 #include "..\Roguelike\Input\InputKey.h"
 #include "..\Roguelike\Input\InputSystem.h"
 #include "..\Roguelike\TextRenderSystem\TextRenderSystem.h"
+#include "..\Roguelike\UI\Menu\MenuScreenBase.h"
 #include "..\Roguelike\UI\Menu\MenuSystem.h"
 #include "..\Roguelike\WorldGenerator.h"
 
 #pragma warning( disable : 4189 )
+
+// MenuScreenBase
+void MenuScreenBase::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MenuScreenBase* pMenuScreenBase = static_cast<MenuScreenBase*>(pObject);
+	pMenuScreenBase->x = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pMenuScreenBase->y = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+}
+
+void* MenuScreenBase::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MenuScreenBase* pMenuScreenBase = new MenuScreenBase;
+	int propertyIndex = 0;
+	MenuScreenBase::InitFromPropertiesSubset(pMenuScreenBase, properties, propertyIndex);
+	return pMenuScreenBase;
+}
 
 // TextRenderCharacterData
 void TextRenderCharacterData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
@@ -170,6 +188,7 @@ void MenuSystem::InitFromPropertiesSubset(void* pObject, const std::vector<Edito
 	pMenuSystem->pMenuInputContext = static_cast<InputContext*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pMenuSystem->pOpenMenuAction = static_cast<InputActionBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pMenuSystem->pCloseMenuAction = static_cast<InputActionBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuSystem->pBaseMenuScreen.SetAsset(static_cast<EditorTypePropertyInstancedAssetPtr*>(properties[propertyIndex++])->GetValue());
 }
 
 void* MenuSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -380,6 +399,7 @@ namespace __Generated
 {
 	std::unordered_map<std::string, void* (*)(const std::vector<EditorTypePropertyBase*>&)> stringToCreateObjectFunction
 	{
+		{"MenuScreenBase", &MenuScreenBase::InitFromProperties},
 		{"TextRenderCharacterData", &TextRenderCharacterData::InitFromProperties},
 		{"TextboxParams", &TextboxParams::InitFromProperties},
 		{"InputActionBase", &InputActionBase::InitFromProperties},

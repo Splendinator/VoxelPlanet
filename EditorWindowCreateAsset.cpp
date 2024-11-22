@@ -8,6 +8,8 @@
 #include "ImGuiEditor.h"
 #include "ImGuiEditorGlobals.h"
 
+#include "DomUtils/DomUtils.h"
+
 namespace fs = std::filesystem;
 
 void EditorWindowCreateAsset::Draw()
@@ -27,10 +29,15 @@ void EditorWindowCreateAsset::CreateNewAssetWindow()
 		ImGui::InputTextWithHint("Search", "Search Classes", searchBuffer, sizeof(searchBuffer));
 		ImGui::PopItemWidth();
 
+		// #NOTE: We probably want this to be ImGuiSearchBar class and reuse
+		char lowerCaseSearchBuffer[128] = {};
+		memcpy(lowerCaseSearchBuffer, searchBuffer, sizeof(searchBuffer));
+		dmut::ToLowerInline(&lowerCaseSearchBuffer[0]);
+		
 		ImGui::BeginChild("Classes", ImVec2(0, 200), true);
 		for (const std::string& type : allTypes)
 		{
-			if (searchBuffer[0] == '\0' || std::strstr(type.c_str(), searchBuffer) != nullptr)
+			if (searchBuffer[0] == '\0' || std::strstr(dmut::ToLower(type).c_str(), lowerCaseSearchBuffer) != nullptr)
 			{
 				bool bSelected = selectedClass == type;
 				if (ImGui::Selectable(type.c_str(), bSelected))

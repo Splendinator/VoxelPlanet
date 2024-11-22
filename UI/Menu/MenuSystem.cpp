@@ -4,6 +4,7 @@
 
 #include "Input/InputAction.h"
 #include "Input/InputSystem.h"
+#include "MenuScreenBase.h"
 
 void MenuSystem::Init()
 {
@@ -12,7 +13,6 @@ void MenuSystem::Init()
 		OpenMenuDelegate.Bind(this, &MenuSystem::OpenMenu);
 		pOpenMenuAction->OnActionActivated.Add(OpenMenuDelegate);
 	}
-	
 	if (pCloseMenuAction)
 	{
 		CloseMenuDelegate.Bind(this, &MenuSystem::CloseMenu);
@@ -31,7 +31,6 @@ void MenuSystem::UnInit()
 	{
 		pOpenMenuAction->OnActionActivated.Remove(OpenMenuDelegate);
 	}
-	
 	if (pCloseMenuAction)
 	{
 		pCloseMenuAction->OnActionActivated.Remove(CloseMenuDelegate);
@@ -53,5 +52,3 @@ void MenuSystem::CloseMenu(OnInputActionDelegateParams Params)
 		pInputSystem->PopInputContext(pMenuInputContext);
 	}
 }
-
-

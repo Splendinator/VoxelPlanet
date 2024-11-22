@@ -27,21 +27,27 @@ public:
 	EditorTypeStruct* FindStructTemplateType(const std::string& typeName) const;
 	std::vector<std::string> GetAllStructTemplateNames(bool bIgnoreAbstract) const;
 
-	std::weak_ptr<EditorAssetBase> FindAsset(const std::string& typeName) const;
-	std::vector<std::weak_ptr<EditorAssetBase>> GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses) const;
+	std::weak_ptr<EditorAssetBase> FindAsset(const std::string& assetName) const;
+
+	// Gather all assets of a given class
+	// bGatherChildClasses - whether to also gather classes that are children of className
+	// bOnlyGatherInstanced - whether to only gather assets with EClassMetadataFlags::Instanced
+	std::vector<std::weak_ptr<EditorAssetBase>> GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses, bool bOnlyGatherInstanced = false) const;
 
 	// Enum utils
 	std::string GetEnumValueNameFromValue(const std::string& enumName, int value) const;
 	int GetEnumValueFromValueName(const std::string& enumName, const std::string& valueName) const;
 	EditorTypeEnum* FindEnumType(const std::string& enumName) const;
 	
-	// Find the object with a given asset name. (i.e pass in "Health" and the object represented by Health.asset will be returned 
-	template<typename T>
-	T* FindObjectFromAsset(const std::string& name);
-
 	// Get editor name from object if possible, this is slow so just use it for debug.
 	// Right now this can only be done for singleton objects
 	std::string FindNameFromObject(void* pObject);
+
+	// Find the object with a given asset name. (i.e pass in "Health" and the object represented by Health.asset will be returned 
+	template<typename T>
+	T* LoadObjectFromAssetName(const std::string& name);
+	template<typename T>
+	T* LoadObjectFromAsset(EditorAssetBase* pAsset);
 	
 private:
 	
@@ -51,7 +57,7 @@ private:
 	// Import assets from their files. see the assets map
 	void ImportAssets(const std::string& assetsDirectory);
 
-	void* FindObjectFromAssetInternal(const std::string& name);
+	void* LoadObjectFromAssetInternal(EditorAssetBase* pAsset);
 
 	// Find template types from a given type map (struct, class, enum)
 	EditorTypeBase* FindType(const std::string& typeName, const std::unordered_map<std::string, EditorTypeBase*>& templateTypes) const;
@@ -73,7 +79,20 @@ private:
 };
 
 template <typename T>
-T* AssetManager::FindObjectFromAsset(const std::string& name)
+T* AssetManager::LoadObjectFromAssetName(const std::string& name)
 {
-	return static_cast<T*>(FindObjectFromAssetInternal(name));
+	auto it = assets.find(name);
+	if (it != assets.end())
+	{
+		return static_cast<T*>(LoadObjectFromAssetInternal(it->second.get()));
+	}
+	
+	DOMLOG_WARN("No asset with name", name)
+	return nullptr;
+}
+
+template <typename T>
+T* AssetManager::LoadObjectFromAsset(EditorAssetBase* pAsset)
+{
+	return static_cast<T*>(LoadObjectFromAssetInternal(pAsset));
 }

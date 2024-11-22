@@ -18,7 +18,7 @@ void Game::Init()
 	// Set random seed based off time
 	srand((unsigned int)time(NULL));
 	
-	pGameInstance = assetManager.FindObjectFromAsset<GameInstance>("GameInstance");
+	pGameInstance = assetManager.LoadObjectFromAssetName<GameInstance>("GameInstance");
 	if (pGameInstance)
 	{
 		pGameInstance->InitGameSystems();

@@ -34,7 +34,7 @@ void EditorWindowCreateNewFolder::CreateNewFolderWindow()
 	else if (ImGui::Button("Create New Folder"))
 	{
 		pEditor->DoAction(std::make_unique<EditorActionCreateNewFolder>(targetFilePath, newFolderName));
-		Close();
+		RequestClose();
 	}
 }
 

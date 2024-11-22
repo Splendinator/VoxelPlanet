@@ -3,8 +3,7 @@
 #include "HUD.h"
 
 #include "ECS.h"
-#include "FilePaths.h"
-#include "HUDObjectHealth.h"
+#include "HUDObjectBase.h"
 
 void HUD::Init()
 {
