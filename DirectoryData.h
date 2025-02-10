@@ -17,4 +17,8 @@ class DirectoryData
 	// path to the hudObject files
 	EDITORPROPERTY()
 	std::string hudObjects;
+
+	// path to the menu .svg's 
+	EDITORPROPERTY()
+	std::string menus;
 };

@@ -37,6 +37,9 @@ public:
 
 private:
 
+	void OnShowEditor();
+	void OnHideEditor();
+	
 	// Input system
 	EDITORPROPERTY()
 	InputSystem* pInputSystem = nullptr;

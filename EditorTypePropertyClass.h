@@ -5,8 +5,9 @@
 /** EditorTypePropertyClass
 *
 * This class is used to represent a class property (MyClass* pMyClass = nullptr)
-* Classes are either instanced, meaning two pointers to the same data asset will result in two *copies* of the same class, not two pointers to same class.
-* or they can be singletons 
+* Classes are either instanced, meaning two pointers to the same data asset will result in two *copies* of the same class, or singletons which mean 2 pointers point to the same 1 object.
+*
+* IMPORTANT: Any system using raw pointer property will be in charge of deleting afterwards 
 */
 class EditorTypePropertyClass : public EditorTypePropertyBase
 {

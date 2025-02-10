@@ -1,14 +1,12 @@
 ﻿#include "pch.h"
 
-#include "ImGuiColours.h"
-#include "InputContext.h"
 #include "InputSystem.h"
 
-#include "Game.h"
-#include "imgui_internal.h"
-#include "InputAction.h"
-
 #include "AssetManager/AssetManager.h"
+#include "Game.h"
+#include "ImGuiColours.h"
+#include "InputAction.h"
+#include "InputContext.h"
 
 void InputSystem::Init()
 {
@@ -25,7 +23,7 @@ void InputSystem::Tick(float deltaTime)
 
 void InputSystem::UnInit()
 {
-	
+	delete pDefaultInputContext;
 }
 
 #ifdef DOMIMGUI

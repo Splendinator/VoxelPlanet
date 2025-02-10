@@ -33,3 +33,12 @@ std::istream& VectorPrimitiveRectangle::PopulateFromFile(std::istream& stream)
 
 	return stream;
 }
+
+const VectorPrimitiveBase* VectorPrimitiveRectangle::FindPrimitiveUnderCursor(Vec2i cursorPos) const
+{
+	if (cursorPos.x >= (int)x && cursorPos.x < (int)(x + width) && cursorPos.y >= (int)y && cursorPos.y < (int)(y + height))
+	{
+		return this;
+	}
+	return nullptr;
+}

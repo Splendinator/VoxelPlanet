@@ -41,6 +41,15 @@ void GameInstance::UnInitGameSystems()
 			pGameSystems[i]->UnInit();
 		}
 	}
+
+	for (GameSystem* pGameSystem : pGameSystems)
+	{
+		if (pGameSystem)
+		{
+			delete pGameSystem;
+		}
+	}
+	pGameSystems.clear();
 }
 
 #ifdef DOMIMGUI

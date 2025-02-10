@@ -13,17 +13,18 @@
 #include "..\Roguelike\Core\GameSystem.h"
 #include "..\Roguelike\DirectoryData.h"
 #include "..\Roguelike\ECS.h"
-#include "..\Roguelike\HUD.h"
-#include "..\Roguelike\HUDAnchorPoint.h"
-#include "..\Roguelike\HUDObjectBase.h"
-#include "..\Roguelike\HUDObjectHealth.h"
 #include "..\Roguelike\ImGuiEditor.h"
 #include "..\Roguelike\Input\InputAction.h"
 #include "..\Roguelike\Input\InputContext.h"
 #include "..\Roguelike\Input\InputKey.h"
 #include "..\Roguelike\Input\InputSystem.h"
 #include "..\Roguelike\TextRenderSystem\TextRenderSystem.h"
+#include "..\Roguelike\UI\HUD\HUD.h"
+#include "..\Roguelike\UI\HUD\HUDAnchorPoint.h"
+#include "..\Roguelike\UI\HUD\HUDObjectBase.h"
+#include "..\Roguelike\UI\HUD\HUDObjectHealth.h"
 #include "..\Roguelike\UI\Menu\MenuScreenBase.h"
+#include "..\Roguelike\UI\Menu\MenuScreenMain.h"
 #include "..\Roguelike\UI\Menu\MenuSystem.h"
 #include "..\Roguelike\WorldGenerator.h"
 
@@ -33,8 +34,8 @@
 void MenuScreenBase::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
 	MenuScreenBase* pMenuScreenBase = static_cast<MenuScreenBase*>(pObject);
-	pMenuScreenBase->x = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
-	pMenuScreenBase->y = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pMenuScreenBase->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuScreenBase->fileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 }
 
 void* MenuScreenBase::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -43,6 +44,21 @@ void* MenuScreenBase::InitFromProperties(const std::vector<EditorTypePropertyBas
 	int propertyIndex = 0;
 	MenuScreenBase::InitFromPropertiesSubset(pMenuScreenBase, properties, propertyIndex);
 	return pMenuScreenBase;
+}
+
+// HUDObjectSharedInitParams
+void HUDObjectSharedInitParams::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	HUDObjectSharedInitParams* pHUDObjectSharedInitParams = static_cast<HUDObjectSharedInitParams*>(pObject);
+	pHUDObjectSharedInitParams->screenEdgePadding = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+}
+
+void* HUDObjectSharedInitParams::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	HUDObjectSharedInitParams* pHUDObjectSharedInitParams = new HUDObjectSharedInitParams;
+	int propertyIndex = 0;
+	HUDObjectSharedInitParams::InitFromPropertiesSubset(pHUDObjectSharedInitParams, properties, propertyIndex);
+	return pHUDObjectSharedInitParams;
 }
 
 // TextRenderCharacterData
@@ -97,27 +113,13 @@ void* InputActionBase::InitFromProperties(const std::vector<EditorTypePropertyBa
 	return pInputActionBase;
 }
 
-// HUDObjectSharedInitParams
-void HUDObjectSharedInitParams::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	HUDObjectSharedInitParams* pHUDObjectSharedInitParams = static_cast<HUDObjectSharedInitParams*>(pObject);
-	pHUDObjectSharedInitParams->screenEdgePadding = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
-}
-
-void* HUDObjectSharedInitParams::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	HUDObjectSharedInitParams* pHUDObjectSharedInitParams = new HUDObjectSharedInitParams;
-	int propertyIndex = 0;
-	HUDObjectSharedInitParams::InitFromPropertiesSubset(pHUDObjectSharedInitParams, properties, propertyIndex);
-	return pHUDObjectSharedInitParams;
-}
-
 // DirectoryData
 void DirectoryData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
 	DirectoryData* pDirectoryData = static_cast<DirectoryData*>(pObject);
 	pDirectoryData->fonts = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 	pDirectoryData->hudObjects = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDirectoryData->menus = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 }
 
 void* DirectoryData::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -197,6 +199,38 @@ void* MenuSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>&
 	int propertyIndex = 0;
 	MenuSystem::InitFromPropertiesSubset(pMenuSystem, properties, propertyIndex);
 	return pMenuSystem;
+}
+
+// MenuScreenMain
+void MenuScreenMain::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MenuScreenMain* pMenuScreenMain = static_cast<MenuScreenMain*>(pObject);
+	MenuScreenBase::InitFromPropertiesSubset(static_cast<MenuScreenBase*>(pMenuScreenMain), properties, propertyIndex);
+}
+
+void* MenuScreenMain::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MenuScreenMain* pMenuScreenMain = new MenuScreenMain;
+	int propertyIndex = 0;
+	MenuScreenMain::InitFromPropertiesSubset(pMenuScreenMain, properties, propertyIndex);
+	return pMenuScreenMain;
+}
+
+// HUDAnchorPoint
+void HUDAnchorPoint::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	HUDAnchorPoint* pHUDAnchorPoint = static_cast<HUDAnchorPoint*>(pObject);
+	pHUDAnchorPoint->anchorPoint = static_cast<EHUDAnchorPoint>(static_cast<EditorTypePropertyEnum*>(properties[propertyIndex++])->GetValue());
+	pHUDAnchorPoint->anchorX = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pHUDAnchorPoint->anchorY = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+}
+
+void* HUDAnchorPoint::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	HUDAnchorPoint* pHUDAnchorPoint = new HUDAnchorPoint;
+	int propertyIndex = 0;
+	HUDAnchorPoint::InitFromPropertiesSubset(pHUDAnchorPoint, properties, propertyIndex);
+	return pHUDAnchorPoint;
 }
 
 // TextRenderSystem
@@ -292,23 +326,6 @@ void* ImGuiEditor::InitFromProperties(const std::vector<EditorTypePropertyBase*>
 	return pImGuiEditor;
 }
 
-// HUDAnchorPoint
-void HUDAnchorPoint::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	HUDAnchorPoint* pHUDAnchorPoint = static_cast<HUDAnchorPoint*>(pObject);
-	pHUDAnchorPoint->anchorPoint = static_cast<EHUDAnchorPoint>(static_cast<EditorTypePropertyEnum*>(properties[propertyIndex++])->GetValue());
-	pHUDAnchorPoint->anchorX = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
-	pHUDAnchorPoint->anchorY = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
-}
-
-void* HUDAnchorPoint::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	HUDAnchorPoint* pHUDAnchorPoint = new HUDAnchorPoint;
-	int propertyIndex = 0;
-	HUDAnchorPoint::InitFromPropertiesSubset(pHUDAnchorPoint, properties, propertyIndex);
-	return pHUDAnchorPoint;
-}
-
 // ECS
 void ECS::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -400,21 +417,22 @@ namespace __Generated
 	std::unordered_map<std::string, void* (*)(const std::vector<EditorTypePropertyBase*>&)> stringToCreateObjectFunction
 	{
 		{"MenuScreenBase", &MenuScreenBase::InitFromProperties},
+		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::InitFromProperties},
 		{"TextRenderCharacterData", &TextRenderCharacterData::InitFromProperties},
 		{"TextboxParams", &TextboxParams::InitFromProperties},
 		{"InputActionBase", &InputActionBase::InitFromProperties},
-		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::InitFromProperties},
 		{"DirectoryData", &DirectoryData::InitFromProperties},
 		{"GameSystem", &GameSystem::InitFromProperties},
 		{"GameInstance", &GameInstance::InitFromProperties},
 		{"WorldGenerator", &WorldGenerator::InitFromProperties},
 		{"MenuSystem", &MenuSystem::InitFromProperties},
+		{"MenuScreenMain", &MenuScreenMain::InitFromProperties},
+		{"HUDAnchorPoint", &HUDAnchorPoint::InitFromProperties},
 		{"TextRenderSystem", &TextRenderSystem::InitFromProperties},
 		{"InputSystem", &InputSystem::InitFromProperties},
 		{"InputContext", &InputContext::InitFromProperties},
 		{"InputActionPress", &InputActionPress::InitFromProperties},
 		{"ImGuiEditor", &ImGuiEditor::InitFromProperties},
-		{"HUDAnchorPoint", &HUDAnchorPoint::InitFromProperties},
 		{"ECS", &ECS::InitFromProperties},
 		{"HUDObjectBase", &HUDObjectBase::InitFromProperties},
 		{"HUD", &HUD::InitFromProperties},

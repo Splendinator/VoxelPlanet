@@ -13,7 +13,7 @@ class ActionDeciderBase
 {
 public:
 
-	virtual ~ActionDeciderBase() = default; // Deleted by SystemAction
+	virtual ~ActionDeciderBase() = default; // Deleted by ECSSystemAction
 
 	// This should be overridden to return an action handler. 
 	// This can return nullptr if no action is to be taken this frame and the action system will ask again next frame. (i.e waiting for player input)

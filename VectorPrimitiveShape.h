@@ -1,4 +1,6 @@
 #pragma once
+#include <DomMath/Vec3.h>
+
 #include "VectorPrimitiveBase.h"
 class VectorPrimitiveShape : public VectorPrimitiveBase
 {
@@ -8,9 +10,12 @@ public:
 	std::istream& PopulateFromFile(std::istream& stream) override;
 	//~ End VectorPrimitiveBase Interface
 
+	void SetColour(u8 R, u8 G, u8 B) { red = R; green = G; blue = B; }
+	Vec3<u8> GetColour() const { return Vec3<u8>((u8)red, (u8)green, (u8)blue); }
+	
 	// #TODO: Do we need something here to get width and height and X and Y? If so all shapes need to return the top left X and Y and width and height
 	// This could make it awkward for circles as they deal with center and radius?
-
+	
 private: 
 	// Colour
 	u32 red = 0;

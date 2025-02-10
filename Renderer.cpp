@@ -80,8 +80,8 @@ namespace
 	void UpdateVectorBuffer(RenderedObjectEntry& entry); // Update the buffer with the vector art data
 	void UpdateViewBuffer(float deltaTime); // Update the view buffer with the view matrix 
 	void UpdateProjectionBuffer(); // Update the projection buffer with the projection matrix
-	void UpdateViewBufferHUD(); // Update the HUD view buffer with the view matrix for HUD objects
-	void UpdateProjectionBufferHUD(); // Update the HUD projection buffer with the projection matrix for HUD objects
+	void UpdateViewBufferHUD(); // Update the UI view buffer with the view matrix for UI objects
+	void UpdateProjectionBufferHUD(); // Update the UI projection buffer with the projection matrix for UI objects
 
 	VkPipelineLayout CreatePipelineLayout();
 
@@ -130,11 +130,11 @@ namespace
 	VkDeviceMemory handleDeviceMemoryViewBuffer = VK_NULL_HANDLE;
 	VkBuffer handleBufferView = VK_NULL_HANDLE;
 	
-	VkDescriptorSet handleDescriptorSetProjectionHUD = VK_NULL_HANDLE; // Projection used for HUD objects
+	VkDescriptorSet handleDescriptorSetProjectionHUD = VK_NULL_HANDLE; // Projection used for UI objects
 	VkDeviceMemory handleDeviceMemoryProjectionBufferHUD = VK_NULL_HANDLE;
 	VkBuffer handleBufferProjectionHUD = VK_NULL_HANDLE;
 
-	VkDescriptorSet handleDescriptorSetViewHUD = VK_NULL_HANDLE; // View used for HUD objects
+	VkDescriptorSet handleDescriptorSetViewHUD = VK_NULL_HANDLE; // View used for UI objects
 	VkDeviceMemory handleDeviceMemoryViewBufferHUD = VK_NULL_HANDLE;
 	VkBuffer handleBufferViewHUD = VK_NULL_HANDLE;
 	
@@ -163,7 +163,7 @@ namespace
 
 	// List of all rendered objects in the game, one per ERenderObjectType
 	std::vector<RenderedObjectEntry> renderedObjectsInGame;	// In game objects
-	std::vector<RenderedObjectEntry> renderedObjectsHUD;	// HUD Objects
+	std::vector<RenderedObjectEntry> renderedObjectsHUD;	// UI Objects
 
 	Mat4f viewMatrix = Mat4f::Identity();
 }
@@ -183,7 +183,7 @@ namespace dmgf
 		{
 		case ERenderObjectType::InGame:
 			return renderedObjectsInGame;
-		case ERenderObjectType::HUD:
+		case ERenderObjectType::UI:
 			return renderedObjectsHUD;
 		default:
 			DOMLOG_ERROR("You fucked it, add a new vector");
@@ -261,14 +261,14 @@ namespace dmgf
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferProjection, handleDeviceMemoryProjectionBuffer, 0), "BindUniformBuffer");
 		UpdateProjectionBuffer();
 
-		// View matrix buffer (HUD)
+		// View matrix buffer (UI)
 		const size_t viewBufferSizeHUD = sizeof(Mat4f);
 		handleDeviceMemoryViewBufferHUD = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		handleBufferViewHUD = CreateUniformBuffer(viewBufferSizeHUD);
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferViewHUD, handleDeviceMemoryViewBufferHUD, 0), "BindUniformBuffer");
 		UpdateViewBufferHUD();
 		
-		// Projection matrix buffer (HUD)
+		// Projection matrix buffer (UI)
 		const size_t projectionBufferSizeHUD = sizeof(Mat4f);
 		handleDeviceMemoryProjectionBufferHUD = CreateDeviceMemory(0x100, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		handleBufferProjectionHUD = CreateUniformBuffer(projectionBufferSizeHUD);
@@ -1002,7 +1002,9 @@ namespace
 	void UpdateVectorBuffer(RenderedObjectEntry& entry)
 	{
 		u32 data[4096] = {};
-
+		
+		// #OPTIMISE: This is recursively calling virtual Serialize functions to do this even though 99% of vector art will be static, though to be fair it's only being called once per art (i.e if there's 200 grass on screen it still only calls it once)
+		// #OPTIMISE: Maybe UI or animated fireballs need to resize primitives but the background tiles don't so they can probably just serialize once when added for the first time.
 		entry.pVectorArt->Serialize(data);
 
 		void* pDeviceData = nullptr;
@@ -1093,7 +1095,7 @@ namespace
 
 	void UpdateViewBufferHUD()
 	{
-		Mat4f viewMatrixHUD = Mat4f::Identity(); // Identity view matrix because the HUD shouldn't ever move
+		Mat4f viewMatrixHUD = Mat4f::Identity(); // Identity view matrix because the UI shouldn't ever move
 
 		void* pDeviceData = nullptr;
 		vkMapMemory(handleDevice, handleDeviceMemoryViewBufferHUD, 0, sizeof(Mat4f), 0, &pDeviceData);
@@ -1518,7 +1520,7 @@ namespace
 			RenderObjects(renderedObjectsInGame);
 		}
 
-		// Render all HUD objects
+		// Render all UI objects
 		{
 			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 0, 1, &handleDescriptorSetProjectionHUD, 0, nullptr);
 			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 1, 1, &handleDescriptorSetViewHUD, 0, nullptr);

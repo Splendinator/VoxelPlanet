@@ -5,23 +5,23 @@
 #include "ActionDeciderPlayer.h"
 #include "FilePaths.h"
 #include "RendererObject.h"
-#include "SystemAction.h"
-#include "SystemCleanUp.h"
-#include "SystemDamage.h"
-#include "SystemEntityMap.h"
-#include "SystemNameslate.h"
-#include "SystemPhysics.h"
-#include "SystemRender.h"
+#include "ECSSystemAction.h"
+#include "ECSSystemCleanUp.h"
+#include "ECSSystemDamage.h"
+#include "ECSSystemEntityMap.h"
+#include "ECSSystemNameslate.h"
+#include "ECSSystemPhysics.h"
+#include "ECSSystemRender.h"
 #include "WorldGenerator.h"
 
-void ECS::RegisterSystem(std::unique_ptr<SystemBase>&& pSystem)
+void ECS::RegisterSystem(std::unique_ptr<ECSSystemBase>&& pSystem)
 {
 	pSystem->Initialise(this);
 	systems.emplace_back(std::move(pSystem));
 }
 #pragma optimize( "", on )
 
-void ECS::RegisterSystemCallback(std::unique_ptr<SystemCallbackBase>&& pSystemCallback)
+void ECS::RegisterSystemCallback(std::unique_ptr<ECSSystemCallbackBase>&& pSystemCallback)
 {
 	systemCallbacks.emplace_back(std::move(pSystemCallback));
 }
@@ -29,13 +29,13 @@ void ECS::RegisterSystemCallback(std::unique_ptr<SystemCallbackBase>&& pSystemCa
 void ECS::Init()
 {
 	// Register systems to ECS (order matters)
-	RegisterSystem(std::make_unique<SystemAction>());
-	RegisterSystem(std::make_unique<SystemEntityMap>());
-	RegisterSystem(std::make_unique<SystemPhysics>());
-	RegisterSystem(std::make_unique<SystemDamage>());
-	RegisterSystem(std::make_unique<SystemNameslate>());
-	RegisterSystem(std::make_unique<SystemRender>());
-	RegisterSystem(std::make_unique<SystemCleanUp>());
+	RegisterSystem(std::make_unique<ECSSystemAction>());
+	RegisterSystem(std::make_unique<ECSSystemEntityMap>());
+	RegisterSystem(std::make_unique<ECSSystemPhysics>());
+	RegisterSystem(std::make_unique<ECSSystemDamage>());
+	RegisterSystem(std::make_unique<ECSSystemNameslate>());
+	RegisterSystem(std::make_unique<ECSSystemRender>());
+	RegisterSystem(std::make_unique<ECSSystemCleanUp>());
 	
 	// Create player entity
 	{
@@ -64,18 +64,18 @@ void ECS::Tick(float deltaTime)
 	// #TODO: Need a way to only tick a entities if the component has changed, maybe just a bool in the base class of all components?
 	
 	// System Pre-Tick
-	SystemTickParams params;
+	ECSSystemTickParams params;
 	params.pEcs = this;
 	params.entityId = INVALID_ENTITY_ID;
 	params.deltaTime = deltaTime;
 	params.frame = frame;
-	for (std::unique_ptr<SystemBase>& pSystem : systems)
+	for (std::unique_ptr<ECSSystemBase>& pSystem : systems)
 	{
 		pSystem->PreTick(params);
 	}
 
 	// System Callbacks
-	for (std::unique_ptr<SystemCallbackBase>& callback : systemCallbacks)
+	for (std::unique_ptr<ECSSystemCallbackBase>& callback : systemCallbacks)
 	{
 		callback->HandleCallbacks(this, deltaTime, frame);
 	}
@@ -109,7 +109,7 @@ EntityId ECS::GetNextFreeEntity()
 
 void ECS::DeleteEntity(EntityId entity)
 {
-	for (std::unique_ptr<SystemCallbackBase>& callback : systemCallbacks)
+	for (std::unique_ptr<ECSSystemCallbackBase>& callback : systemCallbacks)
 	{
 		callback->HandleEntityDeletion(this, entity);
 	}

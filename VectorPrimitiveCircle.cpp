@@ -2,6 +2,8 @@
 
 #include "VectorPrimitiveCircle.h"
 
+#include <DomMath/Vec2.h>
+
 #include "VectorPrimitiveTypes.h"
 #include "DomImport/XMLUtils.h"
 
@@ -30,4 +32,13 @@ std::istream& VectorPrimitiveCircle::PopulateFromFile(std::istream& stream)
 	rad = (u32)std::stof(dmim::GetNextAttribute(stream, "r"));
 
 	return stream;
+}
+
+const VectorPrimitiveBase* VectorPrimitiveCircle::FindPrimitiveUnderCursor(Vec2i cursorPos) const
+{
+	if (Vec2i::DistanceSq(Vec2i(x, y), cursorPos) <= (int)(rad * rad))
+	{
+		return this;
+	}
+	return nullptr;   
 }

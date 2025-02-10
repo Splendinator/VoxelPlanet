@@ -1,12 +1,18 @@
 ﻿#pragma once
 
 
-// This is a 1-to-1 mapping of the enum in DomWindow.h but this one is editor exposed
-// #TODO: Should this have mouse keys on too?
+// This is a 1-to-1 mapping of the enum in DomWindow.h but this one is game level and editor exposed.
+// Make sure to keep them in sync
 EDITORENUM()
 enum class EInputKey
 {
 	NONE = 0,
+
+	LMB = 1,
+	RMB = 2,
+	MMB = 4,
+	SCROLLUP = 10,
+	SCROLLDOWN = 11,
 	
 	BACKSPACE = 8,
 	TAB = 9,

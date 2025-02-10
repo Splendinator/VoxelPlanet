@@ -28,6 +28,8 @@ public:
 
 	void Load();
 	void Unload();
+
+	bool IsLoaded() const { return pInstance != nullptr; }
 	
 
 private:

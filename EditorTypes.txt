@@ -1,7 +1,24 @@
 Class MenuScreenBase
+meta Abstract
 meta Instanced
-float x 0
-float y 0
+class DirectoryData pDirectoryData nullptr
+string fileName ""
+;
+Enum EHUDAnchorPoint
+NONE 0
+TopLeft 1
+TopCenter 2
+TopRight 3
+CenterLeft 4
+Center 5
+CenterRight 6
+BottomLeft 7
+BottomCenter 8
+BottomRight 9
+COUNT 10
+;
+Struct HUDObjectSharedInitParams
+float screenEdgePadding 0.05
 ;
 Struct TextRenderCharacterData
 string fileName ""
@@ -15,6 +32,11 @@ float fontSize 0
 ;
 Enum EInputKey
 NONE 0
+LMB 1
+RMB 2
+MMB 4
+SCROLLUP 10
+SCROLLDOWN 11
 BACKSPACE 8
 TAB 9
 ENTER 13
@@ -120,26 +142,11 @@ bool bCtrl false
 bool bShift false
 bool bAlt false
 ;
-Enum EHUDAnchorPoint
-NONE 0
-TopLeft 1
-TopCenter 2
-TopRight 3
-CenterLeft 4
-Center 5
-CenterRight 6
-BottomLeft 7
-BottomCenter 8
-BottomRight 9
-COUNT 10
-;
-Struct HUDObjectSharedInitParams
-float screenEdgePadding 0.05
-;
 Class DirectoryData
 meta Singleton
 string fonts ""
 string hudObjects ""
+string menus ""
 ;
 Class GameSystem
 meta Abstract
@@ -159,6 +166,14 @@ class InputContext pMenuInputContext nullptr
 class InputActionBase pOpenMenuAction nullptr
 class InputActionBase pCloseMenuAction nullptr
 instancedassetptr MenuScreenBase pBaseMenuScreen nullptr
+;
+Class MenuScreenMain
+Child MenuScreenBase
+;
+Struct HUDAnchorPoint
+enum EHUDAnchorPoint anchorPoint NONE
+float anchorX 0
+float anchorY 0
 ;
 Class TextRenderSystem
 Child GameSystem
@@ -181,11 +196,6 @@ Class ImGuiEditor
 Child GameSystem
 class InputSystem pInputSystem nullptr
 class InputContext pEditorInputContext nullptr
-;
-Struct HUDAnchorPoint
-enum EHUDAnchorPoint anchorPoint NONE
-float anchorX 0
-float anchorY 0
 ;
 Class ECS
 Child GameSystem

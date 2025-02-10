@@ -3,7 +3,7 @@
 #include "Components.h"
 #include "DomMath/Types.h"
 
-class Components
+class ComponentBitfield
 {
 public:
 
@@ -17,11 +17,11 @@ private:
 
 	u64 GetBitValue(EComponents component) const { return (1ull << (u64)component); }
 
-	u64 components; // Bitfield of all components
+	u64 components; // Bitfield of whether this entity has the components
 };
 
 class Entity
 {
 public:
-	Components components;
+	ComponentBitfield components;
 };

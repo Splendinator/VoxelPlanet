@@ -3,10 +3,10 @@
 #include "Core/GameSystem.h"
 
 #include "Components.h"
-#include "Entity.h"
-#include "SystemBase.h"
-#include "SystemCallbackBase.h"
+#include "ECSSystemBase.h"
 #include "ECSTypes.h"
+#include "Entity.h"
+#include "ECSSystemCallbackBase.h"
 
 #define REGISTER_COMPONENT(ComponentName) \
 private:\
@@ -19,13 +19,18 @@ bool EntityHasComponents<ComponentName>(int entityId) const { return entities[en
 template<>\
 ComponentName& AddComponent<ComponentName>(int entityId) { entities[entityId].components.AddComponent(EComponents::##ComponentName); return GetComponent<ComponentName>(entityId); }
 
+// The entity component system.
+// This class was designed to be very speedy, i.e data oriented design with minimal virtual functions, so it might seem a bit less intuitive to code for.
+// The basic idea is that all components are just structs in an array, and entities are just indexes into those arrays.
+// Then the ECSSystems just iterate though the arrays and find any entity that has the correct combination of components and ticks that.
+// (e.g. the render system will iterate through all entities with a ComponentTransform and ComponentMesh and render the mesh at the location).
 EDITORCLASS()
 class ECS : public GameSystem
 {
 	EDITORBODY()
 
-	/// #TODO: We need to handle adding new component / removing components calling the appropriate functions like HandleEntityDeletion() and HandleEntityCreation() maybe
-
+	// #TODO: We need to handle adding new component / removing components calling the appropriate functions like HandleEntityDeletion() and HandleEntityCreation() maybe
+	// #TODO: Right now if we remove the rendering component we won't call ECSSystemRender::OnEntityDeleted() so it'll stick around forever (until the entity is re-used)
 public:
 	
 	//~ Begin GameSystem Interface
@@ -34,10 +39,10 @@ public:
 	void UnInit();
 	//~ End GameSystem Interface
 
-	void RegisterSystem(std::unique_ptr<SystemBase>&& pSystem);
-	void RegisterSystemCallback(std::unique_ptr<SystemCallbackBase>&& pSystemCallback);
+	void RegisterSystem(std::unique_ptr<ECSSystemBase>&& pSystem);
+	void RegisterSystemCallback(std::unique_ptr<ECSSystemCallbackBase>&& pSystemCallback);
 	
-	// Get the next unused entity (entity with no components)
+	// Get the next unused entity (entity with no components). Useful if adding a new entity
 	EntityId GetNextFreeEntity();
 
 	void DeleteEntity(EntityId entity);
@@ -70,10 +75,10 @@ private:
 
 	Entity& GetEntity(EntityId entityId) { return entities[entityId]; }
 	
-	std::vector<std::unique_ptr<SystemBase>> systems;
-	std::vector<std::unique_ptr<SystemCallbackBase>> systemCallbacks;
+	std::vector<std::unique_ptr<ECSSystemBase>> systems;
+	std::vector<std::unique_ptr<ECSSystemCallbackBase>> systemCallbacks;
 
-	Entity entities[NUM_ENTITIES];
+	Entity entities[NUM_ENTITIES] = {};
 
 	EntityId playerEntity = 0;
 
@@ -89,7 +94,7 @@ bool ECS::EntityHasComponents(EntityId entityId) const
 template<typename T>
 T* ECS::GetSystem()
 {
-	for (std::unique_ptr<SystemBase>& system : systems)
+	for (std::unique_ptr<ECSSystemBase>& system : systems)
 	{
 		if (T* returnedSystem = dynamic_cast<T*>(system.get()))
 		{

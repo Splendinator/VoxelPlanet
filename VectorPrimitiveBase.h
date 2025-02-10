@@ -1,5 +1,6 @@
 #pragma once
 
+#include <DomMath/Vec2.h>
 #include "DomMath/Types.h"
 #include "DomUtils/Pointers.h"
 
@@ -21,13 +22,17 @@ public:
 	// This should start reading from right after the associated tag. i.e reading in a circle will start after "<circle"
 	virtual std::istream& PopulateFromFile(std::istream& stream) = 0;
 	
-	// This can be overwritten to find a primitive by its label. 
-	// This is used to search recursively for the first non-nullptr primitive with the given label.
-	virtual VectorPrimitiveBase* FindPrimitiveByLabelInternal(const std::string& label) { return nullptr; };
+	// Recursive function to find the top hovered over primitive
+	// Remember the input cursorPos will be in vector-art space, you most likely can't just plug in the raw mouse coordinates
+	virtual const VectorPrimitiveBase* FindPrimitiveUnderCursor(Vec2i cursorPos) const { return nullptr; }
 
 	// Templated version of FindPrimitiveByLabel() for ease of use. Throws an error if the primitive is not found for ease of debugging vector art assets.
 	template<typename TClass>
 	TransientPtr<TClass> FindPrimitiveByLabel(const std::string& label);
+
+	// This can be overwritten to find a primitive by its label. 
+	// This is used to search recursively for the first non-nullptr primitive with the given label.
+	virtual VectorPrimitiveBase* FindPrimitiveByLabelInternal(const std::string& label) { return nullptr; }
 };
 
 template<typename TClass>

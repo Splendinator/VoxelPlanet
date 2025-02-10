@@ -1,15 +1,33 @@
 ﻿#pragma once
 
-// #TEMP: This is just to fucking test my bitches delete this
-EDITORCLASS(Instanced)
+#include "UI/UICanvas.h"
+
+class DirectoryData;
+
+// A single menu screen 
+EDITORCLASS(Abstract, Instanced)
 class MenuScreenBase
 {
 	EDITORBODY()
+
 public:
 
+	void BaseInit();
+	void BaseUnInit();
+	void BaseTick(float DeltaTime);
+
+protected:
+	virtual void Init(UICanvas* pCanvas) {}
+	virtual void UnInit() {}
+	virtual void Tick(float DeltaTime) {}
+
+	std::unique_ptr<UICanvas> uiCanvas;
+	
+private:
+	
 	EDITORPROPERTY()
-	float x = 0.0f;
+	DirectoryData* pDirectoryData = nullptr;
 
 	EDITORPROPERTY()
-	float y = 0.0f;
+	std::string fileName;
 };

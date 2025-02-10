@@ -31,6 +31,18 @@ void AssetManager::UnInit()
 	}	
 	templateClassTypes.clear();
 
+	for (auto& [key, value] : templateStructTypes)
+	{
+		delete value;
+	}	
+	templateStructTypes.clear();
+
+	for (auto& [key, value] : templateEnumTypes)
+	{
+		delete value;
+	}	
+	templateEnumTypes.clear();
+
 	assets.clear();
 }
 
@@ -97,7 +109,7 @@ std::weak_ptr<EditorAssetBase> AssetManager::FindAsset(const std::string& assetN
 	return {};
 }
 
-std::vector<std::weak_ptr<EditorAssetBase>> AssetManager::GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses, bool bOnlyGatherInstanced) const
+std::vector<std::weak_ptr<EditorAssetBase>> AssetManager::GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses, EClassMetadataFlags requiredFlags) const
 {
 	std::vector<std::weak_ptr<EditorAssetBase>> gatheredAssets;
 
@@ -142,7 +154,7 @@ std::vector<std::weak_ptr<EditorAssetBase>> AssetManager::GatherAssetsOfClass(co
 		{
 			if (std::find(classNamesToGather.begin(), classNamesToGather.end(), pEditorClass->name) != classNamesToGather.end())
 			{
-				if (!bOnlyGatherInstanced || pEditorClass->HasMetadataFlag(EClassMetadataFlags::Instanced))
+				if (requiredFlags == EClassMetadataFlags::None || pEditorClass->HasMetadataFlag(requiredFlags))
 				{
 					gatheredAssets.push_back(asset.second);
 				}

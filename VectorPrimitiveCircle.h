@@ -12,6 +12,7 @@ public:
 	//~ Begin VectorPrimitiveBase Interface
 	u32* Serialize(u32* pBuffer) override;
 	std::istream& PopulateFromFile(std::istream& stream) override;
+	const VectorPrimitiveBase* FindPrimitiveUnderCursor(Vec2i cursorPos) const override;
 	//~ End VectorPrimitiveBase Interface
 
 private:

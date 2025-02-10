@@ -26,7 +26,7 @@ Textbox::Textbox(const TextboxParams& textboxParams, CharacterVectorArtMap& char
 		
 		if (const std::shared_ptr<VectorArt>& pVectorArt = characterVectorArtMap[characterToRender])
 		{
-			TransientPtr<RendererObject> pRendererObject = dmgf::AddObjectFromVectorArt(pVectorArt, dmgf::ERenderObjectType::HUD);
+			TransientPtr<RendererObject> pRendererObject = dmgf::AddObjectFromVectorArt(pVectorArt, dmgf::ERenderObjectType::UI);
 			pRendererObject->SetPosition(currentXPos, currentYPos);
 			pRendererObject->SetSize(textboxParams.fontSize,textboxParams.fontSize);
 			rendererObjects.push_back(pRendererObject);

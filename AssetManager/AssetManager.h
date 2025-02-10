@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "EditorTypeBase.h"
+
 class EditorAssetBase;
 class EditorTypeBase;
 class EditorTypeClass;
@@ -31,8 +33,8 @@ public:
 
 	// Gather all assets of a given class
 	// bGatherChildClasses - whether to also gather classes that are children of className
-	// bOnlyGatherInstanced - whether to only gather assets with EClassMetadataFlags::Instanced
-	std::vector<std::weak_ptr<EditorAssetBase>> GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses, bool bOnlyGatherInstanced = false) const;
+	// RequiredFlags - Flags the asset must have (useful for only getting singletons etc.)
+	std::vector<std::weak_ptr<EditorAssetBase>> GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses, EClassMetadataFlags requiredFlags = EClassMetadataFlags::None) const;
 
 	// Enum utils
 	std::string GetEnumValueNameFromValue(const std::string& enumName, int value) const;
@@ -75,6 +77,7 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<EditorAssetBase>> assets;
 
 	// Map of assets to their singletons (if the asset represents a class with the Singleton EClassMetadataFlags)
+	// #JANK: We can't delete void* so these can't be deleted here. We could consider forcing a UObject style base class maybe?
 	std::unordered_map<EditorAssetBase*, void*> singletonMap;
 };
 

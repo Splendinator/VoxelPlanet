@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "Input/InputSystem.h"
-
 #ifdef DOMIMGUI
 
 #include "ImGuiEditor.h"
@@ -12,6 +10,8 @@
 #include "EditorWindowActionQueue.h"
 #include "EditorWindowFilesystem.h"
 #include "ImGuiEditorGlobals.h"
+#include "Input/InputContext.h"
+#include "Input/InputSystem.h"
 
 void ImGuiEditor::Init()
 {
@@ -21,13 +21,18 @@ void ImGuiEditor::Init()
 	bEditorShowing = false; // Start with editor off
 
 	// #JANK: If we ever resize this vector mid way through a loop (e.g clicking a button on one window to open a second window) then the game crashes.
-	// #JANK: I can't be arsed to add a frame delay or whatever so I'm just reserving 10
-	shownWindows.reserve(10); 
+	// #JANK: I can't be arsed to add a frame delay or whatever so I'm just reserving a bunch
+	shownWindows.reserve(32); 
 }
 
 void ImGuiEditor::Uninit()
 {
+	if (bEditorShowing)
+	{
+		OnHideEditor();
+	}
 
+	delete pEditorInputContext; 
 }
 
 void ImGuiEditor::Tick(float deltaTime)
@@ -78,11 +83,11 @@ void ImGuiEditor::Tick(float deltaTime)
 		{
 			if (bEditorShowing)
 			{
-				pInputSystem->PushInputContext(pEditorInputContext);		
+				OnShowEditor();		
 			}
 			else
 			{
-				pInputSystem->PopInputContext(pEditorInputContext);
+				OnHideEditor();
 			}
 		}
 	}
@@ -169,6 +174,16 @@ void ImGuiEditor::Redo()
 			DOMLOG_ERROR("Cannot re-do an action? Something wrong?")
 		}
 	}
+}
+
+void ImGuiEditor::OnShowEditor()
+{
+	pInputSystem->PushInputContext(pEditorInputContext);
+}
+
+void ImGuiEditor::OnHideEditor()
+{
+	pInputSystem->PopInputContext(pEditorInputContext);
 }
 
 #endif //~ DOMIMGUI

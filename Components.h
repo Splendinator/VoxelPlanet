@@ -38,10 +38,10 @@ struct ComponentAction
 {
 	short maxEnergy = 0; // How often to take a turn, something with 50 max energy will take an action twice as often as something with 100 max energy
 	short energy = 0;
-	ActionDeciderBase* pActionDecider = nullptr; // These are deleted by the SystemAction when the entity is deleted
+	ActionDeciderBase* pActionDecider = nullptr; // These are deleted by the ECSSystemAction when the entity is deleted
 };
 
-// Component to block movement onto its tile
+// Component to block movement onto its tile, just used for the bitflag
 struct ComponentRigid {};
 
 struct ComponentHealth

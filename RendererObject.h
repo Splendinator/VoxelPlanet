@@ -1,5 +1,7 @@
 #pragma once
 
+#include <DomMath/Vec2.h>
+
 #include "DomMath/Mat4.h"
 
 /** RendererObject
@@ -16,6 +18,8 @@ public:
 	void SetRenderPriority(float inRenderPriority); // Render priority should be between 0 and 1, 1.0f rendering on top of 0.0f
 
 	Mat4f& GetModelMatrix() { return modelMatrix; }
+	Vec2f GetPosition() const { return Vec2f(posX, posY); }
+	Vec2f GetScale() const { return Vec2f(scaleX, scaleY); }
 
 protected:
 

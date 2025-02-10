@@ -10,7 +10,7 @@ void EditorTypePropertyInstancedAssetPtr::DrawImGUI()
 {
 	if (ImGui::BeginCombo(name.c_str(), assetName.c_str()))
 	{
-		std::vector<std::weak_ptr<EditorAssetBase>> validAssets = Game::GetAssetManager().GatherAssetsOfClass(className, true, true);
+		std::vector<std::weak_ptr<EditorAssetBase>> validAssets = Game::GetAssetManager().GatherAssetsOfClass(className, true, EClassMetadataFlags::Instanced);
 
 		auto RenderSelectable = [this](const std::string& selectableAssetName)
 		{

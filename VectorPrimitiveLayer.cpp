@@ -94,3 +94,18 @@ VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveByLabelInternal(const st
 
 	return nullptr;
 }
+
+const VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveUnderCursor(Vec2i cursorPos) const
+{
+	// Iterate backwards (highest layer first)
+	for (int i = (int)children.size() - 1; i >= 0; i--)
+	{
+		const VectorPrimitiveBase* child = children[i];
+		if (const VectorPrimitiveBase* pPrimitiveUnderCursor = child->FindPrimitiveUnderCursor(cursorPos))
+		{
+			return pPrimitiveUnderCursor;
+		}
+	}
+
+	return nullptr;
+}

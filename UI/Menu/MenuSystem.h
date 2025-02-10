@@ -10,6 +10,8 @@ class MenuScreenBase;
 class InputContext;
 class InputSystem;
 
+// The menu system keeps a stack of MenuScreens and shows the top one
+// i.e -> PauseMenu -> Options -> Video Options
 EDITORCLASS()
 class MenuSystem : public GameSystem
 {
@@ -22,6 +24,9 @@ public:
 	void UnInit() override;
 	//~ End GameSystem Interface
 
+	void PushMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset);
+	void PopMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset);
+	
 private:
 	// Input system
 	EDITORPROPERTY()
@@ -46,6 +51,10 @@ private:
 	void OpenMenu(OnInputActionDelegateParams Params);
 	void CloseMenu(OnInputActionDelegateParams Params);
 	
+	std::vector<TInstancedAssetPtr<MenuScreenBase>*> activeMenuScreens;
+	
 	DelegateClass<MenuSystem, OnInputActionDelegateParams> OpenMenuDelegate;
 	DelegateClass<MenuSystem, OnInputActionDelegateParams> CloseMenuDelegate;
+
+	bool bMenuOpen = false;
 };

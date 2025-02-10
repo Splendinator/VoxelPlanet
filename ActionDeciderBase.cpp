@@ -6,12 +6,12 @@
 #include "ActionHandlerMove.h"
 #include "ECS.h"
 #include "ECSTypes.h"
-#include "SystemEntityMap.h"
-#include "SystemPhysics.h"
+#include "ECSSystemEntityMap.h"
+#include "ECSSystemPhysics.h"
 
 ActionHandlerBase* ActionDeciderBase::TryMoveOrAttack(ECS& ecs, EntityId e, int deltaX, int deltaY)
 {
-	if (SystemPhysics* pSystemPhysics = ecs.GetSystem<SystemPhysics>())
+	if (ECSSystemPhysics* pSystemPhysics = ecs.GetSystem<ECSSystemPhysics>())
 	{
 		// Get entities current location
 		const int currentX = ecs.GetComponent<ComponentTransform>(e).x;
@@ -26,7 +26,7 @@ ActionHandlerBase* ActionDeciderBase::TryMoveOrAttack(ECS& ecs, EntityId e, int 
 			actionHandlerMove.yOffset = deltaY;
 			return &actionHandlerMove;
 		}
-		else if (SystemEntityMap* pSystemEntityMap = ecs.GetSystem<SystemEntityMap>())
+		else if (ECSSystemEntityMap* pSystemEntityMap = ecs.GetSystem<ECSSystemEntityMap>())
 		{
 			const EntityList& entityList = pSystemEntityMap->GetEntities(targetX, targetY);
 			for (EntityId entity : entityList.entities)
