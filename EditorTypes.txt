@@ -142,6 +142,10 @@ bool bCtrl false
 bool bShift false
 bool bAlt false
 ;
+Class TestEditInlineNewClassBase
+meta Abstract
+meta EditInlineNew
+;
 Class DirectoryData
 meta Singleton
 string fonts ""
@@ -197,6 +201,17 @@ Child GameSystem
 class InputSystem pInputSystem nullptr
 class InputContext pEditorInputContext nullptr
 ;
+Class TestClass
+vector pTestEditInlineNewClasses TestEditInlineNewClassBase
+;
+Class TestEditInlineNewClassInt
+Child TestEditInlineNewClassBase
+int x 20
+;
+Class TestEditInlineNewClassFloat
+Child TestEditInlineNewClassBase
+float x 20
+;
 Class ECS
 Child GameSystem
 ;
@@ -214,6 +229,10 @@ class DirectoryData pDirectoryData nullptr
 class ECS pEcs nullptr
 vector pHudObjects HUDObjectBase
 struct HUDObjectSharedInitParams hudObjectSharedInitParams
+;
+Class TestEditInlineNewClassXofY
+Child TestEditInlineNewClassInt
+int y 20
 ;
 Class HUDObjectHealth
 Child HUDObjectBase

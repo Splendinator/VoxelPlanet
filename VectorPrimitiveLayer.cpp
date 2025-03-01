@@ -66,6 +66,7 @@ std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 		if (VectorPrimitiveFactoryBase* pFactory = FindFactory(readTag))
 		{
 			VectorPrimitiveBase* pNewPrimitive = pFactory->CreatePrimitive();
+			pNewPrimitive->pParent = this;
 			children.push_back(pNewPrimitive);
 			pNewPrimitive->PopulateFromFile(stream);
 		}

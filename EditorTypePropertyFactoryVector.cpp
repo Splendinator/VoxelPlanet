@@ -14,8 +14,6 @@
 #include "EditorTypeUtils.h"
 #include "Game.h"
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
 EditorTypePropertyBase* EditorTypePropertyFactoryVector::CreateType(std::ifstream& stream)
 {
 	// "vector floatArray float"
@@ -93,4 +91,3 @@ EditorTypePropertyBase* EditorTypePropertyFactoryVector::CreateType(std::ifstrea
 	
 	return new EditorTypePropertyVector(pPropertyType, propertyName);
 }
-#pragma optimize("", on)

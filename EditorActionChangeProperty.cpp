@@ -13,7 +13,7 @@ void EditorActionChangeProperty::Undo()
 	{
 		return;
 	}
-	SetValue(previousValue);
+	SetValue({propertyChangeData.oldValue, propertyChangeData.oldClassValue});
 }
 
 bool EditorActionChangeProperty::TryExecuteAction()
@@ -22,18 +22,18 @@ bool EditorActionChangeProperty::TryExecuteAction()
 	{
 		return false;
 	}
-	return SetValue(nextValue);
+	return SetValue({propertyChangeData.newValue, propertyChangeData.newClassValue});
 }
 
 std::string EditorActionChangeProperty::GetDescription() const
 {
-	const std::string& name = pAsset.expired() ? "UNKNOWN" : pProperty->GetName();
-	return "Change Property " + name + " from " + previousValue + " to " + nextValue;
+	const std::string& name = pAsset.expired() ? "UNKNOWN" : propertyChangeData.pProperty->GetName();
+	return "Change Property " + name + " from " + propertyChangeData.oldValue + " to " + propertyChangeData.newValue;
 }
 
-bool EditorActionChangeProperty::SetValue(const std::string& value)
+bool EditorActionChangeProperty::SetValue(const ForceSetValueParams& params)
 {
-	pProperty->ForceSetValue(value);
+	propertyChangeData.pProperty->ForceSetValue(params);
 
 	std::ofstream outFile(assetPath);
 	if (!outFile.is_open())
@@ -44,5 +44,5 @@ bool EditorActionChangeProperty::SetValue(const std::string& value)
 
 	pAsset.lock()->WriteToFile(outFile);
 
-	return true;
+	return true;	
 }

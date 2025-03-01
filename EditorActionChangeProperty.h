@@ -2,8 +2,25 @@
 
 #include "EditorActionBase.h"
 
+class EditorTypeClass;
 class EditorAssetBase;
 class EditorTypePropertyBase;
+
+struct OnPropertyChangedData
+{
+	EditorTypePropertyBase* pProperty = nullptr;
+	std::string oldValue;
+	std::string newValue;
+	std::shared_ptr<EditorTypeClass> oldClassValue;
+	std::shared_ptr<EditorTypeClass> newClassValue;
+};
+
+struct ForceSetValueParams
+{
+	std::string newValue; // Most classes exclusively use this to set their value
+	std::shared_ptr<EditorTypeClass> newClassValue; // EditInlineNew class properties also use this to set their EditInlineNew class
+	// #NOTE: If we add any more params here, maybe add ForceSetValueParams to OnPropertyChangedData instead of oldValue newValue oldClassValue newClassValue
+};
 
 /** EditorActionChangeProperty
 *
@@ -12,8 +29,8 @@ class EditorTypePropertyBase;
 class EditorActionChangeProperty : public EditorActionBase
 {
 public:
-	EditorActionChangeProperty(EditorTypePropertyBase* pInProperty, std::weak_ptr<EditorAssetBase> pInAsset, const std::string& inPreviousValue, const std::string& inNextValue, const std::filesystem::path& inAssetPath) :
-		pProperty(pInProperty), pAsset(pInAsset), previousValue(inPreviousValue), nextValue(inNextValue), assetPath(inAssetPath) {}
+	EditorActionChangeProperty(std::weak_ptr<EditorAssetBase> pInAsset, OnPropertyChangedData inPropertyChangeData,  const std::filesystem::path& inAssetPath) :
+		pAsset(pInAsset), propertyChangeData(inPropertyChangeData), assetPath(inAssetPath) {}
 
 	//~ Begin EditorActionBase Interface
 	virtual void Undo() override;
@@ -23,11 +40,9 @@ public:
 
 private:
 	
-	bool SetValue(const std::string& value);
-
-	EditorTypePropertyBase* pProperty = nullptr;
+	bool SetValue(const ForceSetValueParams& params);
+	
 	std::weak_ptr<EditorAssetBase> pAsset;
-	std::string previousValue;
-	std::string nextValue;
+	OnPropertyChangedData propertyChangeData;
 	std::filesystem::path assetPath;
 };

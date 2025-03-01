@@ -3,7 +3,7 @@
 #include "EditorWindowBase.h"
 
 class EditorAssetBase;
-struct OnPropertyChangedParams;
+struct OnPropertyChangedData;
 
 /** EditorWindowEditAsset
 *
@@ -24,9 +24,9 @@ protected:
 
 private:
 
-	void OnPropertyChanged(const OnPropertyChangedParams& params);
+	void OnPropertyChanged(const OnPropertyChangedData& params);
 
-	DelegateClass<EditorWindowEditAsset, const OnPropertyChangedParams&> onPropertyChangedDelegate;
+	DelegateClass<EditorWindowEditAsset, const OnPropertyChangedData&> onPropertyChangedDelegate;
 	
 	std::weak_ptr<EditorAssetBase> pAsset;
 

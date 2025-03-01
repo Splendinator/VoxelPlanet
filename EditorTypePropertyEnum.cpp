@@ -79,7 +79,7 @@ void EditorTypePropertyEnum::WriteToFile(std::ofstream& file)
 	file << "enum " << enumName  << " " << name << " " << value << std::endl;
 }
 
-void EditorTypePropertyEnum::ForceSetValue(const std::string& newValue)
+void EditorTypePropertyEnum::ForceSetValue(const ForceSetValueParams& params)
 {
-	value = Game::GetAssetManager().GetEnumValueFromValueName(enumName, newValue);
+	value = Game::GetAssetManager().GetEnumValueFromValueName(enumName, params.newValue);
 }

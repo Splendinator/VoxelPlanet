@@ -854,6 +854,7 @@
       <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="UI\UIObjects\UIObjectIconLoader.cpp" />
     <ClCompile Include="UI\UIObjects\UIObjectProgressBar.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
@@ -1204,6 +1205,7 @@
     <ClInclude Include="UI\UIObjects\UIObjectBase.h" />
     <ClInclude Include="UI\UIObjects\UIObjectButton.h" />
     <ClInclude Include="UI\UIObjects\UIObjectContainer.h" />
+    <ClInclude Include="UI\UIObjects\UIObjectIconLoader.h" />
     <ClInclude Include="UI\UIObjects\UIObjectProgressBar.h" />
     <ClInclude Include="UI\UIUtils.h" />
     <ClInclude Include="VectorPrimitiveBase.h" />

@@ -70,9 +70,9 @@ void EditorTypePropertyInstancedAssetPtr::WriteToFile(std::ofstream& file)
 	PropertyFileUtils::WriteInstancedAssetPtrToFile(file, name, className, assetName);
 }
 
-void EditorTypePropertyInstancedAssetPtr::ForceSetValue(const std::string& newValue)
+void EditorTypePropertyInstancedAssetPtr::ForceSetValue(const ForceSetValueParams& params)
 {
-	assetName = newValue;
+	assetName = params.newValue;
 }
 
 const std::string& EditorTypePropertyInstancedAssetPtr::GetValue() const

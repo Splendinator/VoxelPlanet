@@ -3,7 +3,7 @@
 #include "EditorTypeBase.h"
 
 class EditorTypePropertyBase;
-struct OnPropertyChangedParams;
+struct OnPropertyChangedData;
 
 
 /** EditorTypePropertiesBase
@@ -43,20 +43,20 @@ public:
 	std::vector<std::string> baseClasses;
 	
 	// Fired when a property changes
-	DelegateList<const OnPropertyChangedParams&> onPropertyChanged;
+	DelegateList<const OnPropertyChangedData&> onPropertyChanged;
 
 protected:
 
 	// Deep copy these properties to pOther
 	void DeepCopyProperties(EditorTypePropertiesBase* pOther);
 
-	void OnPropertyChanged(const OnPropertyChangedParams& params);
+	void OnPropertyChanged(const OnPropertyChangedData& params);
 
 	// Recursively scan children template objects for the first of either Instanced or Singleton.
 	// If none are found we return EClassMetadataFlags::None
 	EClassMetadataFlags GetChildInstancedOrSingletonFlag(); 
 
-	DelegateClass<EditorTypePropertiesBase, const OnPropertyChangedParams&> onPropertyChangedDelegate;
+	DelegateClass<EditorTypePropertiesBase, const OnPropertyChangedData&> onPropertyChangedDelegate;
 
 private:
 

@@ -13,6 +13,7 @@
 #include "..\Roguelike\Core\GameSystem.h"
 #include "..\Roguelike\DirectoryData.h"
 #include "..\Roguelike\ECS.h"
+#include "..\Roguelike\Game.h"
 #include "..\Roguelike\ImGuiEditor.h"
 #include "..\Roguelike\Input\InputAction.h"
 #include "..\Roguelike\Input\InputContext.h"
@@ -111,6 +112,20 @@ void* InputActionBase::InitFromProperties(const std::vector<EditorTypePropertyBa
 	int propertyIndex = 0;
 	InputActionBase::InitFromPropertiesSubset(pInputActionBase, properties, propertyIndex);
 	return pInputActionBase;
+}
+
+// TestEditInlineNewClassBase
+void TestEditInlineNewClassBase::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	TestEditInlineNewClassBase* pTestEditInlineNewClassBase = static_cast<TestEditInlineNewClassBase*>(pObject);
+}
+
+void* TestEditInlineNewClassBase::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	TestEditInlineNewClassBase* pTestEditInlineNewClassBase = new TestEditInlineNewClassBase;
+	int propertyIndex = 0;
+	TestEditInlineNewClassBase::InitFromPropertiesSubset(pTestEditInlineNewClassBase, properties, propertyIndex);
+	return pTestEditInlineNewClassBase;
 }
 
 // DirectoryData
@@ -326,6 +341,59 @@ void* ImGuiEditor::InitFromProperties(const std::vector<EditorTypePropertyBase*>
 	return pImGuiEditor;
 }
 
+// TestClass
+void TestClass::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	TestClass* pTestClass = static_cast<TestClass*>(pObject);
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pTestClass->pTestEditInlineNewClasses.push_back(static_cast<TestEditInlineNewClassBase*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
+		}
+	}
+}
+
+void* TestClass::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	TestClass* pTestClass = new TestClass;
+	int propertyIndex = 0;
+	TestClass::InitFromPropertiesSubset(pTestClass, properties, propertyIndex);
+	return pTestClass;
+}
+
+// TestEditInlineNewClassInt
+void TestEditInlineNewClassInt::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	TestEditInlineNewClassInt* pTestEditInlineNewClassInt = static_cast<TestEditInlineNewClassInt*>(pObject);
+	TestEditInlineNewClassBase::InitFromPropertiesSubset(static_cast<TestEditInlineNewClassBase*>(pTestEditInlineNewClassInt), properties, propertyIndex);
+	pTestEditInlineNewClassInt->x = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+}
+
+void* TestEditInlineNewClassInt::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	TestEditInlineNewClassInt* pTestEditInlineNewClassInt = new TestEditInlineNewClassInt;
+	int propertyIndex = 0;
+	TestEditInlineNewClassInt::InitFromPropertiesSubset(pTestEditInlineNewClassInt, properties, propertyIndex);
+	return pTestEditInlineNewClassInt;
+}
+
+// TestEditInlineNewClassFloat
+void TestEditInlineNewClassFloat::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	TestEditInlineNewClassFloat* pTestEditInlineNewClassFloat = static_cast<TestEditInlineNewClassFloat*>(pObject);
+	TestEditInlineNewClassBase::InitFromPropertiesSubset(static_cast<TestEditInlineNewClassBase*>(pTestEditInlineNewClassFloat), properties, propertyIndex);
+	pTestEditInlineNewClassFloat->x = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+}
+
+void* TestEditInlineNewClassFloat::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	TestEditInlineNewClassFloat* pTestEditInlineNewClassFloat = new TestEditInlineNewClassFloat;
+	int propertyIndex = 0;
+	TestEditInlineNewClassFloat::InitFromPropertiesSubset(pTestEditInlineNewClassFloat, properties, propertyIndex);
+	return pTestEditInlineNewClassFloat;
+}
+
 // ECS
 void ECS::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -397,6 +465,22 @@ void* HUD::InitFromProperties(const std::vector<EditorTypePropertyBase*>& proper
 	return pHUD;
 }
 
+// TestEditInlineNewClassXofY
+void TestEditInlineNewClassXofY::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	TestEditInlineNewClassXofY* pTestEditInlineNewClassXofY = static_cast<TestEditInlineNewClassXofY*>(pObject);
+	TestEditInlineNewClassInt::InitFromPropertiesSubset(static_cast<TestEditInlineNewClassInt*>(pTestEditInlineNewClassXofY), properties, propertyIndex);
+	pTestEditInlineNewClassXofY->y = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+}
+
+void* TestEditInlineNewClassXofY::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	TestEditInlineNewClassXofY* pTestEditInlineNewClassXofY = new TestEditInlineNewClassXofY;
+	int propertyIndex = 0;
+	TestEditInlineNewClassXofY::InitFromPropertiesSubset(pTestEditInlineNewClassXofY, properties, propertyIndex);
+	return pTestEditInlineNewClassXofY;
+}
+
 // HUDObjectHealth
 void HUDObjectHealth::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -421,6 +505,7 @@ namespace __Generated
 		{"TextRenderCharacterData", &TextRenderCharacterData::InitFromProperties},
 		{"TextboxParams", &TextboxParams::InitFromProperties},
 		{"InputActionBase", &InputActionBase::InitFromProperties},
+		{"TestEditInlineNewClassBase", &TestEditInlineNewClassBase::InitFromProperties},
 		{"DirectoryData", &DirectoryData::InitFromProperties},
 		{"GameSystem", &GameSystem::InitFromProperties},
 		{"GameInstance", &GameInstance::InitFromProperties},
@@ -433,9 +518,13 @@ namespace __Generated
 		{"InputContext", &InputContext::InitFromProperties},
 		{"InputActionPress", &InputActionPress::InitFromProperties},
 		{"ImGuiEditor", &ImGuiEditor::InitFromProperties},
+		{"TestClass", &TestClass::InitFromProperties},
+		{"TestEditInlineNewClassInt", &TestEditInlineNewClassInt::InitFromProperties},
+		{"TestEditInlineNewClassFloat", &TestEditInlineNewClassFloat::InitFromProperties},
 		{"ECS", &ECS::InitFromProperties},
 		{"HUDObjectBase", &HUDObjectBase::InitFromProperties},
 		{"HUD", &HUD::InitFromProperties},
+		{"TestEditInlineNewClassXofY", &TestEditInlineNewClassXofY::InitFromProperties},
 		{"HUDObjectHealth", &HUDObjectHealth::InitFromProperties},
 	};
 }

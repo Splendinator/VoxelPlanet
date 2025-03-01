@@ -48,7 +48,7 @@ void EditorTypePropertyBool::WriteToFile(std::ofstream& file)
 	PropertyFileUtils::WriteBoolToFile(file, name, value);
 }
 
-void EditorTypePropertyBool::ForceSetValue(const std::string& newValue)
+void EditorTypePropertyBool::ForceSetValue(const ForceSetValueParams& params)
 {
-	value = (newValue == "true");
+	value = (params.newValue == "true");
 }

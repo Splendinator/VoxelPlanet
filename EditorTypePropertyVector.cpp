@@ -37,7 +37,7 @@ void EditorTypePropertyVector::DrawImGUI()
 						std::swap(instancedProperties[arrayLength-1], instancedProperties[index]);
 					}
 
-					OnPropertyChangedParams arrayLengthChangedParams = {};
+					OnPropertyChangedData arrayLengthChangedParams = {};
 					arrayLengthChangedParams.pProperty = this;
 					arrayLengthChangedParams.oldValue = std::to_string(arrayLength);
 
@@ -112,20 +112,20 @@ EditorTypePropertyBase* EditorTypePropertyVector::DeepCopy()
 	return deepCopiedVector;
 }
 
-void EditorTypePropertyVector::ForceSetValue(const std::string& newValue)
+void EditorTypePropertyVector::ForceSetValue(const ForceSetValueParams& params)
 {
 	// When a vector gets ForceSetValue called it's getting in a array length.
 	// It's a bit janky maybe to re-use the property changing system for array resizing but, honestly,
 	// I'm not even sure it is that janky. I think it's literally fine (apart from the text in the action log looks fucky)
 	
-	const int newArrayLength = std::stoi(newValue);
+	const int newArrayLength = std::stoi(params.newValue);
 
 	arrayLength = newArrayLength;
 }
 
-void EditorTypePropertyVector::OnInternalVectorPropertyChanged(const OnPropertyChangedParams& onPropertyChangedParams)
+void EditorTypePropertyVector::OnInternalVectorPropertyChanged(const OnPropertyChangedData& OnPropertyChangedData)
 {
-	onPropertyChanged.Invoke(onPropertyChangedParams);
+	onPropertyChanged.Invoke(OnPropertyChangedData);
 }
 
 void EditorTypePropertyVector::AddEntry(EditorTypePropertyBase* pEntry)
@@ -147,7 +147,7 @@ void EditorTypePropertyVector::AddEntry(EditorTypePropertyBase* pEntry)
 
 void EditorTypePropertyVector::AddDefaultEntry()
 {
-	OnPropertyChangedParams arrayLengthChangedParams = {};
+	OnPropertyChangedData arrayLengthChangedParams = {};
 	arrayLengthChangedParams.pProperty = this;
 	arrayLengthChangedParams.oldValue = std::to_string(arrayLength);
 

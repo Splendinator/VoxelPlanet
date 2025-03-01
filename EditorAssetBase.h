@@ -1,7 +1,7 @@
 #pragma once
 
 class EditorTypeBase;
-struct OnPropertyChangedParams;
+struct OnPropertyChangedData;
 
 /** EditorAssetBase
 *
@@ -26,10 +26,10 @@ public:
 	virtual EditorTypeBase* GetEditorType() const = 0;
 
 	// Fired when a property of this asset changes while editing it.
-	DelegateList<const OnPropertyChangedParams&> onPropertyChanged;
+	DelegateList<const OnPropertyChangedData&> onPropertyChanged;
 
 protected:
-	DelegateClass<EditorAssetBase, const OnPropertyChangedParams&> onPropertyChangedDelegate;
+	DelegateClass<EditorAssetBase, const OnPropertyChangedData&> onPropertyChangedDelegate;
 
 	std::string name; // Name of the asset (e.g for Health.asset this will be "Health")
 
@@ -37,5 +37,5 @@ protected:
 
 private: 
 
-	void OnPropertyChanged(const OnPropertyChangedParams& params);
+	void OnPropertyChanged(const OnPropertyChangedData& params);
 };

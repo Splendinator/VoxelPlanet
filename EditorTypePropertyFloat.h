@@ -18,7 +18,7 @@ public:
 	bool CanReadFromFile(std::ifstream& file) const override;
 	void ReadFromFile(std::ifstream& file) override;
 	void WriteToFile(std::ofstream& file) override;
-	void ForceSetValue(const std::string& newValue) override;
+	void ForceSetValue(const ForceSetValueParams& params) override;
 	//~ End EditorTypePropertyBase Interface
 
 	float GetValue() const { return value; }

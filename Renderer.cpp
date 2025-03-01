@@ -434,7 +434,7 @@ namespace dmgf
 		
 		pEntry.pVectorArt = vectorArt;
 	
-		const size_t vectorBufferSize = sizeof(int) * 4 * 4096; // #TODO: Figure out how large the serialized vector art is
+		const size_t vectorBufferSize = sizeof(int) * 4 * 4096; // #TODO: Figure out how large the serialized vector art is (Bear in mind it can change if you load in icons)
 		pEntry.handleDescriptorSet = CreateDescriptorSet(handleDescriptorSetLayoutVector);
 		pEntry.handleDeviceMemory = CreateDeviceMemory(vectorBufferSize, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		pEntry.handleBuffer = CreateUniformBuffer(vectorBufferSize);

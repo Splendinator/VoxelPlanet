@@ -56,7 +56,7 @@ void EditorTypePropertyString::WriteToFile(std::ofstream& file)
 	PropertyFileUtils::WriteStringToFile(file, name, "\"" + value + "\"");
 }
 
-void EditorTypePropertyString::ForceSetValue(const std::string& newValue)
+void EditorTypePropertyString::ForceSetValue(const ForceSetValueParams& params)
 {
-	value = newValue;
+	value = params.newValue;
 }

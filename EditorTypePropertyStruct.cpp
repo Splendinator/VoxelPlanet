@@ -65,7 +65,7 @@ void EditorTypePropertyStruct::WriteToFile(std::ofstream& file)
 	pStructType->WriteToFile(file);
 }
 
-void EditorTypePropertyStruct::ForceSetValue(const std::string& newValue)
+void EditorTypePropertyStruct::ForceSetValue(const ForceSetValueParams& params)
 {
 	// Unused for structs, individual properties will use this
 }
@@ -82,7 +82,7 @@ void* EditorTypePropertyStruct::GetValue() const
 	return nullptr;
 }
 
-void EditorTypePropertyStruct::OnInternalStructPropertyChanged(const OnPropertyChangedParams& onPropertyChangedParams)
+void EditorTypePropertyStruct::OnInternalStructPropertyChanged(const OnPropertyChangedData& OnPropertyChangedData)
 {
-	onPropertyChanged.Invoke(onPropertyChangedParams);
+	onPropertyChanged.Invoke(OnPropertyChangedData);
 }

@@ -29,6 +29,9 @@ public:
 	EditorTypeStruct* FindStructTemplateType(const std::string& typeName) const;
 	std::vector<std::string> GetAllStructTemplateNames(bool bIgnoreAbstract) const;
 
+	// Gather the names of all child class templates that derrive from className (including className) optionally ignoring abstract classes
+	std::vector<std::string> GetAllChildClassTemplateNames(std::string className, bool bIgnoreAbstract) const;
+
 	std::weak_ptr<EditorAssetBase> FindAsset(const std::string& assetName) const;
 
 	// Gather all assets of a given class

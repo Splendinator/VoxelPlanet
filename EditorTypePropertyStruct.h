@@ -19,7 +19,7 @@ public:
 	bool CanReadFromFile(std::ifstream& file) const override;
 	void ReadFromFile(std::ifstream& file) override;
 	void WriteToFile(std::ofstream& file) override;
-	void ForceSetValue(const std::string& newValue) override;
+	void ForceSetValue(const ForceSetValueParams& params) override;
 	//~ End EditorTypePropertyBase Interface
 
 	void* GetValue() const;
@@ -29,8 +29,8 @@ protected:
 
 	std::unique_ptr<EditorTypeStruct> pStructType; // Deep copied struct type. This contains all the properties etc.
 	
-	DelegateClass<EditorTypePropertyStruct, const OnPropertyChangedParams&> onInternalStructPropertyChangedDelegate;
+	DelegateClass<EditorTypePropertyStruct, const OnPropertyChangedData&> onInternalStructPropertyChangedDelegate;
 
-	void OnInternalStructPropertyChanged(const OnPropertyChangedParams& onPropertyChangedParams);
+	void OnInternalStructPropertyChanged(const OnPropertyChangedData& OnPropertyChangedData);
 };
 

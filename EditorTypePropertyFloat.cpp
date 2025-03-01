@@ -45,8 +45,8 @@ void EditorTypePropertyFloat::WriteToFile(std::ofstream& file)
 	PropertyFileUtils::WriteFloatToFile(file, name, value);
 }
 
-void EditorTypePropertyFloat::ForceSetValue(const std::string& newValue)
+void EditorTypePropertyFloat::ForceSetValue(const ForceSetValueParams& params)
 {
-	value = std::stof(newValue);
+	value = std::stof(params.newValue);
 }
 

@@ -1,13 +1,8 @@
 #pragma once
+#include "EditorActionChangeProperty.h"
 
+class EditorTypeClass;
 class EditorTypePropertyBase;
-
-struct OnPropertyChangedParams
-{
-	EditorTypePropertyBase* pProperty = nullptr;
-	std::string oldValue;
-	std::string newValue;
-};
 
 /** EditorTypePropertyBase
 *
@@ -37,11 +32,11 @@ public:
 
 	// This should be overwritten to set the value based off a string of that value.
 	// This ***shouldn't*** call the onPropertyChanged delegate. It's used when setting the value in the editor
-	virtual void ForceSetValue(const std::string& newValue) = 0;
+	virtual void ForceSetValue(const ForceSetValueParams& params) = 0;
 
 	const std::string& GetName() { return name; }
 
-	DelegateList<const OnPropertyChangedParams&> onPropertyChanged;
+	DelegateList<const OnPropertyChangedData&> onPropertyChanged;
 
 protected:
 

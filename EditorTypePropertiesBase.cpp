@@ -94,7 +94,7 @@ void EditorTypePropertiesBase::DeepCopyProperties(EditorTypePropertiesBase* pOth
 	pOther->OnPropertiesPopulated();
 }
 
-void EditorTypePropertiesBase::OnPropertyChanged(const OnPropertyChangedParams& params)
+void EditorTypePropertiesBase::OnPropertyChanged(const OnPropertyChangedData& params)
 {
 	onPropertyChanged.Invoke(params);
 }

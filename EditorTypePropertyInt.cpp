@@ -45,7 +45,7 @@ void EditorTypePropertyInt::WriteToFile(std::ofstream& file)
 	PropertyFileUtils::WriteIntToFile(file, name, value);
 }
 
-void EditorTypePropertyInt::ForceSetValue(const std::string& newValue)
+void EditorTypePropertyInt::ForceSetValue(const ForceSetValueParams& params)
 {
-	value = std::stoi(newValue);
+	value = std::stoi(params.newValue);
 }

@@ -10,6 +10,7 @@
 //	Instanced - Three pointers to the same asset will create 3 identical objects
 //	Singleton - Three pointers to the same asset will create 1 shared object and all point to it.
 //	If neither Instanced/Singleton are in the macro then it will use the base class / engine default
+// EditInlineNew - When creating a new property pointer to this class you create it inline instead of linking to an external asset (like with structs)
 #define EDITORCLASS(...)
 
 // Goes above structs that the assetManager should know about

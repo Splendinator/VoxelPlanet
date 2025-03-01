@@ -2,7 +2,9 @@
 
 #include "MenuScreenBase.h"
 
+class UIObjectIconLoader;
 class UIObjectButton;
+
 // This is the main menu that opens when you hit ESC
 EDITORCLASS()
 class MenuScreenMain : public MenuScreenBase
@@ -17,4 +19,5 @@ public:
 	//~ End MenuScreenBase Interface
 
 	TransientPtr<UIObjectButton> pTestButton;
+	TransientPtr<UIObjectIconLoader> pTestIconLoader;
 };

@@ -47,6 +47,7 @@ void EditorTypeFactoryPropertiesBase::PopulateProperties(std::ifstream& stream, 
 					{"Abstract", EClassMetadataFlags::Abstract},
 					{"Instanced", EClassMetadataFlags::Instanced},
 					{"Singleton", EClassMetadataFlags::Singleton},
+					{"EditInlineNew", EClassMetadataFlags::EditInlineNew},
 				};
 
 			for (const KeywordToFlag& keywordToFlag : keywordsToFlags)

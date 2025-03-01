@@ -96,6 +96,58 @@ std::vector<std::string> AssetManager::GetAllStructTemplateNames(bool bIgnoreAbs
 	return GetAllTypes(templateStructTypes, bIgnoreAbstract);
 }
 
+std::vector<std::string> AssetManager::GetAllChildClassTemplateNames(std::string className, bool bIgnoreAbstract) const
+{
+	// Recursively go down the base class tree until we find className
+	auto IsChildOfClass = [this, &className](EditorTypeClass* pInitialClassType)
+	{
+		std::vector<EditorTypeClass*> pClassTypesToCheckOne = { pInitialClassType };
+		std::vector<EditorTypeClass*> pClassTypesToCheckTwo = { };
+
+		std::vector<EditorTypeClass*>* pCurrentReadVector = &pClassTypesToCheckOne;
+		std::vector<EditorTypeClass*>* pCurrentWriteVector = &pClassTypesToCheckTwo;
+		
+		while (pCurrentReadVector->size() > 0)
+		{
+			pCurrentWriteVector->clear();
+			
+			for (EditorTypeClass* pClassType : *pCurrentReadVector)
+			{
+				if (pClassType->name == className)
+				{
+					// If we are here we have a child of className
+					return true;
+				}
+
+				for (std::string& baseClassName : pClassType->baseClasses)
+				{
+					pCurrentWriteVector->push_back(FindClassTemplateType(baseClassName));
+				}
+			}
+
+			std::swap(pCurrentReadVector, pCurrentWriteVector);
+		}
+		
+		return false;
+	};
+	
+	std::vector<std::string> types;
+	for (auto& [key, value] : templateClassTypes)
+	{
+		if (!bIgnoreAbstract || !value->HasMetadataFlag(EClassMetadataFlags::Abstract))
+		{
+			if (IsChildOfClass(static_cast<EditorTypeClass*>(value)))
+			{
+				types.push_back(key);
+			}
+		}
+	}
+	
+	std::sort(types.begin(), types.end());
+
+	return types;
+}
+
 std::weak_ptr<EditorAssetBase> AssetManager::FindAsset(const std::string& assetName) const
 {
 	auto it = assets.find(assetName);

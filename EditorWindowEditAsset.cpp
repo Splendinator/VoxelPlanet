@@ -36,8 +36,8 @@ void EditorWindowEditAsset::Draw()
 	}
 }
 
-void EditorWindowEditAsset::OnPropertyChanged(const OnPropertyChangedParams& params)
+void EditorWindowEditAsset::OnPropertyChanged(const OnPropertyChangedData& params)
 {
-	pEditor->DoAction(std::make_shared<EditorActionChangeProperty>(params.pProperty, pAsset, params.oldValue, params.newValue, assetPath));
+	pEditor->DoAction(std::make_shared<EditorActionChangeProperty>(pAsset, params, assetPath));
 }
 

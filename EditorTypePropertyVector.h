@@ -17,7 +17,7 @@ public:
 	void ReadFromFile(std::ifstream& file) override;
 	void WriteToFile(std::ofstream& file) override;
 	EditorTypePropertyBase* DeepCopy() override;
-	void ForceSetValue(const std::string& newValue) override;
+	void ForceSetValue(const ForceSetValueParams& params) override;
 	//~ End EditorTypePropertyBase Interface
 
 	std::unique_ptr<EditorTypePropertyBase> dataTemplateType; // The property data type that are in the vector (PropertyTypeFloat for std::vector<float> etc.)
@@ -28,9 +28,9 @@ public:
 
 protected:
 
-	DelegateClass<EditorTypePropertyVector, const OnPropertyChangedParams&> onInternalVectorPropertyChanged;
+	DelegateClass<EditorTypePropertyVector, const OnPropertyChangedData&> onInternalVectorPropertyChanged;
 	
-	void OnInternalVectorPropertyChanged(const OnPropertyChangedParams& onPropertyChangedParams);
+	void OnInternalVectorPropertyChanged(const OnPropertyChangedData& OnPropertyChangedData);
 
 	void AddEntry(EditorTypePropertyBase* pEntry);
 	void AddDefaultEntry();

@@ -19,7 +19,6 @@ void ECS::RegisterSystem(std::unique_ptr<ECSSystemBase>&& pSystem)
 	pSystem->Initialise(this);
 	systems.emplace_back(std::move(pSystem));
 }
-#pragma optimize( "", on )
 
 void ECS::RegisterSystemCallback(std::unique_ptr<ECSSystemCallbackBase>&& pSystemCallback)
 {

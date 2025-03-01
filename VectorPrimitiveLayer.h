@@ -5,7 +5,7 @@
 /** VectorPrimitiveLayer
 *
 * This class is used to represent a layer for vector art.
-* It basically holds a list of other primitives and any transformations applied to this layer are applied to everything underneathe it too.
+* It basically holds a list of other primitives and any transformations applied to this layer are applied to everything underneath it too.
 */
 class VectorPrimitiveLayer : public VectorPrimitiveBase
 {
@@ -18,6 +18,9 @@ public:
 	VectorPrimitiveBase* FindPrimitiveByLabelInternal(const std::string& label) override;
 	const VectorPrimitiveBase* FindPrimitiveUnderCursor(Vec2i cursorPos) const override;
 	//~ End VectorPrimitiveBase Interface
+
+	const std::vector<VectorPrimitiveBase*>& GetChildren() const { return children; }
+	void SetChildren(const std::vector<VectorPrimitiveBase*> newChildren) { children = newChildren; }
 
 private:
 
