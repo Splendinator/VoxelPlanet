@@ -13,7 +13,6 @@
 #include "..\Roguelike\Core\GameSystem.h"
 #include "..\Roguelike\DirectoryData.h"
 #include "..\Roguelike\ECS.h"
-#include "..\Roguelike\Game.h"
 #include "..\Roguelike\ImGuiEditor.h"
 #include "..\Roguelike\Input\InputAction.h"
 #include "..\Roguelike\Input\InputContext.h"
@@ -24,12 +23,29 @@
 #include "..\Roguelike\UI\HUD\HUDAnchorPoint.h"
 #include "..\Roguelike\UI\HUD\HUDObjectBase.h"
 #include "..\Roguelike\UI\HUD\HUDObjectHealth.h"
-#include "..\Roguelike\UI\Menu\MenuScreenBase.h"
-#include "..\Roguelike\UI\Menu\MenuScreenMain.h"
 #include "..\Roguelike\UI\Menu\MenuSystem.h"
+#include "..\Roguelike\UI\Menu\Screens\MenuScreenBase.h"
+#include "..\Roguelike\UI\Menu\Screens\MenuScreenClassSelect.h"
+#include "..\Roguelike\UI\Menu\Screens\MenuScreenMain.h"
 #include "..\Roguelike\WorldGenerator.h"
 
 #pragma warning( disable : 4189 )
+
+// MenuScreenClassSelectEntry
+void MenuScreenClassSelectEntry::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MenuScreenClassSelectEntry* pMenuScreenClassSelectEntry = static_cast<MenuScreenClassSelectEntry*>(pObject);
+	pMenuScreenClassSelectEntry->classIconLayer = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pMenuScreenClassSelectEntry->loaderLayer = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+}
+
+void* MenuScreenClassSelectEntry::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MenuScreenClassSelectEntry* pMenuScreenClassSelectEntry = new MenuScreenClassSelectEntry;
+	int propertyIndex = 0;
+	MenuScreenClassSelectEntry::InitFromPropertiesSubset(pMenuScreenClassSelectEntry, properties, propertyIndex);
+	return pMenuScreenClassSelectEntry;
+}
 
 // MenuScreenBase
 void MenuScreenBase::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
@@ -114,20 +130,6 @@ void* InputActionBase::InitFromProperties(const std::vector<EditorTypePropertyBa
 	return pInputActionBase;
 }
 
-// TestEditInlineNewClassBase
-void TestEditInlineNewClassBase::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	TestEditInlineNewClassBase* pTestEditInlineNewClassBase = static_cast<TestEditInlineNewClassBase*>(pObject);
-}
-
-void* TestEditInlineNewClassBase::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	TestEditInlineNewClassBase* pTestEditInlineNewClassBase = new TestEditInlineNewClassBase;
-	int propertyIndex = 0;
-	TestEditInlineNewClassBase::InitFromPropertiesSubset(pTestEditInlineNewClassBase, properties, propertyIndex);
-	return pTestEditInlineNewClassBase;
-}
-
 // DirectoryData
 void DirectoryData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -135,6 +137,7 @@ void DirectoryData::InitFromPropertiesSubset(void* pObject, const std::vector<Ed
 	pDirectoryData->fonts = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 	pDirectoryData->hudObjects = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 	pDirectoryData->menus = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDirectoryData->sharedUI = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 }
 
 void* DirectoryData::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -196,26 +199,6 @@ void* WorldGenerator::InitFromProperties(const std::vector<EditorTypePropertyBas
 	return pWorldGenerator;
 }
 
-// MenuSystem
-void MenuSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	MenuSystem* pMenuSystem = static_cast<MenuSystem*>(pObject);
-	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pMenuSystem), properties, propertyIndex);
-	pMenuSystem->pInputSystem = static_cast<InputSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-	pMenuSystem->pMenuInputContext = static_cast<InputContext*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-	pMenuSystem->pOpenMenuAction = static_cast<InputActionBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-	pMenuSystem->pCloseMenuAction = static_cast<InputActionBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-	pMenuSystem->pBaseMenuScreen.SetAsset(static_cast<EditorTypePropertyInstancedAssetPtr*>(properties[propertyIndex++])->GetValue());
-}
-
-void* MenuSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	MenuSystem* pMenuSystem = new MenuSystem;
-	int propertyIndex = 0;
-	MenuSystem::InitFromPropertiesSubset(pMenuSystem, properties, propertyIndex);
-	return pMenuSystem;
-}
-
 // MenuScreenMain
 void MenuScreenMain::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -229,6 +212,50 @@ void* MenuScreenMain::InitFromProperties(const std::vector<EditorTypePropertyBas
 	int propertyIndex = 0;
 	MenuScreenMain::InitFromPropertiesSubset(pMenuScreenMain, properties, propertyIndex);
 	return pMenuScreenMain;
+}
+
+// MenuScreenClassSelect
+void MenuScreenClassSelect::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MenuScreenClassSelect* pMenuScreenClassSelect = static_cast<MenuScreenClassSelect*>(pObject);
+	MenuScreenBase::InitFromPropertiesSubset(static_cast<MenuScreenBase*>(pMenuScreenClassSelect), properties, propertyIndex);
+	pMenuScreenClassSelect->classIconFileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pMenuScreenClassSelect->classEntries.push_back(*static_cast<MenuScreenClassSelectEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+		}
+	}
+}
+
+void* MenuScreenClassSelect::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MenuScreenClassSelect* pMenuScreenClassSelect = new MenuScreenClassSelect;
+	int propertyIndex = 0;
+	MenuScreenClassSelect::InitFromPropertiesSubset(pMenuScreenClassSelect, properties, propertyIndex);
+	return pMenuScreenClassSelect;
+}
+
+// MenuSystem
+void MenuSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MenuSystem* pMenuSystem = static_cast<MenuSystem*>(pObject);
+	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pMenuSystem), properties, propertyIndex);
+	pMenuSystem->pInputSystem = static_cast<InputSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuSystem->pMenuInputContext = static_cast<InputContext*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuSystem->pOpenMenuAction = static_cast<InputActionBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuSystem->pCloseMenuAction = static_cast<InputActionBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuSystem->pBaseMenuScreen.SetAsset(static_cast<EditorTypePropertyInstancedAssetPtr*>(properties[propertyIndex++])->GetValue());
+	pMenuSystem->pGameStartMenuScreen.SetAsset(static_cast<EditorTypePropertyInstancedAssetPtr*>(properties[propertyIndex++])->GetValue());
+}
+
+void* MenuSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MenuSystem* pMenuSystem = new MenuSystem;
+	int propertyIndex = 0;
+	MenuSystem::InitFromPropertiesSubset(pMenuSystem, properties, propertyIndex);
+	return pMenuSystem;
 }
 
 // HUDAnchorPoint
@@ -341,59 +368,6 @@ void* ImGuiEditor::InitFromProperties(const std::vector<EditorTypePropertyBase*>
 	return pImGuiEditor;
 }
 
-// TestClass
-void TestClass::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	TestClass* pTestClass = static_cast<TestClass*>(pObject);
-	{
-		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
-		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
-		{
-			pTestClass->pTestEditInlineNewClasses.push_back(static_cast<TestEditInlineNewClassBase*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
-		}
-	}
-}
-
-void* TestClass::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	TestClass* pTestClass = new TestClass;
-	int propertyIndex = 0;
-	TestClass::InitFromPropertiesSubset(pTestClass, properties, propertyIndex);
-	return pTestClass;
-}
-
-// TestEditInlineNewClassInt
-void TestEditInlineNewClassInt::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	TestEditInlineNewClassInt* pTestEditInlineNewClassInt = static_cast<TestEditInlineNewClassInt*>(pObject);
-	TestEditInlineNewClassBase::InitFromPropertiesSubset(static_cast<TestEditInlineNewClassBase*>(pTestEditInlineNewClassInt), properties, propertyIndex);
-	pTestEditInlineNewClassInt->x = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
-}
-
-void* TestEditInlineNewClassInt::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	TestEditInlineNewClassInt* pTestEditInlineNewClassInt = new TestEditInlineNewClassInt;
-	int propertyIndex = 0;
-	TestEditInlineNewClassInt::InitFromPropertiesSubset(pTestEditInlineNewClassInt, properties, propertyIndex);
-	return pTestEditInlineNewClassInt;
-}
-
-// TestEditInlineNewClassFloat
-void TestEditInlineNewClassFloat::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	TestEditInlineNewClassFloat* pTestEditInlineNewClassFloat = static_cast<TestEditInlineNewClassFloat*>(pObject);
-	TestEditInlineNewClassBase::InitFromPropertiesSubset(static_cast<TestEditInlineNewClassBase*>(pTestEditInlineNewClassFloat), properties, propertyIndex);
-	pTestEditInlineNewClassFloat->x = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
-}
-
-void* TestEditInlineNewClassFloat::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	TestEditInlineNewClassFloat* pTestEditInlineNewClassFloat = new TestEditInlineNewClassFloat;
-	int propertyIndex = 0;
-	TestEditInlineNewClassFloat::InitFromPropertiesSubset(pTestEditInlineNewClassFloat, properties, propertyIndex);
-	return pTestEditInlineNewClassFloat;
-}
-
 // ECS
 void ECS::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -465,22 +439,6 @@ void* HUD::InitFromProperties(const std::vector<EditorTypePropertyBase*>& proper
 	return pHUD;
 }
 
-// TestEditInlineNewClassXofY
-void TestEditInlineNewClassXofY::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	TestEditInlineNewClassXofY* pTestEditInlineNewClassXofY = static_cast<TestEditInlineNewClassXofY*>(pObject);
-	TestEditInlineNewClassInt::InitFromPropertiesSubset(static_cast<TestEditInlineNewClassInt*>(pTestEditInlineNewClassXofY), properties, propertyIndex);
-	pTestEditInlineNewClassXofY->y = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
-}
-
-void* TestEditInlineNewClassXofY::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	TestEditInlineNewClassXofY* pTestEditInlineNewClassXofY = new TestEditInlineNewClassXofY;
-	int propertyIndex = 0;
-	TestEditInlineNewClassXofY::InitFromPropertiesSubset(pTestEditInlineNewClassXofY, properties, propertyIndex);
-	return pTestEditInlineNewClassXofY;
-}
-
 // HUDObjectHealth
 void HUDObjectHealth::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -500,31 +458,28 @@ namespace __Generated
 {
 	std::unordered_map<std::string, void* (*)(const std::vector<EditorTypePropertyBase*>&)> stringToCreateObjectFunction
 	{
+		{"MenuScreenClassSelectEntry", &MenuScreenClassSelectEntry::InitFromProperties},
 		{"MenuScreenBase", &MenuScreenBase::InitFromProperties},
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::InitFromProperties},
 		{"TextRenderCharacterData", &TextRenderCharacterData::InitFromProperties},
 		{"TextboxParams", &TextboxParams::InitFromProperties},
 		{"InputActionBase", &InputActionBase::InitFromProperties},
-		{"TestEditInlineNewClassBase", &TestEditInlineNewClassBase::InitFromProperties},
 		{"DirectoryData", &DirectoryData::InitFromProperties},
 		{"GameSystem", &GameSystem::InitFromProperties},
 		{"GameInstance", &GameInstance::InitFromProperties},
 		{"WorldGenerator", &WorldGenerator::InitFromProperties},
-		{"MenuSystem", &MenuSystem::InitFromProperties},
 		{"MenuScreenMain", &MenuScreenMain::InitFromProperties},
+		{"MenuScreenClassSelect", &MenuScreenClassSelect::InitFromProperties},
+		{"MenuSystem", &MenuSystem::InitFromProperties},
 		{"HUDAnchorPoint", &HUDAnchorPoint::InitFromProperties},
 		{"TextRenderSystem", &TextRenderSystem::InitFromProperties},
 		{"InputSystem", &InputSystem::InitFromProperties},
 		{"InputContext", &InputContext::InitFromProperties},
 		{"InputActionPress", &InputActionPress::InitFromProperties},
 		{"ImGuiEditor", &ImGuiEditor::InitFromProperties},
-		{"TestClass", &TestClass::InitFromProperties},
-		{"TestEditInlineNewClassInt", &TestEditInlineNewClassInt::InitFromProperties},
-		{"TestEditInlineNewClassFloat", &TestEditInlineNewClassFloat::InitFromProperties},
 		{"ECS", &ECS::InitFromProperties},
 		{"HUDObjectBase", &HUDObjectBase::InitFromProperties},
 		{"HUD", &HUD::InitFromProperties},
-		{"TestEditInlineNewClassXofY", &TestEditInlineNewClassXofY::InitFromProperties},
 		{"HUDObjectHealth", &HUDObjectHealth::InitFromProperties},
 	};
 }

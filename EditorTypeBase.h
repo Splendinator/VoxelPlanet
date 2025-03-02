@@ -24,7 +24,7 @@ public:
 	EditorTypeBase() {};
 	virtual ~EditorTypeBase() {};
 
-	bool HasMetadataFlag(EClassMetadataFlags flag);
+	bool HasMetadataFlag(EClassMetadataFlags flag) const;
 	void AddMetadataFlag(EClassMetadataFlags flag);
 	
 	// #TODO: Make this protected

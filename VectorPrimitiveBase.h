@@ -17,7 +17,7 @@ public:
 
 	// This should be overridden to serialize the primitive to the input buffer.
 	// Serialized vector art is decoded and rendered by VectorFrag.frag so write this function in such a way that it can be replicated inversely in GLSL (c code)
-	// #TODO: GLSL makes it very awkward to use anything less than u32 (cant use char, can't use pointers) so I'm just using ints for now. This can be rewritten to use bytes here
+	// #JANK: GLSL makes it very awkward to use anything less than u32 (cant use char, can't use pointers) so I'm just using ints for now. This can be rewritten to use bytes here
 	virtual u32* Serialize(u32* pBuffer) = 0;
 
 	// This should be overridden to read in the contents of this vector primitive from an SVG file (xml file).
@@ -27,6 +27,9 @@ public:
 	// Recursive function to find the top hovered over primitive
 	// Remember the input cursorPos will be in vector-art space, you most likely can't just plug in the raw mouse coordinates
 	virtual const VectorPrimitiveBase* FindPrimitiveUnderCursor(Vec2i cursorPos) const { return nullptr; }
+
+	// Returns whether the the passed in primitive is a child 
+	virtual bool IsChildOfThis(const VectorPrimitiveBase* pPossibleChild) const { return false; }
 
 	// Templated version of FindPrimitiveByLabel() for ease of use. Throws an error if the primitive is not found for ease of debugging vector art assets.
 	template<typename TClass>
@@ -39,6 +42,13 @@ public:
 	
 	// This is the layer directly above this; this will be nullptr for the root layer in a file.
 	VectorPrimitiveLayer* pParent = nullptr;
+
+	// #TODO: This is just a hacky way for me to set UIIconLoader icons to the correct location for now.
+	// #TODO: We will eventually want a way to add Transforms (scale, rotation, position) to each VectorArtPrimitiveLayer
+	// #TODO: and it will recursively stack them together as you go down the layers, but this will need to be integrated into the rendering pipeline
+	// This adds to the X and Y co-ordinates.
+	virtual void DebugAddX(u32 deltaX) {}
+	virtual void DebugAddY(u32 deltaY) {}
 };
 
 template<typename TClass>

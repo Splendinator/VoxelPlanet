@@ -2,6 +2,7 @@
 
 #include "UI/UICanvas.h"
 
+class MenuSystem;
 class DirectoryData;
 
 // A single menu screen 
@@ -12,7 +13,7 @@ class MenuScreenBase
 
 public:
 
-	void BaseInit();
+	void BaseInit(MenuSystem* pInMenuSystem);
 	void BaseUnInit();
 	void BaseTick(float DeltaTime);
 
@@ -21,13 +22,20 @@ protected:
 	virtual void UnInit() {}
 	virtual void Tick(float DeltaTime) {}
 
+	// Tell the menu system to close self
+	void RequestCloseSelf();
+	
 	std::unique_ptr<UICanvas> uiCanvas;
-	
-private:
-	
+
 	EDITORPROPERTY()
 	DirectoryData* pDirectoryData = nullptr;
 
+	TransientPtr<MenuSystem> pMenuSystem = nullptr;
+	
+private:
+
 	EDITORPROPERTY()
 	std::string fileName;
+
+	bool bWantsToClose = false;
 };

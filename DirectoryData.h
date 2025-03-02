@@ -14,11 +14,15 @@ class DirectoryData
 	EDITORPROPERTY()
 	std::string fonts;
 
-	// path to the hudObject files
+	// path to the hudObject .svgs
 	EDITORPROPERTY()
 	std::string hudObjects;
 
 	// path to the menu .svg's 
 	EDITORPROPERTY()
 	std::string menus;
+
+	// path to the shared UI .svg's (icons and stuff) 
+	EDITORPROPERTY()
+	std::string sharedUI;
 };

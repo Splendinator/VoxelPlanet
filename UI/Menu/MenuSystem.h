@@ -26,6 +26,8 @@ public:
 
 	void PushMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset);
 	void PopMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset);
+
+	void CloseScreen(MenuScreenBase* pMenuScreen);
 	
 private:
 	// Input system
@@ -47,6 +49,10 @@ private:
 	// Base menu screen to open
 	EDITORPROPERTY()
 	TInstancedAssetPtr<MenuScreenBase> pBaseMenuScreen;
+
+	// Menu screen to open when the game first starts
+	EDITORPROPERTY()
+	TInstancedAssetPtr<MenuScreenBase> pGameStartMenuScreen;
 	
 	void OpenMenu(OnInputActionDelegateParams Params);
 	void CloseMenu(OnInputActionDelegateParams Params);

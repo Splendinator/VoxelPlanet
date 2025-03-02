@@ -26,10 +26,15 @@ public:
 		assetName = inAssetName;
 	}
 
+	T* Get() const { return pInstance; }
+	
 	void Load();
 	void Unload();
 
 	bool IsLoaded() const { return pInstance != nullptr; }
+
+	// This isn't checking the assetName actually resolves to a valid asset 
+	bool IsAssetSet() const { return assetName != "nullptr" && assetName != ""; }
 	
 
 private:

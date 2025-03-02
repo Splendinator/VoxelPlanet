@@ -12,6 +12,7 @@ public:
 	virtual void UnInit() {}
 
 #ifdef DOMIMGUI
+	// A window is already created, so this should just contain the content.
 	virtual void DrawImGui(float deltaTime) {}
 #endif
 	

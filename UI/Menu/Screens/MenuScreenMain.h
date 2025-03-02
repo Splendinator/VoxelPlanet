@@ -17,7 +17,4 @@ public:
 	void UnInit() override;
 	void Tick(float DeltaTime) override;
 	//~ End MenuScreenBase Interface
-
-	TransientPtr<UIObjectButton> pTestButton;
-	TransientPtr<UIObjectIconLoader> pTestIconLoader;
 };

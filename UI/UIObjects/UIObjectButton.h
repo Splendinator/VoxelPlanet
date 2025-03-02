@@ -2,10 +2,20 @@
 
 #include "UIObjectBase.h"
 
+class UIObjectButton;
 class VectorPrimitiveShape;
+
+struct UIObjectButtonDelegateParams
+{
+	UIObjectButton* pButton = nullptr;
+};
 
 class UIObjectButton : public UIObjectBase
 {
+
+public:
+	DelegateList<UIObjectButtonDelegateParams> onClicked; // Fires when button clicked
+	
 protected:
 	
 	//~ Begin UIObjectBase Interface
@@ -16,5 +26,5 @@ protected:
 
 	bool bHoveredOver = false;
 
-	TransientPtr<VectorPrimitiveShape> pButtonPrimitive = nullptr;
+	TransientPtr<VectorPrimitiveBase> pClickablePrimitive;
 };

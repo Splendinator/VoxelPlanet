@@ -3,29 +3,28 @@
 #include "UIObjectButton.h"
 #include "VectorPrimitiveShape.h"
 
+#include "DomWindow/DomWindow.h"
+
 #include "UI/UICanvas.h"
 
 void UIObjectButton::Init(VectorPrimitiveBase* pRoot)
 {
-	UIObjectBase::Init(pRoot);
-
-	pButtonPrimitive = pRoot->FindPrimitiveByLabel<VectorPrimitiveShape>("Button");
+	pClickablePrimitive = pRoot;	
 }
 
 void UIObjectButton::Uninit()
 {
-	pButtonPrimitive = nullptr;
-	
-	UIObjectBase::Uninit();
+	pClickablePrimitive = nullptr;	
 }
 
 void UIObjectButton::Tick(float deltaTime)
 {
-	UIObjectBase::Tick(deltaTime);
-
-	if (pParentCanvas->FindPrimitiveUnderCursor() == pButtonPrimitive.Get())
+	if (dmwi::isPressed(dmwi::LMB)) // #TODO: Maybe we need a middle man for mouse input? We can probably use input actions 
 	{
-		Vec3<u8> colour = pButtonPrimitive->GetColour();
-		pButtonPrimitive->SetColour(colour.x + 1, colour.y + 1, colour.z + 1);
+		const VectorPrimitiveBase* pPrimitiveUnderCursor = pParentCanvas->FindPrimitiveUnderCursor();
+		if (pPrimitiveUnderCursor == pClickablePrimitive || pClickablePrimitive->IsChildOfThis(pPrimitiveUnderCursor))
+		{
+			onClicked.Invoke({this});
+		}
 	}
 }

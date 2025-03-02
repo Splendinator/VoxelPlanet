@@ -2,7 +2,7 @@
 
 #include "EditorTypeBase.h"
 
-bool EditorTypeBase::HasMetadataFlag(EClassMetadataFlags flag)
+bool EditorTypeBase::HasMetadataFlag(EClassMetadataFlags flag) const
 {
 	return (int)metadataFlags & (int)flag;
 }

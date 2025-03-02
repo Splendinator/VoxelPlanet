@@ -26,5 +26,5 @@ private:
 	EDITORPROPERTY()
 	std::vector<GameSystem*> pGameSystems;
 
-	bool bShowingImGui = false;
+	bool bShowingDebugImGui = false;
 };

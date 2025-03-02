@@ -57,10 +57,10 @@ void GameInstance::TickImGui(float deltaTime)
 {
 	if (dmwi::isPressed(dmwi::F8))
 	{
-		bShowingImGui = !bShowingImGui;
+		bShowingDebugImGui = !bShowingDebugImGui;
 	}
 	
-	if (bShowingImGui)
+	if (bShowingDebugImGui)
 	{
 		ImGui::Begin("Debug");
 		

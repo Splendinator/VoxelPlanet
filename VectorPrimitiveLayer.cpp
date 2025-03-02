@@ -80,7 +80,12 @@ VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveByLabelInternal(const st
 	// Label found
 	if (label == layerLabel)
 	{
-		DOMLOG_ERROR_IF(children.size() > 1, "Found correct label but there's more than one child. Returning first");
+		if (children.size() > 1)
+		{
+			// If the layer has multiple primitives we return it, otherwise we treat the primitive itself as having the name and return that
+			// #NOTE: I'm not sure if this is intuitive to use?
+			return this;
+		}
 		return children[0];
 	}
 	
@@ -109,4 +114,42 @@ const VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveUnderCursor(Vec2i 
 	}
 
 	return nullptr;
+}
+
+void VectorPrimitiveLayer::DebugAddX(u32 deltaX)
+{
+	for (VectorPrimitiveBase* child : children)
+	{
+		child->DebugAddX(deltaX);
+	}
+}
+
+void VectorPrimitiveLayer::DebugAddY(u32 deltaY)
+{
+	for (VectorPrimitiveBase* child : children)
+	{
+		child->DebugAddY(deltaY);
+	}
+}
+
+void VectorPrimitiveLayer::SetChildren(const std::vector<VectorPrimitiveBase*> newChildren)
+{
+	for (VectorPrimitiveBase* child : children)
+	{
+		delete child;
+	}
+	children = newChildren;
+}
+
+bool VectorPrimitiveLayer::IsChildOfThis(const VectorPrimitiveBase* pPossibleChild) const
+{
+	for (VectorPrimitiveBase* pChild : children)
+	{
+		if (pChild == pPossibleChild || pChild->IsChildOfThis(pPossibleChild))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

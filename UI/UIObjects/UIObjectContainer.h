@@ -11,6 +11,7 @@ class UIObjectBase;
 // This allows the UI be to hierarchical i.e a root UICanvas might contain a UIObjectHealthBar which itself is made up of a couple of UIObjectProgressBars
 class UIObjectContainer
 {
+	EDITORBODY()
 protected:
 
 	void TickAllUIObjects(float deltaTime);

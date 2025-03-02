@@ -25,7 +25,7 @@ void HealthBarNameslate::Init()
 
 	canvas = std::make_unique<UICanvas>(initParams);
 
-	pHealthBarProgress = canvas->GetUIObject<UIObjectProgressBar>();
+	pHealthBarProgress = canvas->AddExistingUIObject<UIObjectProgressBar>();
 }
 
 void HealthBarNameslate::Uninit()

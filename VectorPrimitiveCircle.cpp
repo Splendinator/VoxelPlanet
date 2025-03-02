@@ -42,3 +42,13 @@ const VectorPrimitiveBase* VectorPrimitiveCircle::FindPrimitiveUnderCursor(Vec2i
 	}
 	return nullptr;   
 }
+
+void VectorPrimitiveCircle::DebugAddX(u32 deltaX)
+{
+	x += deltaX;
+}
+
+void VectorPrimitiveCircle::DebugAddY(u32 deltaY)
+{
+	y += deltaY;
+}

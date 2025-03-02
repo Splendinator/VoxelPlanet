@@ -80,6 +80,18 @@ void EditorTypePropertiesBase::OnTemplateMetadataFlagsPopulated()
 			AddMetadataFlag(derrivedFlag == EClassMetadataFlags::None ? EClassMetadataFlags::Instanced : derrivedFlag);
 		}
 	}
+
+	// We want to inherit EditInlineNew from the base
+	{
+		const bool bEditInlineNew = HasMetadataFlag(EClassMetadataFlags::Instanced);
+		if (!bEditInlineNew)
+		{
+			if (IsChildEditInlineNew())
+			{
+				AddMetadataFlag(EClassMetadataFlags::EditInlineNew);
+			}
+		}
+	}
 }
 
 void EditorTypePropertiesBase::DeepCopyProperties(EditorTypePropertiesBase* pOther)
@@ -123,4 +135,25 @@ EClassMetadataFlags EditorTypePropertiesBase::GetChildInstancedOrSingletonFlag()
 	}
 
 	return EClassMetadataFlags::None;
+}
+
+bool EditorTypePropertiesBase::IsChildEditInlineNew() const
+{
+	if (HasMetadataFlag(EClassMetadataFlags::EditInlineNew))
+	{
+		return true;
+	}
+
+	for (const std::string& baseClass : baseClasses)
+	{
+		EditorTypePropertiesBase* pBaseClass = static_cast<EditorTypePropertiesBase*>(Game::GetAssetManager().FindTemplateType(baseClass));
+		DOMASSERT(pBaseClass);
+
+		if (pBaseClass->IsChildEditInlineNew())
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

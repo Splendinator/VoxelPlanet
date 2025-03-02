@@ -1,3 +1,7 @@
+Struct MenuScreenClassSelectEntry
+string classIconLayer ""
+string loaderLayer ""
+;
 Class MenuScreenBase
 meta Abstract
 meta Instanced
@@ -142,15 +146,12 @@ bool bCtrl false
 bool bShift false
 bool bAlt false
 ;
-Class TestEditInlineNewClassBase
-meta Abstract
-meta EditInlineNew
-;
 Class DirectoryData
 meta Singleton
 string fonts ""
 string hudObjects ""
 string menus ""
+string sharedUI ""
 ;
 Class GameSystem
 meta Abstract
@@ -163,6 +164,14 @@ Class WorldGenerator
 Child GameSystem
 class ECS pEcs nullptr
 ;
+Class MenuScreenMain
+Child MenuScreenBase
+;
+Class MenuScreenClassSelect
+Child MenuScreenBase
+string classIconFileName ""
+vector classEntries MenuScreenClassSelectEntry
+;
 Class MenuSystem
 Child GameSystem
 class InputSystem pInputSystem nullptr
@@ -170,9 +179,7 @@ class InputContext pMenuInputContext nullptr
 class InputActionBase pOpenMenuAction nullptr
 class InputActionBase pCloseMenuAction nullptr
 instancedassetptr MenuScreenBase pBaseMenuScreen nullptr
-;
-Class MenuScreenMain
-Child MenuScreenBase
+instancedassetptr MenuScreenBase pGameStartMenuScreen nullptr
 ;
 Struct HUDAnchorPoint
 enum EHUDAnchorPoint anchorPoint NONE
@@ -201,17 +208,6 @@ Child GameSystem
 class InputSystem pInputSystem nullptr
 class InputContext pEditorInputContext nullptr
 ;
-Class TestClass
-vector pTestEditInlineNewClasses TestEditInlineNewClassBase
-;
-Class TestEditInlineNewClassInt
-Child TestEditInlineNewClassBase
-int x 20
-;
-Class TestEditInlineNewClassFloat
-Child TestEditInlineNewClassBase
-float x 20
-;
 Class ECS
 Child GameSystem
 ;
@@ -229,10 +225,6 @@ class DirectoryData pDirectoryData nullptr
 class ECS pEcs nullptr
 vector pHudObjects HUDObjectBase
 struct HUDObjectSharedInitParams hudObjectSharedInitParams
-;
-Class TestEditInlineNewClassXofY
-Child TestEditInlineNewClassInt
-int y 20
 ;
 Class HUDObjectHealth
 Child HUDObjectBase

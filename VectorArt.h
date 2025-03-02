@@ -35,9 +35,9 @@ public:
 
 	// Page dimensions are used to figure out size of primitives relative to the quad they are on.
 	// i.e if page width is 1000 units wide and you scale a primitive to be 500 units wide, it will be half the width of the quad.
-	u32 GetPageWidth() { return pageWidth; }
-	u32 GetPageHeight() { return pageHeight; }
-
+	u32 GetPageWidth() const { return pageWidth; }
+	u32 GetPageHeight() const { return pageHeight; }
+	
 	VectorPrimitiveLayer* GetRootLayer() { return pRootLayer.get(); }
 
 private:

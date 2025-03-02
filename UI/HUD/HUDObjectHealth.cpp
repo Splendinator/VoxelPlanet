@@ -8,7 +8,7 @@
 
 void HUDObjectHealth::Init(UICanvas& canvas)
 {
-	pHealthBarProgress = canvas.GetUIObject<UIObjectProgressBar>();
+	pHealthBarProgress = canvas.AddExistingUIObject<UIObjectProgressBar>();
 }
 
 void HUDObjectHealth::Tick(ECS& ecs, EntityId player, float deltaTime)

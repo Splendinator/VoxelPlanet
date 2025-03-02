@@ -5,7 +5,7 @@
 #include "Input/InputAction.h"
 #include "Input/InputContext.h"
 #include "Input/InputSystem.h"
-#include "MenuScreenBase.h"
+#include "Screens/MenuScreenBase.h"
 
 void MenuSystem::Init()
 {
@@ -18,6 +18,11 @@ void MenuSystem::Init()
 	{
 		CloseMenuDelegate.Bind(this, &MenuSystem::CloseMenu);
 		pCloseMenuAction->OnActionActivated.Add(CloseMenuDelegate);
+	}
+
+	if (pGameStartMenuScreen.IsAssetSet())
+	{
+		PushMenuScreen(pGameStartMenuScreen);
 	}
 }
 
@@ -35,6 +40,7 @@ void MenuSystem::Tick(float deltaTime)
 
 void MenuSystem::UnInit()
 {
+	
 	if (bMenuOpen)
 	{
 		CloseMenu(OnInputActionDelegateParams());
@@ -62,7 +68,7 @@ void MenuSystem::PushMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenA
 	{
 		activeMenuScreens.push_back(&pMenuScreenAsset);
 
-		pMenuScreenAsset->BaseInit();
+		pMenuScreenAsset->BaseInit(this);
 	}
 }
 
@@ -87,11 +93,23 @@ void MenuSystem::PopMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAs
 
 			if (pNewScreen->IsLoaded())
 			{
-				(*pNewScreen)->BaseInit();
+				(*pNewScreen)->BaseInit(this);
 			}
 		}
 	}
 	
+}
+
+void MenuSystem::CloseScreen(MenuScreenBase* pMenuScreen)
+{
+	for (TInstancedAssetPtr<MenuScreenBase>* pActiveMenuScreen : activeMenuScreens)
+	{
+		if (pActiveMenuScreen->Get() == pMenuScreen)
+		{
+			PopMenuScreen(*pActiveMenuScreen);
+			return;
+		}
+	}
 }
 
 void MenuSystem::OpenMenu(OnInputActionDelegateParams Params)
@@ -115,5 +133,5 @@ void MenuSystem::CloseMenu(OnInputActionDelegateParams Params)
 		pInputSystem->PopInputContext(pMenuInputContext);
 	}
 
-	PopMenuScreen(pBaseMenuScreen);
+	PopMenuScreen(pBaseMenuScreen); // #TODO: This should pop all screens off the stack likely
 }

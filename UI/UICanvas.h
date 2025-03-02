@@ -47,10 +47,12 @@ public:
 	// Return the primitive directly under the cursor, or nullptr if not set
 	const VectorPrimitiveBase* FindPrimitiveUnderCursor() const;
 	
-	// Find a labeled UIObject of class TClass on the canvas
+	// Find an optionally labeled UIObject of class TClass on the canvas
 	template<typename TClass>
-	TransientPtr<TClass> GetUIObject(const std::string& label = "");
+	TransientPtr<TClass> AddExistingUIObject(const std::string& label = "");
 
+	const VectorArt* GetVectorArt() const;
+	
 private:
 
 	const UICanvas* GetCanvas() const final { return this; }
@@ -65,7 +67,7 @@ private:
 };
 
 template<typename TClass>
-TransientPtr<TClass> UICanvas::GetUIObject(const std::string& label /*= ""*/)
+TransientPtr<TClass> UICanvas::AddExistingUIObject(const std::string& label /*= ""*/)
 {
 	return AddUIObject<TClass>(pVectorArt->GetRootLayer(), label);
 }

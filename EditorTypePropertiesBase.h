@@ -54,7 +54,9 @@ protected:
 
 	// Recursively scan children template objects for the first of either Instanced or Singleton.
 	// If none are found we return EClassMetadataFlags::None
-	EClassMetadataFlags GetChildInstancedOrSingletonFlag(); 
+	EClassMetadataFlags GetChildInstancedOrSingletonFlag();
+
+	bool IsChildEditInlineNew() const;
 
 	DelegateClass<EditorTypePropertiesBase, const OnPropertyChangedData&> onPropertyChangedDelegate;
 

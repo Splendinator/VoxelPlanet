@@ -24,3 +24,4 @@ void UIObjectBase::BaseTick(float deltaTime)
 	
 	Tick(deltaTime);
 }
+

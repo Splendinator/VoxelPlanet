@@ -5,11 +5,16 @@
 #include "DirectoryData.h"
 #include "DomWindow/DomWindow.h"
 
-void MenuScreenBase::BaseInit()
+#include "UI/Menu/MenuSystem.h"
+
+void MenuScreenBase::BaseInit(MenuSystem* pInMenuSystem)
 {
+	DOMASSERT(pInMenuSystem);
+	pMenuSystem = pInMenuSystem;
+	
 	UICanvasInitParams initParams;
-	initParams.sizeX = (float)dmwi::getWindowWidth();//* 3.5f;
-	initParams.sizeY = (float)dmwi::getWindowHeight();// * 3.5f;
+	initParams.sizeX = (float)dmwi::getWindowWidth();
+	initParams.sizeY = (float)dmwi::getWindowHeight();
 	initParams.filePath = pDirectoryData->menus + fileName + ".svg";
 	initParams.renderPriority = RenderPriority::menu;
 	initParams.type = dmgf::ERenderObjectType::UI;
@@ -24,6 +29,11 @@ void MenuScreenBase::BaseTick(float DeltaTime)
 	uiCanvas->Tick(DeltaTime);
 	
 	Tick(DeltaTime);
+
+	if (bWantsToClose && pMenuSystem)
+	{
+		pMenuSystem->CloseScreen(this);
+	}
 }
 
 void MenuScreenBase::BaseUnInit()
@@ -31,8 +41,13 @@ void MenuScreenBase::BaseUnInit()
 	UnInit();
 	
 	uiCanvas->UnInit();
-	uiCanvas.reset();	
+	uiCanvas.reset();
+
+	pMenuSystem = nullptr;
 }
 
-
-
+void MenuScreenBase::RequestCloseSelf()
+{
+	// The game will crash if we just close half way through a tick etc. so we need to defer
+	bWantsToClose = true;
+}

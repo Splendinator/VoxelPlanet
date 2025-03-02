@@ -42,3 +42,13 @@ const VectorPrimitiveBase* VectorPrimitiveRectangle::FindPrimitiveUnderCursor(Ve
 	}
 	return nullptr;
 }
+
+void VectorPrimitiveRectangle::DebugAddX(u32 deltaX)
+{
+	SetX(x + deltaX);
+}
+
+void VectorPrimitiveRectangle::DebugAddY(u32 deltaY)
+{
+	SetY(y + deltaY);
+}
