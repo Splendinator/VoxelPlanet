@@ -223,6 +223,10 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RendererObject.cpp" />
     <ClCompile Include="ResourceLoader.cpp" />
+    <ClCompile Include="RPGSystems\Attributes\RPGAttributeModifiers.cpp" />
+    <ClCompile Include="RPGSystems\Attributes\RPGAttributes.cpp" />
+    <ClCompile Include="RPGSystems\Attributes\RPGAttributeSystem.cpp" />
+    <ClCompile Include="RPGSystems\RPGCoreSystem.cpp" />
     <ClCompile Include="StbImageCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -1332,6 +1336,10 @@
     <ClInclude Include="RendererObject.h" />
     <ClInclude Include="RenderPriorities.h" />
     <ClInclude Include="ResourceLoader.h" />
+    <ClInclude Include="RPGSystems\Attributes\RPGAttributeModifiers.h" />
+    <ClInclude Include="RPGSystems\Attributes\RPGAttributes.h" />
+    <ClInclude Include="RPGSystems\Attributes\RPGAttributeSystem.h" />
+    <ClInclude Include="RPGSystems\RPGCoreSystem.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="ECSSystemAction.h" />
     <ClInclude Include="ECSSystemBase.h" />
@@ -1383,6 +1391,9 @@
     <None Include="..\Graphics\Shaders\ImGuiVert.vert" />
     <None Include="..\Graphics\Shaders\VectorFrag.frag" />
     <None Include="..\Graphics\Shaders\VectorVert.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="RPGSystems\Attributes\RPGAttributesShared.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

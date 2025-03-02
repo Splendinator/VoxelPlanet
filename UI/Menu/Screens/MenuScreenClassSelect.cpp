@@ -17,6 +17,7 @@ void MenuScreenClassSelect::Init(UICanvas* pCanvas)
 		{
 			entry.iconLoader = pCanvas->AddExistingUIObject<UIObjectIconLoader>(entry.loaderLayer);
 			entry.iconLoader->LoadUIIcon(pDirectoryData->sharedUI + classIconFileName + ".svg", entry.classIconLayer);
+
 			entry.button = pCanvas->AddExistingUIObject<UIObjectButton>(entry.loaderLayer); // Load button after icon so icon is clickable
 			entry.button->onClicked.Add(onClickedDelegate);
 		}
@@ -36,7 +37,6 @@ void MenuScreenClassSelect::OnClicked(UIObjectButtonDelegateParams params)
 	{
 		if (entry.button == params.pButton)
 		{
-			DOMLOG_INFO("You've selected class:", entry.loaderLayer);
 			RequestCloseSelf();
 		}
 	}

@@ -36,24 +36,23 @@ void ECS::Init()
 	RegisterSystem(std::make_unique<ECSSystemRender>());
 	RegisterSystem(std::make_unique<ECSSystemCleanUp>());
 	
-	// Create player entity
+	// Reserve bare bones player entity at entityId = 0
+	// RPG systems are responsible for setting up the correct health etc.
+	// #TODO: Most of these should be moved out of here and into the correct systems
 	{
 		Entity& e = GetEntity(playerEntity);
 		e.components.AddComponent(EComponents::ComponentMesh);
 		e.components.AddComponent(EComponents::ComponentTransform);
 		e.components.AddComponent(EComponents::ComponentAction);
-		e.components.AddComponent(EComponents::ComponentHealth);
 		e.components.AddComponent(EComponents::ComponentFaction);
 		e.components.AddComponent(EComponents::ComponentRigid);
 		GetComponent<ComponentMesh>(playerEntity).pRendererObject = dmgf::AddObjectFromSVG(FilePath::VectorArt::player);
 		GetComponent<ComponentMesh>(playerEntity).pRendererObject->SetRenderPriority(RenderPriority::unit);
 		GetComponent<ComponentTransform>(playerEntity).x = WORLD_START_X;
 		GetComponent<ComponentTransform>(playerEntity).y = WORLD_START_Y;
-		GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;
-		GetComponent<ComponentAction>(playerEntity).energy = 100;
 		GetComponent<ComponentAction>(playerEntity).pActionDecider = new ActionDeciderPlayer;
-		GetComponent<ComponentHealth>(playerEntity).health = 100;
-		GetComponent<ComponentHealth>(playerEntity).maxHealth = 100;
+		GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;
+		GetComponent<ComponentAction>(playerEntity).energy = 100; 
 		GetComponent<ComponentFaction>(playerEntity).factionFlags = ComponentFaction::EFactionFlags::Player;
 	}
 }
@@ -62,7 +61,7 @@ void ECS::Tick(float deltaTime)
 {
 	// #TODO: Need a way to only tick a entities if the component has changed, maybe just a bool in the base class of all components?
 	
-	// System Pre-Tick
+	// System Pre-Tic
 	ECSSystemTickParams params;
 	params.pEcs = this;
 	params.entityId = INVALID_ENTITY_ID;

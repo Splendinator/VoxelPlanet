@@ -4,7 +4,6 @@
 
 #include "EditorActionChangeProperty.h"
 #include "EditorAssetBase.h"
-#include "EditorTypePropertyBase.h"
 #include "ImGuiEditor.h"
 
 void EditorWindowEditAsset::Open()
@@ -32,6 +31,11 @@ void EditorWindowEditAsset::Draw()
 	}
 	else
 	{
+		if (ImGui::Button("Open File in Explorer"))
+		{
+			system(("explorer " + pAsset.lock()->GetAssetFilePath().string()).c_str());
+		}
+
 		pAsset.lock()->Draw();
 	}
 }

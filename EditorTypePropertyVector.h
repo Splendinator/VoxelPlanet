@@ -32,6 +32,7 @@ protected:
 	
 	void OnInternalVectorPropertyChanged(const OnPropertyChangedData& OnPropertyChangedData);
 
-	void AddEntry(EditorTypePropertyBase* pEntry);
-	void AddDefaultEntry();
+	// If Index = -1 it will instert at the end, else it will insert at index and push everything else forward one
+	void AddEntry(EditorTypePropertyBase* pEntry, int index = -1);
+	void AddDefaultEntry(int index = -1);
 };

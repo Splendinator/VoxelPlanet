@@ -18,6 +18,10 @@
 #include "..\Roguelike\Input\InputContext.h"
 #include "..\Roguelike\Input\InputKey.h"
 #include "..\Roguelike\Input\InputSystem.h"
+#include "..\Roguelike\RPGSystems\Attributes\RPGAttributeModifiers.h"
+#include "..\Roguelike\RPGSystems\Attributes\RPGAttributes.h"
+#include "..\Roguelike\RPGSystems\Attributes\RPGAttributeSystem.h"
+#include "..\Roguelike\RPGSystems\RPGCoreSystem.h"
 #include "..\Roguelike\TextRenderSystem\TextRenderSystem.h"
 #include "..\Roguelike\UI\HUD\HUD.h"
 #include "..\Roguelike\UI\HUD\HUDAnchorPoint.h"
@@ -110,6 +114,20 @@ void* TextboxParams::InitFromProperties(const std::vector<EditorTypePropertyBase
 	int propertyIndex = 0;
 	TextboxParams::InitFromPropertiesSubset(pTextboxParams, properties, propertyIndex);
 	return pTextboxParams;
+}
+
+// RPGAttributeModifierBase
+void RPGAttributeModifierBase::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	RPGAttributeModifierBase* pRPGAttributeModifierBase = static_cast<RPGAttributeModifierBase*>(pObject);
+}
+
+void* RPGAttributeModifierBase::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	RPGAttributeModifierBase* pRPGAttributeModifierBase = new RPGAttributeModifierBase;
+	int propertyIndex = 0;
+	RPGAttributeModifierBase::InitFromPropertiesSubset(pRPGAttributeModifierBase, properties, propertyIndex);
+	return pRPGAttributeModifierBase;
 }
 
 // InputActionBase
@@ -298,6 +316,60 @@ void* TextRenderSystem::InitFromProperties(const std::vector<EditorTypePropertyB
 	return pTextRenderSystem;
 }
 
+// RPGCoreSystem
+void RPGCoreSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	RPGCoreSystem* pRPGCoreSystem = static_cast<RPGCoreSystem*>(pObject);
+	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pRPGCoreSystem), properties, propertyIndex);
+}
+
+void* RPGCoreSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	RPGCoreSystem* pRPGCoreSystem = new RPGCoreSystem;
+	int propertyIndex = 0;
+	RPGCoreSystem::InitFromPropertiesSubset(pRPGCoreSystem, properties, propertyIndex);
+	return pRPGCoreSystem;
+}
+
+// RPGAttributeBase
+void RPGAttributeBase::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	RPGAttributeBase* pRPGAttributeBase = static_cast<RPGAttributeBase*>(pObject);
+	pRPGAttributeBase->displayName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pRPGAttributeBase->baseValue = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pRPGAttributeBase->pModifiers.push_back(static_cast<RPGAttributeModifierBase*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
+		}
+	}
+}
+
+void* RPGAttributeBase::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	RPGAttributeBase* pRPGAttributeBase = new RPGAttributeBase;
+	int propertyIndex = 0;
+	RPGAttributeBase::InitFromPropertiesSubset(pRPGAttributeBase, properties, propertyIndex);
+	return pRPGAttributeBase;
+}
+
+// RPGAttributeModifierTest
+void RPGAttributeModifierTest::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	RPGAttributeModifierTest* pRPGAttributeModifierTest = static_cast<RPGAttributeModifierTest*>(pObject);
+	RPGAttributeModifierBase::InitFromPropertiesSubset(static_cast<RPGAttributeModifierBase*>(pRPGAttributeModifierTest), properties, propertyIndex);
+	pRPGAttributeModifierTest->delta = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+}
+
+void* RPGAttributeModifierTest::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	RPGAttributeModifierTest* pRPGAttributeModifierTest = new RPGAttributeModifierTest;
+	int propertyIndex = 0;
+	RPGAttributeModifierTest::InitFromPropertiesSubset(pRPGAttributeModifierTest, properties, propertyIndex);
+	return pRPGAttributeModifierTest;
+}
+
 // InputSystem
 void InputSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -439,6 +511,44 @@ void* HUD::InitFromProperties(const std::vector<EditorTypePropertyBase*>& proper
 	return pHUD;
 }
 
+// RPGAttributeSystem
+void RPGAttributeSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	RPGAttributeSystem* pRPGAttributeSystem = static_cast<RPGAttributeSystem*>(pObject);
+	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pRPGAttributeSystem), properties, propertyIndex);
+	pRPGAttributeSystem->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pRPGAttributeSystem->attributes.push_back(static_cast<RPGAttributeBase*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
+		}
+	}
+}
+
+void* RPGAttributeSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	RPGAttributeSystem* pRPGAttributeSystem = new RPGAttributeSystem;
+	int propertyIndex = 0;
+	RPGAttributeSystem::InitFromPropertiesSubset(pRPGAttributeSystem, properties, propertyIndex);
+	return pRPGAttributeSystem;
+}
+
+// RPGAttributeMaxHealth
+void RPGAttributeMaxHealth::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	RPGAttributeMaxHealth* pRPGAttributeMaxHealth = static_cast<RPGAttributeMaxHealth*>(pObject);
+	RPGAttributeBase::InitFromPropertiesSubset(static_cast<RPGAttributeBase*>(pRPGAttributeMaxHealth), properties, propertyIndex);
+}
+
+void* RPGAttributeMaxHealth::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	RPGAttributeMaxHealth* pRPGAttributeMaxHealth = new RPGAttributeMaxHealth;
+	int propertyIndex = 0;
+	RPGAttributeMaxHealth::InitFromPropertiesSubset(pRPGAttributeMaxHealth, properties, propertyIndex);
+	return pRPGAttributeMaxHealth;
+}
+
 // HUDObjectHealth
 void HUDObjectHealth::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -463,6 +573,7 @@ namespace __Generated
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::InitFromProperties},
 		{"TextRenderCharacterData", &TextRenderCharacterData::InitFromProperties},
 		{"TextboxParams", &TextboxParams::InitFromProperties},
+		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::InitFromProperties},
 		{"InputActionBase", &InputActionBase::InitFromProperties},
 		{"DirectoryData", &DirectoryData::InitFromProperties},
 		{"GameSystem", &GameSystem::InitFromProperties},
@@ -473,6 +584,9 @@ namespace __Generated
 		{"MenuSystem", &MenuSystem::InitFromProperties},
 		{"HUDAnchorPoint", &HUDAnchorPoint::InitFromProperties},
 		{"TextRenderSystem", &TextRenderSystem::InitFromProperties},
+		{"RPGCoreSystem", &RPGCoreSystem::InitFromProperties},
+		{"RPGAttributeBase", &RPGAttributeBase::InitFromProperties},
+		{"RPGAttributeModifierTest", &RPGAttributeModifierTest::InitFromProperties},
 		{"InputSystem", &InputSystem::InitFromProperties},
 		{"InputContext", &InputContext::InitFromProperties},
 		{"InputActionPress", &InputActionPress::InitFromProperties},
@@ -480,6 +594,8 @@ namespace __Generated
 		{"ECS", &ECS::InitFromProperties},
 		{"HUDObjectBase", &HUDObjectBase::InitFromProperties},
 		{"HUD", &HUD::InitFromProperties},
+		{"RPGAttributeSystem", &RPGAttributeSystem::InitFromProperties},
+		{"RPGAttributeMaxHealth", &RPGAttributeMaxHealth::InitFromProperties},
 		{"HUDObjectHealth", &HUDObjectHealth::InitFromProperties},
 	};
 }

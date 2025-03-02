@@ -29,7 +29,8 @@ VectorArt::VectorArt(const char* pFilePath)
 	pageWidth = (u32)std::stof(tag);
 	tag = dmim::GetNextAttribute(svgFile, "height");
 	pageHeight = (u32)std::stof(tag);
-	
+
+	// #TODO: Empty layers cause a freeze
 	// Layers
 	while (tag != "g")
 	{

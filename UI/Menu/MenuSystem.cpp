@@ -40,7 +40,6 @@ void MenuSystem::Tick(float deltaTime)
 
 void MenuSystem::UnInit()
 {
-	
 	if (bMenuOpen)
 	{
 		CloseMenu(OnInputActionDelegateParams());

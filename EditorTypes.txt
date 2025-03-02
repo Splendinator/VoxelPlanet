@@ -34,6 +34,10 @@ float xPos 0
 float yPos 0
 float fontSize 0
 ;
+Class RPGAttributeModifierBase
+meta Abstract
+meta EditInlineNew
+;
 Enum EInputKey
 NONE 0
 LMB 1
@@ -191,6 +195,20 @@ Child GameSystem
 vector characterDatas TextRenderCharacterData
 class DirectoryData pDirectoryData nullptr
 ;
+Class RPGCoreSystem
+Child GameSystem
+;
+Class RPGAttributeBase
+meta Abstract
+meta Singleton
+string displayName ""
+int baseValue 0
+vector pModifiers RPGAttributeModifierBase
+;
+Class RPGAttributeModifierTest
+Child RPGAttributeModifierBase
+int delta 0
+;
 Class InputSystem
 Child GameSystem
 class InputContext pDefaultInputContext nullptr
@@ -225,6 +243,14 @@ class DirectoryData pDirectoryData nullptr
 class ECS pEcs nullptr
 vector pHudObjects HUDObjectBase
 struct HUDObjectSharedInitParams hudObjectSharedInitParams
+;
+Class RPGAttributeSystem
+Child GameSystem
+class ECS pEcs nullptr
+vector attributes RPGAttributeBase
+;
+Class RPGAttributeMaxHealth
+Child RPGAttributeBase
 ;
 Class HUDObjectHealth
 Child HUDObjectBase

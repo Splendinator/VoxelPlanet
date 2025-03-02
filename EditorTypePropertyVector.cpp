@@ -16,7 +16,6 @@ void EditorTypePropertyVector::DrawImGUI()
 		if (ImGui::Button("Add"))
 		{
 			AddDefaultEntry();
-			
 		}
 		
 		for (int index = 0; index < arrayLength; ++index)
@@ -46,6 +45,13 @@ void EditorTypePropertyVector::DrawImGUI()
 					arrayLengthChangedParams.newValue = std::to_string(arrayLength);
 
 					onPropertyChanged.Invoke(arrayLengthChangedParams);
+				}
+
+				// #TODO: This isn't working with undo yet, We'll need to extend OnPropertyChangedData and pass through an int of the index or something.
+				ImGui::SameLine();
+				if (ImGui::Button("Insert Above"))
+				{
+					AddDefaultEntry(index);
 				}
 				ImGui::PopID();
 			}
@@ -128,7 +134,7 @@ void EditorTypePropertyVector::OnInternalVectorPropertyChanged(const OnPropertyC
 	onPropertyChanged.Invoke(OnPropertyChangedData);
 }
 
-void EditorTypePropertyVector::AddEntry(EditorTypePropertyBase* pEntry)
+void EditorTypePropertyVector::AddEntry(EditorTypePropertyBase* pEntry, int index /*= -1*/)
 {
 	++arrayLength;
 	pEntry->onPropertyChanged.Add(onInternalVectorPropertyChanged);
@@ -143,15 +149,24 @@ void EditorTypePropertyVector::AddEntry(EditorTypePropertyBase* pEntry)
 	{
 		instancedProperties.push_back(std::unique_ptr<EditorTypePropertyBase>(pEntry));
 	}
+	
+	if (index >= 0)
+	{
+		for (int swapIndex = arrayLength - 1; swapIndex > index; --swapIndex)
+		{
+			// Bubble the new entry to the correct place
+			std::swap(instancedProperties[swapIndex], instancedProperties[swapIndex-1]);
+		}
+	}
 }
 
-void EditorTypePropertyVector::AddDefaultEntry()
+void EditorTypePropertyVector::AddDefaultEntry(int index /*= -1*/)
 {
 	OnPropertyChangedData arrayLengthChangedParams = {};
 	arrayLengthChangedParams.pProperty = this;
 	arrayLengthChangedParams.oldValue = std::to_string(arrayLength);
 
-	AddEntry(dataTemplateType->DeepCopy());
+	AddEntry(dataTemplateType->DeepCopy(), index);
 
 	arrayLengthChangedParams.newValue = std::to_string(arrayLength);
 	
