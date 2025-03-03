@@ -16,7 +16,7 @@ void UIObjectIconLoader::LoadUIIcon(const std::string& file, const std::string& 
 	else
 	{
 		// #JANK: Should this use pParent instead of getting the layer directly?
-		pReplaceWithThis = pLoadedVectorArt->FindPrimitiveByLabel<VectorPrimitiveBase>(primitiveName)->pParent;
+		pReplaceWithThis = pLoadedVectorArt->FindLayerByLabel(primitiveName);
 	}
 
 	// #TODO: Right now this assumes the icons are loaded in from 0,0 in their respective files.

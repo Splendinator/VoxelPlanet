@@ -9,7 +9,11 @@ EDITORCLASS(Singleton)
 class DirectoryData
 {
 	EDITORBODY()
+public:
 
+	// Error checked that it resolves to a correct file, prefer this instead of manual concatenation
+	static std::string ConcatenateFilePathChecked(std::string path, std::string fileName, std::string extension);
+	
 	// path to the font files
 	EDITORPROPERTY()
 	std::string fonts;
@@ -25,4 +29,8 @@ class DirectoryData
 	// path to the shared UI .svg's (icons and stuff) 
 	EDITORPROPERTY()
 	std::string sharedUI;
+
+	// path to class .svg's
+	EDITORPROPERTY()
+	std::string rpgClassVisuals;
 };

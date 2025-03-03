@@ -41,13 +41,10 @@ void ECS::Init()
 	// #TODO: Most of these should be moved out of here and into the correct systems
 	{
 		Entity& e = GetEntity(playerEntity);
-		e.components.AddComponent(EComponents::ComponentMesh);
 		e.components.AddComponent(EComponents::ComponentTransform);
 		e.components.AddComponent(EComponents::ComponentAction);
 		e.components.AddComponent(EComponents::ComponentFaction);
 		e.components.AddComponent(EComponents::ComponentRigid);
-		GetComponent<ComponentMesh>(playerEntity).pRendererObject = dmgf::AddObjectFromSVG(FilePath::VectorArt::player);
-		GetComponent<ComponentMesh>(playerEntity).pRendererObject->SetRenderPriority(RenderPriority::unit);
 		GetComponent<ComponentTransform>(playerEntity).x = WORLD_START_X;
 		GetComponent<ComponentTransform>(playerEntity).y = WORLD_START_Y;
 		GetComponent<ComponentAction>(playerEntity).pActionDecider = new ActionDeciderPlayer;

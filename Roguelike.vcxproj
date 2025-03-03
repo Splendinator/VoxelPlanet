@@ -226,6 +226,7 @@
     <ClCompile Include="RPGSystems\Attributes\RPGAttributeModifiers.cpp" />
     <ClCompile Include="RPGSystems\Attributes\RPGAttributes.cpp" />
     <ClCompile Include="RPGSystems\Attributes\RPGAttributeSystem.cpp" />
+    <ClCompile Include="RPGSystems\Classes\RPGClassSystem.cpp" />
     <ClCompile Include="RPGSystems\RPGCoreSystem.cpp" />
     <ClCompile Include="StbImageCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -1339,6 +1340,9 @@
     <ClInclude Include="RPGSystems\Attributes\RPGAttributeModifiers.h" />
     <ClInclude Include="RPGSystems\Attributes\RPGAttributes.h" />
     <ClInclude Include="RPGSystems\Attributes\RPGAttributeSystem.h" />
+    <ClInclude Include="RPGSystems\Classes\RPGClassData.h" />
+    <ClInclude Include="RPGSystems\Classes\RPGClassSpecialisationData.h" />
+    <ClInclude Include="RPGSystems\Classes\RPGClassSystem.h" />
     <ClInclude Include="RPGSystems\RPGCoreSystem.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="ECSSystemAction.h" />

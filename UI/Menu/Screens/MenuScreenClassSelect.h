@@ -2,6 +2,8 @@
 
 #include "MenuScreenBase.h"
 
+#include "RPGSystems/Classes/RPGClassSystem.h"
+
 #include "UI/UIObjects/UIObjectButton.h"
 
 class UIObjectIconLoader;
@@ -19,7 +21,9 @@ struct MenuScreenClassSelectEntry
 	EDITORPROPERTY()
 	std::string loaderLayer;
 
-	// #TODO: Class data assets etc. when we get RPG systems
+	// Class 
+	EDITORPROPERTY()
+	ERPGClass rpgClass = ERPGClass::None;
 
 	TransientPtr<UIObjectIconLoader> iconLoader;
 	TransientPtr<UIObjectButton> button;
@@ -37,6 +41,12 @@ protected:
 	//~ End MenuScreenBase Interface
 
 	void OnClicked(UIObjectButtonDelegateParams params);
+
+	EDITORPROPERTY()
+	RPGClassSystem* pRpgClassSystem = nullptr;
+
+	EDITORPROPERTY()
+	ECS* pEcs = nullptr;
 	
 	// Name of class icon file, no .svg
 	EDITORPROPERTY()

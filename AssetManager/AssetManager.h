@@ -8,6 +8,8 @@ class EditorTypeClass;
 class EditorTypeStruct;
 class EditorTypeEnum;
 
+#define ENUMSTRING(enum, value) (sizeof(enum)/*will compile error if misspelled*/, Game::GetAssetManager().GetEnumValueNameFromValue(#enum, (int)value))
+
 /** Asset Manager
  *
  * This class is responsible for eveything assets: reading them in, instantiating objects from them, etc.

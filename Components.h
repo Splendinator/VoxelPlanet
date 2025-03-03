@@ -3,6 +3,8 @@
 #include "DomMath/Types.h"
 #include "DomUtils/Pointers.h"
 
+#include "RPGSystems/Classes/RPGClassSystem.h"
+
 class ActionDeciderBase;
 class RendererObject;
 
@@ -16,6 +18,8 @@ enum class EComponents
 	ComponentRigid,
 	ComponentHealth,
 	ComponentFaction,
+	ComponentClass,
+	ComponentProgression
 };
 
 // Component to render something
@@ -61,4 +65,17 @@ struct ComponentFaction
 	};
 	
 	EFactionFlags factionFlags = EFactionFlags::None;
+};
+
+// Allows RPG characters to have a class
+struct ComponentClass
+{
+	ERPGClass rpgClass = ERPGClass::None;
+	ERPGClassSpecialisation specialisation = ERPGClassSpecialisation::None;
+};
+
+// Allows RPG characters to have a level
+struct ComponentProgression
+{
+	int level = 1;
 };

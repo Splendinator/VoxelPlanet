@@ -30,8 +30,12 @@ public:
 	
 	void Serialize(u32* pBuffer);
 
+	// See VectorPrimitiveBase::FindPrimitiveByLabelInternal
 	template<typename TClass>
 	TClass* FindPrimitiveByLabel(const std::string& label);
+
+	// Unlike FindPrimitiveByLabel this returns a layer even if the layer only has 1 primitive
+	VectorPrimitiveLayer* FindLayerByLabel(const std::string& label);
 
 	// Page dimensions are used to figure out size of primitives relative to the quad they are on.
 	// i.e if page width is 1000 units wide and you scale a primitive to be 500 units wide, it will be half the width of the quad.

@@ -1,10 +1,5 @@
 #pragma once
 
-// MY HEADERS
-#include "DomLog/DomLog.h"
-#include "DomUtils/Delegate.h"
-#include "ImGuiEditorMacros.h"
-
 // EXTERNAL
 #include "stb_image.h"
 #include "tinyobj_loader.h"
@@ -33,3 +28,9 @@
 #define NOMINMAX
 #include <Windows.h>
 
+// MY HEADERS
+#include "DomLog/DomLog.h"
+#include "DomUtils/Delegate.h"
+#include "ImGuiEditorMacros.h"
+#include "Game.h"
+#include "AssetManager/AssetManager.h" // Contains utils for ENUMSTRING() so useful to be here

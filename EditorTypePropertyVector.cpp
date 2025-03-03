@@ -21,39 +21,49 @@ void EditorTypePropertyVector::DrawImGUI()
 		for (int index = 0; index < arrayLength; ++index)
 		{
 			const std::string& arrayEntryLabel = std::to_string(index);
+
+			auto DrawButtons = [&]()
+			{
+				ImGui::SameLine();
+				{
+					ImGui::PushID(index);
+					if (ImGui::Button("Remove"))
+					{
+						if (arrayLength - 1 != index)
+						{
+							std::swap(instancedProperties[arrayLength-1], instancedProperties[index]);
+						}
+	
+						OnPropertyChangedData arrayLengthChangedParams = {};
+						arrayLengthChangedParams.pProperty = this;
+						arrayLengthChangedParams.oldValue = std::to_string(arrayLength);
+	
+						--arrayLength;
+					
+						arrayLengthChangedParams.newValue = std::to_string(arrayLength);
+	
+						onPropertyChanged.Invoke(arrayLengthChangedParams);
+					}
+	
+					// #TODO: This isn't working with undo yet, We'll need to extend OnPropertyChangedData and pass through an int of the index or something.
+					ImGui::SameLine();
+					if (ImGui::Button("Insert Above"))
+					{
+						AddDefaultEntry(index);
+					}
+					ImGui::PopID();
+				}
+			};
+			
 			if (ImGui::TreeNodeEx(arrayEntryLabel.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 			{
+				DrawButtons();
 				instancedProperties[index]->DrawImGUI();
 				ImGui::TreePop();
 			}
-			ImGui::SameLine();
+			else
 			{
-				ImGui::PushID(index);
-				if (ImGui::Button("Remove"))
-				{
-					if (arrayLength - 1 != index)
-					{
-						std::swap(instancedProperties[arrayLength-1], instancedProperties[index]);
-					}
-
-					OnPropertyChangedData arrayLengthChangedParams = {};
-					arrayLengthChangedParams.pProperty = this;
-					arrayLengthChangedParams.oldValue = std::to_string(arrayLength);
-
-					--arrayLength;
-				
-					arrayLengthChangedParams.newValue = std::to_string(arrayLength);
-
-					onPropertyChanged.Invoke(arrayLengthChangedParams);
-				}
-
-				// #TODO: This isn't working with undo yet, We'll need to extend OnPropertyChangedData and pass through an int of the index or something.
-				ImGui::SameLine();
-				if (ImGui::Button("Insert Above"))
-				{
-					AddDefaultEntry(index);
-				}
-				ImGui::PopID();
+				DrawButtons();
 			}
 		}
 		

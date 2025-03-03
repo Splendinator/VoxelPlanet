@@ -24,6 +24,7 @@ public:
 	void UnInit() override;
 	//~ End GameSystem Interface
 
+	// Push / Pop a screen
 	void PushMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset);
 	void PopMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset);
 
@@ -56,7 +57,8 @@ private:
 	
 	void OpenMenu(OnInputActionDelegateParams Params);
 	void CloseMenu(OnInputActionDelegateParams Params);
-	
+
+	// Stack of active menus screens, only the screen at the top of the stack will be initialised and ticking.
 	std::vector<TInstancedAssetPtr<MenuScreenBase>*> activeMenuScreens;
 	
 	DelegateClass<MenuSystem, OnInputActionDelegateParams> OpenMenuDelegate;

@@ -15,7 +15,7 @@ void MenuScreenBase::BaseInit(MenuSystem* pInMenuSystem)
 	UICanvasInitParams initParams;
 	initParams.sizeX = (float)dmwi::getWindowWidth();
 	initParams.sizeY = (float)dmwi::getWindowHeight();
-	initParams.filePath = pDirectoryData->menus + fileName + ".svg";
+	initParams.filePath = DirectoryData::ConcatenateFilePathChecked(pDirectoryData->menus, fileName, ".svg");
 	initParams.renderPriority = RenderPriority::menu;
 	initParams.type = dmgf::ERenderObjectType::UI;
 

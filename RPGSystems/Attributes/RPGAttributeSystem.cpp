@@ -7,7 +7,7 @@
 
 void RPGAttributeSystem::Init()
 {
-	DOMLOG_ERROR_IF(pEcs == nullptr, "Need ECS to calcualte anything")
+	DOMLOG_ERROR_IF(pEcs == nullptr, "Need ECS to calculate anything")
 	sharedData.pEcs = pEcs;
 }
 
@@ -19,6 +19,7 @@ void RPGAttributeSystem::DrawImGui(float deltaTime)
 		for (EntityId entity = 0; entity < NUM_ENTITIES; ++entity)
 		{
 			ImGui::PushID(entity);
+			
 			bool bDisplayingThisEntity = false;
 			for (const RPGAttributeBase* pAttribute : attributes)
 			{
@@ -33,10 +34,12 @@ void RPGAttributeSystem::DrawImGui(float deltaTime)
 					ImGui::Text("%s: %d", pAttribute->displayName.c_str(), pAttribute->GetAttributeValue(entity, sharedData));
 				}
 			}
+			
 			if (bDisplayingThisEntity)
 			{
 				ImGui::Separator();
 			}
+			
 			ImGui::PopID();
 		}
 	}

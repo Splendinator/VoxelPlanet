@@ -13,6 +13,8 @@ class MenuScreenBase
 
 public:
 
+	// Right now the screen is only initialised while it's top of the MenuSystem stack.
+	// #NOTE: I'm not sure if this is what we want, screens on the bottom should stay active probably so they can keep state?
 	void BaseInit(MenuSystem* pInMenuSystem);
 	void BaseUnInit();
 	void BaseTick(float DeltaTime);

@@ -15,7 +15,7 @@ void HUDObjectBase::BaseInit(EntityId player, const HUDObjectSharedInitParams& h
 	UICanvasInitParams initParams;
 	initParams.sizeX = sizeX;
 	initParams.sizeY = sizeY;
-	initParams.filePath = pDirectoryData->hudObjects + fileName + ".svg";
+	initParams.filePath = DirectoryData::ConcatenateFilePathChecked(pDirectoryData->hudObjects, fileName, ".svg");
 	initParams.renderPriority = RenderPriority::HUD;
 	initParams.type = dmgf::ERenderObjectType::UI;
 

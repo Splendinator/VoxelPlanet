@@ -70,6 +70,8 @@ public:
 	REGISTER_COMPONENT(ComponentRigid);
 	REGISTER_COMPONENT(ComponentHealth);
 	REGISTER_COMPONENT(ComponentFaction);
+	REGISTER_COMPONENT(ComponentClass);
+	REGISTER_COMPONENT(ComponentProgression);
 
 private:
 

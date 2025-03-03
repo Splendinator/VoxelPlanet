@@ -18,7 +18,7 @@ void TextRenderSystem::Init()
 		{
 			DOMLOG_ERROR_IF(characterData.character > 128 || characterData.character < 0, characterData.character, "is out of range for ascii character", characterData.fileName);
 		
-			characterVectorArtMap[characterData.character] = std::make_shared<VectorArt>((baseDirectory + characterData.fileName + ".svg").c_str());
+			characterVectorArtMap[characterData.character] = std::make_shared<VectorArt>(DirectoryData::ConcatenateFilePathChecked(baseDirectory, characterData.fileName, ".svg").c_str());
 		}
 		characterDatas.clear(); // Don't need this once loaded into our hashmap
 	}

@@ -3,12 +3,16 @@
 #include "MenuScreenClassSelect.h"
 
 #include "DirectoryData.h"
+#include "ECS.h"
 
 #include "UI/UIObjects/UIObjectButton.h"
 #include "UI/UIObjects/UIObjectIconLoader.h"
 
 void MenuScreenClassSelect::Init(UICanvas* pCanvas)
 {
+	DOMLOG_ERROR_IF(pRpgClassSystem == nullptr, "Need RPG class system")
+	DOMLOG_ERROR_IF(pEcs == nullptr, "Need Ecs system")
+	
 	if (pDirectoryData)
 	{
 		onClickedDelegate.Bind(this, &MenuScreenClassSelect::OnClicked);
@@ -16,7 +20,7 @@ void MenuScreenClassSelect::Init(UICanvas* pCanvas)
 		for (MenuScreenClassSelectEntry& entry : classEntries)
 		{
 			entry.iconLoader = pCanvas->AddExistingUIObject<UIObjectIconLoader>(entry.loaderLayer);
-			entry.iconLoader->LoadUIIcon(pDirectoryData->sharedUI + classIconFileName + ".svg", entry.classIconLayer);
+			entry.iconLoader->LoadUIIcon(DirectoryData::ConcatenateFilePathChecked(pDirectoryData->sharedUI, classIconFileName, ".svg"), entry.classIconLayer);
 
 			entry.button = pCanvas->AddExistingUIObject<UIObjectButton>(entry.loaderLayer); // Load button after icon so icon is clickable
 			entry.button->onClicked.Add(onClickedDelegate);
@@ -37,7 +41,13 @@ void MenuScreenClassSelect::OnClicked(UIObjectButtonDelegateParams params)
 	{
 		if (entry.button == params.pButton)
 		{
+			if (pRpgClassSystem && pEcs)
+			{
+				pRpgClassSystem->SetEntityClass(pEcs->GetPlayerEntityId(), entry.rpgClass, /*bSetMesh=*/true);
+			}
+
 			RequestCloseSelf();
+			return;
 		}
 	}
 }

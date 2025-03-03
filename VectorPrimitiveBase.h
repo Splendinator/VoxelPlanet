@@ -37,7 +37,8 @@ public:
 
 	// This can be overwritten to find a primitive by its label. 
 	// This is used to search recursively for the first non-nullptr primitive with the given label.
-	// Note: This doesn't return the VectorPrimitiveLayer with the label but the primitive below it
+	// This *doesn't* return the VectorPrimitiveLayer with the label but the primitive below it
+	// However, this *does* return the layer in the case that the layer has multiple children 
 	virtual VectorPrimitiveBase* FindPrimitiveByLabelInternal(const std::string& label) { return nullptr; }
 	
 	// This is the layer directly above this; this will be nullptr for the root layer in a file.

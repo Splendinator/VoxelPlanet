@@ -44,6 +44,12 @@ void MenuSystem::UnInit()
 	{
 		CloseMenu(OnInputActionDelegateParams());
 	}
+
+	while (activeMenuScreens.size() > 0)
+	{
+		DOMASSERT(activeMenuScreens.back() != nullptr)
+		PopMenuScreen(*activeMenuScreens.back());
+	}
 	
 	if (pOpenMenuAction)
 	{
@@ -65,8 +71,13 @@ void MenuSystem::PushMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenA
 	pMenuScreenAsset.Load();
 	if (pMenuScreenAsset.IsLoaded())
 	{
-		activeMenuScreens.push_back(&pMenuScreenAsset);
+		if (activeMenuScreens.size() > 0)
+		{
+			TInstancedAssetPtr<MenuScreenBase>* pOldScreen = activeMenuScreens.back();
+			(*pOldScreen)->BaseUnInit();
+		}
 
+		activeMenuScreens.push_back(&pMenuScreenAsset);
 		pMenuScreenAsset->BaseInit(this);
 	}
 }
@@ -76,24 +87,20 @@ void MenuSystem::PopMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAs
 	DOMASSERT(!activeMenuScreens.empty())
 	
 	TInstancedAssetPtr<MenuScreenBase>* pOldScreen = activeMenuScreens.back();
+	if (&pMenuScreenAsset == pOldScreen)
+	{
+		pMenuScreenAsset->BaseUnInit();
+	}
+	pOldScreen->Unload();
 	
 	activeMenuScreens.erase(std::remove(activeMenuScreens.begin(), activeMenuScreens.end(), &pMenuScreenAsset));
 
-	TInstancedAssetPtr<MenuScreenBase>* pNewScreen = activeMenuScreens.empty() ? nullptr : activeMenuScreens.back();
-
-	if (pOldScreen != pNewScreen)
+	if (activeMenuScreens.size() > 0)
 	{
-		(*pOldScreen)->BaseUnInit();
-		pOldScreen->Unload();
-
-		if (pNewScreen)
+		TInstancedAssetPtr<MenuScreenBase>* pNewScreen = activeMenuScreens.back();
+		if (pNewScreen != pOldScreen)
 		{
-			pNewScreen->Load();
-
-			if (pNewScreen->IsLoaded())
-			{
-				(*pNewScreen)->BaseInit(this);
-			}
+			(*pNewScreen)->BaseInit(this);
 		}
 	}
 	
@@ -132,5 +139,5 @@ void MenuSystem::CloseMenu(OnInputActionDelegateParams Params)
 		pInputSystem->PopInputContext(pMenuInputContext);
 	}
 
-	PopMenuScreen(pBaseMenuScreen); // #TODO: This should pop all screens off the stack likely
+	PopMenuScreen(pBaseMenuScreen);
 }

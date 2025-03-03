@@ -1,7 +1,3 @@
-Struct MenuScreenClassSelectEntry
-string classIconLayer ""
-string loaderLayer ""
-;
 Class MenuScreenBase
 meta Abstract
 meta Instanced
@@ -33,6 +29,23 @@ string text ""
 float xPos 0
 float yPos 0
 float fontSize 0
+;
+Enum ERPGClassSpecialisation
+None 4
+;
+Enum ERPGClass
+None 0
+Warrior 1
+Ranger 2
+Mage 3
+;
+Class RPGClassSpecialisationData
+meta Singleton
+string displayName ""
+;
+Struct RPGClassSpecialisationEntry
+enum ERPGClassSpecialisation rpgSpecialisation None
+class RPGClassSpecialisationData pRpgClassSpecialisationData nullptr
 ;
 Class RPGAttributeModifierBase
 meta Abstract
@@ -156,6 +169,7 @@ string fonts ""
 string hudObjects ""
 string menus ""
 string sharedUI ""
+string rpgClassVisuals ""
 ;
 Class GameSystem
 meta Abstract
@@ -171,10 +185,10 @@ class ECS pEcs nullptr
 Class MenuScreenMain
 Child MenuScreenBase
 ;
-Class MenuScreenClassSelect
-Child MenuScreenBase
-string classIconFileName ""
-vector classEntries MenuScreenClassSelectEntry
+Struct MenuScreenClassSelectEntry
+string classIconLayer ""
+string loaderLayer ""
+enum ERPGClass rpgClass None
 ;
 Class MenuSystem
 Child GameSystem
@@ -197,6 +211,16 @@ class DirectoryData pDirectoryData nullptr
 ;
 Class RPGCoreSystem
 Child GameSystem
+;
+Struct RPGClassEntry
+enum ERPGClass rpgClass None
+class RPGClassData pClassData nullptr
+;
+Class RPGClassData
+meta Singleton
+string displayName ""
+string vectorArtFileName ""
+vector specialisations RPGClassSpecialisationEntry
 ;
 Class RPGAttributeBase
 meta Abstract
@@ -229,6 +253,13 @@ class InputContext pEditorInputContext nullptr
 Class ECS
 Child GameSystem
 ;
+Class MenuScreenClassSelect
+Child MenuScreenBase
+class RPGClassSystem pRpgClassSystem nullptr
+class ECS pEcs nullptr
+string classIconFileName ""
+vector classEntries MenuScreenClassSelectEntry
+;
 Class HUDObjectBase
 meta Abstract
 struct HUDAnchorPoint screenAnchorPoint
@@ -243,6 +274,12 @@ class DirectoryData pDirectoryData nullptr
 class ECS pEcs nullptr
 vector pHudObjects HUDObjectBase
 struct HUDObjectSharedInitParams hudObjectSharedInitParams
+;
+Class RPGClassSystem
+Child GameSystem
+class ECS pEcs nullptr
+class DirectoryData pDirectoryData nullptr
+vector classes RPGClassEntry
 ;
 Class RPGAttributeSystem
 Child GameSystem
