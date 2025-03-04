@@ -60,3 +60,35 @@ void TextRenderSystem::RemoveTextbox(TextboxHandle handle)
 	pTextbox = nullptr;
 }
 
+#ifdef DOMIMGUI
+void TextRenderSystem::DrawImGui(float deltaTime)
+{
+	static TextboxHandle debugTextboxHandle = -1;
+	static char debugTextboxText[256] = {};
+	static float debugFontSize = 20.f;
+
+	bool bRefreshTextbox = false;
+
+	bRefreshTextbox |= ImGui::SliderFloat("Font Size", &debugFontSize, 0.0f, 100.f);
+	bRefreshTextbox |= ImGui::InputText("Debug Text", debugTextboxText, 256);
+
+	if (bRefreshTextbox)
+	{
+		if (debugTextboxHandle != -1)
+		{
+			RemoveTextbox(debugTextboxHandle);
+			debugTextboxHandle = -1;
+		}
+		
+		if (debugTextboxText[0] != '\0')
+		{
+			TextboxParams params = {};
+			params.text = debugTextboxText;
+			params.fontSize = debugFontSize;
+			params.xPos = 192.f;
+			params.yPos = 108.f;
+			debugTextboxHandle = AddTextbox(params);
+		}
+	}
+}
+#endif

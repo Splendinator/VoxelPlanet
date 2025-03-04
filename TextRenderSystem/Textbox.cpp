@@ -33,7 +33,8 @@ Textbox::Textbox(const TextboxParams& textboxParams, CharacterVectorArtMap& char
 		}
 		else
 		{
-			DOMLOG_WARN("No .svg for character", characterToRender)
+			
+			DOMLOG_WARN_IF(characterToRender != ' ', "No .svg for non whitespace character", characterToRender)
 		}
 
 		currentXPos += textboxParams.fontSize;

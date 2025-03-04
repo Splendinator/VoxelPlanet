@@ -4,7 +4,8 @@
 
 #include "Core/GameSystem.h"
 
-// #TEMP: I DON'T THINK WE NEED THIS AS WE CAN USE THE InputContexts, DELETE LATER?
+// #TEMP: We don't use this yet, we need to figure out how to stop the menus getting mouse input when the editor is open though.
+// #TEMP: We should be using InputActions with EButton::LMB though likely.
 
 // Priority flags, only the highest priority system should be capturing mouse input 
 enum class EMouseCapturePriorityFlags : u8

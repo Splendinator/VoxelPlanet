@@ -65,9 +65,12 @@ class TextRenderSystem : public GameSystem
 	//~ Begin GameSystem Interface
 	void Init() override;
 	void UnInit() override;
+#ifdef DOMIMGUI
+	void DrawImGui(float deltaTime) override;
+#endif
 	//~ End GameSystem Interface
 
-	TextboxHandle AddTextbox(const TextboxParams& textboxParams);
+	[[nodiscard]] TextboxHandle AddTextbox(const TextboxParams& textboxParams);
 	void RemoveTextbox(TextboxHandle handle);
 
 	
