@@ -17,18 +17,28 @@ public:
 	std::istream& PopulateFromFile(std::istream& stream) override;
 	VectorPrimitiveBase* FindPrimitiveByLabelInternal(const std::string& label) override;
 	const VectorPrimitiveBase* FindPrimitiveUnderCursor(Vec2i cursorPos) const override;
-	void DebugAddX(u32 deltaX) override;
-	void DebugAddY(u32 deltaY) override;
 	bool IsChildOfThis(const VectorPrimitiveBase* pPossibleChild) const override;
 	//~ End VectorPrimitiveBase Interface
 
 	const std::vector<VectorPrimitiveBase*>& GetChildren() const { return children; }
 	void SetChildren(const std::vector<VectorPrimitiveBase*> newChildren);
 
+	void SetPositionOffset(Vec2i inPositionOffset) { positionOffset = inPositionOffset; }
+	
 private:
 
-	std::string layerLabel; // This is the name of the layer in inkscape
-	float opacity = 1.0f; // Opacity of this layer
+	// This is the name of the layer in inkscape
+	std::string layerLabel; 
+
+	// Opacity of all things inside this layer
+	float opacity = 1.0f; 
+
+	// #TODO: Right now all primitives use aboslute co-ordinates when read in from a .svg.
+	// #TODO: We instead need to use this and force relative co-ordinates. To do this we need to calcualte a bounding box around the layer.   
+	// Position offset of all things inside this layer
+	Vec2i positionOffset = {};
+	
+	// #NOTE: Rotation + scale?
 
 	// #TODO: This should be a unique ptr
 	std::vector<VectorPrimitiveBase*> children;

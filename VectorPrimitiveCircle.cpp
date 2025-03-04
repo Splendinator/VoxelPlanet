@@ -26,7 +26,7 @@ std::istream& VectorPrimitiveCircle::PopulateFromFile(std::istream& stream)
 {
 	VectorPrimitiveShape::PopulateFromFile(stream);
 
-	// #TODO: Should these be floats instead?
+	// #JANK: Should these be floats instead?
 	x = (u32)std::stof(dmim::GetNextAttribute(stream, "cx"));
 	y = (u32)std::stof(dmim::GetNextAttribute(stream, "cy"));
 	rad = (u32)std::stof(dmim::GetNextAttribute(stream, "r"));
@@ -41,14 +41,4 @@ const VectorPrimitiveBase* VectorPrimitiveCircle::FindPrimitiveUnderCursor(Vec2i
 		return this;
 	}
 	return nullptr;   
-}
-
-void VectorPrimitiveCircle::DebugAddX(u32 deltaX)
-{
-	x += deltaX;
-}
-
-void VectorPrimitiveCircle::DebugAddY(u32 deltaY)
-{
-	y += deltaY;
 }

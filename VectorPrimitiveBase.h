@@ -43,13 +43,6 @@ public:
 	
 	// This is the layer directly above this; this will be nullptr for the root layer in a file.
 	VectorPrimitiveLayer* pParent = nullptr;
-
-	// #TODO: This is just a hacky way for me to set UIIconLoader icons to the correct location for now.
-	// #TODO: We will eventually want a way to add Transforms (scale, rotation, position) to each VectorArtPrimitiveLayer
-	// #TODO: and it will recursively stack them together as you go down the layers, but this will need to be integrated into the rendering pipeline
-	// This adds to the X and Y co-ordinates.
-	virtual void DebugAddX(u32 deltaX) {}
-	virtual void DebugAddY(u32 deltaY) {}
 };
 
 template<typename TClass>

@@ -10,7 +10,7 @@ void RPGSkillSystem::Init()
 {
 	if (pDirectoryData)
 	{
-		TransientPtr<RendererObject> transparentRenderObject = dmgf::AddObjectFromSVG(DirectoryData::ConcatenateSVGFilePathChecked(pDirectoryData->rpgSkillVisuals, greenTransparentFileName).c_str(), dmgf::ERenderObjectType::UI);
+		TransientPtr<RendererObject> transparentRenderObject = dmgf::AddObjectFromSVG(DirectoryData::ConcatenateSVGFilePathChecked(pDirectoryData->rpgSkillVisuals, redTransparentFileName).c_str(), dmgf::ERenderObjectType::UI);
 		transparentRenderObject->SetRenderPriority(1.0f);
 		transparentRenderObject->SetSize(3000.f, 3000.f);
 	}

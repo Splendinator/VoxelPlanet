@@ -25,7 +25,7 @@ std::istream& VectorPrimitiveRectangle::PopulateFromFile(std::istream& stream)
 {
 	VectorPrimitiveShape::PopulateFromFile(stream);
 
-	// #TODO: Should these be floats instead?
+	// #JANK: Should these be floats instead?
 	width = (u32)std::stof(dmim::GetNextAttribute(stream, "width"));
 	height = (u32)std::stof(dmim::GetNextAttribute(stream, "height"));
 	x = (u32)std::stof(dmim::GetNextAttribute(stream, "x"));
@@ -41,14 +41,4 @@ const VectorPrimitiveBase* VectorPrimitiveRectangle::FindPrimitiveUnderCursor(Ve
 		return this;
 	}
 	return nullptr;
-}
-
-void VectorPrimitiveRectangle::DebugAddX(u32 deltaX)
-{
-	SetX(x + deltaX);
-}
-
-void VectorPrimitiveRectangle::DebugAddY(u32 deltaY)
-{
-	SetY(y + deltaY);
 }

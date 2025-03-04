@@ -20,17 +20,26 @@ VectorPrimitiveLayer::~VectorPrimitiveLayer()
 #pragma optimize("", off)
 u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 {
+	// Push translation data that recursively effects any objects that are children of this layer
 	*pBuffer = (u32)EPrimitiveType::PushLayer;
 	++pBuffer;
 	
 	*pBuffer = (u32)(255 * opacity);
 	++pBuffer;
-	
+
+	*pBuffer = positionOffset.x;
+	++pBuffer;
+
+	*pBuffer = positionOffset.y;
+	++pBuffer;
+
+	// Draw children
 	for (VectorPrimitiveBase* child : children)
 	{
 		pBuffer = child->Serialize(pBuffer);
 	}
 
+	// Pop layer translations
 	*pBuffer = (u32)EPrimitiveType::PopLayer;
 	++pBuffer;
 
@@ -123,6 +132,9 @@ VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveByLabelInternal(const st
 
 const VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveUnderCursor(Vec2i cursorPos) const
 {
+	// Adjust by inverse positionOffset to keep everything accurate
+	cursorPos = cursorPos - positionOffset;
+	
 	// Iterate backwards (highest layer first)
 	for (int i = (int)children.size() - 1; i >= 0; i--)
 	{
@@ -134,22 +146,6 @@ const VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveUnderCursor(Vec2i 
 	}
 
 	return nullptr;
-}
-
-void VectorPrimitiveLayer::DebugAddX(u32 deltaX)
-{
-	for (VectorPrimitiveBase* child : children)
-	{
-		child->DebugAddX(deltaX);
-	}
-}
-
-void VectorPrimitiveLayer::DebugAddY(u32 deltaY)
-{
-	for (VectorPrimitiveBase* child : children)
-	{
-		child->DebugAddY(deltaY);
-	}
 }
 
 void VectorPrimitiveLayer::SetChildren(const std::vector<VectorPrimitiveBase*> newChildren)
