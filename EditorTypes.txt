@@ -1,3 +1,8 @@
+Struct MenuScreenClassSelectEntry
+string classIconLayer ""
+string loaderLayer ""
+class RPGClassData pRpgClass nullptr
+;
 Class MenuScreenBase
 meta Abstract
 meta Instanced
@@ -30,22 +35,24 @@ float xPos 0
 float yPos 0
 float fontSize 0
 ;
-Enum ERPGClassSpecialisation
-None 4
+Struct RPGLevelProgressionData
+int requiredXp 0
 ;
-Enum ERPGClass
-None 0
-Warrior 1
-Ranger 2
-Mage 3
+Struct RPGRacePerLevelAttributeValues
+float maxHealthMultiplierPerLevel 1.1
+;
+Struct RPGRaceInitialAttributeValues
+int maxHealth 100
 ;
 Class RPGClassSpecialisationData
 meta Singleton
 string displayName ""
 ;
-Struct RPGClassSpecialisationEntry
-enum ERPGClassSpecialisation rpgSpecialisation None
-class RPGClassSpecialisationData pRpgClassSpecialisationData nullptr
+Class RPGClassData
+meta Singleton
+string displayName ""
+string vectorArtFileName ""
+vector specialisations RPGClassSpecialisationData
 ;
 Class RPGAttributeModifierBase
 meta Abstract
@@ -170,6 +177,7 @@ string hudObjects ""
 string menus ""
 string sharedUI ""
 string rpgClassVisuals ""
+string rpgRaceVisuals ""
 ;
 Class GameSystem
 meta Abstract
@@ -185,10 +193,13 @@ class ECS pEcs nullptr
 Class MenuScreenMain
 Child MenuScreenBase
 ;
-Struct MenuScreenClassSelectEntry
-string classIconLayer ""
-string loaderLayer ""
-enum ERPGClass rpgClass None
+Class MenuScreenClassSelect
+Child MenuScreenBase
+class RPGSystem pRpgSystem nullptr
+class ECS pEcs nullptr
+class RPGRaceData pPlayerRace nullptr
+string classIconFileName ""
+vector classEntries MenuScreenClassSelectEntry
 ;
 Class MenuSystem
 Child GameSystem
@@ -209,24 +220,17 @@ Child GameSystem
 vector characterDatas TextRenderCharacterData
 class DirectoryData pDirectoryData nullptr
 ;
-Class RPGCoreSystem
-Child GameSystem
-;
-Struct RPGClassEntry
-enum ERPGClass rpgClass None
-class RPGClassData pClassData nullptr
-;
-Class RPGClassData
+Class RPGRaceData
 meta Singleton
 string displayName ""
+struct RPGRaceInitialAttributeValues initialAttributes
+struct RPGRacePerLevelAttributeValues perLevelAttributes
 string vectorArtFileName ""
-vector specialisations RPGClassSpecialisationEntry
 ;
 Class RPGAttributeBase
 meta Abstract
 meta Singleton
 string displayName ""
-int baseValue 0
 vector pModifiers RPGAttributeModifierBase
 ;
 Class RPGAttributeModifierTest
@@ -253,13 +257,6 @@ class InputContext pEditorInputContext nullptr
 Class ECS
 Child GameSystem
 ;
-Class MenuScreenClassSelect
-Child MenuScreenBase
-class RPGClassSystem pRpgClassSystem nullptr
-class ECS pEcs nullptr
-string classIconFileName ""
-vector classEntries MenuScreenClassSelectEntry
-;
 Class HUDObjectBase
 meta Abstract
 struct HUDAnchorPoint screenAnchorPoint
@@ -275,16 +272,12 @@ class ECS pEcs nullptr
 vector pHudObjects HUDObjectBase
 struct HUDObjectSharedInitParams hudObjectSharedInitParams
 ;
-Class RPGClassSystem
+Class RPGSystem
 Child GameSystem
 class ECS pEcs nullptr
 class DirectoryData pDirectoryData nullptr
-vector classes RPGClassEntry
-;
-Class RPGAttributeSystem
-Child GameSystem
-class ECS pEcs nullptr
 vector attributes RPGAttributeBase
+vector levels RPGLevelProgressionData
 ;
 Class RPGAttributeMaxHealth
 Child RPGAttributeBase

@@ -20,11 +20,10 @@
 #include "..\Roguelike\Input\InputSystem.h"
 #include "..\Roguelike\RPGSystems\Attributes\RPGAttributeModifiers.h"
 #include "..\Roguelike\RPGSystems\Attributes\RPGAttributes.h"
-#include "..\Roguelike\RPGSystems\Attributes\RPGAttributeSystem.h"
 #include "..\Roguelike\RPGSystems\Classes\RPGClassData.h"
 #include "..\Roguelike\RPGSystems\Classes\RPGClassSpecialisationData.h"
-#include "..\Roguelike\RPGSystems\Classes\RPGClassSystem.h"
-#include "..\Roguelike\RPGSystems\RPGCoreSystem.h"
+#include "..\Roguelike\RPGSystems\Races\RPGRaceData.h"
+#include "..\Roguelike\RPGSystems\RPGSystem.h"
 #include "..\Roguelike\TextRenderSystem\TextRenderSystem.h"
 #include "..\Roguelike\UI\HUD\HUD.h"
 #include "..\Roguelike\UI\HUD\HUDAnchorPoint.h"
@@ -37,6 +36,23 @@
 #include "..\Roguelike\WorldGenerator.h"
 
 #pragma warning( disable : 4189 )
+
+// MenuScreenClassSelectEntry
+void MenuScreenClassSelectEntry::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MenuScreenClassSelectEntry* pMenuScreenClassSelectEntry = static_cast<MenuScreenClassSelectEntry*>(pObject);
+	pMenuScreenClassSelectEntry->classIconLayer = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pMenuScreenClassSelectEntry->loaderLayer = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pMenuScreenClassSelectEntry->pRpgClass = static_cast<RPGClassData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* MenuScreenClassSelectEntry::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MenuScreenClassSelectEntry* pMenuScreenClassSelectEntry = new MenuScreenClassSelectEntry;
+	int propertyIndex = 0;
+	MenuScreenClassSelectEntry::InitFromPropertiesSubset(pMenuScreenClassSelectEntry, properties, propertyIndex);
+	return pMenuScreenClassSelectEntry;
+}
 
 // MenuScreenBase
 void MenuScreenBase::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
@@ -103,6 +119,51 @@ void* TextboxParams::InitFromProperties(const std::vector<EditorTypePropertyBase
 	return pTextboxParams;
 }
 
+// RPGLevelProgressionData
+void RPGLevelProgressionData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	RPGLevelProgressionData* pRPGLevelProgressionData = static_cast<RPGLevelProgressionData*>(pObject);
+	pRPGLevelProgressionData->requiredXp = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+}
+
+void* RPGLevelProgressionData::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	RPGLevelProgressionData* pRPGLevelProgressionData = new RPGLevelProgressionData;
+	int propertyIndex = 0;
+	RPGLevelProgressionData::InitFromPropertiesSubset(pRPGLevelProgressionData, properties, propertyIndex);
+	return pRPGLevelProgressionData;
+}
+
+// RPGRacePerLevelAttributeValues
+void RPGRacePerLevelAttributeValues::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	RPGRacePerLevelAttributeValues* pRPGRacePerLevelAttributeValues = static_cast<RPGRacePerLevelAttributeValues*>(pObject);
+	pRPGRacePerLevelAttributeValues->maxHealthMultiplierPerLevel = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+}
+
+void* RPGRacePerLevelAttributeValues::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	RPGRacePerLevelAttributeValues* pRPGRacePerLevelAttributeValues = new RPGRacePerLevelAttributeValues;
+	int propertyIndex = 0;
+	RPGRacePerLevelAttributeValues::InitFromPropertiesSubset(pRPGRacePerLevelAttributeValues, properties, propertyIndex);
+	return pRPGRacePerLevelAttributeValues;
+}
+
+// RPGRaceInitialAttributeValues
+void RPGRaceInitialAttributeValues::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	RPGRaceInitialAttributeValues* pRPGRaceInitialAttributeValues = static_cast<RPGRaceInitialAttributeValues*>(pObject);
+	pRPGRaceInitialAttributeValues->maxHealth = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+}
+
+void* RPGRaceInitialAttributeValues::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	RPGRaceInitialAttributeValues* pRPGRaceInitialAttributeValues = new RPGRaceInitialAttributeValues;
+	int propertyIndex = 0;
+	RPGRaceInitialAttributeValues::InitFromPropertiesSubset(pRPGRaceInitialAttributeValues, properties, propertyIndex);
+	return pRPGRaceInitialAttributeValues;
+}
+
 // RPGClassSpecialisationData
 void RPGClassSpecialisationData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -118,20 +179,27 @@ void* RPGClassSpecialisationData::InitFromProperties(const std::vector<EditorTyp
 	return pRPGClassSpecialisationData;
 }
 
-// RPGClassSpecialisationEntry
-void RPGClassSpecialisationEntry::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+// RPGClassData
+void RPGClassData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
-	RPGClassSpecialisationEntry* pRPGClassSpecialisationEntry = static_cast<RPGClassSpecialisationEntry*>(pObject);
-	pRPGClassSpecialisationEntry->rpgSpecialisation = static_cast<ERPGClassSpecialisation>(static_cast<EditorTypePropertyEnum*>(properties[propertyIndex++])->GetValue());
-	pRPGClassSpecialisationEntry->pRpgClassSpecialisationData = static_cast<RPGClassSpecialisationData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	RPGClassData* pRPGClassData = static_cast<RPGClassData*>(pObject);
+	pRPGClassData->displayName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pRPGClassData->vectorArtFileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pRPGClassData->specialisations.push_back(static_cast<RPGClassSpecialisationData*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
+		}
+	}
 }
 
-void* RPGClassSpecialisationEntry::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+void* RPGClassData::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
 {
-	RPGClassSpecialisationEntry* pRPGClassSpecialisationEntry = new RPGClassSpecialisationEntry;
+	RPGClassData* pRPGClassData = new RPGClassData;
 	int propertyIndex = 0;
-	RPGClassSpecialisationEntry::InitFromPropertiesSubset(pRPGClassSpecialisationEntry, properties, propertyIndex);
-	return pRPGClassSpecialisationEntry;
+	RPGClassData::InitFromPropertiesSubset(pRPGClassData, properties, propertyIndex);
+	return pRPGClassData;
 }
 
 // RPGAttributeModifierBase
@@ -175,6 +243,7 @@ void DirectoryData::InitFromPropertiesSubset(void* pObject, const std::vector<Ed
 	pDirectoryData->menus = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 	pDirectoryData->sharedUI = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 	pDirectoryData->rpgClassVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDirectoryData->rpgRaceVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 }
 
 void* DirectoryData::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -251,21 +320,30 @@ void* MenuScreenMain::InitFromProperties(const std::vector<EditorTypePropertyBas
 	return pMenuScreenMain;
 }
 
-// MenuScreenClassSelectEntry
-void MenuScreenClassSelectEntry::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+// MenuScreenClassSelect
+void MenuScreenClassSelect::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
-	MenuScreenClassSelectEntry* pMenuScreenClassSelectEntry = static_cast<MenuScreenClassSelectEntry*>(pObject);
-	pMenuScreenClassSelectEntry->classIconLayer = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pMenuScreenClassSelectEntry->loaderLayer = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pMenuScreenClassSelectEntry->rpgClass = static_cast<ERPGClass>(static_cast<EditorTypePropertyEnum*>(properties[propertyIndex++])->GetValue());
+	MenuScreenClassSelect* pMenuScreenClassSelect = static_cast<MenuScreenClassSelect*>(pObject);
+	MenuScreenBase::InitFromPropertiesSubset(static_cast<MenuScreenBase*>(pMenuScreenClassSelect), properties, propertyIndex);
+	pMenuScreenClassSelect->pRpgSystem = static_cast<RPGSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuScreenClassSelect->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuScreenClassSelect->pPlayerRace = static_cast<RPGRaceData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuScreenClassSelect->classIconFileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pMenuScreenClassSelect->classEntries.push_back(*static_cast<MenuScreenClassSelectEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+		}
+	}
 }
 
-void* MenuScreenClassSelectEntry::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+void* MenuScreenClassSelect::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
 {
-	MenuScreenClassSelectEntry* pMenuScreenClassSelectEntry = new MenuScreenClassSelectEntry;
+	MenuScreenClassSelect* pMenuScreenClassSelect = new MenuScreenClassSelect;
 	int propertyIndex = 0;
-	MenuScreenClassSelectEntry::InitFromPropertiesSubset(pMenuScreenClassSelectEntry, properties, propertyIndex);
-	return pMenuScreenClassSelectEntry;
+	MenuScreenClassSelect::InitFromPropertiesSubset(pMenuScreenClassSelect, properties, propertyIndex);
+	return pMenuScreenClassSelect;
 }
 
 // MenuSystem
@@ -329,58 +407,30 @@ void* TextRenderSystem::InitFromProperties(const std::vector<EditorTypePropertyB
 	return pTextRenderSystem;
 }
 
-// RPGCoreSystem
-void RPGCoreSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+// RPGRaceData
+void RPGRaceData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
-	RPGCoreSystem* pRPGCoreSystem = static_cast<RPGCoreSystem*>(pObject);
-	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pRPGCoreSystem), properties, propertyIndex);
-}
-
-void* RPGCoreSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	RPGCoreSystem* pRPGCoreSystem = new RPGCoreSystem;
-	int propertyIndex = 0;
-	RPGCoreSystem::InitFromPropertiesSubset(pRPGCoreSystem, properties, propertyIndex);
-	return pRPGCoreSystem;
-}
-
-// RPGClassEntry
-void RPGClassEntry::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	RPGClassEntry* pRPGClassEntry = static_cast<RPGClassEntry*>(pObject);
-	pRPGClassEntry->rpgClass = static_cast<ERPGClass>(static_cast<EditorTypePropertyEnum*>(properties[propertyIndex++])->GetValue());
-	pRPGClassEntry->pClassData = static_cast<RPGClassData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-}
-
-void* RPGClassEntry::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	RPGClassEntry* pRPGClassEntry = new RPGClassEntry;
-	int propertyIndex = 0;
-	RPGClassEntry::InitFromPropertiesSubset(pRPGClassEntry, properties, propertyIndex);
-	return pRPGClassEntry;
-}
-
-// RPGClassData
-void RPGClassData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	RPGClassData* pRPGClassData = static_cast<RPGClassData*>(pObject);
-	pRPGClassData->displayName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pRPGClassData->vectorArtFileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	RPGRaceData* pRPGRaceData = static_cast<RPGRaceData*>(pObject);
+	pRPGRaceData->displayName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 	{
-		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
-		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
-		{
-			pRPGClassData->specialisations.push_back(*static_cast<RPGClassSpecialisationEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
-		}
-	}
+RPGRaceInitialAttributeValues* temp = static_cast<RPGRaceInitialAttributeValues*>(static_cast<EditorTypePropertyStruct*>(properties[propertyIndex++])->GetValue());
+pRPGRaceData->initialAttributes = *temp;
+delete temp;
+}
+	{
+RPGRacePerLevelAttributeValues* temp = static_cast<RPGRacePerLevelAttributeValues*>(static_cast<EditorTypePropertyStruct*>(properties[propertyIndex++])->GetValue());
+pRPGRaceData->perLevelAttributes = *temp;
+delete temp;
+}
+	pRPGRaceData->vectorArtFileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 }
 
-void* RPGClassData::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+void* RPGRaceData::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
 {
-	RPGClassData* pRPGClassData = new RPGClassData;
+	RPGRaceData* pRPGRaceData = new RPGRaceData;
 	int propertyIndex = 0;
-	RPGClassData::InitFromPropertiesSubset(pRPGClassData, properties, propertyIndex);
-	return pRPGClassData;
+	RPGRaceData::InitFromPropertiesSubset(pRPGRaceData, properties, propertyIndex);
+	return pRPGRaceData;
 }
 
 // RPGAttributeBase
@@ -388,7 +438,6 @@ void RPGAttributeBase::InitFromPropertiesSubset(void* pObject, const std::vector
 {
 	RPGAttributeBase* pRPGAttributeBase = static_cast<RPGAttributeBase*>(pObject);
 	pRPGAttributeBase->displayName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pRPGAttributeBase->baseValue = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
 	{
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
@@ -507,31 +556,6 @@ void* ECS::InitFromProperties(const std::vector<EditorTypePropertyBase*>& proper
 	return pECS;
 }
 
-// MenuScreenClassSelect
-void MenuScreenClassSelect::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	MenuScreenClassSelect* pMenuScreenClassSelect = static_cast<MenuScreenClassSelect*>(pObject);
-	MenuScreenBase::InitFromPropertiesSubset(static_cast<MenuScreenBase*>(pMenuScreenClassSelect), properties, propertyIndex);
-	pMenuScreenClassSelect->pRpgClassSystem = static_cast<RPGClassSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-	pMenuScreenClassSelect->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-	pMenuScreenClassSelect->classIconFileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	{
-		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
-		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
-		{
-			pMenuScreenClassSelect->classEntries.push_back(*static_cast<MenuScreenClassSelectEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
-		}
-	}
-}
-
-void* MenuScreenClassSelect::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	MenuScreenClassSelect* pMenuScreenClassSelect = new MenuScreenClassSelect;
-	int propertyIndex = 0;
-	MenuScreenClassSelect::InitFromPropertiesSubset(pMenuScreenClassSelect, properties, propertyIndex);
-	return pMenuScreenClassSelect;
-}
-
 // HUDObjectBase
 void HUDObjectBase::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -588,51 +612,35 @@ void* HUD::InitFromProperties(const std::vector<EditorTypePropertyBase*>& proper
 	return pHUD;
 }
 
-// RPGClassSystem
-void RPGClassSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+// RPGSystem
+void RPGSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
-	RPGClassSystem* pRPGClassSystem = static_cast<RPGClassSystem*>(pObject);
-	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pRPGClassSystem), properties, propertyIndex);
-	pRPGClassSystem->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-	pRPGClassSystem->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	RPGSystem* pRPGSystem = static_cast<RPGSystem*>(pObject);
+	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pRPGSystem), properties, propertyIndex);
+	pRPGSystem->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pRPGSystem->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	{
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pRPGClassSystem->classes.push_back(*static_cast<RPGClassEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+			pRPGSystem->attributes.push_back(static_cast<RPGAttributeBase*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
 		}
 	}
-}
-
-void* RPGClassSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	RPGClassSystem* pRPGClassSystem = new RPGClassSystem;
-	int propertyIndex = 0;
-	RPGClassSystem::InitFromPropertiesSubset(pRPGClassSystem, properties, propertyIndex);
-	return pRPGClassSystem;
-}
-
-// RPGAttributeSystem
-void RPGAttributeSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	RPGAttributeSystem* pRPGAttributeSystem = static_cast<RPGAttributeSystem*>(pObject);
-	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pRPGAttributeSystem), properties, propertyIndex);
-	pRPGAttributeSystem->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	{
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pRPGAttributeSystem->attributes.push_back(static_cast<RPGAttributeBase*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
+			pRPGSystem->levels.push_back(*static_cast<RPGLevelProgressionData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
 		}
 	}
 }
 
-void* RPGAttributeSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+void* RPGSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
 {
-	RPGAttributeSystem* pRPGAttributeSystem = new RPGAttributeSystem;
+	RPGSystem* pRPGSystem = new RPGSystem;
 	int propertyIndex = 0;
-	RPGAttributeSystem::InitFromPropertiesSubset(pRPGAttributeSystem, properties, propertyIndex);
-	return pRPGAttributeSystem;
+	RPGSystem::InitFromPropertiesSubset(pRPGSystem, properties, propertyIndex);
+	return pRPGSystem;
 }
 
 // RPGAttributeMaxHealth
@@ -669,12 +677,16 @@ namespace __Generated
 {
 	std::unordered_map<std::string, void* (*)(const std::vector<EditorTypePropertyBase*>&)> stringToCreateObjectFunction
 	{
+		{"MenuScreenClassSelectEntry", &MenuScreenClassSelectEntry::InitFromProperties},
 		{"MenuScreenBase", &MenuScreenBase::InitFromProperties},
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::InitFromProperties},
 		{"TextRenderCharacterData", &TextRenderCharacterData::InitFromProperties},
 		{"TextboxParams", &TextboxParams::InitFromProperties},
+		{"RPGLevelProgressionData", &RPGLevelProgressionData::InitFromProperties},
+		{"RPGRacePerLevelAttributeValues", &RPGRacePerLevelAttributeValues::InitFromProperties},
+		{"RPGRaceInitialAttributeValues", &RPGRaceInitialAttributeValues::InitFromProperties},
 		{"RPGClassSpecialisationData", &RPGClassSpecialisationData::InitFromProperties},
-		{"RPGClassSpecialisationEntry", &RPGClassSpecialisationEntry::InitFromProperties},
+		{"RPGClassData", &RPGClassData::InitFromProperties},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::InitFromProperties},
 		{"InputActionBase", &InputActionBase::InitFromProperties},
 		{"DirectoryData", &DirectoryData::InitFromProperties},
@@ -682,13 +694,11 @@ namespace __Generated
 		{"GameInstance", &GameInstance::InitFromProperties},
 		{"WorldGenerator", &WorldGenerator::InitFromProperties},
 		{"MenuScreenMain", &MenuScreenMain::InitFromProperties},
-		{"MenuScreenClassSelectEntry", &MenuScreenClassSelectEntry::InitFromProperties},
+		{"MenuScreenClassSelect", &MenuScreenClassSelect::InitFromProperties},
 		{"MenuSystem", &MenuSystem::InitFromProperties},
 		{"HUDAnchorPoint", &HUDAnchorPoint::InitFromProperties},
 		{"TextRenderSystem", &TextRenderSystem::InitFromProperties},
-		{"RPGCoreSystem", &RPGCoreSystem::InitFromProperties},
-		{"RPGClassEntry", &RPGClassEntry::InitFromProperties},
-		{"RPGClassData", &RPGClassData::InitFromProperties},
+		{"RPGRaceData", &RPGRaceData::InitFromProperties},
 		{"RPGAttributeBase", &RPGAttributeBase::InitFromProperties},
 		{"RPGAttributeModifierTest", &RPGAttributeModifierTest::InitFromProperties},
 		{"InputSystem", &InputSystem::InitFromProperties},
@@ -696,11 +706,9 @@ namespace __Generated
 		{"InputActionPress", &InputActionPress::InitFromProperties},
 		{"ImGuiEditor", &ImGuiEditor::InitFromProperties},
 		{"ECS", &ECS::InitFromProperties},
-		{"MenuScreenClassSelect", &MenuScreenClassSelect::InitFromProperties},
 		{"HUDObjectBase", &HUDObjectBase::InitFromProperties},
 		{"HUD", &HUD::InitFromProperties},
-		{"RPGClassSystem", &RPGClassSystem::InitFromProperties},
-		{"RPGAttributeSystem", &RPGAttributeSystem::InitFromProperties},
+		{"RPGSystem", &RPGSystem::InitFromProperties},
 		{"RPGAttributeMaxHealth", &RPGAttributeMaxHealth::InitFromProperties},
 		{"HUDObjectHealth", &HUDObjectHealth::InitFromProperties},
 	};

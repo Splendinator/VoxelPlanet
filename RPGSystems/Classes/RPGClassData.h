@@ -1,20 +1,6 @@
 ﻿#pragma once
 
-#include "RPGClassSystem.h"
-
 class RPGClassSpecialisationData;
-
-EDITORSTRUCT()
-struct RPGClassSpecialisationEntry
-{
-	EDITORBODY()
-	
-	EDITORPROPERTY()
-	ERPGClassSpecialisation rpgSpecialisation = ERPGClassSpecialisation::None;
-
-	EDITORPROPERTY()
-	const RPGClassSpecialisationData* pRpgClassSpecialisationData = nullptr;
-};
 
 // In this game a class is a basic class you have for the first 5 levels or so, it determines certain things like your starting resource (mana, stamina, etc.)
 // and the first few skills you get. The philosophy is that a lot of specialisations will want to share basic utility spells (e.g. most melee characters will want a charge attack to gap close)
@@ -33,7 +19,7 @@ public:
 	EDITORPROPERTY()
 	std::string vectorArtFileName;
 	
-	// Map of all possible specialisations for this class
+	// All possible specialisations for this class
 	EDITORPROPERTY()
-	std::vector<RPGClassSpecialisationEntry> specialisations;
+	std::vector<const RPGClassSpecialisationData*> specialisations;
 };

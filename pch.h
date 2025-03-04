@@ -29,6 +29,7 @@
 #include <Windows.h>
 
 // MY HEADERS
+#include "DomMath/Types.h"
 #include "DomLog/DomLog.h"
 #include "DomUtils/Delegate.h"
 #include "ImGuiEditorMacros.h"

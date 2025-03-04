@@ -80,5 +80,8 @@ void ECSSystemNameslate::Tick(const ECSSystemTickParams& params, const std::tupl
 void ECSSystemNameslate::OnEntityDeleted(const ECSSystemEntityDeletionParams& params, const std::tuple<ComponentTransform*, ComponentHealth*>& components)
 {
 	HealthBarNameslate& nameslate = nameslates[params.entityId];
-	nameslate.Uninit();
+	if (nameslate.IsInitialised()) // It's possible to not be initialised if they die on frame 1
+	{
+		nameslate.Uninit();
+	}
 }

@@ -3,9 +3,10 @@
 #include "DomMath/Types.h"
 #include "DomUtils/Pointers.h"
 
-#include "RPGSystems/Classes/RPGClassSystem.h"
-
 class ActionDeciderBase;
+class RPGClassData;
+class RPGClassSpecialisationData;
+class RPGRaceData;
 class RendererObject;
 
 // Enum entries in here must match the name of the struct
@@ -19,7 +20,8 @@ enum class EComponents
 	ComponentHealth,
 	ComponentFaction,
 	ComponentClass,
-	ComponentProgression
+	ComponentProgression,
+	ComponentRace,
 };
 
 // Component to render something
@@ -70,12 +72,18 @@ struct ComponentFaction
 // Allows RPG characters to have a class
 struct ComponentClass
 {
-	ERPGClass rpgClass = ERPGClass::None;
-	ERPGClassSpecialisation specialisation = ERPGClassSpecialisation::None;
+	const RPGClassData* pClassData = nullptr;
+	const RPGClassSpecialisationData* pSpecialisationData = nullptr;
 };
 
 // Allows RPG characters to have a level
 struct ComponentProgression
 {
 	int level = 1;
+};
+
+// RPG Race
+struct ComponentRace
+{
+	const RPGRaceData* pRaceData = nullptr;
 };

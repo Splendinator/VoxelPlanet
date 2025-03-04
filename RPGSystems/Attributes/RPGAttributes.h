@@ -20,6 +20,7 @@ public:
 	
 	virtual bool CanApplyAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const { PUREVIRTUAL() return false; }
 	virtual void ApplyAttribute(EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const { PUREVIRTUAL() }
+	virtual int GetBaseAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const { PUREVIRTUAL() return 0; }
 
 	int GetAttributeValue(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const;
 
@@ -29,10 +30,12 @@ public:
 	
 protected:
 
-	// Base value of this attribute before any modifiers are applied
-	EDITORPROPERTY()
-	int baseValue = 0;
+	// Used for attributes that increase linearly per level
+	int CalculateInitialAdditiveAttribute(int initialValue, int additivePerLevel, int level) const;
 
+	// Used for attributes that increase multiplicatively per level (10% more health per level)
+	int CalculateInitialExponentialAttribute(int initialValue, float multiplierPerLevel, int level) const;
+	
 	// List of modifiers executed sequentially, so order matters. (100 + 10 * 1.1 != 100 * 1.1 + 10)
 	EDITORPROPERTY()
 	std::vector<RPGAttributeModifierBase*> pModifiers;
@@ -46,5 +49,6 @@ class RPGAttributeMaxHealth : public RPGAttributeBase
 	//~ Begin RPGAttributeMaxHealth Interface
 	bool CanApplyAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const override;
 	void ApplyAttribute(EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const override;
+	int GetBaseAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const override;
 	//~ End RPGAttributeMaxHealth Interface
 };

@@ -5,12 +5,14 @@
 #include "DirectoryData.h"
 #include "ECS.h"
 
+#include "RPGSystems/RPGSystem.h"
+
 #include "UI/UIObjects/UIObjectButton.h"
 #include "UI/UIObjects/UIObjectIconLoader.h"
 
 void MenuScreenClassSelect::Init(UICanvas* pCanvas)
 {
-	DOMLOG_ERROR_IF(pRpgClassSystem == nullptr, "Need RPG class system")
+	DOMLOG_ERROR_IF(pRpgSystem == nullptr, "Need RPG system")
 	DOMLOG_ERROR_IF(pEcs == nullptr, "Need Ecs system")
 	
 	if (pDirectoryData)
@@ -41,9 +43,14 @@ void MenuScreenClassSelect::OnClicked(UIObjectButtonDelegateParams params)
 	{
 		if (entry.button == params.pButton)
 		{
-			if (pRpgClassSystem && pEcs)
+			if (pRpgSystem && pEcs)
 			{
-				pRpgClassSystem->SetEntityClass(pEcs->GetPlayerEntityId(), entry.rpgClass, /*bSetMesh=*/true);
+				RPGEntitySetupParams entitySetupParams = {};
+				entitySetupParams.pClassData = entry.pRpgClass;
+				entitySetupParams.bUseClassMeshOverRaceMesh = true;
+				entitySetupParams.startLevel = 0;
+				entitySetupParams.pRaceData = pPlayerRace;
+				pRpgSystem->SetupEntity(pEcs->GetPlayerEntityId(), entitySetupParams);
 			}
 
 			RequestCloseSelf();

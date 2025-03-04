@@ -2,10 +2,12 @@
 
 #include "MenuScreenBase.h"
 
-#include "RPGSystems/Classes/RPGClassSystem.h"
-
 #include "UI/UIObjects/UIObjectButton.h"
 
+class ECS;
+class RPGClassData;
+class RPGRaceData;
+class RPGSystem;
 class UIObjectIconLoader;
 
 EDITORSTRUCT()
@@ -23,7 +25,7 @@ struct MenuScreenClassSelectEntry
 
 	// Class 
 	EDITORPROPERTY()
-	ERPGClass rpgClass = ERPGClass::None;
+	const RPGClassData* pRpgClass = nullptr;
 
 	TransientPtr<UIObjectIconLoader> iconLoader;
 	TransientPtr<UIObjectButton> button;
@@ -43,10 +45,14 @@ protected:
 	void OnClicked(UIObjectButtonDelegateParams params);
 
 	EDITORPROPERTY()
-	RPGClassSystem* pRpgClassSystem = nullptr;
+	RPGSystem* pRpgSystem = nullptr;
 
 	EDITORPROPERTY()
 	ECS* pEcs = nullptr;
+
+	// Race that the player will spawn as
+	EDITORPROPERTY()
+	const RPGRaceData* pPlayerRace = nullptr;
 	
 	// Name of class icon file, no .svg
 	EDITORPROPERTY()

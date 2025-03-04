@@ -2,6 +2,7 @@
 
 class ECS;
 
+// Shared data needed by attributes to calculate their final values
 struct RPGAttributeCalculationSharedData
 {
     ECS* pEcs;

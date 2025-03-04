@@ -13,6 +13,7 @@ public:
 
 	// Error checked that it resolves to a correct file, prefer this instead of manual concatenation
 	static std::string ConcatenateFilePathChecked(std::string path, std::string fileName, std::string extension);
+	static std::string ConcatenateSVGFilePathChecked(std::string path, std::string fileName) { return ConcatenateFilePathChecked(path, fileName, ".svg"); }
 	
 	// path to the font files
 	EDITORPROPERTY()
@@ -33,4 +34,8 @@ public:
 	// path to class .svg's
 	EDITORPROPERTY()
 	std::string rpgClassVisuals;
+
+	// path to race .svg's
+	EDITORPROPERTY()
+	std::string rpgRaceVisuals;
 };
