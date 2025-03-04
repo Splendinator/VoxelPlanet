@@ -178,6 +178,7 @@ string menus ""
 string sharedUI ""
 string rpgClassVisuals ""
 string rpgRaceVisuals ""
+string rpgSkillVisuals ""
 ;
 Class GameSystem
 meta Abstract
@@ -220,6 +221,12 @@ Child GameSystem
 vector characterDatas TextRenderCharacterData
 class DirectoryData pDirectoryData nullptr
 ;
+Class RPGSkillSystem
+Child GameSystem
+class DirectoryData pDirectoryData nullptr
+string redTransparentFileName ""
+string greenTransparentFileName ""
+;
 Class RPGRaceData
 meta Singleton
 string displayName ""
@@ -232,10 +239,6 @@ meta Abstract
 meta Singleton
 string displayName ""
 vector pModifiers RPGAttributeModifierBase
-;
-Class RPGAttributeModifierTest
-Child RPGAttributeModifierBase
-int delta 0
 ;
 Class InputSystem
 Child GameSystem

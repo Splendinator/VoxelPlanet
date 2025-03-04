@@ -6,6 +6,7 @@
 #include "VectorPrimitiveFactoryCircle.h"
 #include "VectorPrimitiveFactoryLayer.h"
 #include "VectorPrimitiveFactoryRectangle.h"
+#include "VectorPrimitiveTypes.h"
 
 VectorPrimitiveLayer::~VectorPrimitiveLayer()
 {
@@ -15,20 +16,39 @@ VectorPrimitiveLayer::~VectorPrimitiveLayer()
 	}
 }
 
+// #TEMP: Optimisation
+#pragma optimize("", off)
 u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 {
+	*pBuffer = (u32)EPrimitiveType::PushLayer;
+	++pBuffer;
+	
+	*pBuffer = (u32)(255 * opacity);
+	++pBuffer;
+	
 	for (VectorPrimitiveBase* child : children)
 	{
 		pBuffer = child->Serialize(pBuffer);
 	}
 
+	*pBuffer = (u32)EPrimitiveType::PopLayer;
+	++pBuffer;
+
 	return pBuffer;
 }
+#pragma optimize("", on)
 
 std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 {
 	layerLabel = dmim::GetNextAttribute(stream, "inkscape:label");
+	std::string style = dmim::GetNextAttribute(stream, "style");
+	std::string opacityString = dmim::GetSubAttribute(style, "opacity");
 
+	if (!opacityString.empty())
+	{
+		opacity = std::stof(opacityString);
+	}
+	
 	struct FactoryEntry
 	{
 		std::string tag;
@@ -71,7 +91,7 @@ std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 			pNewPrimitive->PopulateFromFile(stream);
 		}
 	}
-
+	
 	return stream;
 }
 

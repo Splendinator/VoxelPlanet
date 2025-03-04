@@ -40,7 +40,17 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 		{
 			pEditor->AddWindow(std::make_unique<EditorWindowCreateAsset>(path));
 		}
-		
+
+		// Draw directories first
+		for (const auto& entry : fs::directory_iterator(path))
+		{
+			if (entry.is_directory())
+			{
+				DrawDirectory(entry.path());
+			}
+		}
+
+		// Draw assets under
 		for (const auto& entry : fs::directory_iterator(path))
 		{
 			if (entry.is_regular_file())
@@ -72,10 +82,6 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 					}
 					ImGui::PopID();
 				}
-			}
-			else if (entry.is_directory())
-			{
-				DrawDirectory(entry.path());
 			}
 		}
 		

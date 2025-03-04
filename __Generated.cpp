@@ -24,6 +24,7 @@
 #include "..\Roguelike\RPGSystems\Classes\RPGClassSpecialisationData.h"
 #include "..\Roguelike\RPGSystems\Races\RPGRaceData.h"
 #include "..\Roguelike\RPGSystems\RPGSystem.h"
+#include "..\Roguelike\RPGSystems\Skills\RPGSkillSystem.h"
 #include "..\Roguelike\TextRenderSystem\TextRenderSystem.h"
 #include "..\Roguelike\UI\HUD\HUD.h"
 #include "..\Roguelike\UI\HUD\HUDAnchorPoint.h"
@@ -244,6 +245,7 @@ void DirectoryData::InitFromPropertiesSubset(void* pObject, const std::vector<Ed
 	pDirectoryData->sharedUI = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 	pDirectoryData->rpgClassVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 	pDirectoryData->rpgRaceVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDirectoryData->rpgSkillVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 }
 
 void* DirectoryData::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -407,6 +409,24 @@ void* TextRenderSystem::InitFromProperties(const std::vector<EditorTypePropertyB
 	return pTextRenderSystem;
 }
 
+// RPGSkillSystem
+void RPGSkillSystem::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	RPGSkillSystem* pRPGSkillSystem = static_cast<RPGSkillSystem*>(pObject);
+	GameSystem::InitFromPropertiesSubset(static_cast<GameSystem*>(pRPGSkillSystem), properties, propertyIndex);
+	pRPGSkillSystem->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pRPGSkillSystem->redTransparentFileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pRPGSkillSystem->greenTransparentFileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+}
+
+void* RPGSkillSystem::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	RPGSkillSystem* pRPGSkillSystem = new RPGSkillSystem;
+	int propertyIndex = 0;
+	RPGSkillSystem::InitFromPropertiesSubset(pRPGSkillSystem, properties, propertyIndex);
+	return pRPGSkillSystem;
+}
+
 // RPGRaceData
 void RPGRaceData::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -453,22 +473,6 @@ void* RPGAttributeBase::InitFromProperties(const std::vector<EditorTypePropertyB
 	int propertyIndex = 0;
 	RPGAttributeBase::InitFromPropertiesSubset(pRPGAttributeBase, properties, propertyIndex);
 	return pRPGAttributeBase;
-}
-
-// RPGAttributeModifierTest
-void RPGAttributeModifierTest::InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	RPGAttributeModifierTest* pRPGAttributeModifierTest = static_cast<RPGAttributeModifierTest*>(pObject);
-	RPGAttributeModifierBase::InitFromPropertiesSubset(static_cast<RPGAttributeModifierBase*>(pRPGAttributeModifierTest), properties, propertyIndex);
-	pRPGAttributeModifierTest->delta = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
-}
-
-void* RPGAttributeModifierTest::InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	RPGAttributeModifierTest* pRPGAttributeModifierTest = new RPGAttributeModifierTest;
-	int propertyIndex = 0;
-	RPGAttributeModifierTest::InitFromPropertiesSubset(pRPGAttributeModifierTest, properties, propertyIndex);
-	return pRPGAttributeModifierTest;
 }
 
 // InputSystem
@@ -698,9 +702,9 @@ namespace __Generated
 		{"MenuSystem", &MenuSystem::InitFromProperties},
 		{"HUDAnchorPoint", &HUDAnchorPoint::InitFromProperties},
 		{"TextRenderSystem", &TextRenderSystem::InitFromProperties},
+		{"RPGSkillSystem", &RPGSkillSystem::InitFromProperties},
 		{"RPGRaceData", &RPGRaceData::InitFromProperties},
 		{"RPGAttributeBase", &RPGAttributeBase::InitFromProperties},
-		{"RPGAttributeModifierTest", &RPGAttributeModifierTest::InitFromProperties},
 		{"InputSystem", &InputSystem::InitFromProperties},
 		{"InputContext", &InputContext::InitFromProperties},
 		{"InputActionPress", &InputActionPress::InitFromProperties},

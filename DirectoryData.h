@@ -38,4 +38,8 @@ public:
 	// path to race .svg's
 	EDITORPROPERTY()
 	std::string rpgRaceVisuals;
+
+	// path to skill .svg's
+	EDITORPROPERTY()
+	std::string rpgSkillVisuals;
 };

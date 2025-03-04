@@ -28,6 +28,7 @@ public:
 private:
 
 	std::string layerLabel; // This is the name of the layer in inkscape
+	float opacity = 1.0f; // Opacity of this layer
 
 	// #TODO: This should be a unique ptr
 	std::vector<VectorPrimitiveBase*> children;

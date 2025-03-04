@@ -47,8 +47,8 @@ void MenuScreenClassSelect::OnClicked(UIObjectButtonDelegateParams params)
 			{
 				RPGEntitySetupParams entitySetupParams = {};
 				entitySetupParams.pClassData = entry.pRpgClass;
-				entitySetupParams.bUseClassMeshOverRaceMesh = true;
-				entitySetupParams.startLevel = 50;
+				entitySetupParams.bUseClassMeshOverRaceMesh = true; // Player's mesh will change based off class choice
+				entitySetupParams.startLevel = 0;
 				entitySetupParams.pRaceData = pPlayerRace;
 				pRpgSystem->SetupEntity(pEcs->GetPlayerEntityId(), entitySetupParams);
 			}
