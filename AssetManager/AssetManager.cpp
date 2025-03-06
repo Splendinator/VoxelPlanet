@@ -400,13 +400,32 @@ void* AssetManager::LoadObjectFromAssetInternal(EditorAssetBase* pAsset)
 			auto foundSingleton = singletonMap.find(pClassAsset);
 			if (foundSingleton == singletonMap.end())
 			{
-				auto it = __Generated::stringToCreateObjectFunction.find(pClassAsset->GetEditorType()->name);
-				if (it != __Generated::stringToCreateObjectFunction.end())
-				{
-					void* newSingleton = it->second(pClassAsset->GetProperties());
-					singletonMap.emplace(pClassAsset, newSingleton);
-					return newSingleton;
-				}
+				// If two singletons reference each other we end up with an infinite recursion so we need to break creation up into 2 steps
+				// 1. Create empty object in the singleton map (so that it may be referenced by other singleton propeties that reference this one)
+				// 2. Initialise the properties on the empty object afterwards.
+				
+				auto createEmptyObjectIt = __Generated::stringToCreateEmptyObjectFunction.find(pClassAsset->GetEditorType()->name);
+				DOMLOG_ERROR_IF(createEmptyObjectIt == __Generated::stringToCreateEmptyObjectFunction.end(), "__generated code fucked up?")
+
+				void* newSingleton = createEmptyObjectIt->second();
+				singletonMap.emplace(pClassAsset, newSingleton);
+
+				auto initialiseExistingObjectIt = __Generated::stringToInitialiseExistingObjectFunction.find(pClassAsset->GetEditorType()->name);
+				DOMLOG_ERROR_IF(initialiseExistingObjectIt == __Generated::stringToInitialiseExistingObjectFunction.end(), "__generated code fucked up?")
+
+				int propertyIndex = 0;
+				initialiseExistingObjectIt->second(newSingleton, pClassAsset->GetProperties(), propertyIndex);
+				
+				return newSingleton;
+				
+				//// #TODO: If two singletons reference each other they infinite loop trying to create each other
+				//auto it = __Generated::stringToCreateObjectFunction.find(pClassAsset->GetEditorType()->name);
+				//if (it != __Generated::stringToCreateObjectFunction.end())
+				//{
+				//	void* newSingleton = it->second(pClassAsset->GetProperties());
+				//	singletonMap.emplace(pClassAsset, newSingleton);
+				//	return newSingleton;
+				//}
 			}
 			return foundSingleton->second;
 		}

@@ -2,7 +2,7 @@
 
 #include "Core/GameSystem.h"
 
-#include "ECSTypes.h"
+#include "ECS/ECSTypes.h"
 
 class DirectoryData;
 class ECS;

@@ -22,10 +22,11 @@
 // Goes above properties of classes or structs that the assetManager should know about
 #define EDITORPROPERTY()
 
-// Has to go somewhere in the class/struct. Note the change of publicity scope and do not assume scope after this macro
+// Has to go somewhere in the class/struct. Note the change of publicity scope.
 #define EDITORBODY() public: \
-static void* InitFromProperties(const std::vector<class EditorTypePropertyBase*>& properties); \
-static void InitFromPropertiesSubset(void* pClass, const std::vector<EditorTypePropertyBase*>& properties, int& index);
+static void* _InitFromProperties(const std::vector<class EditorTypePropertyBase*>& properties); \
+static void _InitFromPropertiesSubset(void* pClass, const std::vector<EditorTypePropertyBase*>& properties, int& index); \
+static void* _CreateEmptyObject();
 
 namespace ImGuiEditorMacros
 {

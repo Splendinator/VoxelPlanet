@@ -2,7 +2,7 @@
 
 #include "ChunkGeneratorGrass.h"
 
-#include "ActionDeciderAI.h" /// #TEMP: Not needed probably after we generate enemies in post
+#include "Actions/ActionDeciders/ActionDeciderAI.h" /// #TEMP: Not needed probably after we generate enemies in post
 #include "FilePaths.h"
 #include "RenderPriorities.h"
 #include "Renderer.h"
@@ -81,7 +81,7 @@ EntityId ChunkGeneratorGrass::GetBackground(ECS* pEcs, int x, int y)
 	mesh.pRendererObject = pGrassRendererObject;
 	transform.x = x;
 	transform.y = y;
-
+	
 	return entity;
 }
 

@@ -3,7 +3,7 @@
 #include "Core/GameSystem.h"
 
 #include "Attributes/RPGAttributesShared.h"
-#include "ECSTypes.h"
+#include "ECS/ECSTypes.h"
 
 #include "Races/RPGRaceData.h"
 

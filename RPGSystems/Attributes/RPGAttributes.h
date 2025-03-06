@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "ECSTypes.h"
+#include "ECS/ECSTypes.h"
 
 class ECS;
 class RPGAttributeModifierBase;

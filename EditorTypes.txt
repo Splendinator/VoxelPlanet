@@ -35,6 +35,23 @@ float xPos 0
 float yPos 0
 float fontSize 0
 ;
+Enum ERPGSkillAimResponse
+Valid 0
+Invalid 1
+;
+Class RPGSkillData
+meta Singleton
+class RPGSkillAimModuleBase pAimModule nullptr
+class RPGSkillEffectModuleBase pEffectModule nullptr
+;
+Class RPGSkillEffectModuleBase
+meta Abstract
+meta EditInlineNew
+;
+Class RPGSkillAimModuleBase
+meta Abstract
+meta EditInlineNew
+;
 Struct RPGLevelProgressionData
 int requiredXp 0
 ;
@@ -170,6 +187,13 @@ bool bCtrl false
 bool bShift false
 bool bAlt false
 ;
+Class ECSSystemBase
+meta Abstract
+meta Singleton
+;
+Class ECSSystemAction
+Child ECSSystemBase
+;
 Class DirectoryData
 meta Singleton
 string fonts ""
@@ -221,11 +245,16 @@ Child GameSystem
 vector characterDatas TextRenderCharacterData
 class DirectoryData pDirectoryData nullptr
 ;
-Class RPGSkillSystem
-Child GameSystem
-class DirectoryData pDirectoryData nullptr
-string redTransparentFileName ""
-string greenTransparentFileName ""
+Struct RPGSkillAimResponseVisualEntry
+enum ERPGSkillAimResponse response Valid
+string fileName ""
+;
+Class RPGSkillEffectModuleTemp
+Child RPGSkillEffectModuleBase
+int damage 0
+;
+Class RPGSkillAimModuleTemp
+Child RPGSkillAimModuleBase
 ;
 Class RPGRaceData
 meta Singleton
@@ -257,8 +286,28 @@ Child GameSystem
 class InputSystem pInputSystem nullptr
 class InputContext pEditorInputContext nullptr
 ;
+Class ECSSystemRender
+Child ECSSystemBase
+;
+Class ECSSystemPhysics
+Child ECSSystemBase
+;
+Class ECSSystemNameslate
+Child ECSSystemBase
+;
+Class ECSSystemEntityMap
+Child ECSSystemBase
+;
+Class ECSSystemDamage
+Child ECSSystemBase
+;
+Class ECSSystemCleanUp
+Child ECSSystemBase
+;
 Class ECS
 Child GameSystem
+vector systems ECSSystemBase
+class RPGSkillSystem pSkillSystem nullptr
 ;
 Class HUDObjectBase
 meta Abstract
@@ -274,6 +323,13 @@ class DirectoryData pDirectoryData nullptr
 class ECS pEcs nullptr
 vector pHudObjects HUDObjectBase
 struct HUDObjectSharedInitParams hudObjectSharedInitParams
+;
+Class RPGSkillSystem
+Child GameSystem
+class DirectoryData pDirectoryData nullptr
+class ECS pEcs nullptr
+class ECSSystemEntityMap pEcsEntityMap nullptr
+vector skillAimResponseVisuals RPGSkillAimResponseVisualEntry
 ;
 Class RPGSystem
 Child GameSystem

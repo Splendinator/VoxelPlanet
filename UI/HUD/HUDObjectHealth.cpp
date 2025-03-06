@@ -2,8 +2,8 @@
 
 #include "HUDObjectHealth.h"
 
-#include "Components.h"
-#include "ECS.h"
+#include "ECS/Components.h"
+#include "ECS/ECS.h"
 #include "UI/UIObjects/UIObjectProgressBar.h"
 
 void HUDObjectHealth::Init(UICanvas& canvas)

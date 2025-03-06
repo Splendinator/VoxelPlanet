@@ -1,9 +1,5 @@
 #pragma once
 
-// EXTERNAL
-#include "stb_image.h"
-#include "tinyobj_loader.h"
-
 // STL
 #include <string.h>
 #include <unordered_map>
@@ -31,6 +27,10 @@
 // MY HEADERS
 #include "DomMath/Types.h"
 #include "DomLog/DomLog.h"
+#include "DomMath/Vec2.h"
+#include "DomMath/Vec3.h"
+#include "DomMath/Vec4.h"
+#include "DomUtils/Pointers.h"
 #include "DomUtils/Delegate.h"
 #include "ImGuiEditorMacros.h"
 #include "Game.h"

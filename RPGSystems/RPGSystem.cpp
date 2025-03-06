@@ -4,9 +4,9 @@
 
 #include "Attributes/RPGAttributes.h"
 #include "Classes/RPGClassData.h"
-#include "Components.h"
 #include "DirectoryData.h"
-#include "ECS.h"
+#include "Ecs/Components.h"
+#include "Ecs/ECS.h"
 #include "RenderPriorities.h"
 #include "Renderer.h"
 #include "RendererObject.h"

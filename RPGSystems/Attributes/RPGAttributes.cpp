@@ -2,7 +2,7 @@
 
 #include "RPGAttributes.h"
 
-#include "ECS.h"
+#include "Ecs/ECS.h"
 #include "RPGAttributeModifiers.h"
 #include "RPGAttributesShared.h"
 

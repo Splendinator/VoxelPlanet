@@ -2,7 +2,7 @@
 
 #include "HUD.h"
 
-#include "ECS.h"
+#include "ECS/ECS.h"
 #include "HUDObjectBase.h"
 
 void HUD::Init()

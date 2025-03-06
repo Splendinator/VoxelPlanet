@@ -3,7 +3,7 @@
 #include "MenuScreenClassSelect.h"
 
 #include "DirectoryData.h"
-#include "ECS.h"
+#include "ECS/ECS.h"
 
 #include "RPGSystems/RPGSystem.h"
 
