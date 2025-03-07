@@ -5,7 +5,7 @@
 #include "ECS/ECS.h"
 #include "ECS/Systems/ECSSystemEntityMap.h"
 
-void RPGSkillEffectModuleTemp::ApplyEffect(const RPGSkillParams& params)
+void RPGSkillEffectModuleTemp::ApplyEffect(const RPGSkillParams& params) const
 {
 	const EntityList& entityList = params.entityMapSystem.GetEntities(params.targetPos.x, params.targetPos.y);
 

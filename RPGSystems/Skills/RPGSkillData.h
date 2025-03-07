@@ -10,6 +10,8 @@ class RPGSkillData
 	EDITORBODY()
 public:
 
+	bool IsValid() const { return pAimModule && pEffectModule; }
+
 	EDITORPROPERTY()
 	const RPGSkillAimModuleBase* pAimModule;
 

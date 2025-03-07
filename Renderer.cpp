@@ -1504,10 +1504,13 @@ namespace
 
 				for (auto& rendererObject : renderObject.rendererObjects)
 				{
-					Mat4f modelMatrix = rendererObject->GetModelMatrix();
-					vkCmdPushConstants(handleCommandBuffer, handlePipelineLayout, VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Mat4f), &modelMatrix);
+					if (rendererObject->IsVisible())
+					{
+						Mat4f modelMatrix = rendererObject->GetModelMatrix();
+						vkCmdPushConstants(handleCommandBuffer, handlePipelineLayout, VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Mat4f), &modelMatrix);
 
-					vkCmdDraw(handleCommandBuffer, DMUT_ARRAY_SIZE(quad), 1, 0, 0);
+						vkCmdDraw(handleCommandBuffer, DMUT_ARRAY_SIZE(quad), 1, 0, 0);
+					}
 				}
 			}
 		};

@@ -15,26 +15,11 @@ void WorldGenerator::Init()
 
 void WorldGenerator::Tick(float deltaTime)
 {
-	// #TODO: This stuff should be moved to a CameraSystem or something
+	// Update center to generate around where the player moves  
 	if (pEcs)
 	{
 		ComponentTransform& transform = pEcs->GetComponent<ComponentTransform>(pEcs->GetPlayerEntityId());
 		SetCenter(transform.x, transform.y, false);
-		dmgf::SetCameraCenter(transform.x * ECSSystemRender::GRID_SIZE + ECSSystemRender::GRID_SIZE * 0.5f, transform.y * ECSSystemRender::GRID_SIZE + ECSSystemRender::GRID_SIZE * 0.5f);
-	}
-	// Zoom
-	{
-		static float zoom = 64.f / ECSSystemRender::GRID_SIZE;
-		static float zoomSpeed = 64.f / ECSSystemRender::GRID_SIZE;
-		if (dmwi::isHeld(dmwi::Button::PLUS))
-		{
-			zoom += zoomSpeed * deltaTime;
-		}
-		if (dmwi::isHeld(dmwi::Button::SUB))
-		{
-			zoom -= zoomSpeed * deltaTime;
-		}
-		dmgf::SetCameraZoom(zoom);
 	}
 }
 

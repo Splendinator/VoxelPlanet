@@ -6,6 +6,7 @@
 
 // #TEMP: We don't use this yet, we need to figure out how to stop the menus getting mouse input when the editor is open though.
 // #TEMP: We should be using InputActions with EButton::LMB though likely.
+// #TEMP: Maybe we could just make this the drag-and-drop manager?
 
 // Priority flags, only the highest priority system should be capturing mouse input 
 enum class EMouseCapturePriorityFlags : u8

@@ -4,23 +4,34 @@
 
 #include "RPGSkillsShared.h"
 
+class CameraSystem;
 class RPGSkillData;
 class RendererObject;
 class DirectoryData;
 
 // Map of responses to their player-facing graphics
 EDITORSTRUCT()
-struct RPGSkillAimResponseVisualEntry
+struct RPGSkillHighlightEntry
 {
 	EDITORBODY()
 
-	// Response
+	// Highlight enum
 	EDITORPROPERTY()
-	ERPGSkillAimResponse response = ERPGSkillAimResponse::Valid;
+	ERPGSkillHighlightType highlight = ERPGSkillHighlightType::Valid;
 
-	// Graphics to show when receiving this response 
+	// Graphics to show this highlight type
 	EDITORPROPERTY()
 	std::string fileName;
+
+	// Pooled renderer objects of this type, this will not shrink once populated and the visuals will just be made invisible.
+	std::vector<TransientPtr<RendererObject>> pooledHighlightVisuals;
+
+	// This will point to the head of the stack of pooledHighlightVisuals.
+	// Anything less than this will be visible, anything more than this will be visible  
+	int pooledHighlightVisualsStackIndex = -1;
+
+	void AddVisual(Vec2i visualsGridPosition, const DirectoryData& directoryData);
+	void ClearVisualsStack();
 	
 };
 
@@ -41,8 +52,14 @@ public:
 	void PlayerStartAimingSkill(const RPGSkillData* pSkill);
 	void StopAimingSkill();
 
+	// Try and fire the skill at location, will return false if the skill can't be fired at the location.
+	bool TryFireSkill(const RPGSkillData* pSkill, EntityId caster, const Vec2i& targetLocation);
+	bool TryFirePlayerAimedSkill(); // This will automatically cancel aiming if successful.
+
 protected:
 
+	void ClearAllAimingVisuals();
+	
 	EDITORPROPERTY()
 	const DirectoryData* pDirectoryData = nullptr;
 
@@ -52,11 +69,12 @@ protected:
 	EDITORPROPERTY()
 	ECSSystemEntityMap* pEcsEntityMap = nullptr;
 
+	EDITORPROPERTY()
+	const CameraSystem* pCameraSystem = nullptr;
+
 	// Map of skill aim responses to their 
 	EDITORPROPERTY()
-	std::vector<RPGSkillAimResponseVisualEntry> skillAimResponseVisuals;
-
-	std::vector<TransientPtr<RendererObject*>> shownAimResponseVisuals;
+	std::vector<RPGSkillHighlightEntry> skillHighlightVisuals;
 
 	// This is set to the skill the player is aiming while they are aiming it
 	const RPGSkillData* pPlayerCurrentlyAimedSkill = nullptr;

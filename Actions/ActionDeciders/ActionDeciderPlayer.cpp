@@ -23,7 +23,7 @@ ActionHandlerBase* ActionDeciderPlayer::DecideAction(ECS& ecs, EntityId e)
 	// Wait
 	if (dmwi::isPressed(dmwi::Button::NUMPAD5)) { return &ActionHandlerWait::GetSingleton(); }
 
-	// #TEMP: The whole action decider system needs re-doing with editor exposed shit
+	// #TEMP: The whole action decider system needs re-doing with editor exposed shit and we need to re-do this
 	// Cast Spell 
 	if (pSkillSystem)
 	{
@@ -32,9 +32,21 @@ ActionHandlerBase* ActionDeciderPlayer::DecideAction(ECS& ecs, EntityId e)
 			bAimingSkill = true;
 			pSkillSystem->PlayerStartAimingSkill(Game::GetAssetManager().LoadObjectFromAssetName<RPGSkillData>("RPGSkillData_Temp"));
 		}
-		if (dmwi::isPressed(dmwi::Button::NUM2))
+		if (dmwi::isPressed(dmwi::Button::RMB))
 		{
+			bAimingSkill = false;
 			pSkillSystem->StopAimingSkill();
+		}
+		if (dmwi::isPressed(dmwi::Button::LMB))
+		{
+			if (bAimingSkill)
+			{
+				const bool bFired = pSkillSystem->TryFirePlayerAimedSkill();
+				if (bFired)
+				{
+					return &ActionHandlerWait::GetSingleton();
+				}
+			}
 		}
 	}
 

@@ -18,9 +18,8 @@ void ECSSystemRender::Tick(const ECSSystemTickParams& params, const std::tuple<C
 {
 	RendererObject* pRendererObject = std::get<ComponentMesh*>(components)->pRendererObject;
 	ComponentTransform* transform = std::get<ComponentTransform*>(components);
-
-	pRendererObject->SetSize(GRID_SIZE, GRID_SIZE);
-	pRendererObject->SetPosition(GRID_SIZE * transform->x, GRID_SIZE * transform->y);
+	
+	SetupRenderObjectOnGrid(pRendererObject, {transform->x, transform->y});
 }
 
 void ECSSystemRender::OnEntityDeleted(const ECSSystemEntityDeletionParams& params, const std::tuple<ComponentMesh*, ComponentTransform*>& components)
@@ -31,4 +30,10 @@ void ECSSystemRender::OnEntityDeleted(const ECSSystemEntityDeletionParams& param
 		dmgf::RemoveObject(pRendererObject);
 		pRendererObject = nullptr;
 	}
+}
+
+void ECSSystemRender::SetupRenderObjectOnGrid(TransientPtr<RendererObject> pRendererObject, Vec2i gridCoordinates /*= {0,0}*/)
+{
+	pRendererObject->SetSize(GRID_SIZE, GRID_SIZE);
+	pRendererObject->SetPosition(GRID_SIZE * (float)gridCoordinates.x, GRID_SIZE * (float)gridCoordinates.y);
 }

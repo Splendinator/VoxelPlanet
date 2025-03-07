@@ -25,6 +25,7 @@
 #include <Windows.h>
 
 // MY HEADERS
+#include "ImGuiEditorMacros.h"
 #include "DomMath/Types.h"
 #include "DomLog/DomLog.h"
 #include "DomMath/Vec2.h"
@@ -32,6 +33,5 @@
 #include "DomMath/Vec4.h"
 #include "DomUtils/Pointers.h"
 #include "DomUtils/Delegate.h"
-#include "ImGuiEditorMacros.h"
 #include "Game.h"
 #include "AssetManager/AssetManager.h" // Contains utils for ENUMSTRING() so useful to be here

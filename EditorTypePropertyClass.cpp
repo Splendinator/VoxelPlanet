@@ -125,6 +125,8 @@ bool EditorTypePropertyClass::CanReadFromFile(std::ifstream& file) const
 	return temp == name;
 }
 
+// #TEMP: Optimisation
+#pragma optimize("", off)
 void EditorTypePropertyClass::ReadFromFile(std::ifstream& file)
 {
 	// Read in "class SingleFloat pNext nullptr"
@@ -135,13 +137,30 @@ void EditorTypePropertyClass::ReadFromFile(std::ifstream& file)
 	if (assetName != "nullptr")
 	{
 		EditorTypeClass* pClassTemplate = Game::GetAssetManager().FindClassTemplateType(className);
+		if (pClassTemplate == nullptr)
+		{
+			DOMLOG_ERROR("Can't find template type for class", className, ". Perhaps this class was renamed? Nulling out property.")
+			assetName = "nullptr";
+			return;
+		}
+		
 		if (pClassTemplate->HasMetadataFlag(EClassMetadataFlags::EditInlineNew))
 		{
-			SetEditInlineNewClass(static_cast<EditorTypeClass*>(Game::GetAssetManager().FindClassTemplateType(assetName)->DeepCopy()));
+			EditorTypeClass* pFoundTemplateType = Game::GetAssetManager().FindClassTemplateType(assetName);
+
+			if (pFoundTemplateType == nullptr)
+			{
+				DOMLOG_ERROR("Can't find template type for class", assetName, ". Perhaps this class was renamed? Nulling out property.")
+				assetName = "nullptr";
+				return;
+			}
+			
+			SetEditInlineNewClass(static_cast<EditorTypeClass*>(pFoundTemplateType->DeepCopy()));
 			pEditInlineNewClass->ReadFromFile(file);
 		}
 	}
 }
+#pragma optimize("", on)
 
 void EditorTypePropertyClass::WriteToFile(std::ofstream& file)
 {

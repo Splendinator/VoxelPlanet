@@ -35,9 +35,11 @@ float xPos 0
 float yPos 0
 float fontSize 0
 ;
-Enum ERPGSkillAimResponse
-Valid 0
-Invalid 1
+Enum ERPGSkillHighlightType
+None 0
+Valid 1
+Invalid 2
+AffectedArea 3
 ;
 Class RPGSkillData
 meta Singleton
@@ -211,6 +213,12 @@ meta Singleton
 Class GameInstance
 vector pGameSystems GameSystem
 ;
+Class CameraSystem
+Child GameSystem
+class ECS pEcs nullptr
+float zoom 64
+float zoomSpeed 64
+;
 Class WorldGenerator
 Child GameSystem
 class ECS pEcs nullptr
@@ -245,16 +253,18 @@ Child GameSystem
 vector characterDatas TextRenderCharacterData
 class DirectoryData pDirectoryData nullptr
 ;
-Struct RPGSkillAimResponseVisualEntry
-enum ERPGSkillAimResponse response Valid
+Struct RPGSkillHighlightEntry
+enum ERPGSkillHighlightType highlight Valid
 string fileName ""
 ;
 Class RPGSkillEffectModuleTemp
 Child RPGSkillEffectModuleBase
 int damage 0
 ;
-Class RPGSkillAimModuleTemp
+Class RPGSkillAimModuleLine
 Child RPGSkillAimModuleBase
+int maxRange 0
+int areaRadius 0
 ;
 Class RPGRaceData
 meta Singleton
@@ -329,7 +339,8 @@ Child GameSystem
 class DirectoryData pDirectoryData nullptr
 class ECS pEcs nullptr
 class ECSSystemEntityMap pEcsEntityMap nullptr
-vector skillAimResponseVisuals RPGSkillAimResponseVisualEntry
+class CameraSystem pCameraSystem nullptr
+vector skillHighlightVisuals RPGSkillHighlightEntry
 ;
 Class RPGSystem
 Child GameSystem

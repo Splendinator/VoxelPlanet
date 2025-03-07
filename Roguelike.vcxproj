@@ -687,6 +687,7 @@
     </ClCompile>
     <ClCompile Include="AssetManager\AssetManager.cpp" />
     <ClCompile Include="AssetManager\InstancedAssetPtr.cpp" />
+    <ClCompile Include="Camera\CameraSystem.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkGeneratorGrass.cpp" />
     <ClCompile Include="Core\GameInstance.cpp" />
@@ -2406,6 +2407,7 @@
     <ClInclude Include="Actions\ActionHandlers\ActionHandlerWait.h" />
     <ClInclude Include="AssetManager\AssetManager.h" />
     <ClInclude Include="AssetManager\InstancedAssetPtr.h" />
+    <ClInclude Include="Camera\CameraSystem.h" />
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="ChunkGeneratorBase.h" />
     <ClInclude Include="ChunkGeneratorGrass.h" />

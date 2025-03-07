@@ -9,6 +9,7 @@
 #include "EditorTypePropertyVector.h"
 #include "EditorTypePropertyEnum.h"
 #include "EditorTypePropertyInstancedAssetPtr.h"
+#include "..\Roguelike\Camera\CameraSystem.h"
 #include "..\Roguelike\Core\GameInstance.h"
 #include "..\Roguelike\Core\GameSystem.h"
 #include "..\Roguelike\DirectoryData.h"
@@ -476,6 +477,29 @@ void* GameInstance::_CreateEmptyObject()
 	return new GameInstance;
 }
 
+// CameraSystem
+void CameraSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	CameraSystem* pCameraSystem = static_cast<CameraSystem*>(pObject);
+	GameSystem::_InitFromPropertiesSubset(static_cast<GameSystem*>(pCameraSystem), properties, propertyIndex);
+	pCameraSystem->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pCameraSystem->zoom = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pCameraSystem->zoomSpeed = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+}
+
+void* CameraSystem::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	CameraSystem* pCameraSystem = new CameraSystem;
+	int propertyIndex = 0;
+	CameraSystem::_InitFromPropertiesSubset(pCameraSystem, properties, propertyIndex);
+	return pCameraSystem;
+}
+
+void* CameraSystem::_CreateEmptyObject()
+{
+	return new CameraSystem;
+}
+
 // WorldGenerator
 void WorldGenerator::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -624,25 +648,25 @@ void* TextRenderSystem::_CreateEmptyObject()
 	return new TextRenderSystem;
 }
 
-// RPGSkillAimResponseVisualEntry
-void RPGSkillAimResponseVisualEntry::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+// RPGSkillHighlightEntry
+void RPGSkillHighlightEntry::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
-	RPGSkillAimResponseVisualEntry* pRPGSkillAimResponseVisualEntry = static_cast<RPGSkillAimResponseVisualEntry*>(pObject);
-	pRPGSkillAimResponseVisualEntry->response = static_cast<ERPGSkillAimResponse>(static_cast<EditorTypePropertyEnum*>(properties[propertyIndex++])->GetValue());
-	pRPGSkillAimResponseVisualEntry->fileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	RPGSkillHighlightEntry* pRPGSkillHighlightEntry = static_cast<RPGSkillHighlightEntry*>(pObject);
+	pRPGSkillHighlightEntry->highlight = static_cast<ERPGSkillHighlightType>(static_cast<EditorTypePropertyEnum*>(properties[propertyIndex++])->GetValue());
+	pRPGSkillHighlightEntry->fileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 }
 
-void* RPGSkillAimResponseVisualEntry::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+void* RPGSkillHighlightEntry::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
 {
-	RPGSkillAimResponseVisualEntry* pRPGSkillAimResponseVisualEntry = new RPGSkillAimResponseVisualEntry;
+	RPGSkillHighlightEntry* pRPGSkillHighlightEntry = new RPGSkillHighlightEntry;
 	int propertyIndex = 0;
-	RPGSkillAimResponseVisualEntry::_InitFromPropertiesSubset(pRPGSkillAimResponseVisualEntry, properties, propertyIndex);
-	return pRPGSkillAimResponseVisualEntry;
+	RPGSkillHighlightEntry::_InitFromPropertiesSubset(pRPGSkillHighlightEntry, properties, propertyIndex);
+	return pRPGSkillHighlightEntry;
 }
 
-void* RPGSkillAimResponseVisualEntry::_CreateEmptyObject()
+void* RPGSkillHighlightEntry::_CreateEmptyObject()
 {
-	return new RPGSkillAimResponseVisualEntry;
+	return new RPGSkillHighlightEntry;
 }
 
 // RPGSkillEffectModuleTemp
@@ -666,24 +690,26 @@ void* RPGSkillEffectModuleTemp::_CreateEmptyObject()
 	return new RPGSkillEffectModuleTemp;
 }
 
-// RPGSkillAimModuleTemp
-void RPGSkillAimModuleTemp::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+// RPGSkillAimModuleLine
+void RPGSkillAimModuleLine::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
-	RPGSkillAimModuleTemp* pRPGSkillAimModuleTemp = static_cast<RPGSkillAimModuleTemp*>(pObject);
-	RPGSkillAimModuleBase::_InitFromPropertiesSubset(static_cast<RPGSkillAimModuleBase*>(pRPGSkillAimModuleTemp), properties, propertyIndex);
+	RPGSkillAimModuleLine* pRPGSkillAimModuleLine = static_cast<RPGSkillAimModuleLine*>(pObject);
+	RPGSkillAimModuleBase::_InitFromPropertiesSubset(static_cast<RPGSkillAimModuleBase*>(pRPGSkillAimModuleLine), properties, propertyIndex);
+	pRPGSkillAimModuleLine->maxRange = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+	pRPGSkillAimModuleLine->areaRadius = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
 }
 
-void* RPGSkillAimModuleTemp::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+void* RPGSkillAimModuleLine::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
 {
-	RPGSkillAimModuleTemp* pRPGSkillAimModuleTemp = new RPGSkillAimModuleTemp;
+	RPGSkillAimModuleLine* pRPGSkillAimModuleLine = new RPGSkillAimModuleLine;
 	int propertyIndex = 0;
-	RPGSkillAimModuleTemp::_InitFromPropertiesSubset(pRPGSkillAimModuleTemp, properties, propertyIndex);
-	return pRPGSkillAimModuleTemp;
+	RPGSkillAimModuleLine::_InitFromPropertiesSubset(pRPGSkillAimModuleLine, properties, propertyIndex);
+	return pRPGSkillAimModuleLine;
 }
 
-void* RPGSkillAimModuleTemp::_CreateEmptyObject()
+void* RPGSkillAimModuleLine::_CreateEmptyObject()
 {
-	return new RPGSkillAimModuleTemp;
+	return new RPGSkillAimModuleLine;
 }
 
 // RPGRaceData
@@ -1056,11 +1082,12 @@ void RPGSkillSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<
 	pRPGSkillSystem->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pRPGSkillSystem->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pRPGSkillSystem->pEcsEntityMap = static_cast<ECSSystemEntityMap*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pRPGSkillSystem->pCameraSystem = static_cast<CameraSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	{
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pRPGSkillSystem->skillAimResponseVisuals.push_back(*static_cast<RPGSkillAimResponseVisualEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+			pRPGSkillSystem->skillHighlightVisuals.push_back(*static_cast<RPGSkillHighlightEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
 		}
 	}
 }
@@ -1178,15 +1205,16 @@ namespace __Generated
 		{"DirectoryData", &DirectoryData::_InitFromProperties},
 		{"GameSystem", &GameSystem::_InitFromProperties},
 		{"GameInstance", &GameInstance::_InitFromProperties},
+		{"CameraSystem", &CameraSystem::_InitFromProperties},
 		{"WorldGenerator", &WorldGenerator::_InitFromProperties},
 		{"MenuScreenMain", &MenuScreenMain::_InitFromProperties},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_InitFromProperties},
 		{"MenuSystem", &MenuSystem::_InitFromProperties},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_InitFromProperties},
 		{"TextRenderSystem", &TextRenderSystem::_InitFromProperties},
-		{"RPGSkillAimResponseVisualEntry", &RPGSkillAimResponseVisualEntry::_InitFromProperties},
+		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_InitFromProperties},
 		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_InitFromProperties},
-		{"RPGSkillAimModuleTemp", &RPGSkillAimModuleTemp::_InitFromProperties},
+		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_InitFromProperties},
 		{"RPGRaceData", &RPGRaceData::_InitFromProperties},
 		{"RPGAttributeBase", &RPGAttributeBase::_InitFromProperties},
 		{"InputSystem", &InputSystem::_InitFromProperties},
@@ -1230,15 +1258,16 @@ namespace __Generated
 		{"DirectoryData", &DirectoryData::_CreateEmptyObject},
 		{"GameSystem", &GameSystem::_CreateEmptyObject},
 		{"GameInstance", &GameInstance::_CreateEmptyObject},
+		{"CameraSystem", &CameraSystem::_CreateEmptyObject},
 		{"WorldGenerator", &WorldGenerator::_CreateEmptyObject},
 		{"MenuScreenMain", &MenuScreenMain::_CreateEmptyObject},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_CreateEmptyObject},
 		{"MenuSystem", &MenuSystem::_CreateEmptyObject},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_CreateEmptyObject},
 		{"TextRenderSystem", &TextRenderSystem::_CreateEmptyObject},
-		{"RPGSkillAimResponseVisualEntry", &RPGSkillAimResponseVisualEntry::_CreateEmptyObject},
+		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_CreateEmptyObject},
 		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_CreateEmptyObject},
-		{"RPGSkillAimModuleTemp", &RPGSkillAimModuleTemp::_CreateEmptyObject},
+		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_CreateEmptyObject},
 		{"RPGRaceData", &RPGRaceData::_CreateEmptyObject},
 		{"RPGAttributeBase", &RPGAttributeBase::_CreateEmptyObject},
 		{"InputSystem", &InputSystem::_CreateEmptyObject},
@@ -1282,15 +1311,16 @@ namespace __Generated
 		{"DirectoryData", &DirectoryData::_InitFromPropertiesSubset},
 		{"GameSystem", &GameSystem::_InitFromPropertiesSubset},
 		{"GameInstance", &GameInstance::_InitFromPropertiesSubset},
+		{"CameraSystem", &CameraSystem::_InitFromPropertiesSubset},
 		{"WorldGenerator", &WorldGenerator::_InitFromPropertiesSubset},
 		{"MenuScreenMain", &MenuScreenMain::_InitFromPropertiesSubset},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_InitFromPropertiesSubset},
 		{"MenuSystem", &MenuSystem::_InitFromPropertiesSubset},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_InitFromPropertiesSubset},
 		{"TextRenderSystem", &TextRenderSystem::_InitFromPropertiesSubset},
-		{"RPGSkillAimResponseVisualEntry", &RPGSkillAimResponseVisualEntry::_InitFromPropertiesSubset},
+		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_InitFromPropertiesSubset},
 		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_InitFromPropertiesSubset},
-		{"RPGSkillAimModuleTemp", &RPGSkillAimModuleTemp::_InitFromPropertiesSubset},
+		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_InitFromPropertiesSubset},
 		{"RPGRaceData", &RPGRaceData::_InitFromPropertiesSubset},
 		{"RPGAttributeBase", &RPGAttributeBase::_InitFromPropertiesSubset},
 		{"InputSystem", &InputSystem::_InitFromPropertiesSubset},
