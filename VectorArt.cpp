@@ -61,13 +61,5 @@ void VectorArt::Serialize(u32* pBuffer)
 
 VectorPrimitiveLayer* VectorArt::FindLayerByLabel(const std::string& label)
 {
-	VectorPrimitiveBase* pVectorPrimitiveBase = FindPrimitiveByLabel<VectorPrimitiveBase>(label);
-	if (pVectorPrimitiveBase == nullptr)
-	{
-		return nullptr;
-	}
-
-	VectorPrimitiveLayer* pReturnedLayer = dynamic_cast<VectorPrimitiveLayer*>(pVectorPrimitiveBase);
-
-	return pReturnedLayer ? pReturnedLayer : pVectorPrimitiveBase->pParent; // 
+	return pRootLayer->FindLayerByLabel(label); 
 }

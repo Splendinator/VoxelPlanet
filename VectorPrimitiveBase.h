@@ -1,6 +1,7 @@
 #pragma once
 
 #include <DomMath/Vec2.h>
+
 #include "DomMath/Types.h"
 #include "DomUtils/Pointers.h"
 
@@ -39,33 +40,14 @@ public:
 	// Returns whether the the passed in primitive is a child 
 	virtual bool IsChildOfThis(const VectorPrimitiveBase* pPossibleChild) const { return false; }
 
-	// Templated version of FindPrimitiveByLabel() for ease of use. Throws an error if the primitive is not found for ease of debugging vector art assets.
-	template<typename TClass>
-	TransientPtr<TClass> FindPrimitiveByLabel(const std::string& label);
-
-	// This can be overwritten to find a primitive by its label. 
-	// This is used to search recursively for the first non-nullptr primitive with the given label.
-	// This *doesn't* return the VectorPrimitiveLayer with the label but the primitive below it
-	// However, this *does* return the layer in the case that the layer has multiple children 
-	virtual VectorPrimitiveBase* FindPrimitiveByLabelInternal(const std::string& label) { return nullptr; }
+	// Recursively goes through the layers until it finds one with the correct label
+	virtual VectorPrimitiveLayer* FindLayerByLabel(const std::string& label) { return nullptr; }
 	
 	// This is the layer directly above this; this will be nullptr for the root layer in a file.
 	VectorPrimitiveLayer* pParent = nullptr;
 
 protected:
-
+	
 	// Child classes will need to call this whenever they change shape/size to keep the layer bounding box accurate
 	void RefreshParentLayerBoundingBox();
 };
-
-template<typename TClass>
-TransientPtr<TClass> VectorPrimitiveBase::FindPrimitiveByLabel(const std::string& label)
-{
-	static_assert(std::is_base_of<VectorPrimitiveBase, TClass>::value, "TClass must inherit from VectorPrimitiveBase");
-
-	TClass* pPrimitive = dynamic_cast<TClass*>(FindPrimitiveByLabelInternal(label));
-
-	DOMLOG_ERROR_IF(pPrimitive == nullptr, "Failed to find primitive with label:", label);
-
-	return pPrimitive;
-}

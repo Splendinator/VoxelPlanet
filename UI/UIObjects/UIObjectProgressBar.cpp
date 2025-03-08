@@ -4,15 +4,17 @@
 
 #include "VectorPrimitiveRectangle.h"
 
-void UIObjectProgressBar::Init(VectorPrimitiveBase* pRoot)
+void UIObjectProgressBar::Init(VectorPrimitiveLayer* pRoot)
 {
-	pProgressBarPrimitive = pRoot->FindPrimitiveByLabel<VectorPrimitiveRectangle>("ProgressBar");
-	progressBarTotalWidth = (float)pProgressBarPrimitive->GetWidth();
+	progressBarTotalWidth = pRoot->GetBoundingBox().GetWidth();
+
+	// pRoot will contain background and foreground, we pick out the foreground that will rescale
+	pProgressBar = pRoot->FindLayerByLabel("ProgressBar");
 }
 
 void UIObjectProgressBar::Uninit()
 {
-	pProgressBarPrimitive = nullptr;
+	pProgressBar = nullptr;
 	progressBarTotalWidth = 0.0f;
 }
 
@@ -20,7 +22,5 @@ void UIObjectProgressBar::SetProgressFrac(float progressFrac)
 {
 	progressFrac = std::clamp(progressFrac, 0.0f, 1.0f);
 
-	const u32 progressBarWidth = (u32)(progressBarTotalWidth * progressFrac);
-
-	pProgressBarPrimitive->SetWidth(progressBarWidth);
+	pProgressBar->SetScaleX(progressFrac);
 }

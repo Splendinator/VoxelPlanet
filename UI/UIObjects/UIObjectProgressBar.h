@@ -7,7 +7,7 @@ class VectorPrimitiveRectangle;
 
 /** UIObjectProgressBar
 *
-* UI Object that resizes a VectorPrimitiveRectangle to allow setting progress
+* UI Object that scales a layer along the X direction depending on progress passed in
 */
 class UIObjectProgressBar : public UIObjectBase
 {
@@ -18,10 +18,10 @@ public:
 
 protected:
 	//~ Begin UIObjectBase Interface
-	void Init(VectorPrimitiveBase* pRoot) override;
+	void Init(VectorPrimitiveLayer* pRoot) override;
 	void Uninit() override;
 	//~ End UIObjectBase Interface
 
-	TransientPtr<VectorPrimitiveRectangle> pProgressBarPrimitive = nullptr;
+	TransientPtr<VectorPrimitiveLayer> pProgressBar = nullptr;
 	float progressBarTotalWidth = 0.0f;
 };

@@ -111,29 +111,23 @@ std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 	return stream;
 }
 
-VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveByLabelInternal(const std::string& label)
+VectorPrimitiveLayer* VectorPrimitiveLayer::FindLayerByLabel(const std::string& label)
 {
 	// Label found
 	if (label == layerLabel)
 	{
-		if (children.size() > 1)
-		{
-			// If the layer has multiple primitives we return it, otherwise we treat the primitive itself as having the name and return that
-			// #NOTE: I'm not sure if this is intuitive to use?
-			return this;
-		}
-		return children[0];
+		return this;
 	}
 	
 	// Search children recursively
 	for (VectorPrimitiveBase* child : children)
 	{
-		if (VectorPrimitiveBase* pFound = child->FindPrimitiveByLabelInternal(label))
+		if (VectorPrimitiveLayer* pFound = child->FindLayerByLabel(label))
 		{
 			return pFound;
 		}
 	}
-
+	
 	return nullptr;
 }
 

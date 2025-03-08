@@ -7,7 +7,7 @@
 
 #include "UI/UICanvas.h"
 
-void UIObjectButton::Init(VectorPrimitiveBase* pRoot)
+void UIObjectButton::Init(VectorPrimitiveLayer* pRoot)
 {
 	pClickablePrimitive = pRoot;	
 }

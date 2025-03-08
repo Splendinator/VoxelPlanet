@@ -16,12 +16,7 @@ public:
 	Box2f GetBoundingBox() const override;
 	void AdjustPositionWithinLayer(Vec2f delta) override;
 	//~ End VectorPrimitiveBase Interface
-
-	void SetWidth(u32 inWidth) { width = inWidth; RefreshParentLayerBoundingBox(); }
-	void SetHeight(u32 inHeight) { height = inHeight; RefreshParentLayerBoundingBox(); }
-	void SetX(i32 inX) { x = inX; RefreshParentLayerBoundingBox(); }
-	void SetY(i32 inY) { y = inY; RefreshParentLayerBoundingBox(); }
-
+	
 	u32 GetWidth() const { return width; }
 	u32 GetHeight() const { return height; }
 	i32 GetX() const { return x; }

@@ -2,7 +2,7 @@
 
 #include "UIObjectBase.h"
 
-void UIObjectBase::BaseInit(VectorPrimitiveBase* pRoot, const UICanvas* pCanvas)
+void UIObjectBase::BaseInit(VectorPrimitiveLayer* pRoot, const UICanvas* pCanvas)
 {
 	pParentCanvas = pCanvas;
 	

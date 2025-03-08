@@ -15,7 +15,7 @@ public:
 
 	// Init and UnInit functions are automatically called by the UIObjectContainer that contains this UIObject
 	// pRoot will either be the layer (if multiple primitives are on one layer) or the single primitive in the layer
-	void BaseInit(VectorPrimitiveBase* pRoot, const UICanvas* pCanvas);
+	void BaseInit(VectorPrimitiveLayer* pRoot, const UICanvas* pCanvas);
 	void BaseUninit();
 
 	// Optional tick for objects that need anims
@@ -24,7 +24,7 @@ public:
 protected:
 
 	// Init objects using UIObjectContainer::AddExistingUIObject()
-	virtual void Init(VectorPrimitiveBase* pRoot) {};
+	virtual void Init(VectorPrimitiveLayer* pRoot) {};
 
 	// Opposite of Init()
 	virtual void Uninit() {};

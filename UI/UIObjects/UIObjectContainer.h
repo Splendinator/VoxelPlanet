@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VectorPrimitiveBase.h"
+#include "VectorPrimitiveLayer.h"
 
 #include <type_traits>
 
@@ -18,7 +18,7 @@ protected:
 	void UninitAllUIObjects();
 
 	template<typename TClass>
-	TransientPtr<TClass> AddUIObject(VectorPrimitiveBase* pRoot, const std::string& label = "");
+	TransientPtr<TClass> AddUIObject(VectorPrimitiveLayer* pRoot, const std::string& label = "");
 
 	virtual const UICanvas* GetCanvas() const = 0;
 	
@@ -29,15 +29,15 @@ private:
 };
 
 template<typename TClass>
-TransientPtr<TClass> UIObjectContainer::AddUIObject(VectorPrimitiveBase* pRoot, const std::string& label /*= ""*/)
+TransientPtr<TClass> UIObjectContainer::AddUIObject(VectorPrimitiveLayer* pRoot, const std::string& label /*= ""*/)
 {
 	static_assert(std::is_base_of<UIObjectBase, TClass>::value, "TClass must inherit from UIObjectBase");
 
-	TransientPtr<VectorPrimitiveBase> pNewUIObjectRoot = label == "" ? TransientPtr<VectorPrimitiveBase>(pRoot) : pRoot->FindPrimitiveByLabel<VectorPrimitiveBase>(label);
+	VectorPrimitiveLayer* pNewUIObjectRoot = label == "" ? pRoot : pRoot->FindLayerByLabel(label);
 	
 	TClass* pNewUIObject = new TClass();
 	
-	pNewUIObject->BaseInit(pNewUIObjectRoot.Get(), GetCanvas());
+	pNewUIObject->BaseInit(pNewUIObjectRoot, GetCanvas());
 
 	pChildren.push_back(pNewUIObject);
 

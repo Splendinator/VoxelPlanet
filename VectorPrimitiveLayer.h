@@ -15,7 +15,7 @@ public:
 	//~ Begin VectorPrimitiveBase Interface
 	u32* Serialize(u32* pBuffer) override;
 	std::istream& PopulateFromFile(std::istream& stream) override;
-	VectorPrimitiveBase* FindPrimitiveByLabelInternal(const std::string& label) override;
+	VectorPrimitiveLayer* FindLayerByLabel(const std::string& label) override;
 	const VectorPrimitiveBase* FindPrimitiveUnderCursor(Vec2i cursorPos) const override;
 	bool IsChildOfThis(const VectorPrimitiveBase* pPossibleChild) const override;
 	Box2f GetBoundingBox() const override { return currentBoundingBox; }
@@ -25,7 +25,10 @@ public:
 	const std::vector<VectorPrimitiveBase*>& GetChildren() const { return children; }
 	
 	void SetPositionOffset(Vec2f inPositionOffset) { positionOffset = inPositionOffset; }
+
 	void SetScale(Vec2f inScale) { scale = inScale; }
+	void SetScaleX(float scaleX) { scale.x = scaleX; }
+	void SetScaleY(float scaleY) { scale.y = scaleY; }
 
 	// Steal the children from the passed in layer, useful to inject UI icons into existing vector art.
 	void StealChildrenFromLayer(VectorPrimitiveLayer* pOtherLayer);
@@ -34,6 +37,10 @@ public:
 	// Certain things like moving a primitive within a layer require the layer's bounding box to be refreshed for it to be accurate
 	// If the bounding box is inaccurate it can mess with certain renderer operations like scaling the layer
 	void RefreshBoundingBox();
+
+	// Returns the single primitive of this layer casted to the correct type. If there isn't exactly 1 child this returns nullptr.
+	template <typename TClass>
+	TClass* GetSinglePrimitive();
 	
 private:
 
@@ -55,4 +62,23 @@ private:
 	// #TODO: This should be a unique ptr
 	std::vector<VectorPrimitiveBase*> children;
 };
+
+template <typename TClass>
+TClass* VectorPrimitiveLayer::GetSinglePrimitive()
+{
+	static_assert(std::is_base_of<VectorPrimitiveBase, TClass>::value, "TClass must inherit from VectorPrimitiveBase");
+	static_assert(!std::is_same<VectorPrimitiveLayer, TClass>::value, "Use FindLayerByLabel");
+	
+	if (children.size() != 1)
+	{
+		DOMLOG_ERROR("Layer has incorrect number of children, was this intentional?")
+		return nullptr;
+	}
+	
+	TClass* pPrimitive = dynamic_cast<TClass*>(children[0]);
+
+	DOMLOG_ERROR_IF(pPrimitive == nullptr, "Primitive found on layer", layerLabel, "is not the correct type");
+	
+	return pPrimitive;
+}
 

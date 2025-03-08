@@ -29,12 +29,8 @@ public:
 	VectorArt(const VectorArt& other) = delete;
 	
 	void Serialize(u32* pBuffer);
-
-	// See VectorPrimitiveBase::FindPrimitiveByLabelInternal
-	template<typename TClass>
-	TClass* FindPrimitiveByLabel(const std::string& label);
-
-	// Unlike FindPrimitiveByLabel this returns a layer even if the layer only has 1 primitive
+	
+	// Scans the whole vector art and returns the layer with the label if found
 	VectorPrimitiveLayer* FindLayerByLabel(const std::string& label);
 
 	// Page dimensions are used to figure out size of primitives relative to the quad they are on.
@@ -51,9 +47,3 @@ private:
 	u32 pageWidth = 0;
 	u32 pageHeight = 0;
 };
-
-template<typename TClass>
-TClass* VectorArt::FindPrimitiveByLabel(const std::string& label)
-{
-	return pRootLayer->FindPrimitiveByLabel<TClass>(label);
-}

@@ -19,7 +19,7 @@ public:
 protected:
 	
 	//~ Begin UIObjectBase Interface
-	void Init(VectorPrimitiveBase* pRoot) override;
+	void Init(VectorPrimitiveLayer* pRoot) override;
 	void Uninit() override;
 	void Tick(float deltaTime) override;
 	//~ End UIObjectBase Interface

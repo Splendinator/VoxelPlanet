@@ -28,7 +28,7 @@ void UIObjectIconLoader::LoadUIIcon(const std::string& file, const std::string& 
 	//pReplaceThis->SetScale({scaleX, scaleY});
 }
 
-void UIObjectIconLoader::Init(VectorPrimitiveBase* pRoot)
+void UIObjectIconLoader::Init(VectorPrimitiveLayer* pRoot)
 {
 	UIObjectBase::Init(pRoot);
 	 
