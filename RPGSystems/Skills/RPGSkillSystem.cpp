@@ -115,8 +115,6 @@ void RPGSkillSystem::StopAimingSkill()
 	ClearAllAimingVisuals();
 }
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
 bool RPGSkillSystem::TryFirePlayerAimedSkill()
 {
 	if (!pCameraSystem || !pEcs)
@@ -156,7 +154,6 @@ bool RPGSkillSystem::TryFireSkill(const RPGSkillData* pSkill, EntityId caster, c
 
 	return false;
 }
-#pragma optimize("", on)
 
 void RPGSkillSystem::ClearAllAimingVisuals()
 {

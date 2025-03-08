@@ -23,6 +23,14 @@ public:
 	// This should be overridden to read in the contents of this vector primitive from an SVG file (xml file).
 	// This should start reading from right after the associated tag. i.e reading in a circle will start after "<circle"
 	virtual std::istream& PopulateFromFile(std::istream& stream) = 0;
+
+	// Should returns the 2d bounding box of this shape
+	virtual Box2f GetBoundingBox() const = 0;
+
+	// Children should override this to change their X and Y co-ordinates.
+	// This is just used to adjust primitives within a layer to keep them relative to the top left of the layer's bounding box.
+	// **Do not use this** to move all primitives in a layer. Use VectorPrimitiveLayer::SetPositionOffset()
+	virtual void AdjustPositionWithinLayer(Vec2f delta) = 0;
 	
 	// Recursive function to find the top hovered over primitive
 	// Remember the input cursorPos will be in vector-art space, you most likely can't just plug in the raw mouse coordinates
@@ -43,6 +51,11 @@ public:
 	
 	// This is the layer directly above this; this will be nullptr for the root layer in a file.
 	VectorPrimitiveLayer* pParent = nullptr;
+
+protected:
+
+	// Child classes will need to call this whenever they change shape/size to keep the layer bounding box accurate
+	void RefreshParentLayerBoundingBox();
 };
 
 template<typename TClass>

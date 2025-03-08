@@ -9,9 +9,9 @@ u32* VectorPrimitiveRectangle::Serialize(u32* pBuffer)
 	*pBuffer = (u32)EPrimitiveType::Rectangle;
 	++pBuffer;
 
-	*pBuffer = x;
+	*pBuffer = (u32)x;
 	++pBuffer;
-	*pBuffer = y;
+	*pBuffer = (u32)y;
 	++pBuffer;
 	*pBuffer = width;
 	++pBuffer;
@@ -28,8 +28,8 @@ std::istream& VectorPrimitiveRectangle::PopulateFromFile(std::istream& stream)
 	// #JANK: Should these be floats instead?
 	width = (u32)std::stof(dmim::GetNextAttribute(stream, "width"));
 	height = (u32)std::stof(dmim::GetNextAttribute(stream, "height"));
-	x = (u32)std::stof(dmim::GetNextAttribute(stream, "x"));
-	y = (u32)std::stof(dmim::GetNextAttribute(stream, "y"));
+	x = (i32)std::stof(dmim::GetNextAttribute(stream, "x"));
+	y = (i32)std::stof(dmim::GetNextAttribute(stream, "y"));
 
 	return stream;
 }
@@ -41,4 +41,19 @@ const VectorPrimitiveBase* VectorPrimitiveRectangle::FindPrimitiveUnderCursor(Ve
 		return this;
 	}
 	return nullptr;
+}
+
+Box2f VectorPrimitiveRectangle::GetBoundingBox() const
+{
+	Box2f boundingBox;
+	boundingBox.SetTopLeft({(float)x, (float)y});
+	boundingBox.SetSize({(float)width, (float)height});
+
+	return boundingBox;
+}
+
+void VectorPrimitiveRectangle::AdjustPositionWithinLayer(Vec2f delta)
+{
+	x += (i32)delta.x;
+	y += (i32)delta.y;
 }

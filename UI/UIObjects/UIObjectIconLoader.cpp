@@ -18,12 +18,9 @@ void UIObjectIconLoader::LoadUIIcon(const std::string& file, const std::string& 
 		// #JANK: Should this use pParent instead of getting the layer directly?
 		pReplaceWithThis = pLoadedVectorArt->FindLayerByLabel(primitiveName);
 	}
-
-	// #TODO: Right now this assumes the icons are loaded in from 0,0 in their respective files.
-	// #TODO: I'm not sure of the best way to fix this as the .svg file saves absolute co-ordinates.
-	// #TODO: Likely we need to correct for this with bounding boxes when we add stacking layer transforms (i.e the TODO in VectorPrimitiveBase)   
+	
 	pReplaceThis->SetChildren(pReplaceWithThis->GetChildren());
-	pReplaceThis->SetPositionOffset({(i32)pRectangleForSize->GetX(), (i32)pRectangleForSize->GetY()});
+	pReplaceThis->SetPositionOffset({(float)pRectangleForSize->GetX(), (float)pRectangleForSize->GetY()});
 }
 
 void UIObjectIconLoader::Init(VectorPrimitiveBase* pRoot)

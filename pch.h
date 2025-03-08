@@ -31,6 +31,7 @@
 #include "DomMath/Vec2.h"
 #include "DomMath/Vec3.h"
 #include "DomMath/Vec4.h"
+#include "DomMath/Box2.h"
 #include "DomUtils/Pointers.h"
 #include "DomUtils/Delegate.h"
 #include "Game.h"

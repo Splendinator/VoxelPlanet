@@ -12,9 +12,9 @@ u32* VectorPrimitiveCircle::Serialize(u32* pBuffer)
 	*pBuffer = (u32)EPrimitiveType::Cirlce;
 	++pBuffer;
 
-	*pBuffer = x;
+	*pBuffer = (u32)x;
 	++pBuffer;
-	*pBuffer = y;
+	*pBuffer = (u32)y;
 	++pBuffer;
 	*pBuffer = rad;
 	++pBuffer;
@@ -27,8 +27,8 @@ std::istream& VectorPrimitiveCircle::PopulateFromFile(std::istream& stream)
 	VectorPrimitiveShape::PopulateFromFile(stream);
 
 	// #JANK: Should these be floats instead?
-	x = (u32)std::stof(dmim::GetNextAttribute(stream, "cx"));
-	y = (u32)std::stof(dmim::GetNextAttribute(stream, "cy"));
+	x = (i32)std::stof(dmim::GetNextAttribute(stream, "cx"));
+	y = (i32)std::stof(dmim::GetNextAttribute(stream, "cy"));
 	rad = (u32)std::stof(dmim::GetNextAttribute(stream, "r"));
 
 	return stream;
@@ -41,4 +41,15 @@ const VectorPrimitiveBase* VectorPrimitiveCircle::FindPrimitiveUnderCursor(Vec2i
 		return this;
 	}
 	return nullptr;   
+}
+
+Box2f VectorPrimitiveCircle::GetBoundingBox() const
+{
+	return Box2f::InitFromCenterAndSize({(float)x, (float)y}, {(float)rad, (float)rad});
+}
+
+void VectorPrimitiveCircle::AdjustPositionWithinLayer(Vec2f delta)
+{
+	x += (i32)delta.x;
+	y += (i32)delta.y;
 }

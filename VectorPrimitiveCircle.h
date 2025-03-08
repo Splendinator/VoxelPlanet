@@ -13,12 +13,14 @@ public:
 	u32* Serialize(u32* pBuffer) override;
 	std::istream& PopulateFromFile(std::istream& stream) override;
 	const VectorPrimitiveBase* FindPrimitiveUnderCursor(Vec2i cursorPos) const override;
+	Box2f GetBoundingBox() const override;
+	void AdjustPositionWithinLayer(Vec2f delta) override;
 	//~ End VectorPrimitiveBase Interface
 
 private:
 	// Coordinates of center
-	u32 x = 0; 
-	u32 y = 0;
+	i32 x = 0; 
+	i32 y = 0;
 
 	u32 rad = 0;
 };

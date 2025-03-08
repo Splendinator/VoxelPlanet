@@ -18,12 +18,19 @@ public:
 	VectorPrimitiveBase* FindPrimitiveByLabelInternal(const std::string& label) override;
 	const VectorPrimitiveBase* FindPrimitiveUnderCursor(Vec2i cursorPos) const override;
 	bool IsChildOfThis(const VectorPrimitiveBase* pPossibleChild) const override;
+	Box2f GetBoundingBox() const override;
+	void AdjustPositionWithinLayer(Vec2f delta) override;
 	//~ End VectorPrimitiveBase Interface
 
 	const std::vector<VectorPrimitiveBase*>& GetChildren() const { return children; }
 	void SetChildren(const std::vector<VectorPrimitiveBase*> newChildren);
 
-	void SetPositionOffset(Vec2i inPositionOffset) { positionOffset = inPositionOffset; }
+	void SetPositionOffset(Vec2f inPositionOffset) { positionOffset = inPositionOffset; }
+
+	// This will refresh the layer's bounding box such that the top-left most child primitive has co-ordinates (0,0).
+	// Certain things like moving a primitive within a layer require the layer's bounding box to be refreshed for it to be accurate
+	// If the bounding box is inaccurate it can mess with certain renderer operations like scaling the layer
+	void RefreshBoundingBox();
 	
 private:
 
@@ -32,11 +39,12 @@ private:
 
 	// Opacity of all things inside this layer
 	float opacity = 1.0f; 
-
-	// #TODO: Right now all primitives use aboslute co-ordinates when read in from a .svg.
-	// #TODO: We instead need to use this and force relative co-ordinates. To do this we need to calcualte a bounding box around the layer.   
+	
 	// Position offset of all things inside this layer
-	Vec2i positionOffset = {};
+	Vec2f positionOffset = {};
+
+	// This is the previous bounding box, this is used when recalculating the bounding box to figure out the delta.
+	Box2f lastBoundingBox;
 	
 	// #NOTE: Rotation + scale?
 

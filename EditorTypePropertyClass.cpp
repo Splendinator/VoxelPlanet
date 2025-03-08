@@ -125,8 +125,6 @@ bool EditorTypePropertyClass::CanReadFromFile(std::ifstream& file) const
 	return temp == name;
 }
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
 void EditorTypePropertyClass::ReadFromFile(std::ifstream& file)
 {
 	// Read in "class SingleFloat pNext nullptr"
@@ -160,7 +158,6 @@ void EditorTypePropertyClass::ReadFromFile(std::ifstream& file)
 		}
 	}
 }
-#pragma optimize("", on)
 
 void EditorTypePropertyClass::WriteToFile(std::ofstream& file)
 {

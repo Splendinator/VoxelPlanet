@@ -25,10 +25,10 @@ u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 	*pBuffer = (u32)(255 * opacity);
 	++pBuffer;
 
-	*pBuffer = positionOffset.x;
+	*pBuffer = (u32)positionOffset.x;
 	++pBuffer;
 
-	*pBuffer = positionOffset.y;
+	*pBuffer = (u32)positionOffset.y;
 	++pBuffer;
 
 	// Draw children
@@ -98,6 +98,10 @@ std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 			pNewPrimitive->PopulateFromFile(stream);
 		}
 	}
+
+	// .svg files save all primitives in absolute space (relative to the top left of the document) but it's far more useful for us to use
+	// layer space (relative to the top left of the bounding box of the layer) so we translate to that by refreshing the bounding box with a {0,0,0,0} lastBoundingBox. 
+	RefreshBoundingBox();
 	
 	return stream;
 }
@@ -131,7 +135,7 @@ VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveByLabelInternal(const st
 const VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveUnderCursor(Vec2i cursorPos) const
 {
 	// Adjust by inverse positionOffset to keep everything accurate
-	cursorPos = cursorPos - positionOffset;
+	cursorPos = cursorPos - Vec2i((int)positionOffset.x, (int)positionOffset.y);
 	
 	// Iterate backwards (highest layer first)
 	for (int i = (int)children.size() - 1; i >= 0; i--)
@@ -153,6 +157,8 @@ void VectorPrimitiveLayer::SetChildren(const std::vector<VectorPrimitiveBase*> n
 		delete child;
 	}
 	children = newChildren;
+
+	RefreshBoundingBox();
 }
 
 bool VectorPrimitiveLayer::IsChildOfThis(const VectorPrimitiveBase* pPossibleChild) const
@@ -166,4 +172,58 @@ bool VectorPrimitiveLayer::IsChildOfThis(const VectorPrimitiveBase* pPossibleChi
 	}
 
 	return false;
+}
+
+Box2f VectorPrimitiveLayer::GetBoundingBox() const
+{
+	if (children.size() == 0)
+	{
+		return {};
+	}
+	
+	float leftMost = std::numeric_limits<float>::max();
+	float rightMost = std::numeric_limits<float>::min();
+	float topMost = std::numeric_limits<float>::max();
+	float bottomMost = std::numeric_limits<float>::min();
+
+	for (VectorPrimitiveBase* pChild : children)
+	{
+		Box2f childBoundingBox = pChild->GetBoundingBox();
+
+		const float childLeft = childBoundingBox.GetLeft();
+		const float childRight = childBoundingBox.GetRight();
+		const float childTop = childBoundingBox.GetTop();
+		const float childBottom = childBoundingBox.GetBottom();
+
+		leftMost = std::min(childLeft, leftMost);
+		rightMost = std::max(childRight, rightMost);
+		topMost = std::min(childTop, topMost);
+		bottomMost = std::max(childBottom, bottomMost);
+	}
+
+	return Box2f::InitFromLeftRightTopBottom(leftMost, rightMost, topMost, bottomMost);
+}
+
+void VectorPrimitiveLayer::AdjustPositionWithinLayer(Vec2f delta)
+{
+	for (VectorPrimitiveBase* pChild : children)
+	{
+		pChild->AdjustPositionWithinLayer(delta);
+	}
+}
+
+void VectorPrimitiveLayer::RefreshBoundingBox()
+{
+	Box2f boundingBox = GetBoundingBox();
+	SetPositionOffset( { boundingBox.GetLeft(), boundingBox.GetTop() });
+
+	const float xDelta = lastBoundingBox.GetLeft() - boundingBox.GetLeft();
+	const float yDelta = lastBoundingBox.GetTop() - boundingBox.GetTop();
+	
+	for (VectorPrimitiveBase* pChild : children)
+	{
+		pChild->AdjustPositionWithinLayer({xDelta, yDelta});
+	}
+
+	lastBoundingBox = boundingBox;
 }
