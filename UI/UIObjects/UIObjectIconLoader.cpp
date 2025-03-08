@@ -21,6 +21,7 @@ void UIObjectIconLoader::LoadUIIcon(const std::string& file, const std::string& 
 	
 	pReplaceThis->SetChildren(pReplaceWithThis->GetChildren());
 	pReplaceThis->SetPositionOffset({(float)pRectangleForSize->GetX(), (float)pRectangleForSize->GetY()});
+	pReplaceThis->SetScale({2.0f, 2.0f});
 }
 
 void UIObjectIconLoader::Init(VectorPrimitiveBase* pRoot)

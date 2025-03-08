@@ -22,13 +22,19 @@ u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 	*pBuffer = (u32)EPrimitiveType::PushLayer;
 	++pBuffer;
 	
-	*pBuffer = (u32)(255 * opacity);
+	*pBuffer = *reinterpret_cast<u32*>(&opacity);
 	++pBuffer;
 
 	*pBuffer = (u32)positionOffset.x;
 	++pBuffer;
 
 	*pBuffer = (u32)positionOffset.y;
+	++pBuffer;
+
+	*pBuffer = *reinterpret_cast<u32*>(&scale.x);
+	++pBuffer;
+
+	*pBuffer = *reinterpret_cast<u32*>(&scale.y);
 	++pBuffer;
 
 	// Draw children
@@ -43,7 +49,6 @@ u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 
 	return pBuffer;
 }
-#pragma optimize("", on)
 
 std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 {
@@ -134,8 +139,10 @@ VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveByLabelInternal(const st
 
 const VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveUnderCursor(Vec2i cursorPos) const
 {
-	// Adjust by inverse positionOffset to keep everything accurate
-	cursorPos = cursorPos - Vec2i((int)positionOffset.x, (int)positionOffset.y);
+	// Adjust by inverse positionOffset and scaleOffset to keep everything accurate
+	cursorPos -= Vec2i((int)positionOffset.x, (int)positionOffset.y);
+	cursorPos.x = (i32)(cursorPos.x / scale.x);
+	cursorPos.y = (i32)(cursorPos.y / scale.y);
 	
 	// Iterate backwards (highest layer first)
 	for (int i = (int)children.size() - 1; i >= 0; i--)

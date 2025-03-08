@@ -26,6 +26,7 @@ public:
 	void SetChildren(const std::vector<VectorPrimitiveBase*> newChildren);
 
 	void SetPositionOffset(Vec2f inPositionOffset) { positionOffset = inPositionOffset; }
+	void SetScale(Vec2f inScale) { scale = inScale;};
 
 	// This will refresh the layer's bounding box such that the top-left most child primitive has co-ordinates (0,0).
 	// Certain things like moving a primitive within a layer require the layer's bounding box to be refreshed for it to be accurate
@@ -42,6 +43,9 @@ private:
 	
 	// Position offset of all things inside this layer
 	Vec2f positionOffset = {};
+
+	// Scale of this layer, it will be scaled from the top left of the layer (i.e. it will grow right and down, but the top left will stay in the same place)
+	Vec2f scale = {1.0f, 1.0f};
 
 	// This is the previous bounding box, this is used when recalculating the bounding box to figure out the delta.
 	Box2f lastBoundingBox;
