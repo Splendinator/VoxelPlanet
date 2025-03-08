@@ -45,7 +45,7 @@ const VectorPrimitiveBase* VectorPrimitiveCircle::FindPrimitiveUnderCursor(Vec2i
 
 Box2f VectorPrimitiveCircle::GetBoundingBox() const
 {
-	return Box2f::InitFromCenterAndSize({(float)x, (float)y}, {(float)rad, (float)rad});
+	return Box2f::InitFromCenterAndSize({(float)x, (float)y}, {(float)rad*2.0f, (float)rad*2.0f});
 }
 
 void VectorPrimitiveCircle::AdjustPositionWithinLayer(Vec2f delta)

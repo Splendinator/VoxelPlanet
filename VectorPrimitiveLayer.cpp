@@ -105,7 +105,7 @@ std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 	}
 
 	// .svg files save all primitives in absolute space (relative to the top left of the document) but it's far more useful for us to use
-	// layer space (relative to the top left of the bounding box of the layer) so we translate to that by refreshing the bounding box with a {0,0,0,0} lastBoundingBox. 
+	// layer space (relative to the top left of the bounding box of the layer) so we translate to that by refreshing the bounding box with a {0,0,0,0} currentBoundingBox. 
 	RefreshBoundingBox();
 	
 	return stream;
@@ -157,17 +157,6 @@ const VectorPrimitiveBase* VectorPrimitiveLayer::FindPrimitiveUnderCursor(Vec2i 
 	return nullptr;
 }
 
-void VectorPrimitiveLayer::SetChildren(const std::vector<VectorPrimitiveBase*> newChildren)
-{
-	for (VectorPrimitiveBase* child : children)
-	{
-		delete child;
-	}
-	children = newChildren;
-
-	RefreshBoundingBox();
-}
-
 bool VectorPrimitiveLayer::IsChildOfThis(const VectorPrimitiveBase* pPossibleChild) const
 {
 	for (VectorPrimitiveBase* pChild : children)
@@ -181,17 +170,43 @@ bool VectorPrimitiveLayer::IsChildOfThis(const VectorPrimitiveBase* pPossibleChi
 	return false;
 }
 
-Box2f VectorPrimitiveLayer::GetBoundingBox() const
+void VectorPrimitiveLayer::AdjustPositionWithinLayer(Vec2f delta)
+{
+	positionOffset.x += delta.x;
+	positionOffset.y += delta.y;
+}
+
+void VectorPrimitiveLayer::StealChildrenFromLayer(VectorPrimitiveLayer* pOtherLayer)
+{
+	if (pOtherLayer == nullptr)
+	{
+		return;
+	}
+	
+	for (VectorPrimitiveBase* child : children)
+	{
+		delete child;
+	}
+
+	children = std::move(pOtherLayer->children);
+	
+	// Steal size of bounding box from other layer, but keep our own position/scale etc.
+	currentBoundingBox.SetWidth(pOtherLayer->currentBoundingBox.GetWidth());
+	currentBoundingBox.SetHeight(pOtherLayer->currentBoundingBox.GetHeight());
+}
+
+void VectorPrimitiveLayer::RefreshBoundingBox()
 {
 	if (children.size() == 0)
 	{
-		return {};
+		return;
 	}
-	
+
+	// 1. Calculate new bounding box
 	float leftMost = std::numeric_limits<float>::max();
-	float rightMost = std::numeric_limits<float>::min();
+	float rightMost = std::numeric_limits<float>::lowest();
 	float topMost = std::numeric_limits<float>::max();
-	float bottomMost = std::numeric_limits<float>::min();
+	float bottomMost = std::numeric_limits<float>::lowest();
 
 	for (VectorPrimitiveBase* pChild : children)
 	{
@@ -208,29 +223,19 @@ Box2f VectorPrimitiveLayer::GetBoundingBox() const
 		bottomMost = std::max(childBottom, bottomMost);
 	}
 
-	return Box2f::InitFromLeftRightTopBottom(leftMost, rightMost, topMost, bottomMost);
-}
+	// std::max() is used here to cull anything that ends up off the left or top of the canvas
+	const Box2f newBoundingBox = Box2f::InitFromLeftRightTopBottom(std::max(leftMost, 0.0f), rightMost, std::max(topMost, 0.0f), bottomMost);
 
-void VectorPrimitiveLayer::AdjustPositionWithinLayer(Vec2f delta)
-{
-	for (VectorPrimitiveBase* pChild : children)
-	{
-		pChild->AdjustPositionWithinLayer(delta);
-	}
-}
-
-void VectorPrimitiveLayer::RefreshBoundingBox()
-{
-	Box2f boundingBox = GetBoundingBox();
-	SetPositionOffset( { boundingBox.GetLeft(), boundingBox.GetTop() });
-
-	const float xDelta = lastBoundingBox.GetLeft() - boundingBox.GetLeft();
-	const float yDelta = lastBoundingBox.GetTop() - boundingBox.GetTop();
+	// 2. Move all children to be relative to the top left of our new bounding box.
+	SetPositionOffset( { newBoundingBox.GetLeft(), newBoundingBox.GetTop() });
+	
+	const float xDelta = currentBoundingBox.GetLeft() - newBoundingBox.GetLeft();
+	const float yDelta = currentBoundingBox.GetTop() - newBoundingBox.GetTop();
 	
 	for (VectorPrimitiveBase* pChild : children)
 	{
 		pChild->AdjustPositionWithinLayer({xDelta, yDelta});
 	}
 
-	lastBoundingBox = boundingBox;
+	currentBoundingBox = newBoundingBox;
 }

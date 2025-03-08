@@ -19,20 +19,31 @@ void UIObjectIconLoader::LoadUIIcon(const std::string& file, const std::string& 
 		pReplaceWithThis = pLoadedVectorArt->FindLayerByLabel(primitiveName);
 	}
 	
-	pReplaceThis->SetChildren(pReplaceWithThis->GetChildren());
-	pReplaceThis->SetPositionOffset({(float)pRectangleForSize->GetX(), (float)pRectangleForSize->GetY()});
+	pReplaceThis->StealChildrenFromLayer(pReplaceWithThis);
 	pReplaceThis->SetScale({2.0f, 2.0f});
+	
+	//DOMLOG_ERROR_IF(newIconBoundingBox.GetWidth() == 0.0f || newIconBoundingBox.GetHeight() == 0.0f)
+	//const float scaleX = iconSize.GetWidth() / newIconBoundingBox.GetWidth();
+	//const float scaleY = iconSize.GetHeight() / newIconBoundingBox.GetHeight();
+	//pReplaceThis->SetScale({scaleX, scaleY});
 }
 
 void UIObjectIconLoader::Init(VectorPrimitiveBase* pRoot)
 {
 	UIObjectBase::Init(pRoot);
-
-	pRectangleForSize = dynamic_cast<VectorPrimitiveRectangle*>(pRoot);
-	DOMLOG_ERROR_IF(pRectangleForSize == nullptr, "We expect a parent. I don't even know how this can be null")
+	 
+	if (VectorPrimitiveLayer* pLayer = dynamic_cast<VectorPrimitiveLayer*>(pRoot))
+	{
+		pReplaceThis = pLayer;
+	}
+	else
+	{
+		pReplaceThis = pRoot->pParent;
+	}
 	
-	pReplaceThis = pRoot->pParent;
 	DOMLOG_ERROR_IF(pReplaceThis == nullptr, "We expect a parent. I don't even know how this can be null")
+
+	iconSize = pReplaceThis->GetBoundingBox();
 }
 
 void UIObjectIconLoader::Uninit()

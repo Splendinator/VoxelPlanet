@@ -12,7 +12,7 @@ class VectorArt;
  * UIObjectIconLoader* pIconLoader = UICanvas->AddExistingUIObject<UIObjectIconLoader>("SpellIcon")
  * pIconLoader->LoadIcon("SpellIcons.svg", "Fireball")
  *
- * The layer you pass in should contain a single rectangle that will be used for sizes #TODO: We can add a generic bounding box if we want the freedom to use circles too etc.
+ * The size of the new icon is the same as the bounding box of the primitive passed in, so don't pass in an empty layer. 
  *
  * This would replace the contents of layer "SpellIcon" in the base file with the contents of the layer "Fireball" in the SpellIcons.svg
  */
@@ -31,9 +31,8 @@ protected:
 
 	std::unique_ptr<VectorArt> pLoadedVectorArt = nullptr;
 
-	// This rectangle is used to resize the new vector art to fit
-	// #TODO: We can add a generic bounding box if we want the freedom to use circles too etc.
-	TransientPtr<VectorPrimitiveRectangle> pRectangleForSize = nullptr;
+	// This box is used to resize the new vector art to fit
+	Box2f iconSize = {};
 	
 	TransientPtr<VectorPrimitiveLayer> pReplaceWithThis = nullptr; 
 	TransientPtr<VectorPrimitiveLayer> pReplaceThis = nullptr;

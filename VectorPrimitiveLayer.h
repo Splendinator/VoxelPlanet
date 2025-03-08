@@ -18,16 +18,18 @@ public:
 	VectorPrimitiveBase* FindPrimitiveByLabelInternal(const std::string& label) override;
 	const VectorPrimitiveBase* FindPrimitiveUnderCursor(Vec2i cursorPos) const override;
 	bool IsChildOfThis(const VectorPrimitiveBase* pPossibleChild) const override;
-	Box2f GetBoundingBox() const override;
+	Box2f GetBoundingBox() const override { return currentBoundingBox; }
 	void AdjustPositionWithinLayer(Vec2f delta) override;
 	//~ End VectorPrimitiveBase Interface
 
 	const std::vector<VectorPrimitiveBase*>& GetChildren() const { return children; }
-	void SetChildren(const std::vector<VectorPrimitiveBase*> newChildren);
-
+	
 	void SetPositionOffset(Vec2f inPositionOffset) { positionOffset = inPositionOffset; }
-	void SetScale(Vec2f inScale) { scale = inScale;};
+	void SetScale(Vec2f inScale) { scale = inScale; }
 
+	// Steal the children from the passed in layer, useful to inject UI icons into existing vector art.
+	void StealChildrenFromLayer(VectorPrimitiveLayer* pOtherLayer);
+	
 	// This will refresh the layer's bounding box such that the top-left most child primitive has co-ordinates (0,0).
 	// Certain things like moving a primitive within a layer require the layer's bounding box to be refreshed for it to be accurate
 	// If the bounding box is inaccurate it can mess with certain renderer operations like scaling the layer
@@ -48,9 +50,7 @@ private:
 	Vec2f scale = {1.0f, 1.0f};
 
 	// This is the previous bounding box, this is used when recalculating the bounding box to figure out the delta.
-	Box2f lastBoundingBox;
-	
-	// #NOTE: Rotation + scale?
+	Box2f currentBoundingBox;
 
 	// #TODO: This should be a unique ptr
 	std::vector<VectorPrimitiveBase*> children;

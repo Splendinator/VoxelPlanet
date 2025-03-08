@@ -4,9 +4,7 @@
 
 #include "DirectoryData.h"
 #include "ECS/ECS.h"
-
 #include "RPGSystems/RPGSystem.h"
-
 #include "UI/UIObjects/UIObjectButton.h"
 #include "UI/UIObjects/UIObjectIconLoader.h"
 

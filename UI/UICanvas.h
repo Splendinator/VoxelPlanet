@@ -50,8 +50,8 @@ public:
 	// Find an optionally labeled UIObject of class TClass on the canvas
 	template<typename TClass>
 	TransientPtr<TClass> AddExistingUIObject(const std::string& label = "");
-
-	const VectorArt* GetVectorArt() const;
+	
+	const VectorArt* GetVectorArt() const { return pVectorArt.get(); }
 	
 private:
 
