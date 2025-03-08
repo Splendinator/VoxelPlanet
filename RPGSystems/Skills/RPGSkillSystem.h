@@ -70,6 +70,9 @@ protected:
 	ECSSystemEntityMap* pEcsEntityMap = nullptr;
 
 	EDITORPROPERTY()
+	RPGSystem* pRpgSystem = nullptr;
+
+	EDITORPROPERTY()
 	const CameraSystem* pCameraSystem = nullptr;
 
 	// Map of skill aim responses to their 

@@ -219,6 +219,24 @@ class ECS pEcs nullptr
 float zoom 64
 float zoomSpeed 64
 ;
+Class ActionHandlerBase
+meta Abstract
+meta Singleton
+;
+Class ActionHandlerAttack
+Child ActionHandlerBase
+class RPGSystem pRpgSystem nullptr
+;
+Class ActionDeciderBase
+meta Abstract
+meta Singleton
+class ActionHandlerAttack pAttackAction nullptr
+class ActionHandlerMove pMoveAction nullptr
+;
+Class ActionDeciderAI
+Child ActionDeciderBase
+class ActionHandlerWait pWaitAction nullptr
+;
 Class WorldGenerator
 Child GameSystem
 class ECS pEcs nullptr
@@ -317,7 +335,23 @@ Child ECSSystemBase
 Class ECS
 Child GameSystem
 vector systems ECSSystemBase
+class ActionDeciderPlayer pPlayerActionDecider nullptr
+;
+Class ActionHandlerWait
+Child ActionHandlerBase
+;
+Class ActionHandlerSkill
+Child ActionHandlerBase
 class RPGSkillSystem pSkillSystem nullptr
+;
+Class ActionHandlerMove
+Child ActionHandlerBase
+;
+Class ActionDeciderPlayer
+Child ActionDeciderBase
+class RPGSkillSystem pSkillSystem nullptr
+class ActionHandlerWait pWaitAction nullptr
+class ActionHandlerSkill pSkillAction nullptr
 ;
 Class HUDObjectBase
 meta Abstract
@@ -339,6 +373,7 @@ Child GameSystem
 class DirectoryData pDirectoryData nullptr
 class ECS pEcs nullptr
 class ECSSystemEntityMap pEcsEntityMap nullptr
+class RPGSystem pRpgSystem nullptr
 class CameraSystem pCameraSystem nullptr
 vector skillHighlightVisuals RPGSkillHighlightEntry
 ;
@@ -347,10 +382,14 @@ Child GameSystem
 class ECS pEcs nullptr
 class DirectoryData pDirectoryData nullptr
 vector attributes RPGAttributeBase
-vector levels RPGLevelProgressionData
+vector levelProgressionData RPGLevelProgressionData
 ;
 Class RPGAttributeMaxHealth
 Child RPGAttributeBase
+;
+Class HUDObjectXP
+Child HUDObjectBase
+class RPGSystem pRpgSystem nullptr
 ;
 Class HUDObjectHealth
 Child HUDObjectBase

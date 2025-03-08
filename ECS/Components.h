@@ -44,7 +44,7 @@ struct ComponentAction
 {
 	short maxEnergy = 0; // How often to take a turn, something with 50 max energy will take an action twice as often as something with 100 max energy
 	short energy = 0;
-	ActionDeciderBase* pActionDecider = nullptr; // These are deleted by the ECSSystemAction when the entity is deleted
+	TransientPtr<ActionDeciderBase> pActionDecider = nullptr;
 };
 
 // Component to block movement onto its tile, just used for the bitflag
@@ -79,7 +79,8 @@ struct ComponentClass
 // Allows RPG characters to have a level
 struct ComponentProgression
 {
-	int level = 1;
+	u32 level = 0; // This is an index and starts at 0.
+	u32 currentXp = 0;
 };
 
 // RPG Race

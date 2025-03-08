@@ -12,13 +12,15 @@ class ECS;
 * 
 * These classes are singletons
 */
+EDITORCLASS(Abstract, Singleton)
 class ActionHandlerBase
 {
+	EDITORBODY()
 public:
 	
 	// Override this to do the action
-	virtual void DoAction(ECS& ecs, EntityId e) = 0;
+	virtual void DoAction(ECS& ecs, EntityId e) { PUREVIRTUAL() };
 
 	// Override this to reset the parameters. Needed to clean up singletons after use in the action system
-	virtual void Reset() = 0;
+	virtual void Reset() { PUREVIRTUAL() };
 };

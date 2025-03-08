@@ -5,8 +5,7 @@
 #include "DirectoryData.h"
 #include "ECS/ECS.h"
 #include "RPGSystems/RPGSystem.h"
-#include "UI/UIObjects/UIObjectButton.h"
-#include "UI/UIObjects/UIObjectIconLoader.h"
+#include "UI/UIObjects/UIObjectButtonWithIcon.h"
 
 void MenuScreenClassSelect::Init(UICanvas* pCanvas)
 {
@@ -19,11 +18,9 @@ void MenuScreenClassSelect::Init(UICanvas* pCanvas)
 		
 		for (MenuScreenClassSelectEntry& entry : classEntries)
 		{
-			entry.iconLoader = pCanvas->AddExistingUIObject<UIObjectIconLoader>(entry.loaderLayer);
-			entry.iconLoader->LoadUIIcon(DirectoryData::ConcatenateFilePathChecked(pDirectoryData->sharedUI, classIconFileName, ".svg"), entry.classIconLayer);
-
-			entry.button = pCanvas->AddExistingUIObject<UIObjectButton>(entry.loaderLayer); // Load button after icon so icon is clickable
-			entry.button->onClicked.Add(onClickedDelegate);
+			entry.buttonWithIcon = pCanvas->AddExistingUIObject<UIObjectButtonWithIcon>(entry.loaderLayer);
+			entry.buttonWithIcon->GetButton().onClicked.Add(onClickedDelegate);
+			entry.buttonWithIcon->LoadUIIcon(DirectoryData::ConcatenateSVGFilePathChecked(pDirectoryData->sharedUI, classIconFileName), entry.classIconLayer);
 		}
 	}
 }
@@ -39,7 +36,7 @@ void MenuScreenClassSelect::OnClicked(UIObjectButtonDelegateParams params)
 
 	for (MenuScreenClassSelectEntry& entry : classEntries)
 	{
-		if (entry.button == params.pButton)
+		if (&entry.buttonWithIcon->GetButton() == params.pButton)
 		{
 			if (pRpgSystem && pEcs)
 			{
@@ -48,7 +45,7 @@ void MenuScreenClassSelect::OnClicked(UIObjectButtonDelegateParams params)
 				entitySetupParams.bUseClassMeshOverRaceMesh = true; // Player's mesh will change based off class choice
 				entitySetupParams.startLevel = 0;
 				entitySetupParams.pRaceData = pPlayerRace;
-				pRpgSystem->SetupEntity(pEcs->GetPlayerEntityId(), entitySetupParams);
+				pRpgSystem->SetupRPGEntity(pEcs->GetPlayerEntityId(), entitySetupParams);
 			}
 
 			RequestCloseSelf();

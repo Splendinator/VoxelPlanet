@@ -26,5 +26,5 @@ protected:
 
 	bool bHoveredOver = false;
 
-	TransientPtr<VectorPrimitiveBase> pClickablePrimitive;
+	TransientPtr<VectorPrimitiveLayer> pClickableLayer;
 };

@@ -67,7 +67,7 @@ ActionHandlerBase* ActionDeciderAI::DecideAction(ECS& ecs, EntityId actor)
 		}
 	}
 
-	return &ActionHandlerWait::GetSingleton();
+	return pWaitAction;
 }
 
 bool ActionDeciderAI::IsWarringFactions(const ComponentFaction& faction, const ComponentFaction& otherFaction) const

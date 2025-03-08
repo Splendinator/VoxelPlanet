@@ -4,6 +4,7 @@
 
 class ECS;
 class ECSSystemEntityMap;
+class RPGSystem;
 
 // When trying to aim a skill at a specific location it will return one of these values for that location.
 // e.g. aiming a 5 range fireball at 6 range will return a ERPGSkillHighlightType::Invalid to show you can't aim there .
@@ -22,6 +23,7 @@ struct RPGSkillParams
 {
 	ECS& ecs;
 	ECSSystemEntityMap& entityMapSystem;
+	RPGSystem& rpgSystem;
 	
 	EntityId caster;
 	

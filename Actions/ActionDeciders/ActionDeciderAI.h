@@ -2,14 +2,17 @@
 
 #include "ActionDeciderBase.h"
 
+class ActionHandlerWait;
 struct ComponentFaction;
 
 /** ActionDeciderAI
 *
 * This class is used for deciding what action an AI will take
 */
+EDITORCLASS()
 class ActionDeciderAI : public ActionDeciderBase
 {
+	EDITORBODY()
 public:
 
 	//~ Begin ActionDeciderBase Interface
@@ -19,5 +22,9 @@ public:
 protected:
 
 	bool IsWarringFactions(const ComponentFaction& faction, const ComponentFaction& otherFaction) const;
+
+	
+	EDITORPROPERTY()
+	ActionHandlerWait* pWaitAction = nullptr;
 
 };

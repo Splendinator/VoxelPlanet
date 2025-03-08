@@ -28,9 +28,7 @@ protected:
 	void Init(VectorPrimitiveLayer* pRoot) override;
 	void Uninit() override;
 	//~ End UIObjectBase Interface
-
-	std::unique_ptr<VectorArt> pLoadedVectorArt = nullptr;
-
+	
 	// This box is used to resize the new vector art to fit
 	Box2f iconSize = {};
 	

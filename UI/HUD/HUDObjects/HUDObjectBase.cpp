@@ -3,8 +3,7 @@
 #include "HUDObjectBase.h"
 
 #include "DirectoryData.h"
-#include "Game.h"
-#include "HUD.h"
+#include "UI/HUD/HUD.h"
 
 void HUDObjectBase::BaseInit(EntityId player, const HUDObjectSharedInitParams& hudInitParams, DirectoryData* pDirectoryData)
 {

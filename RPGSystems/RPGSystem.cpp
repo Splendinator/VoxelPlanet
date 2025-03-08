@@ -19,7 +19,21 @@ void RPGSystem::Init()
 	attributeSharedData.pEcs = pEcs;
 }
 
-void RPGSystem::SetupEntity(EntityId entity, RPGEntitySetupParams params)
+void RPGSystem::RecalculateAttributesForEntity(EntityId entity)
+{
+	for (const RPGAttributeBase* pAttribute : attributes)
+	{
+		if (pAttribute)
+		{
+			if (pAttribute->CanApplyAttribute(entity, attributeSharedData))
+			{
+				pAttribute->ApplyAttribute(entity, attributeSharedData);
+			}
+		}
+	}
+}
+
+void RPGSystem::SetupRPGEntity(EntityId entity, RPGEntitySetupParams params)
 {
 	if (pEcs && pDirectoryData)
 	{
@@ -67,20 +81,55 @@ void RPGSystem::SetupEntity(EntityId entity, RPGEntitySetupParams params)
 		{
 			ComponentHealth& healthComponent = pEcs->AddComponent<ComponentHealth>(entity);
 			
-			for (const RPGAttributeBase* pAttribute : attributes)
-			{
-				if (pAttribute)
-				{
-					if (pAttribute->CanApplyAttribute(entity, attributeSharedData))
-					{
-						pAttribute->ApplyAttribute(entity, attributeSharedData);
-					}
-				}
-			}
+			RecalculateAttributesForEntity(entity);
 
 			healthComponent.health = healthComponent.maxHealth;
 		}
 	}
+}
+
+void RPGSystem::DealDamage(RPGDamageParams params)
+{
+	if (pEcs)
+	{
+		ComponentHealth& targetHealthComponent = pEcs->GetComponent<ComponentHealth>(params.targetEntity);
+		targetHealthComponent.health -= params.damage;
+		
+		if (targetHealthComponent.health <= 0)
+		{
+			// Killing blow
+
+			// Award XP
+			if (pEcs->EntityHasComponents<ComponentProgression>(params.attackerEntity))
+			{
+				ComponentProgression& progressionComponent = pEcs->GetComponent<ComponentProgression>(params.attackerEntity);
+				if (const RPGLevelProgressionData* pLevelProgressionData = GetLevelProgressionDataForLevel(progressionComponent.level))
+				{
+					progressionComponent.currentXp += 20; // #TODO: Grab this from the race + level
+					if (progressionComponent.currentXp >= pLevelProgressionData->requiredXp)
+					{
+						progressionComponent.currentXp = 0;
+						++progressionComponent.level;
+					
+						RecalculateAttributesForEntity(params.attackerEntity);
+
+						ComponentHealth& attackerHealthComponent = pEcs->GetComponent<ComponentHealth>(params.attackerEntity);
+						attackerHealthComponent.health = attackerHealthComponent.maxHealth;
+					}
+				}
+			}
+		}
+	}
+}
+
+const RPGLevelProgressionData* RPGSystem::GetLevelProgressionDataForLevel(u32 level) const
+{
+	if (level < levelProgressionData.size())
+	{
+		return &levelProgressionData[level];
+	}
+	
+	return nullptr;
 }
 
 #ifdef DOMIMGUI

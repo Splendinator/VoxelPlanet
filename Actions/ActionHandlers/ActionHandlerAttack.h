@@ -2,27 +2,25 @@
 
 #include "ActionHandlerBase.h"
 
+class RPGSystem;
+
 /** ActionHandlerAttack
 *
 * This class is used for doing a melee attack 
 */
+EDITORCLASS()
 class ActionHandlerAttack : public ActionHandlerBase
 {
+	EDITORBODY()
 public:
-
-	static ActionHandlerAttack& GetSingleton() 
-	{ 
-		static ActionHandlerAttack staticActionHandlerAttack;
-		return staticActionHandlerAttack;
-	}
-
+	
 	//~ Begin ActionHandlerBase Interface
 	void DoAction(ECS& ecs, EntityId e) override;
 	void Reset() override;
 	//~ End ActionHandlerBase Interface
 
+	EDITORPROPERTY()
+	RPGSystem* pRpgSystem = nullptr;
 
-	EntityId enemy = INVALID_ENTITY_ID; // Enemy to attack
-	int damage = 0; // Damage to deal
-
+	EntityId target = INVALID_ENTITY_ID; // Target
 };

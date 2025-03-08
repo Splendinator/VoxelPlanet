@@ -30,10 +30,7 @@ void ECS::Init()
 
 		GetComponent<ComponentTransform>(playerEntity).x = WORLD_START_X;
 		GetComponent<ComponentTransform>(playerEntity).y = WORLD_START_Y;
-
-		// #TODO: Redo action deciders
-		ActionDeciderPlayer* pPlayerActionDecider = new ActionDeciderPlayer;
-		pPlayerActionDecider->pSkillSystem = pSkillSystem;
+		
 		GetComponent<ComponentAction>(playerEntity).pActionDecider = pPlayerActionDecider;
 		GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;
 		GetComponent<ComponentAction>(playerEntity).energy = 100;

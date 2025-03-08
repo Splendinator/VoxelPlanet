@@ -20,7 +20,7 @@ struct RPGLevelProgressionData
 
 	// XP to the next level
 	EDITORPROPERTY()
-	int requiredXp = 0;
+	u32 requiredXp = 0;
 };
 
 struct RPGEntitySetupParams
@@ -37,6 +37,14 @@ struct RPGEntitySetupParams
 	int startLevel = 0; // Starts at 0, not 1.
 };
 
+struct RPGDamageParams
+{
+	EntityId attackerEntity;
+	EntityId targetEntity;
+
+	u32 damage;
+};
+
 // RPG system. Responsible for anything RPG, (levels, attributes, classes, races, skills, etc.).
 // This class is mostly just a house for all the data assets, the bulk of the RPG logic will be in the ECS as it happens to entities 
 EDITORCLASS()
@@ -47,12 +55,18 @@ class RPGSystem : public GameSystem
 public:
 	//~ Begin GameSystem Interface
 	void Init() override;
+	void RecalculateAttributesForEntity(EntityId entity);
 #ifdef DOMIMGUI
 	void DrawImGui(float deltaTime) override;
 #endif
 	//~ End GameSystem Interface
 	
-	void SetupEntity(EntityId entity, RPGEntitySetupParams params);
+	void SetupRPGEntity(EntityId entity, RPGEntitySetupParams params);
+
+	void DealDamage(RPGDamageParams params);
+	
+	// Returns nullptr if none can be found (usually means max level has been hit)
+	const RPGLevelProgressionData* GetLevelProgressionDataForLevel(u32 level) const;
 
 protected:
 
@@ -69,7 +83,7 @@ protected:
 	// Data on progression from one level to the next. The entry in the array is the level so there should be one entry per player level. (i.e if there's 50 levels you'd want 50 here)
 	// It is theoretically possible for units to be outside of this range, but you can't level up with XP past the number of levels in this array and they'll stop giving skill points etc. past the max
 	EDITORPROPERTY()
-	std::vector<RPGLevelProgressionData> levels;
+	std::vector<RPGLevelProgressionData> levelProgressionData;
 
 	RPGAttributeCalculationSharedData attributeSharedData = {};
 };

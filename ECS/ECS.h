@@ -19,7 +19,8 @@ bool EntityHasComponents<ComponentName>(int entityId) const { return entities[en
 template<>\
 ComponentName& AddComponent<ComponentName>(int entityId) { entities[entityId].components.AddComponent(EComponents::##ComponentName); return GetComponent<ComponentName>(entityId); }
 
-class RPGSkillSystem;
+class ActionDeciderPlayer;
+
 // The entity component system.
 // This class was designed to be very speedy, i.e data oriented design with minimal virtual functions, so it might seem a bit less intuitive to code for.
 // The basic idea is that all components are just structs in an array, and entities are just indexes into those arrays.
@@ -83,9 +84,9 @@ private:
 	EDITORPROPERTY()
 	std::vector<ECSSystemBase*> systems;
 
-	// #TEMP: Remove this
+	// Player's action decider
 	EDITORPROPERTY()
-	RPGSkillSystem* pSkillSystem = nullptr;
+	ActionDeciderPlayer* pPlayerActionDecider = nullptr;
 	
 	std::vector<std::unique_ptr<ECSSystemCallbackBase>> systemCallbacks;
 

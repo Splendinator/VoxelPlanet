@@ -2,17 +2,22 @@
 
 #include "ActionHandlerAttack.h"
 
-#include "Ecs/Components.h"
-#include "Ecs/ECS.h"
+#include "RPGSystems/RPGSystem.h"
 
 void ActionHandlerAttack::DoAction(ECS& ecs, EntityId e)
 {
-	// #TODO: Proper damage formula using like strength stats and defense armour shite and whatever and dodge and shit and whatever
-	ecs.GetComponent<ComponentHealth>(enemy).health -= damage;
+	if (pRpgSystem)
+	{
+		RPGDamageParams damageParams = {};
+		damageParams.damage = 20; // #TODO: Calculate this from some sort of basic attack damage attribute
+		damageParams.attackerEntity = e;
+		damageParams.targetEntity = target;
+
+		pRpgSystem->DealDamage(damageParams);
+	}
 }
 
 void ActionHandlerAttack::Reset()
 {
-	enemy = INVALID_ENTITY_ID;
-	damage = 0;
+	target = INVALID_ENTITY_ID;
 }

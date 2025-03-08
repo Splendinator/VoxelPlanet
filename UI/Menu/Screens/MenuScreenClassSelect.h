@@ -4,11 +4,11 @@
 
 #include "UI/UIObjects/UIObjectButton.h"
 
+class UIObjectButtonWithIcon;
 class ECS;
 class RPGClassData;
 class RPGRaceData;
 class RPGSystem;
-class UIObjectIconLoader;
 
 EDITORSTRUCT()
 struct MenuScreenClassSelectEntry
@@ -27,8 +27,7 @@ struct MenuScreenClassSelectEntry
 	EDITORPROPERTY()
 	const RPGClassData* pRpgClass = nullptr;
 
-	TransientPtr<UIObjectIconLoader> iconLoader;
-	TransientPtr<UIObjectButton> button;
+	TransientPtr<UIObjectButtonWithIcon> buttonWithIcon;
 };
 
 EDITORCLASS()

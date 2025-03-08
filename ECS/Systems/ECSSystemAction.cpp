@@ -31,7 +31,7 @@ void ECSSystemAction::PreTick(ECSSystemTickParams tickParams)
 			}
 		});
 
-	// Lower energy of all entities
+	// Lowest energy of all entities
 	if (lowestEnergy > 0)
 	{
 		tickParams.pEcs->ForEachEntity([&](EntityId e)
@@ -56,10 +56,14 @@ void ECSSystemAction::Tick(const ECSSystemTickParams& params, const std::tuple<C
 
 	ComponentAction* pAction = std::get<ComponentAction*>(components);
 
+	if (pAction->pActionDecider == nullptr)
+	{
+		DOMLOG_WARN("No action decider set up on entity", params.entityId);
+		return;
+	}
+	
 	if (pAction->energy == 0)
 	{
-		DOMASSERT(pAction->pActionDecider, "Action decider not set");
-
 		if (ActionHandlerBase* pActionHandler = pAction->pActionDecider->DecideAction(*params.pEcs, params.entityId))
 		{
 			pActionHandler->DoAction(*params.pEcs, params.entityId);
@@ -74,7 +78,5 @@ void ECSSystemAction::Tick(const ECSSystemTickParams& params, const std::tuple<C
 
 void ECSSystemAction::OnEntityDeleted(const ECSSystemEntityDeletionParams& params, const std::tuple<ComponentAction*>& components)
 {
-	ComponentAction* pAction = std::get<ComponentAction*>(components);
 	
-	delete pAction->pActionDecider;
 }

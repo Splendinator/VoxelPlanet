@@ -63,7 +63,7 @@ void RPGSkillSystem::Tick(float deltaTime)
 		ClearAllAimingVisuals();
 
 		
-		RPGSkillParams params = {*pEcs, *pEcsEntityMap};
+		RPGSkillParams params = {*pEcs, *pEcsEntityMap, *pRpgSystem};
 		params.caster = pEcs->GetPlayerEntityId();
 		params.targetPos = pCameraSystem->GetWorldGridCoordinateUnderMouse();
 
@@ -134,12 +134,12 @@ bool RPGSkillSystem::TryFirePlayerAimedSkill()
 
 bool RPGSkillSystem::TryFireSkill(const RPGSkillData* pSkill, EntityId caster, const Vec2i& targetLocation)
 {
-	if (!pSkill || !pEcs || !pEcsEntityMap || !pSkill->IsValid())
+	if (!pSkill || !pEcs || !pEcsEntityMap || !pRpgSystem || !pSkill->IsValid())
 	{
 		return false;
 	}
 
-	RPGSkillParams params = {*pEcs, *pEcsEntityMap};
+	RPGSkillParams params = {*pEcs, *pEcsEntityMap, *pRpgSystem};
 	params.caster = pEcs->GetPlayerEntityId();
 	params.targetPos = pCameraSystem->GetWorldGridCoordinateUnderMouse();
 

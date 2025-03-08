@@ -40,6 +40,12 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 		{
 			pEditor->AddWindow(std::make_unique<EditorWindowCreateAsset>(path));
 		}
+		ImGui::SameLine();
+		if (ImGui::Button("Open in Explorer"))
+		{
+			system(("explorer " + path.string()).c_str());
+		}
+		// #NOTE: We purposely don't have a delete folder button so you don't delete half the game's assets on accident.
 
 		// Draw directories first
 		for (const auto& entry : fs::directory_iterator(path))

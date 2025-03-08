@@ -21,9 +21,8 @@ ActionHandlerBase* ActionDeciderPlayer::DecideAction(ECS& ecs, EntityId e)
 	if (dmwi::isPressed(dmwi::Button::NUMPAD3)) { return TryMoveOrAttack(ecs, e,  1,  1); }
 
 	// Wait
-	if (dmwi::isPressed(dmwi::Button::NUMPAD5)) { return &ActionHandlerWait::GetSingleton(); }
-
-	// #TEMP: The whole action decider system needs re-doing with editor exposed shit and we need to re-do this
+	if (dmwi::isPressed(dmwi::Button::NUMPAD5)) { return pWaitAction; }
+	
 	// Cast Spell 
 	if (pSkillSystem)
 	{
@@ -44,7 +43,7 @@ ActionHandlerBase* ActionDeciderPlayer::DecideAction(ECS& ecs, EntityId e)
 				const bool bFired = pSkillSystem->TryFirePlayerAimedSkill();
 				if (bFired)
 				{
-					return &ActionHandlerWait::GetSingleton();
+					return pWaitAction;
 				}
 			}
 		}

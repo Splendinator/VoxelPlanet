@@ -4,6 +4,7 @@
 
 #include "ECS/ECS.h"
 #include "ECS/Systems/ECSSystemEntityMap.h"
+#include "RPGSystems/RPGSystem.h"
 
 void RPGSkillEffectModuleTemp::ApplyEffect(const RPGSkillParams& params) const
 {
@@ -13,7 +14,12 @@ void RPGSkillEffectModuleTemp::ApplyEffect(const RPGSkillParams& params) const
 	{
 		if (params.ecs.EntityHasComponents<ComponentHealth>(entity))
 		{
-			params.ecs.GetComponent<ComponentHealth>(entity).health -= damage;
+			RPGDamageParams damageParams = {};
+			damageParams.attackerEntity = params.caster;
+			damageParams.targetEntity = entity;
+			damageParams.damage = damage;
+			
+			params.rpgSystem.DealDamage(damageParams);
 		}
 		
 	}

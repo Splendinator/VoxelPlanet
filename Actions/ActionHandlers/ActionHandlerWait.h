@@ -6,16 +6,12 @@
 *
 * This class is used to wait a turn
 */
+EDITORCLASS()
 class ActionHandlerWait : public ActionHandlerBase
 {
+	EDITORBODY()
 public:
-
-	static ActionHandlerWait& GetSingleton()
-	{ 
-		static ActionHandlerWait staticActionHandlerWait;
-		return staticActionHandlerWait;
-	}
-
+	
 	//~ Begin ActionHandlerBase Interface
 	void DoAction(ECS& ecs, EntityId e) override {};
 	void Reset() override {};

@@ -18,9 +18,12 @@ class RPGAttributeBase
 
 public:
 	
-	virtual bool CanApplyAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const { PUREVIRTUAL() return false; }
 	virtual void ApplyAttribute(EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const { PUREVIRTUAL() }
 	virtual int GetBaseAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const { PUREVIRTUAL() return 0; }
+
+	// Returns whether this attribute can be applied to an entities components.
+	// Some attributes don't have an associated component value and are calculated at runtime whenever used via GetAttributeValue() and will return false here.
+	virtual bool CanApplyAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const { return false; }
 
 	int GetAttributeValue(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const;
 

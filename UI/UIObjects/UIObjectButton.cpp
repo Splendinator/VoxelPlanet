@@ -9,12 +9,12 @@
 
 void UIObjectButton::Init(VectorPrimitiveLayer* pRoot)
 {
-	pClickablePrimitive = pRoot;	
+	pClickableLayer = pRoot;	
 }
 
 void UIObjectButton::Uninit()
 {
-	pClickablePrimitive = nullptr;	
+	pClickableLayer = nullptr;	
 }
 
 void UIObjectButton::Tick(float deltaTime)
@@ -22,7 +22,7 @@ void UIObjectButton::Tick(float deltaTime)
 	if (dmwi::isPressed(dmwi::LMB)) // #TODO: Maybe we need a middle man for mouse input? We can probably use input actions 
 	{
 		const VectorPrimitiveBase* pPrimitiveUnderCursor = pParentCanvas->FindPrimitiveUnderCursor();
-		if (pPrimitiveUnderCursor == pClickablePrimitive || pClickablePrimitive->IsChildOfThis(pPrimitiveUnderCursor))
+		if (pPrimitiveUnderCursor == pClickableLayer || pClickableLayer->IsChildOfThis(pPrimitiveUnderCursor))
 		{
 			onClicked.Invoke({this});
 		}

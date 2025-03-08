@@ -2,7 +2,7 @@
 
 #include "ChunkGeneratorGrass.h"
 
-#include "Actions/ActionDeciders/ActionDeciderAI.h" /// #TEMP: Not needed probably after we generate enemies in post
+#include "Actions/ActionDeciders/ActionDeciderAI.h"
 #include "FilePaths.h"
 #include "RenderPriorities.h"
 #include "Renderer.h"
@@ -51,14 +51,14 @@ EntityId ChunkGeneratorGrass::GetForeground(ECS* pEcs, int x, int y)
 		transform.y = y;
 		action.maxEnergy = 100;
 		action.energy = 100;
-		action.pActionDecider = new ActionDeciderAI;
+		action.pActionDecider = Game::GetAssetManager().LoadObjectFromAssetName<ActionDeciderBase>("ActionDeciderAI");
 		health.health = 100;
 		health.maxHealth = 100;
 		faction.factionFlags = bEnemy ? ComponentFaction::EFactionFlags::Enemy : ComponentFaction::EFactionFlags::Player;
 		
 		pEnemyRenderObject->SetRenderPriority(RenderPriority::unit);
 		
-		return INVALID_ENTITY_ID; /// #TEMP: We don't want the chunk to own this entity
+		return INVALID_ENTITY_ID; 
 	}
 	else
 	{
@@ -82,24 +82,5 @@ EntityId ChunkGeneratorGrass::GetBackground(ECS* pEcs, int x, int y)
 	transform.x = x;
 	transform.y = y;
 	
-	return entity;
-}
-
-EntityId ChunkGeneratorDebug::GetBackground(ECS* pEcs, int x, int y)
-{
-	EntityId entity = pEcs->GetNextFreeEntity();
-
-	TransientPtr<RendererObject> pGrassRendererObject = dmgf::AddObjectFromSVG(FilePath::VectorArt::dirt);
-
-	pGrassRendererObject->SetRenderPriority(RenderPriority::background);
-
-	// #TODO: Add mesh and transform creation to a util func. render prio should be based on layer
-	ComponentMesh& mesh = pEcs->AddComponent<ComponentMesh>(entity);
-	ComponentTransform& transform = pEcs->AddComponent<ComponentTransform>(entity);
-
-	mesh.pRendererObject = pGrassRendererObject;
-	transform.x = x;
-	transform.y = y;
-
 	return entity;
 }

@@ -9,6 +9,14 @@
 #include "EditorTypePropertyVector.h"
 #include "EditorTypePropertyEnum.h"
 #include "EditorTypePropertyInstancedAssetPtr.h"
+#include "..\Roguelike\Actions\ActionDeciders\ActionDeciderAI.h"
+#include "..\Roguelike\Actions\ActionDeciders\ActionDeciderBase.h"
+#include "..\Roguelike\Actions\ActionDeciders\ActionDeciderPlayer.h"
+#include "..\Roguelike\Actions\ActionHandlers\ActionHandlerAttack.h"
+#include "..\Roguelike\Actions\ActionHandlers\ActionHandlerBase.h"
+#include "..\Roguelike\Actions\ActionHandlers\ActionHandlerMove.h"
+#include "..\Roguelike\Actions\ActionHandlers\ActionHandlerSkill.h"
+#include "..\Roguelike\Actions\ActionHandlers\ActionHandlerWait.h"
 #include "..\Roguelike\Camera\CameraSystem.h"
 #include "..\Roguelike\Core\GameInstance.h"
 #include "..\Roguelike\Core\GameSystem.h"
@@ -41,8 +49,9 @@
 #include "..\Roguelike\TextRenderSystem\TextRenderSystem.h"
 #include "..\Roguelike\UI\HUD\HUD.h"
 #include "..\Roguelike\UI\HUD\HUDAnchorPoint.h"
-#include "..\Roguelike\UI\HUD\HUDObjectBase.h"
-#include "..\Roguelike\UI\HUD\HUDObjectHealth.h"
+#include "..\Roguelike\UI\HUD\HUDObjects\HUDObjectBase.h"
+#include "..\Roguelike\UI\HUD\HUDObjects\HUDObjectHealth.h"
+#include "..\Roguelike\UI\HUD\HUDObjects\HUDObjectXP.h"
 #include "..\Roguelike\UI\Menu\MenuSystem.h"
 #include "..\Roguelike\UI\Menu\Screens\MenuScreenBase.h"
 #include "..\Roguelike\UI\Menu\Screens\MenuScreenClassSelect.h"
@@ -498,6 +507,88 @@ void* CameraSystem::_InitFromProperties(const std::vector<EditorTypePropertyBase
 void* CameraSystem::_CreateEmptyObject()
 {
 	return new CameraSystem;
+}
+
+// ActionHandlerBase
+void ActionHandlerBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ActionHandlerBase* pActionHandlerBase = static_cast<ActionHandlerBase*>(pObject);
+}
+
+void* ActionHandlerBase::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ActionHandlerBase* pActionHandlerBase = new ActionHandlerBase;
+	int propertyIndex = 0;
+	ActionHandlerBase::_InitFromPropertiesSubset(pActionHandlerBase, properties, propertyIndex);
+	return pActionHandlerBase;
+}
+
+void* ActionHandlerBase::_CreateEmptyObject()
+{
+	return new ActionHandlerBase;
+}
+
+// ActionHandlerAttack
+void ActionHandlerAttack::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ActionHandlerAttack* pActionHandlerAttack = static_cast<ActionHandlerAttack*>(pObject);
+	ActionHandlerBase::_InitFromPropertiesSubset(static_cast<ActionHandlerBase*>(pActionHandlerAttack), properties, propertyIndex);
+	pActionHandlerAttack->pRpgSystem = static_cast<RPGSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* ActionHandlerAttack::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ActionHandlerAttack* pActionHandlerAttack = new ActionHandlerAttack;
+	int propertyIndex = 0;
+	ActionHandlerAttack::_InitFromPropertiesSubset(pActionHandlerAttack, properties, propertyIndex);
+	return pActionHandlerAttack;
+}
+
+void* ActionHandlerAttack::_CreateEmptyObject()
+{
+	return new ActionHandlerAttack;
+}
+
+// ActionDeciderBase
+void ActionDeciderBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ActionDeciderBase* pActionDeciderBase = static_cast<ActionDeciderBase*>(pObject);
+	pActionDeciderBase->pAttackAction = static_cast<ActionHandlerAttack*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pActionDeciderBase->pMoveAction = static_cast<ActionHandlerMove*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* ActionDeciderBase::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ActionDeciderBase* pActionDeciderBase = new ActionDeciderBase;
+	int propertyIndex = 0;
+	ActionDeciderBase::_InitFromPropertiesSubset(pActionDeciderBase, properties, propertyIndex);
+	return pActionDeciderBase;
+}
+
+void* ActionDeciderBase::_CreateEmptyObject()
+{
+	return new ActionDeciderBase;
+}
+
+// ActionDeciderAI
+void ActionDeciderAI::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ActionDeciderAI* pActionDeciderAI = static_cast<ActionDeciderAI*>(pObject);
+	ActionDeciderBase::_InitFromPropertiesSubset(static_cast<ActionDeciderBase*>(pActionDeciderAI), properties, propertyIndex);
+	pActionDeciderAI->pWaitAction = static_cast<ActionHandlerWait*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* ActionDeciderAI::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ActionDeciderAI* pActionDeciderAI = new ActionDeciderAI;
+	int propertyIndex = 0;
+	ActionDeciderAI::_InitFromPropertiesSubset(pActionDeciderAI, properties, propertyIndex);
+	return pActionDeciderAI;
+}
+
+void* ActionDeciderAI::_CreateEmptyObject()
+{
+	return new ActionDeciderAI;
 }
 
 // WorldGenerator
@@ -992,7 +1083,7 @@ void ECS::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypeP
 			pECS->systems.push_back(static_cast<ECSSystemBase*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
 		}
 	}
-	pECS->pSkillSystem = static_cast<RPGSkillSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pECS->pPlayerActionDecider = static_cast<ActionDeciderPlayer*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 }
 
 void* ECS::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -1006,6 +1097,90 @@ void* ECS::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& prope
 void* ECS::_CreateEmptyObject()
 {
 	return new ECS;
+}
+
+// ActionHandlerWait
+void ActionHandlerWait::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ActionHandlerWait* pActionHandlerWait = static_cast<ActionHandlerWait*>(pObject);
+	ActionHandlerBase::_InitFromPropertiesSubset(static_cast<ActionHandlerBase*>(pActionHandlerWait), properties, propertyIndex);
+}
+
+void* ActionHandlerWait::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ActionHandlerWait* pActionHandlerWait = new ActionHandlerWait;
+	int propertyIndex = 0;
+	ActionHandlerWait::_InitFromPropertiesSubset(pActionHandlerWait, properties, propertyIndex);
+	return pActionHandlerWait;
+}
+
+void* ActionHandlerWait::_CreateEmptyObject()
+{
+	return new ActionHandlerWait;
+}
+
+// ActionHandlerSkill
+void ActionHandlerSkill::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ActionHandlerSkill* pActionHandlerSkill = static_cast<ActionHandlerSkill*>(pObject);
+	ActionHandlerBase::_InitFromPropertiesSubset(static_cast<ActionHandlerBase*>(pActionHandlerSkill), properties, propertyIndex);
+	pActionHandlerSkill->pSkillSystem = static_cast<RPGSkillSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* ActionHandlerSkill::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ActionHandlerSkill* pActionHandlerSkill = new ActionHandlerSkill;
+	int propertyIndex = 0;
+	ActionHandlerSkill::_InitFromPropertiesSubset(pActionHandlerSkill, properties, propertyIndex);
+	return pActionHandlerSkill;
+}
+
+void* ActionHandlerSkill::_CreateEmptyObject()
+{
+	return new ActionHandlerSkill;
+}
+
+// ActionHandlerMove
+void ActionHandlerMove::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ActionHandlerMove* pActionHandlerMove = static_cast<ActionHandlerMove*>(pObject);
+	ActionHandlerBase::_InitFromPropertiesSubset(static_cast<ActionHandlerBase*>(pActionHandlerMove), properties, propertyIndex);
+}
+
+void* ActionHandlerMove::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ActionHandlerMove* pActionHandlerMove = new ActionHandlerMove;
+	int propertyIndex = 0;
+	ActionHandlerMove::_InitFromPropertiesSubset(pActionHandlerMove, properties, propertyIndex);
+	return pActionHandlerMove;
+}
+
+void* ActionHandlerMove::_CreateEmptyObject()
+{
+	return new ActionHandlerMove;
+}
+
+// ActionDeciderPlayer
+void ActionDeciderPlayer::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ActionDeciderPlayer* pActionDeciderPlayer = static_cast<ActionDeciderPlayer*>(pObject);
+	ActionDeciderBase::_InitFromPropertiesSubset(static_cast<ActionDeciderBase*>(pActionDeciderPlayer), properties, propertyIndex);
+	pActionDeciderPlayer->pSkillSystem = static_cast<RPGSkillSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pActionDeciderPlayer->pWaitAction = static_cast<ActionHandlerWait*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pActionDeciderPlayer->pSkillAction = static_cast<ActionHandlerSkill*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* ActionDeciderPlayer::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ActionDeciderPlayer* pActionDeciderPlayer = new ActionDeciderPlayer;
+	int propertyIndex = 0;
+	ActionDeciderPlayer::_InitFromPropertiesSubset(pActionDeciderPlayer, properties, propertyIndex);
+	return pActionDeciderPlayer;
+}
+
+void* ActionDeciderPlayer::_CreateEmptyObject()
+{
+	return new ActionDeciderPlayer;
 }
 
 // HUDObjectBase
@@ -1082,6 +1257,7 @@ void RPGSkillSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<
 	pRPGSkillSystem->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pRPGSkillSystem->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pRPGSkillSystem->pEcsEntityMap = static_cast<ECSSystemEntityMap*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pRPGSkillSystem->pRpgSystem = static_cast<RPGSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pRPGSkillSystem->pCameraSystem = static_cast<CameraSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	{
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
@@ -1123,7 +1299,7 @@ void RPGSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<Edito
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pRPGSystem->levels.push_back(*static_cast<RPGLevelProgressionData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+			pRPGSystem->levelProgressionData.push_back(*static_cast<RPGLevelProgressionData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
 		}
 	}
 }
@@ -1159,6 +1335,27 @@ void* RPGAttributeMaxHealth::_InitFromProperties(const std::vector<EditorTypePro
 void* RPGAttributeMaxHealth::_CreateEmptyObject()
 {
 	return new RPGAttributeMaxHealth;
+}
+
+// HUDObjectXP
+void HUDObjectXP::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	HUDObjectXP* pHUDObjectXP = static_cast<HUDObjectXP*>(pObject);
+	HUDObjectBase::_InitFromPropertiesSubset(static_cast<HUDObjectBase*>(pHUDObjectXP), properties, propertyIndex);
+	pHUDObjectXP->pRpgSystem = static_cast<RPGSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* HUDObjectXP::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	HUDObjectXP* pHUDObjectXP = new HUDObjectXP;
+	int propertyIndex = 0;
+	HUDObjectXP::_InitFromPropertiesSubset(pHUDObjectXP, properties, propertyIndex);
+	return pHUDObjectXP;
+}
+
+void* HUDObjectXP::_CreateEmptyObject()
+{
+	return new HUDObjectXP;
 }
 
 // HUDObjectHealth
@@ -1206,6 +1403,10 @@ namespace __Generated
 		{"GameSystem", &GameSystem::_InitFromProperties},
 		{"GameInstance", &GameInstance::_InitFromProperties},
 		{"CameraSystem", &CameraSystem::_InitFromProperties},
+		{"ActionHandlerBase", &ActionHandlerBase::_InitFromProperties},
+		{"ActionHandlerAttack", &ActionHandlerAttack::_InitFromProperties},
+		{"ActionDeciderBase", &ActionDeciderBase::_InitFromProperties},
+		{"ActionDeciderAI", &ActionDeciderAI::_InitFromProperties},
 		{"WorldGenerator", &WorldGenerator::_InitFromProperties},
 		{"MenuScreenMain", &MenuScreenMain::_InitFromProperties},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_InitFromProperties},
@@ -1228,11 +1429,16 @@ namespace __Generated
 		{"ECSSystemDamage", &ECSSystemDamage::_InitFromProperties},
 		{"ECSSystemCleanUp", &ECSSystemCleanUp::_InitFromProperties},
 		{"ECS", &ECS::_InitFromProperties},
+		{"ActionHandlerWait", &ActionHandlerWait::_InitFromProperties},
+		{"ActionHandlerSkill", &ActionHandlerSkill::_InitFromProperties},
+		{"ActionHandlerMove", &ActionHandlerMove::_InitFromProperties},
+		{"ActionDeciderPlayer", &ActionDeciderPlayer::_InitFromProperties},
 		{"HUDObjectBase", &HUDObjectBase::_InitFromProperties},
 		{"HUD", &HUD::_InitFromProperties},
 		{"RPGSkillSystem", &RPGSkillSystem::_InitFromProperties},
 		{"RPGSystem", &RPGSystem::_InitFromProperties},
 		{"RPGAttributeMaxHealth", &RPGAttributeMaxHealth::_InitFromProperties},
+		{"HUDObjectXP", &HUDObjectXP::_InitFromProperties},
 		{"HUDObjectHealth", &HUDObjectHealth::_InitFromProperties},
 	};
 
@@ -1259,6 +1465,10 @@ namespace __Generated
 		{"GameSystem", &GameSystem::_CreateEmptyObject},
 		{"GameInstance", &GameInstance::_CreateEmptyObject},
 		{"CameraSystem", &CameraSystem::_CreateEmptyObject},
+		{"ActionHandlerBase", &ActionHandlerBase::_CreateEmptyObject},
+		{"ActionHandlerAttack", &ActionHandlerAttack::_CreateEmptyObject},
+		{"ActionDeciderBase", &ActionDeciderBase::_CreateEmptyObject},
+		{"ActionDeciderAI", &ActionDeciderAI::_CreateEmptyObject},
 		{"WorldGenerator", &WorldGenerator::_CreateEmptyObject},
 		{"MenuScreenMain", &MenuScreenMain::_CreateEmptyObject},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_CreateEmptyObject},
@@ -1281,11 +1491,16 @@ namespace __Generated
 		{"ECSSystemDamage", &ECSSystemDamage::_CreateEmptyObject},
 		{"ECSSystemCleanUp", &ECSSystemCleanUp::_CreateEmptyObject},
 		{"ECS", &ECS::_CreateEmptyObject},
+		{"ActionHandlerWait", &ActionHandlerWait::_CreateEmptyObject},
+		{"ActionHandlerSkill", &ActionHandlerSkill::_CreateEmptyObject},
+		{"ActionHandlerMove", &ActionHandlerMove::_CreateEmptyObject},
+		{"ActionDeciderPlayer", &ActionDeciderPlayer::_CreateEmptyObject},
 		{"HUDObjectBase", &HUDObjectBase::_CreateEmptyObject},
 		{"HUD", &HUD::_CreateEmptyObject},
 		{"RPGSkillSystem", &RPGSkillSystem::_CreateEmptyObject},
 		{"RPGSystem", &RPGSystem::_CreateEmptyObject},
 		{"RPGAttributeMaxHealth", &RPGAttributeMaxHealth::_CreateEmptyObject},
+		{"HUDObjectXP", &HUDObjectXP::_CreateEmptyObject},
 		{"HUDObjectHealth", &HUDObjectHealth::_CreateEmptyObject},
 	};
 
@@ -1312,6 +1527,10 @@ namespace __Generated
 		{"GameSystem", &GameSystem::_InitFromPropertiesSubset},
 		{"GameInstance", &GameInstance::_InitFromPropertiesSubset},
 		{"CameraSystem", &CameraSystem::_InitFromPropertiesSubset},
+		{"ActionHandlerBase", &ActionHandlerBase::_InitFromPropertiesSubset},
+		{"ActionHandlerAttack", &ActionHandlerAttack::_InitFromPropertiesSubset},
+		{"ActionDeciderBase", &ActionDeciderBase::_InitFromPropertiesSubset},
+		{"ActionDeciderAI", &ActionDeciderAI::_InitFromPropertiesSubset},
 		{"WorldGenerator", &WorldGenerator::_InitFromPropertiesSubset},
 		{"MenuScreenMain", &MenuScreenMain::_InitFromPropertiesSubset},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_InitFromPropertiesSubset},
@@ -1334,11 +1553,16 @@ namespace __Generated
 		{"ECSSystemDamage", &ECSSystemDamage::_InitFromPropertiesSubset},
 		{"ECSSystemCleanUp", &ECSSystemCleanUp::_InitFromPropertiesSubset},
 		{"ECS", &ECS::_InitFromPropertiesSubset},
+		{"ActionHandlerWait", &ActionHandlerWait::_InitFromPropertiesSubset},
+		{"ActionHandlerSkill", &ActionHandlerSkill::_InitFromPropertiesSubset},
+		{"ActionHandlerMove", &ActionHandlerMove::_InitFromPropertiesSubset},
+		{"ActionDeciderPlayer", &ActionDeciderPlayer::_InitFromPropertiesSubset},
 		{"HUDObjectBase", &HUDObjectBase::_InitFromPropertiesSubset},
 		{"HUD", &HUD::_InitFromPropertiesSubset},
 		{"RPGSkillSystem", &RPGSkillSystem::_InitFromPropertiesSubset},
 		{"RPGSystem", &RPGSystem::_InitFromPropertiesSubset},
 		{"RPGAttributeMaxHealth", &RPGAttributeMaxHealth::_InitFromPropertiesSubset},
+		{"HUDObjectXP", &HUDObjectXP::_InitFromPropertiesSubset},
 		{"HUDObjectHealth", &HUDObjectHealth::_InitFromPropertiesSubset},
 	};
 }

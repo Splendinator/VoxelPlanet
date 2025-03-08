@@ -6,15 +6,11 @@
 *
 * This class is used for moving an entity
 */
+EDITORCLASS()
 class ActionHandlerMove : public ActionHandlerBase
 {
+	EDITORBODY()
 public:
-
-	static ActionHandlerMove& GetSingleton() 
-	{ 
-		static ActionHandlerMove staticActionHandlerMove;
-		return staticActionHandlerMove;
-	}
 	
 	//~ Begin ActionHandlerBase Interface
 	void DoAction(ECS& ecs, EntityId e) override;

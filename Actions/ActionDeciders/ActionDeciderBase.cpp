@@ -21,10 +21,13 @@ ActionHandlerBase* ActionDeciderBase::TryMoveOrAttack(ECS& ecs, EntityId e, int 
 
 		if (pSystemPhysics->CanMoveTo(targetX, targetY))
 		{
-			ActionHandlerMove& actionHandlerMove = ActionHandlerMove::GetSingleton();
-			actionHandlerMove.xOffset = deltaX;
-			actionHandlerMove.yOffset = deltaY;
-			return &actionHandlerMove;
+			if (pMoveAction)
+			{
+				ActionHandlerMove& actionHandlerMove = *pMoveAction;
+				actionHandlerMove.xOffset = deltaX;
+				actionHandlerMove.yOffset = deltaY;
+				return &actionHandlerMove;
+			}
 		}
 		else if (ECSSystemEntityMap* pSystemEntityMap = ecs.GetSystem<ECSSystemEntityMap>())
 		{
@@ -33,10 +36,12 @@ ActionHandlerBase* ActionDeciderBase::TryMoveOrAttack(ECS& ecs, EntityId e, int 
 			{
 				if (ecs.EntityHasComponents<ComponentHealth>(entity))
 				{
-					ActionHandlerAttack& actionHandlerAttack = ActionHandlerAttack::GetSingleton();
-					actionHandlerAttack.enemy = entity;
-					actionHandlerAttack.damage = 20; // #TODO: Get damage from proper formula
-					return &actionHandlerAttack;
+					if (pAttackAction)
+					{
+						ActionHandlerAttack& actionHandlerAttack = *pAttackAction;
+						actionHandlerAttack.target = entity;
+						return &actionHandlerAttack;
+					}
 				}
 			}
 		}

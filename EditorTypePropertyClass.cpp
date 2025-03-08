@@ -23,6 +23,11 @@ EditorTypePropertyBase(propertyName), className(inClassName), assetName(inAssetN
 void EditorTypePropertyClass::DrawImGUI()
 {
 	EditorTypeClass* pClassTemplate = Game::GetAssetManager().FindClassTemplateType(className);
+	if (pClassTemplate == nullptr)
+	{
+		DOMLOG_ERROR("Cannot find template object for class", className, ". Is it an editor exposed class?")
+	}
+	
 	if (pClassTemplate->HasMetadataFlag(EClassMetadataFlags::EditInlineNew))
 	{
 		if (pEditInlineNewClass)

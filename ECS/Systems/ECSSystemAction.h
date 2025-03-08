@@ -19,7 +19,7 @@ public:
 	//~ End ECSSystemBase Interface
 
 	void Tick(const ECSSystemTickParams& params, const std::tuple<ComponentAction*>& components);
-	void OnEntityDeleted(const ECSSystemEntityDeletionParams& params, const std::tuple<ComponentAction*>& components);;
+	void OnEntityDeleted(const ECSSystemEntityDeletionParams& params, const std::tuple<ComponentAction*>& components);
 
 protected:
 	

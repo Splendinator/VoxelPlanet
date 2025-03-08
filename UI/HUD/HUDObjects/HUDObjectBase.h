@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ECS/ECSTypes.h"
-#include "HUDAnchorPoint.h"
+#include "UI/HUD/HUDAnchorPoint.h"
 #include "UI/UICanvas.h"
 
 class DirectoryData;
