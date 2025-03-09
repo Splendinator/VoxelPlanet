@@ -31,8 +31,6 @@ void ImGuiEditor::Uninit()
 	{
 		OnHideEditor();
 	}
-
-	delete pEditorInputContext; 
 }
 
 void ImGuiEditor::Tick(float deltaTime)

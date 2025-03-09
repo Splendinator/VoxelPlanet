@@ -82,7 +82,6 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<EditorAssetBase>> assets;
 
 	// Map of assets to their singletons (if the asset represents a class with the Singleton EClassMetadataFlags)
-	// #JANK: We can't delete void* so these can't be deleted here. We could consider forcing a UObject style base class maybe?
 	std::unordered_map<EditorAssetBase*, void*> singletonMap;
 };
 

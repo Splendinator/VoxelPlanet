@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+// #NOTE: In the future, don't data drive stuff like this, just do it like the way we do in RenderPriorities.h because
+// #NOTE: it's a pain in my balls to keep referencing this with an EDITORPROPERTY() for no real reason.
+
 /** DirectoryData
  *
  * Just a nice centralised place to hold directories to things like textures etc.

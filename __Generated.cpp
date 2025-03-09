@@ -83,6 +83,11 @@ void* SkillTreeMenuSkillSlotData::_CreateEmptyObject()
 	return new SkillTreeMenuSkillSlotData;
 }
 
+void SkillTreeMenuSkillSlotData::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<SkillTreeMenuSkillSlotData*>(pObject);
+}
+
 // MainMenuButtonData
 void MainMenuButtonData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -102,6 +107,11 @@ void* MainMenuButtonData::_InitFromProperties(const std::vector<EditorTypeProper
 void* MainMenuButtonData::_CreateEmptyObject()
 {
 	return new MainMenuButtonData;
+}
+
+void MainMenuButtonData::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<MainMenuButtonData*>(pObject);
 }
 
 // MenuScreenClassSelectEntry
@@ -126,6 +136,11 @@ void* MenuScreenClassSelectEntry::_CreateEmptyObject()
 	return new MenuScreenClassSelectEntry;
 }
 
+void MenuScreenClassSelectEntry::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<MenuScreenClassSelectEntry*>(pObject);
+}
+
 // MenuScreenBase
 void MenuScreenBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -145,6 +160,11 @@ void* MenuScreenBase::_InitFromProperties(const std::vector<EditorTypePropertyBa
 void* MenuScreenBase::_CreateEmptyObject()
 {
 	return new MenuScreenBase;
+}
+
+void MenuScreenBase::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<MenuScreenBase*>(pObject);
 }
 
 // HUDObjectSharedInitParams
@@ -167,6 +187,11 @@ void* HUDObjectSharedInitParams::_CreateEmptyObject()
 	return new HUDObjectSharedInitParams;
 }
 
+void HUDObjectSharedInitParams::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<HUDObjectSharedInitParams*>(pObject);
+}
+
 // IDragAndDroppable
 void IDragAndDroppable::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -184,6 +209,11 @@ void* IDragAndDroppable::_InitFromProperties(const std::vector<EditorTypePropert
 void* IDragAndDroppable::_CreateEmptyObject()
 {
 	return new IDragAndDroppable;
+}
+
+void IDragAndDroppable::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<IDragAndDroppable*>(pObject);
 }
 
 // TextRenderCharacterData
@@ -205,6 +235,11 @@ void* TextRenderCharacterData::_InitFromProperties(const std::vector<EditorTypeP
 void* TextRenderCharacterData::_CreateEmptyObject()
 {
 	return new TextRenderCharacterData;
+}
+
+void TextRenderCharacterData::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<TextRenderCharacterData*>(pObject);
 }
 
 // TextboxParams
@@ -230,6 +265,11 @@ void* TextboxParams::_CreateEmptyObject()
 	return new TextboxParams;
 }
 
+void TextboxParams::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<TextboxParams*>(pObject);
+}
+
 // RPGSkillData
 void RPGSkillData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -253,6 +293,11 @@ void* RPGSkillData::_CreateEmptyObject()
 	return new RPGSkillData;
 }
 
+void RPGSkillData::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGSkillData*>(pObject);
+}
+
 // RPGSkillEffectModuleBase
 void RPGSkillEffectModuleBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -272,6 +317,11 @@ void* RPGSkillEffectModuleBase::_CreateEmptyObject()
 	return new RPGSkillEffectModuleBase;
 }
 
+void RPGSkillEffectModuleBase::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGSkillEffectModuleBase*>(pObject);
+}
+
 // RPGSkillAimModuleBase
 void RPGSkillAimModuleBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -289,6 +339,11 @@ void* RPGSkillAimModuleBase::_InitFromProperties(const std::vector<EditorTypePro
 void* RPGSkillAimModuleBase::_CreateEmptyObject()
 {
 	return new RPGSkillAimModuleBase;
+}
+
+void RPGSkillAimModuleBase::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGSkillAimModuleBase*>(pObject);
 }
 
 // RPGLevelProgressionData
@@ -311,6 +366,11 @@ void* RPGLevelProgressionData::_CreateEmptyObject()
 	return new RPGLevelProgressionData;
 }
 
+void RPGLevelProgressionData::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGLevelProgressionData*>(pObject);
+}
+
 // RPGRacePerLevelAttributeValues
 void RPGRacePerLevelAttributeValues::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -329,6 +389,11 @@ void* RPGRacePerLevelAttributeValues::_InitFromProperties(const std::vector<Edit
 void* RPGRacePerLevelAttributeValues::_CreateEmptyObject()
 {
 	return new RPGRacePerLevelAttributeValues;
+}
+
+void RPGRacePerLevelAttributeValues::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGRacePerLevelAttributeValues*>(pObject);
 }
 
 // RPGRaceInitialAttributeValues
@@ -351,6 +416,11 @@ void* RPGRaceInitialAttributeValues::_CreateEmptyObject()
 	return new RPGRaceInitialAttributeValues;
 }
 
+void RPGRaceInitialAttributeValues::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGRaceInitialAttributeValues*>(pObject);
+}
+
 // RPGClassSpecialisationData
 void RPGClassSpecialisationData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -369,6 +439,11 @@ void* RPGClassSpecialisationData::_InitFromProperties(const std::vector<EditorTy
 void* RPGClassSpecialisationData::_CreateEmptyObject()
 {
 	return new RPGClassSpecialisationData;
+}
+
+void RPGClassSpecialisationData::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGClassSpecialisationData*>(pObject);
 }
 
 // RPGClassData
@@ -406,6 +481,11 @@ void* RPGClassData::_CreateEmptyObject()
 	return new RPGClassData;
 }
 
+void RPGClassData::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGClassData*>(pObject);
+}
+
 // RPGAttributeModifierBase
 void RPGAttributeModifierBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -423,6 +503,11 @@ void* RPGAttributeModifierBase::_InitFromProperties(const std::vector<EditorType
 void* RPGAttributeModifierBase::_CreateEmptyObject()
 {
 	return new RPGAttributeModifierBase;
+}
+
+void RPGAttributeModifierBase::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGAttributeModifierBase*>(pObject);
 }
 
 // InputActionBase
@@ -448,6 +533,11 @@ void* InputActionBase::_CreateEmptyObject()
 	return new InputActionBase;
 }
 
+void InputActionBase::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<InputActionBase*>(pObject);
+}
+
 // ECSSystemBase
 void ECSSystemBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -465,6 +555,11 @@ void* ECSSystemBase::_InitFromProperties(const std::vector<EditorTypePropertyBas
 void* ECSSystemBase::_CreateEmptyObject()
 {
 	return new ECSSystemBase;
+}
+
+void ECSSystemBase::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ECSSystemBase*>(pObject);
 }
 
 // ECSSystemAction
@@ -485,6 +580,11 @@ void* ECSSystemAction::_InitFromProperties(const std::vector<EditorTypePropertyB
 void* ECSSystemAction::_CreateEmptyObject()
 {
 	return new ECSSystemAction;
+}
+
+void ECSSystemAction::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ECSSystemAction*>(pObject);
 }
 
 // DirectoryData
@@ -513,6 +613,11 @@ void* DirectoryData::_CreateEmptyObject()
 	return new DirectoryData;
 }
 
+void DirectoryData::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<DirectoryData*>(pObject);
+}
+
 // GameSystem
 void GameSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -530,6 +635,11 @@ void* GameSystem::_InitFromProperties(const std::vector<EditorTypePropertyBase*>
 void* GameSystem::_CreateEmptyObject()
 {
 	return new GameSystem;
+}
+
+void GameSystem::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<GameSystem*>(pObject);
 }
 
 // GameInstance
@@ -558,6 +668,11 @@ void* GameInstance::_CreateEmptyObject()
 	return new GameInstance;
 }
 
+void GameInstance::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<GameInstance*>(pObject);
+}
+
 // CameraSystem
 void CameraSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -581,6 +696,11 @@ void* CameraSystem::_CreateEmptyObject()
 	return new CameraSystem;
 }
 
+void CameraSystem::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<CameraSystem*>(pObject);
+}
+
 // ActionHandlerBase
 void ActionHandlerBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -598,6 +718,11 @@ void* ActionHandlerBase::_InitFromProperties(const std::vector<EditorTypePropert
 void* ActionHandlerBase::_CreateEmptyObject()
 {
 	return new ActionHandlerBase;
+}
+
+void ActionHandlerBase::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ActionHandlerBase*>(pObject);
 }
 
 // ActionHandlerAttack
@@ -621,6 +746,11 @@ void* ActionHandlerAttack::_CreateEmptyObject()
 	return new ActionHandlerAttack;
 }
 
+void ActionHandlerAttack::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ActionHandlerAttack*>(pObject);
+}
+
 // ActionDeciderBase
 void ActionDeciderBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -640,6 +770,11 @@ void* ActionDeciderBase::_InitFromProperties(const std::vector<EditorTypePropert
 void* ActionDeciderBase::_CreateEmptyObject()
 {
 	return new ActionDeciderBase;
+}
+
+void ActionDeciderBase::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ActionDeciderBase*>(pObject);
 }
 
 // ActionDeciderAI
@@ -663,6 +798,11 @@ void* ActionDeciderAI::_CreateEmptyObject()
 	return new ActionDeciderAI;
 }
 
+void ActionDeciderAI::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ActionDeciderAI*>(pObject);
+}
+
 // WorldGenerator
 void WorldGenerator::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -682,6 +822,11 @@ void* WorldGenerator::_InitFromProperties(const std::vector<EditorTypePropertyBa
 void* WorldGenerator::_CreateEmptyObject()
 {
 	return new WorldGenerator;
+}
+
+void WorldGenerator::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<WorldGenerator*>(pObject);
 }
 
 // MenuScreenSkillTree
@@ -713,6 +858,11 @@ void* MenuScreenSkillTree::_CreateEmptyObject()
 	return new MenuScreenSkillTree;
 }
 
+void MenuScreenSkillTree::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<MenuScreenSkillTree*>(pObject);
+}
+
 // MenuScreenMain
 void MenuScreenMain::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -738,6 +888,11 @@ void* MenuScreenMain::_InitFromProperties(const std::vector<EditorTypePropertyBa
 void* MenuScreenMain::_CreateEmptyObject()
 {
 	return new MenuScreenMain;
+}
+
+void MenuScreenMain::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<MenuScreenMain*>(pObject);
 }
 
 // MenuScreenClassSelect
@@ -771,6 +926,11 @@ void* MenuScreenClassSelect::_CreateEmptyObject()
 	return new MenuScreenClassSelect;
 }
 
+void MenuScreenClassSelect::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<MenuScreenClassSelect*>(pObject);
+}
+
 // MenuSystem
 void MenuSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -798,6 +958,11 @@ void* MenuSystem::_CreateEmptyObject()
 	return new MenuSystem;
 }
 
+void MenuSystem::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<MenuSystem*>(pObject);
+}
+
 // HUDAnchorPoint
 void HUDAnchorPoint::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -818,6 +983,11 @@ void* HUDAnchorPoint::_InitFromProperties(const std::vector<EditorTypePropertyBa
 void* HUDAnchorPoint::_CreateEmptyObject()
 {
 	return new HUDAnchorPoint;
+}
+
+void HUDAnchorPoint::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<HUDAnchorPoint*>(pObject);
 }
 
 // DragAndDropManager
@@ -844,6 +1014,11 @@ void* DragAndDropManager::_InitFromProperties(const std::vector<EditorTypeProper
 void* DragAndDropManager::_CreateEmptyObject()
 {
 	return new DragAndDropManager;
+}
+
+void DragAndDropManager::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<DragAndDropManager*>(pObject);
 }
 
 // TextRenderSystem
@@ -874,6 +1049,11 @@ void* TextRenderSystem::_CreateEmptyObject()
 	return new TextRenderSystem;
 }
 
+void TextRenderSystem::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<TextRenderSystem*>(pObject);
+}
+
 // RPGSkillHighlightEntry
 void RPGSkillHighlightEntry::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -893,6 +1073,11 @@ void* RPGSkillHighlightEntry::_InitFromProperties(const std::vector<EditorTypePr
 void* RPGSkillHighlightEntry::_CreateEmptyObject()
 {
 	return new RPGSkillHighlightEntry;
+}
+
+void RPGSkillHighlightEntry::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGSkillHighlightEntry*>(pObject);
 }
 
 // RPGSkillEffectModuleTemp
@@ -916,6 +1101,11 @@ void* RPGSkillEffectModuleTemp::_CreateEmptyObject()
 	return new RPGSkillEffectModuleTemp;
 }
 
+void RPGSkillEffectModuleTemp::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGSkillEffectModuleTemp*>(pObject);
+}
+
 // RPGSkillAimModuleLine
 void RPGSkillAimModuleLine::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -936,6 +1126,11 @@ void* RPGSkillAimModuleLine::_InitFromProperties(const std::vector<EditorTypePro
 void* RPGSkillAimModuleLine::_CreateEmptyObject()
 {
 	return new RPGSkillAimModuleLine;
+}
+
+void RPGSkillAimModuleLine::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGSkillAimModuleLine*>(pObject);
 }
 
 // RPGRaceData
@@ -969,6 +1164,11 @@ void* RPGRaceData::_CreateEmptyObject()
 	return new RPGRaceData;
 }
 
+void RPGRaceData::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGRaceData*>(pObject);
+}
+
 // RPGAttributeBase
 void RPGAttributeBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -996,6 +1196,11 @@ void* RPGAttributeBase::_CreateEmptyObject()
 	return new RPGAttributeBase;
 }
 
+void RPGAttributeBase::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGAttributeBase*>(pObject);
+}
+
 // InputSystem
 void InputSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1015,6 +1220,11 @@ void* InputSystem::_InitFromProperties(const std::vector<EditorTypePropertyBase*
 void* InputSystem::_CreateEmptyObject()
 {
 	return new InputSystem;
+}
+
+void InputSystem::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<InputSystem*>(pObject);
 }
 
 // InputContext
@@ -1044,6 +1254,11 @@ void* InputContext::_CreateEmptyObject()
 	return new InputContext;
 }
 
+void InputContext::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<InputContext*>(pObject);
+}
+
 // InputActionPress
 void InputActionPress::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1062,6 +1277,11 @@ void* InputActionPress::_InitFromProperties(const std::vector<EditorTypeProperty
 void* InputActionPress::_CreateEmptyObject()
 {
 	return new InputActionPress;
+}
+
+void InputActionPress::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<InputActionPress*>(pObject);
 }
 
 // ImGuiEditor
@@ -1086,6 +1306,11 @@ void* ImGuiEditor::_CreateEmptyObject()
 	return new ImGuiEditor;
 }
 
+void ImGuiEditor::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ImGuiEditor*>(pObject);
+}
+
 // ECSSystemRender
 void ECSSystemRender::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1104,6 +1329,11 @@ void* ECSSystemRender::_InitFromProperties(const std::vector<EditorTypePropertyB
 void* ECSSystemRender::_CreateEmptyObject()
 {
 	return new ECSSystemRender;
+}
+
+void ECSSystemRender::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ECSSystemRender*>(pObject);
 }
 
 // ECSSystemPhysics
@@ -1126,6 +1356,11 @@ void* ECSSystemPhysics::_CreateEmptyObject()
 	return new ECSSystemPhysics;
 }
 
+void ECSSystemPhysics::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ECSSystemPhysics*>(pObject);
+}
+
 // ECSSystemNameslate
 void ECSSystemNameslate::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1144,6 +1379,11 @@ void* ECSSystemNameslate::_InitFromProperties(const std::vector<EditorTypeProper
 void* ECSSystemNameslate::_CreateEmptyObject()
 {
 	return new ECSSystemNameslate;
+}
+
+void ECSSystemNameslate::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ECSSystemNameslate*>(pObject);
 }
 
 // ECSSystemEntityMap
@@ -1166,6 +1406,11 @@ void* ECSSystemEntityMap::_CreateEmptyObject()
 	return new ECSSystemEntityMap;
 }
 
+void ECSSystemEntityMap::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ECSSystemEntityMap*>(pObject);
+}
+
 // ECSSystemDamage
 void ECSSystemDamage::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1186,6 +1431,11 @@ void* ECSSystemDamage::_CreateEmptyObject()
 	return new ECSSystemDamage;
 }
 
+void ECSSystemDamage::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ECSSystemDamage*>(pObject);
+}
+
 // ECSSystemCleanUp
 void ECSSystemCleanUp::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1204,6 +1454,11 @@ void* ECSSystemCleanUp::_InitFromProperties(const std::vector<EditorTypeProperty
 void* ECSSystemCleanUp::_CreateEmptyObject()
 {
 	return new ECSSystemCleanUp;
+}
+
+void ECSSystemCleanUp::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ECSSystemCleanUp*>(pObject);
 }
 
 // ECS
@@ -1234,6 +1489,11 @@ void* ECS::_CreateEmptyObject()
 	return new ECS;
 }
 
+void ECS::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ECS*>(pObject);
+}
+
 // ActionHandlerWait
 void ActionHandlerWait::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1252,6 +1512,11 @@ void* ActionHandlerWait::_InitFromProperties(const std::vector<EditorTypePropert
 void* ActionHandlerWait::_CreateEmptyObject()
 {
 	return new ActionHandlerWait;
+}
+
+void ActionHandlerWait::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ActionHandlerWait*>(pObject);
 }
 
 // ActionHandlerSkill
@@ -1275,6 +1540,11 @@ void* ActionHandlerSkill::_CreateEmptyObject()
 	return new ActionHandlerSkill;
 }
 
+void ActionHandlerSkill::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ActionHandlerSkill*>(pObject);
+}
+
 // ActionHandlerMove
 void ActionHandlerMove::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1293,6 +1563,11 @@ void* ActionHandlerMove::_InitFromProperties(const std::vector<EditorTypePropert
 void* ActionHandlerMove::_CreateEmptyObject()
 {
 	return new ActionHandlerMove;
+}
+
+void ActionHandlerMove::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ActionHandlerMove*>(pObject);
 }
 
 // ActionDeciderPlayer
@@ -1316,6 +1591,11 @@ void* ActionDeciderPlayer::_InitFromProperties(const std::vector<EditorTypePrope
 void* ActionDeciderPlayer::_CreateEmptyObject()
 {
 	return new ActionDeciderPlayer;
+}
+
+void ActionDeciderPlayer::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ActionDeciderPlayer*>(pObject);
 }
 
 // HUDObjectBase
@@ -1348,6 +1628,11 @@ void* HUDObjectBase::_InitFromProperties(const std::vector<EditorTypePropertyBas
 void* HUDObjectBase::_CreateEmptyObject()
 {
 	return new HUDObjectBase;
+}
+
+void HUDObjectBase::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<HUDObjectBase*>(pObject);
 }
 
 // HUD
@@ -1384,6 +1669,11 @@ void* HUD::_CreateEmptyObject()
 	return new HUD;
 }
 
+void HUD::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<HUD*>(pObject);
+}
+
 // RPGSkillSystem
 void RPGSkillSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1415,6 +1705,11 @@ void* RPGSkillSystem::_InitFromProperties(const std::vector<EditorTypePropertyBa
 void* RPGSkillSystem::_CreateEmptyObject()
 {
 	return new RPGSkillSystem;
+}
+
+void RPGSkillSystem::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGSkillSystem*>(pObject);
 }
 
 // RPGSystem
@@ -1453,6 +1748,11 @@ void* RPGSystem::_CreateEmptyObject()
 	return new RPGSystem;
 }
 
+void RPGSystem::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGSystem*>(pObject);
+}
+
 // RPGAttributeMaxHealth
 void RPGAttributeMaxHealth::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1471,6 +1771,11 @@ void* RPGAttributeMaxHealth::_InitFromProperties(const std::vector<EditorTypePro
 void* RPGAttributeMaxHealth::_CreateEmptyObject()
 {
 	return new RPGAttributeMaxHealth;
+}
+
+void RPGAttributeMaxHealth::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGAttributeMaxHealth*>(pObject);
 }
 
 // HUDObjectXP
@@ -1494,6 +1799,11 @@ void* HUDObjectXP::_CreateEmptyObject()
 	return new HUDObjectXP;
 }
 
+void HUDObjectXP::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<HUDObjectXP*>(pObject);
+}
+
 // HUDObjectHealth
 void HUDObjectHealth::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1512,6 +1822,11 @@ void* HUDObjectHealth::_InitFromProperties(const std::vector<EditorTypePropertyB
 void* HUDObjectHealth::_CreateEmptyObject()
 {
 	return new HUDObjectHealth;
+}
+
+void HUDObjectHealth::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<HUDObjectHealth*>(pObject);
 }
 
 namespace __Generated
@@ -1715,5 +2030,71 @@ namespace __Generated
 		{"RPGAttributeMaxHealth", &RPGAttributeMaxHealth::_InitFromPropertiesSubset},
 		{"HUDObjectXP", &HUDObjectXP::_InitFromPropertiesSubset},
 		{"HUDObjectHealth", &HUDObjectHealth::_InitFromPropertiesSubset},
+	};
+	std::unordered_map<std::string, void (*)(void*)> stringToDeleteObjectFunction
+	{
+		{"SkillTreeMenuSkillSlotData", &SkillTreeMenuSkillSlotData::_DeleteObject},
+		{"MainMenuButtonData", &MainMenuButtonData::_DeleteObject},
+		{"MenuScreenClassSelectEntry", &MenuScreenClassSelectEntry::_DeleteObject},
+		{"MenuScreenBase", &MenuScreenBase::_DeleteObject},
+		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::_DeleteObject},
+		{"IDragAndDroppable", &IDragAndDroppable::_DeleteObject},
+		{"TextRenderCharacterData", &TextRenderCharacterData::_DeleteObject},
+		{"TextboxParams", &TextboxParams::_DeleteObject},
+		{"RPGSkillData", &RPGSkillData::_DeleteObject},
+		{"RPGSkillEffectModuleBase", &RPGSkillEffectModuleBase::_DeleteObject},
+		{"RPGSkillAimModuleBase", &RPGSkillAimModuleBase::_DeleteObject},
+		{"RPGLevelProgressionData", &RPGLevelProgressionData::_DeleteObject},
+		{"RPGRacePerLevelAttributeValues", &RPGRacePerLevelAttributeValues::_DeleteObject},
+		{"RPGRaceInitialAttributeValues", &RPGRaceInitialAttributeValues::_DeleteObject},
+		{"RPGClassSpecialisationData", &RPGClassSpecialisationData::_DeleteObject},
+		{"RPGClassData", &RPGClassData::_DeleteObject},
+		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_DeleteObject},
+		{"InputActionBase", &InputActionBase::_DeleteObject},
+		{"ECSSystemBase", &ECSSystemBase::_DeleteObject},
+		{"ECSSystemAction", &ECSSystemAction::_DeleteObject},
+		{"DirectoryData", &DirectoryData::_DeleteObject},
+		{"GameSystem", &GameSystem::_DeleteObject},
+		{"GameInstance", &GameInstance::_DeleteObject},
+		{"CameraSystem", &CameraSystem::_DeleteObject},
+		{"ActionHandlerBase", &ActionHandlerBase::_DeleteObject},
+		{"ActionHandlerAttack", &ActionHandlerAttack::_DeleteObject},
+		{"ActionDeciderBase", &ActionDeciderBase::_DeleteObject},
+		{"ActionDeciderAI", &ActionDeciderAI::_DeleteObject},
+		{"WorldGenerator", &WorldGenerator::_DeleteObject},
+		{"MenuScreenSkillTree", &MenuScreenSkillTree::_DeleteObject},
+		{"MenuScreenMain", &MenuScreenMain::_DeleteObject},
+		{"MenuScreenClassSelect", &MenuScreenClassSelect::_DeleteObject},
+		{"MenuSystem", &MenuSystem::_DeleteObject},
+		{"HUDAnchorPoint", &HUDAnchorPoint::_DeleteObject},
+		{"DragAndDropManager", &DragAndDropManager::_DeleteObject},
+		{"TextRenderSystem", &TextRenderSystem::_DeleteObject},
+		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_DeleteObject},
+		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_DeleteObject},
+		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_DeleteObject},
+		{"RPGRaceData", &RPGRaceData::_DeleteObject},
+		{"RPGAttributeBase", &RPGAttributeBase::_DeleteObject},
+		{"InputSystem", &InputSystem::_DeleteObject},
+		{"InputContext", &InputContext::_DeleteObject},
+		{"InputActionPress", &InputActionPress::_DeleteObject},
+		{"ImGuiEditor", &ImGuiEditor::_DeleteObject},
+		{"ECSSystemRender", &ECSSystemRender::_DeleteObject},
+		{"ECSSystemPhysics", &ECSSystemPhysics::_DeleteObject},
+		{"ECSSystemNameslate", &ECSSystemNameslate::_DeleteObject},
+		{"ECSSystemEntityMap", &ECSSystemEntityMap::_DeleteObject},
+		{"ECSSystemDamage", &ECSSystemDamage::_DeleteObject},
+		{"ECSSystemCleanUp", &ECSSystemCleanUp::_DeleteObject},
+		{"ECS", &ECS::_DeleteObject},
+		{"ActionHandlerWait", &ActionHandlerWait::_DeleteObject},
+		{"ActionHandlerSkill", &ActionHandlerSkill::_DeleteObject},
+		{"ActionHandlerMove", &ActionHandlerMove::_DeleteObject},
+		{"ActionDeciderPlayer", &ActionDeciderPlayer::_DeleteObject},
+		{"HUDObjectBase", &HUDObjectBase::_DeleteObject},
+		{"HUD", &HUD::_DeleteObject},
+		{"RPGSkillSystem", &RPGSkillSystem::_DeleteObject},
+		{"RPGSystem", &RPGSystem::_DeleteObject},
+		{"RPGAttributeMaxHealth", &RPGAttributeMaxHealth::_DeleteObject},
+		{"HUDObjectXP", &HUDObjectXP::_DeleteObject},
+		{"HUDObjectHealth", &HUDObjectHealth::_DeleteObject},
 	};
 }

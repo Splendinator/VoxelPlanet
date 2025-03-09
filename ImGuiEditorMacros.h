@@ -26,7 +26,8 @@
 #define EDITORBODY() public: \
 static void* _InitFromProperties(const std::vector<class EditorTypePropertyBase*>& properties); \
 static void _InitFromPropertiesSubset(void* pClass, const std::vector<EditorTypePropertyBase*>& properties, int& index); \
-static void* _CreateEmptyObject();
+static void* _CreateEmptyObject(); \
+static void _DeleteObject(void* pObject);
 
 namespace ImGuiEditorMacros
 {

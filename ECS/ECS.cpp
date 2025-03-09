@@ -65,6 +65,11 @@ void ECS::Tick(float deltaTime)
 
 void ECS::UnInit()
 {
+	for (EntityId id = 0; id < NUM_ENTITIES; ++id)
+	{
+		DeleteEntity(id);
+	}
+	
 	systemCallbacks.clear();
 	systems.clear();
 	

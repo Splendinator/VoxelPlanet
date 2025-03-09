@@ -23,7 +23,6 @@ void InputSystem::Tick(float deltaTime)
 
 void InputSystem::UnInit()
 {
-	delete pDefaultInputContext;
 }
 
 #ifdef DOMIMGUI

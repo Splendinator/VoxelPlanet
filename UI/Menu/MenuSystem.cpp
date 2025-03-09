@@ -54,14 +54,11 @@ void MenuSystem::UnInit()
 	if (pOpenMenuAction)
 	{
 		pOpenMenuAction->OnActionActivated.Remove(OpenMenuDelegate);
-		delete pOpenMenuAction;
 	}
 	if (pCloseMenuAction)
 	{
 		pCloseMenuAction->OnActionActivated.Remove(CloseMenuDelegate);
-		delete pCloseMenuAction;
 	}
-	delete pMenuInputContext;
 }
 
 void MenuSystem::PushMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset)

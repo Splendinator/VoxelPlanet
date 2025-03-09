@@ -56,7 +56,6 @@ void UIObjectDragAndDropArea::Init(VectorPrimitiveLayer* pRoot)
 	
 	dragAndDropAreaBoundingBox.left += screenSpacePosition.x;
 	dragAndDropAreaBoundingBox.top += screenSpacePosition.y;
-	
 }
 
 void UIObjectDragAndDropArea::Uninit()

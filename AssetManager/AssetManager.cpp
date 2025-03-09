@@ -23,6 +23,8 @@ void AssetManager::Init()
 	ImportAssets(ImGuiEditorGlobals::editorBaseDirectory);	
 }
 
+// #TEMP: Optimisation
+#pragma optimize("", off)
 void AssetManager::UnInit()
 {
 	for (auto& [key, value] : templateClassTypes)
@@ -42,9 +44,22 @@ void AssetManager::UnInit()
 		delete value;
 	}	
 	templateEnumTypes.clear();
-
+	
+	for (auto& [key, value] : singletonMap)
+	{
+		DOMLOG_INFO("Deleting singleton:", key->GetName(), key->GetEditorType()->name)
+		
+		auto it = __Generated::stringToDeleteObjectFunction.find(key->GetEditorType()->name);
+		if (it != __Generated::stringToDeleteObjectFunction.end())
+		{
+			it->second(value);
+		}
+	}
+	singletonMap.clear();
+	
 	assets.clear();
 }
+#pragma optimize("", on)
 
 void AssetManager::AddAsset(std::shared_ptr<EditorAssetBase> pAsset)
 {
