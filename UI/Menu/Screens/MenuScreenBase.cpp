@@ -11,10 +11,21 @@ void MenuScreenBase::BaseInit(MenuSystem* pInMenuSystem)
 {
 	DOMASSERT(pInMenuSystem);
 	pMenuSystem = pInMenuSystem;
+
+	if (pDirectoryData == nullptr)
+	{
+		DOMLOG_ERROR("DirectoryData is nullptr");
+		return;
+	}
+
+	const float sizeFraction = pInMenuSystem->GetMenuSizeFraction();
+	const float halfInverseSizeFrac = (1.0f - sizeFraction) * 0.5f; 
 	
 	UICanvasInitParams initParams;
-	initParams.sizeX = (float)dmwi::getWindowWidth();
-	initParams.sizeY = (float)dmwi::getWindowHeight();
+	initParams.sizeX = (float)dmwi::getWindowWidth() * sizeFraction;
+	initParams.sizeY = (float)dmwi::getWindowHeight() * sizeFraction;
+	initParams.posX = (float)dmwi::getWindowWidth() * halfInverseSizeFrac;
+	initParams.posY = (float)dmwi::getWindowHeight() * halfInverseSizeFrac;
 	initParams.filePath = DirectoryData::ConcatenateFilePathChecked(pDirectoryData->menus, fileName, ".svg");
 	initParams.renderPriority = RenderPriority::menu;
 	initParams.type = dmgf::ERenderObjectType::UI;

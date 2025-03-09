@@ -13,6 +13,8 @@ UICanvas::UICanvas(UICanvasInitParams& initParams)
 	pRenderObject = dmgf::AddObjectFromVectorArt(pVectorArt, initParams.type);
 	pRenderObject->SetRenderPriority(initParams.renderPriority);
 	pRenderObject->SetSize(initParams.sizeX, initParams.sizeY);
+	pRenderObject->SetPosition(initParams.posX, initParams.posY);
+	pRenderObject->SetVisible(initParams.bStartVisible);
 }
 
 UICanvas::~UICanvas()
@@ -42,6 +44,24 @@ void UICanvas::UnInit()
 void UICanvas::SetPosition(float x, float y)
 {
 	pRenderObject->SetPosition(x, y);
+}
+
+void UICanvas::SetVisible(bool bVisible)
+{
+	pRenderObject->SetVisible(bVisible);
+}
+
+Vec2f UICanvas::GetScreenSpacePosition() const
+{
+	return pRenderObject->GetPosition();
+}
+
+Vec2f UICanvas::GetScreenSpaceScale() const
+{
+	const Vec2f renderObjectSize = pRenderObject->GetScale();
+	const Vec2f vectorArtSize = {(float)pVectorArt->GetPageWidth() ,(float)pVectorArt->GetPageHeight()}; 
+
+	return renderObjectSize / vectorArtSize;
 }
 
 const VectorPrimitiveBase* UICanvas::FindPrimitiveUnderCursor() const

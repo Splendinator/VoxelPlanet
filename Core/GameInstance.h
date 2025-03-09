@@ -19,6 +19,12 @@ public:
 	void TickImGui(float deltaTime);
 #endif
 
+	// Find a game system by dynamic casting all game systems.
+	// This is a lot slower than using an EDITORPROPERTY() to the singleton system but in cases where
+	// setting up the data would be a massive hassle and/or performance isn't a concern this can be used.  
+	template<typename TGameSystem>
+	TGameSystem* FindGameSystemSlow() const;
+	
 private:
 
 	// Vector of game systems, the systems will initialise in the order that they are in the array.
@@ -28,3 +34,19 @@ private:
 
 	bool bShowingDebugImGui = false;
 };
+
+template <typename TGameSystem>
+TGameSystem* GameInstance::FindGameSystemSlow() const
+{
+	static_assert(std::is_base_of<GameSystem, TGameSystem>::value, "Must be a game system");
+	
+	for (GameSystem* pGameSystem : pGameSystems)
+	{
+		if (TGameSystem* pCastedGameSystem = dynamic_cast<TGameSystem*>(pGameSystem))
+		{
+			return pCastedGameSystem;
+		}
+	}
+
+	return nullptr;
+}

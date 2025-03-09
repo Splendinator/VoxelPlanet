@@ -16,6 +16,17 @@ public:
 
 	TInstancedAssetPtr() = default;
 	~TInstancedAssetPtr() { if (pInstance) Unload(); }
+	TInstancedAssetPtr(const TInstancedAssetPtr<T>& other)
+	{
+		assetName = other.assetName;
+		DOMLOG_ERROR_IF(other.pInstance, "Trying to copy instanced asset pointer with loaded instance, This won't work as instance is deleted in destructor. Try move semantics.")
+	}
+	TInstancedAssetPtr(TInstancedAssetPtr<T>&& other)
+	{
+		assetName = std::move(other.assetName);
+		pInstance = other.pInstance;
+		other.pInstance = nullptr;
+	};
 
 	T* operator->() {return pInstance;} 
 	

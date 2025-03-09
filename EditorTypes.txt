@@ -1,3 +1,10 @@
+Struct SkillTreeMenuSkillSlotData
+string buttonLayerName ""
+;
+Struct MainMenuButtonData
+string buttonLayerName ""
+instancedassetptr MenuScreenBase pMenuScreenToOpen nullptr
+;
 Struct MenuScreenClassSelectEntry
 string classIconLayer ""
 string loaderLayer ""
@@ -25,6 +32,9 @@ COUNT 10
 Struct HUDObjectSharedInitParams
 float screenEdgePadding 0.05
 ;
+Class IDragAndDroppable
+meta Abstract
+;
 Struct TextRenderCharacterData
 string fileName ""
 int character 0
@@ -42,7 +52,9 @@ Invalid 2
 AffectedArea 3
 ;
 Class RPGSkillData
+Child IDragAndDroppable
 meta Singleton
+string iconLayerName ""
 class RPGSkillAimModuleBase pAimModule nullptr
 class RPGSkillEffectModuleBase pEffectModule nullptr
 ;
@@ -72,6 +84,7 @@ meta Singleton
 string displayName ""
 string vectorArtFileName ""
 vector specialisations RPGClassSpecialisationData
+vector classSkills RPGSkillData
 ;
 Class RPGAttributeModifierBase
 meta Abstract
@@ -241,8 +254,15 @@ Class WorldGenerator
 Child GameSystem
 class ECS pEcs nullptr
 ;
+Class MenuScreenSkillTree
+Child MenuScreenBase
+vector skillSlotDatas SkillTreeMenuSkillSlotData
+class DragAndDropManager pDragAndDropManager nullptr
+class ECS pEcs nullptr
+;
 Class MenuScreenMain
 Child MenuScreenBase
+vector buttonDatas MainMenuButtonData
 ;
 Class MenuScreenClassSelect
 Child MenuScreenBase
@@ -260,11 +280,21 @@ class InputActionBase pOpenMenuAction nullptr
 class InputActionBase pCloseMenuAction nullptr
 instancedassetptr MenuScreenBase pBaseMenuScreen nullptr
 instancedassetptr MenuScreenBase pGameStartMenuScreen nullptr
+float menuSizeFraction 1
 ;
 Struct HUDAnchorPoint
 enum EHUDAnchorPoint anchorPoint NONE
 float anchorX 0
 float anchorY 0
+;
+Class DragAndDropManager
+Child GameSystem
+float floatingIconSize 0
+string floatingIconFileName ""
+string iconLoaderLayerName ""
+float floatingIconXOffset 0
+float floatingIconYOffset 0
+class DirectoryData pDirectoryData nullptr
 ;
 Class TextRenderSystem
 Child GameSystem
@@ -375,6 +405,7 @@ class ECS pEcs nullptr
 class ECSSystemEntityMap pEcsEntityMap nullptr
 class RPGSystem pRpgSystem nullptr
 class CameraSystem pCameraSystem nullptr
+string skillIconFileName ""
 vector skillHighlightVisuals RPGSkillHighlightEntry
 ;
 Class RPGSystem

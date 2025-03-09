@@ -36,3 +36,4 @@
 #include "DomUtils/Delegate.h"
 #include "Game.h"
 #include "AssetManager/AssetManager.h" // Contains utils for ENUMSTRING() so useful to be here
+#include "AssetManager/InstancedAssetPtr.h"

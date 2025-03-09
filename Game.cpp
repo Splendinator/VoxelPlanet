@@ -11,6 +11,8 @@
 AssetManager assetManager;
 GameInstance* pGameInstance = nullptr;
 
+bool bRestartRequested = false;
+
 void Game::Init()
 {
 	assetManager.Init();
@@ -44,6 +46,13 @@ void GameplayTick(float deltaTime)
 #ifdef DOMIMGUI
 		pGameInstance->TickImGui(deltaTime);
 #endif
+	}
+
+	if (bRestartRequested)
+	{
+		Game::UnInit();
+		Game::Init();
+		bRestartRequested = false;
 	}
 }
 
@@ -86,5 +95,12 @@ bool Game::CanClose()
 {
 	return dmwi::isHeld(dmwi::Button::SHIFT) && dmwi::isPressed(dmwi::Button::ESC);
 }
+
+void Game::RestartGame()
+{
+	bRestartRequested = true;
+}
+
+const GameInstance& Game::GetGameInstance() { DOMASSERT(pGameInstance) return *pGameInstance; }
 
 AssetManager& Game::GetAssetManager() { return assetManager; };

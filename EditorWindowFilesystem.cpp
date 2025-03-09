@@ -17,6 +17,10 @@ namespace fs = std::filesystem;
 
 void EditorWindowFilesystem::Draw()
 {
+	if (ImGui::Button("Reload Game"))
+	{
+		Game::RestartGame();
+	}
 	DrawDirectory(rootDirectory);
 }
 

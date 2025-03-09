@@ -29,6 +29,8 @@ public:
 	void PopMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset);
 
 	void CloseScreen(MenuScreenBase* pMenuScreen);
+
+	float GetMenuSizeFraction() const { return menuSizeFraction; }
 	
 private:
 	// Input system
@@ -54,6 +56,10 @@ private:
 	// Menu screen to open when the game first starts
 	EDITORPROPERTY()
 	TInstancedAssetPtr<MenuScreenBase> pGameStartMenuScreen;
+
+	// Size of menus relative to the size of the screen (1.0f = fullscreen) 
+	EDITORPROPERTY()
+	float menuSizeFraction = 1.0f;
 	
 	void OpenMenu(OnInputActionDelegateParams Params);
 	void CloseMenu(OnInputActionDelegateParams Params);
@@ -64,5 +70,5 @@ private:
 	DelegateClass<MenuSystem, OnInputActionDelegateParams> OpenMenuDelegate;
 	DelegateClass<MenuSystem, OnInputActionDelegateParams> CloseMenuDelegate;
 
-	bool bMenuOpen = false;
+	bool bMainMenuOpen = false;
 };

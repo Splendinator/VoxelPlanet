@@ -12,6 +12,7 @@ namespace RenderPriority
 	const float spellcastUI = 0.4f; // Green/red transparent highlights when aiming a skill
 
 	// ** ERenderObjectType::UI **	
-	const float HUD = 0.9f;
-	const float menu = 1.0f;
+	const float HUD = 0.8f;
+	const float menu = 0.9f;
+	const float dragAndDropIcon = 1.0f; // floating icon following mouse while drag and dropping
 }

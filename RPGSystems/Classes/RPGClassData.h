@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+class RPGSkillData;
 class RPGClassSpecialisationData;
 
 // In this game a class is a basic class you have for the first 5 levels or so, it determines certain things like your starting resource (mana, stamina, etc.)
@@ -21,5 +22,9 @@ public:
 	
 	// All possible specialisations for this class
 	EDITORPROPERTY()
-	std::vector<const RPGClassSpecialisationData*> specialisations;
+	std::vector<RPGClassSpecialisationData*> specialisations;
+
+	// Skills this class unlocks 
+	EDITORPROPERTY()
+	std::vector<RPGSkillData*> classSkills;
 };

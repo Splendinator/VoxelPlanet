@@ -3,7 +3,6 @@
 #include "TextRenderSystem.h"
 
 #include "DirectoryData.h"
-#include "Game.h"
 #include "Textbox.h"
 #include "VectorArt.h"
 

@@ -46,7 +46,12 @@ public:
 	// This is the layer directly above this; this will be nullptr for the root layer in a file.
 	VectorPrimitiveLayer* pParent = nullptr;
 
+	void SetVisible(bool bInVisible) { bVisible = bInVisible; }
+	bool GetVisible() const { return bVisible; }
+	
 protected:
+
+	bool bVisible = true;
 	
 	// Child classes will need to call this whenever they change shape/size to keep the layer bounding box accurate
 	void RefreshParentLayerBoundingBox();

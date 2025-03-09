@@ -1456,6 +1456,10 @@
       <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="UI\DragAndDrop\DragAndDropManager.cpp" />
+    <ClCompile Include="UI\DragAndDrop\DragAndDropShared.cpp" />
+    <ClCompile Include="UI\DragAndDrop\IDragAndDropArea.cpp" />
+    <ClCompile Include="UI\DragAndDrop\IDragAndDroppable.cpp" />
     <ClCompile Include="UI\HUD\HUD.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
@@ -1921,6 +1925,7 @@
       <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="UI\Menu\Screens\MenuScreenSkillTree.cpp" />
     <ClCompile Include="UI\UICanvas.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
@@ -2154,6 +2159,7 @@
       <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="UI\UIObjects\UIObjectDragAndDropArea.cpp" />
     <ClCompile Include="UI\UIObjects\UIObjectIconLoader.cpp" />
     <ClCompile Include="UI\UIObjects\UIObjectProgressBar.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
@@ -2504,6 +2510,10 @@
     <ClInclude Include="RPGSystems\Skills\RPGSkillSystem.h" />
     <ClInclude Include="TextRenderSystem\Textbox.h" />
     <ClInclude Include="TextRenderSystem\TextRenderSystem.h" />
+    <ClInclude Include="UI\DragAndDrop\DragAndDropManager.h" />
+    <ClInclude Include="UI\DragAndDrop\DragAndDropShared.h" />
+    <ClInclude Include="UI\DragAndDrop\IDragAndDropArea.h" />
+    <ClInclude Include="UI\DragAndDrop\IDragAndDroppable.h" />
     <ClInclude Include="UI\HUD\HUD.h" />
     <ClInclude Include="UI\HUD\HUDAnchorPoint.h" />
     <ClInclude Include="UI\HUD\HUDObjects\HUDObjectBase.h" />
@@ -2513,11 +2523,13 @@
     <ClInclude Include="UI\Menu\Screens\MenuScreenBase.h" />
     <ClInclude Include="UI\Menu\Screens\MenuScreenClassSelect.h" />
     <ClInclude Include="UI\Menu\Screens\MenuScreenMain.h" />
+    <ClInclude Include="UI\Menu\Screens\MenuScreenSkillTree.h" />
     <ClInclude Include="UI\UICanvas.h" />
     <ClInclude Include="UI\UIObjects\UIObjectBase.h" />
     <ClInclude Include="UI\UIObjects\UIObjectButton.h" />
     <ClInclude Include="UI\UIObjects\UIObjectButtonWithIcon.h" />
     <ClInclude Include="UI\UIObjects\UIObjectContainer.h" />
+    <ClInclude Include="UI\UIObjects\UIObjectDragAndDropArea.h" />
     <ClInclude Include="UI\UIObjects\UIObjectIconLoader.h" />
     <ClInclude Include="UI\UIObjects\UIObjectProgressBar.h" />
     <ClInclude Include="UI\UIUtils.h" />

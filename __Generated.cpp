@@ -47,6 +47,8 @@
 #include "..\Roguelike\RPGSystems\Skills\RPGSkillsShared.h"
 #include "..\Roguelike\RPGSystems\Skills\RPGSkillSystem.h"
 #include "..\Roguelike\TextRenderSystem\TextRenderSystem.h"
+#include "..\Roguelike\UI\DragAndDrop\DragAndDropManager.h"
+#include "..\Roguelike\UI\DragAndDrop\IDragAndDroppable.h"
 #include "..\Roguelike\UI\HUD\HUD.h"
 #include "..\Roguelike\UI\HUD\HUDAnchorPoint.h"
 #include "..\Roguelike\UI\HUD\HUDObjects\HUDObjectBase.h"
@@ -56,9 +58,51 @@
 #include "..\Roguelike\UI\Menu\Screens\MenuScreenBase.h"
 #include "..\Roguelike\UI\Menu\Screens\MenuScreenClassSelect.h"
 #include "..\Roguelike\UI\Menu\Screens\MenuScreenMain.h"
+#include "..\Roguelike\UI\Menu\Screens\MenuScreenSkillTree.h"
 #include "..\Roguelike\WorldGenerator.h"
 
 #pragma warning( disable : 4189 )
+
+// SkillTreeMenuSkillSlotData
+void SkillTreeMenuSkillSlotData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	SkillTreeMenuSkillSlotData* pSkillTreeMenuSkillSlotData = static_cast<SkillTreeMenuSkillSlotData*>(pObject);
+	pSkillTreeMenuSkillSlotData->buttonLayerName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+}
+
+void* SkillTreeMenuSkillSlotData::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	SkillTreeMenuSkillSlotData* pSkillTreeMenuSkillSlotData = new SkillTreeMenuSkillSlotData;
+	int propertyIndex = 0;
+	SkillTreeMenuSkillSlotData::_InitFromPropertiesSubset(pSkillTreeMenuSkillSlotData, properties, propertyIndex);
+	return pSkillTreeMenuSkillSlotData;
+}
+
+void* SkillTreeMenuSkillSlotData::_CreateEmptyObject()
+{
+	return new SkillTreeMenuSkillSlotData;
+}
+
+// MainMenuButtonData
+void MainMenuButtonData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MainMenuButtonData* pMainMenuButtonData = static_cast<MainMenuButtonData*>(pObject);
+	pMainMenuButtonData->buttonLayerName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pMainMenuButtonData->pMenuScreenToOpen.SetAsset(static_cast<EditorTypePropertyInstancedAssetPtr*>(properties[propertyIndex++])->GetValue());
+}
+
+void* MainMenuButtonData::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MainMenuButtonData* pMainMenuButtonData = new MainMenuButtonData;
+	int propertyIndex = 0;
+	MainMenuButtonData::_InitFromPropertiesSubset(pMainMenuButtonData, properties, propertyIndex);
+	return pMainMenuButtonData;
+}
+
+void* MainMenuButtonData::_CreateEmptyObject()
+{
+	return new MainMenuButtonData;
+}
 
 // MenuScreenClassSelectEntry
 void MenuScreenClassSelectEntry::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
@@ -123,6 +167,25 @@ void* HUDObjectSharedInitParams::_CreateEmptyObject()
 	return new HUDObjectSharedInitParams;
 }
 
+// IDragAndDroppable
+void IDragAndDroppable::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	IDragAndDroppable* pIDragAndDroppable = static_cast<IDragAndDroppable*>(pObject);
+}
+
+void* IDragAndDroppable::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	IDragAndDroppable* pIDragAndDroppable = new IDragAndDroppable;
+	int propertyIndex = 0;
+	IDragAndDroppable::_InitFromPropertiesSubset(pIDragAndDroppable, properties, propertyIndex);
+	return pIDragAndDroppable;
+}
+
+void* IDragAndDroppable::_CreateEmptyObject()
+{
+	return new IDragAndDroppable;
+}
+
 // TextRenderCharacterData
 void TextRenderCharacterData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -171,6 +234,8 @@ void* TextboxParams::_CreateEmptyObject()
 void RPGSkillData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
 	RPGSkillData* pRPGSkillData = static_cast<RPGSkillData*>(pObject);
+	IDragAndDroppable::_InitFromPropertiesSubset(static_cast<IDragAndDroppable*>(pRPGSkillData), properties, propertyIndex);
+	pRPGSkillData->iconLayerName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 	pRPGSkillData->pAimModule = static_cast<RPGSkillAimModuleBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pRPGSkillData->pEffectModule = static_cast<RPGSkillEffectModuleBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 }
@@ -317,6 +382,13 @@ void RPGClassData::_InitFromPropertiesSubset(void* pObject, const std::vector<Ed
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
 			pRPGClassData->specialisations.push_back(static_cast<RPGClassSpecialisationData*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
+		}
+	}
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pRPGClassData->classSkills.push_back(static_cast<RPGSkillData*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
 		}
 	}
 }
@@ -612,11 +684,47 @@ void* WorldGenerator::_CreateEmptyObject()
 	return new WorldGenerator;
 }
 
+// MenuScreenSkillTree
+void MenuScreenSkillTree::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MenuScreenSkillTree* pMenuScreenSkillTree = static_cast<MenuScreenSkillTree*>(pObject);
+	MenuScreenBase::_InitFromPropertiesSubset(static_cast<MenuScreenBase*>(pMenuScreenSkillTree), properties, propertyIndex);
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pMenuScreenSkillTree->skillSlotDatas.push_back(*static_cast<SkillTreeMenuSkillSlotData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+		}
+	}
+	pMenuScreenSkillTree->pDragAndDropManager = static_cast<DragAndDropManager*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pMenuScreenSkillTree->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* MenuScreenSkillTree::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MenuScreenSkillTree* pMenuScreenSkillTree = new MenuScreenSkillTree;
+	int propertyIndex = 0;
+	MenuScreenSkillTree::_InitFromPropertiesSubset(pMenuScreenSkillTree, properties, propertyIndex);
+	return pMenuScreenSkillTree;
+}
+
+void* MenuScreenSkillTree::_CreateEmptyObject()
+{
+	return new MenuScreenSkillTree;
+}
+
 // MenuScreenMain
 void MenuScreenMain::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
 	MenuScreenMain* pMenuScreenMain = static_cast<MenuScreenMain*>(pObject);
 	MenuScreenBase::_InitFromPropertiesSubset(static_cast<MenuScreenBase*>(pMenuScreenMain), properties, propertyIndex);
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pMenuScreenMain->buttonDatas.push_back(*static_cast<MainMenuButtonData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+		}
+	}
 }
 
 void* MenuScreenMain::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -674,6 +782,7 @@ void MenuSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<Edit
 	pMenuSystem->pCloseMenuAction = static_cast<InputActionBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pMenuSystem->pBaseMenuScreen.SetAsset(static_cast<EditorTypePropertyInstancedAssetPtr*>(properties[propertyIndex++])->GetValue());
 	pMenuSystem->pGameStartMenuScreen.SetAsset(static_cast<EditorTypePropertyInstancedAssetPtr*>(properties[propertyIndex++])->GetValue());
+	pMenuSystem->menuSizeFraction = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
 }
 
 void* MenuSystem::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -709,6 +818,32 @@ void* HUDAnchorPoint::_InitFromProperties(const std::vector<EditorTypePropertyBa
 void* HUDAnchorPoint::_CreateEmptyObject()
 {
 	return new HUDAnchorPoint;
+}
+
+// DragAndDropManager
+void DragAndDropManager::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	DragAndDropManager* pDragAndDropManager = static_cast<DragAndDropManager*>(pObject);
+	GameSystem::_InitFromPropertiesSubset(static_cast<GameSystem*>(pDragAndDropManager), properties, propertyIndex);
+	pDragAndDropManager->floatingIconSize = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pDragAndDropManager->floatingIconFileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDragAndDropManager->iconLoaderLayerName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDragAndDropManager->floatingIconXOffset = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pDragAndDropManager->floatingIconYOffset = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pDragAndDropManager->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* DragAndDropManager::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	DragAndDropManager* pDragAndDropManager = new DragAndDropManager;
+	int propertyIndex = 0;
+	DragAndDropManager::_InitFromPropertiesSubset(pDragAndDropManager, properties, propertyIndex);
+	return pDragAndDropManager;
+}
+
+void* DragAndDropManager::_CreateEmptyObject()
+{
+	return new DragAndDropManager;
 }
 
 // TextRenderSystem
@@ -1259,6 +1394,7 @@ void RPGSkillSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<
 	pRPGSkillSystem->pEcsEntityMap = static_cast<ECSSystemEntityMap*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pRPGSkillSystem->pRpgSystem = static_cast<RPGSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pRPGSkillSystem->pCameraSystem = static_cast<CameraSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pRPGSkillSystem->skillIconFileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 	{
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
@@ -1382,9 +1518,12 @@ namespace __Generated
 {
 	std::unordered_map<std::string, void* (*)(const std::vector<EditorTypePropertyBase*>&)> stringToCreateObjectFunction
 	{
+		{"SkillTreeMenuSkillSlotData", &SkillTreeMenuSkillSlotData::_InitFromProperties},
+		{"MainMenuButtonData", &MainMenuButtonData::_InitFromProperties},
 		{"MenuScreenClassSelectEntry", &MenuScreenClassSelectEntry::_InitFromProperties},
 		{"MenuScreenBase", &MenuScreenBase::_InitFromProperties},
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::_InitFromProperties},
+		{"IDragAndDroppable", &IDragAndDroppable::_InitFromProperties},
 		{"TextRenderCharacterData", &TextRenderCharacterData::_InitFromProperties},
 		{"TextboxParams", &TextboxParams::_InitFromProperties},
 		{"RPGSkillData", &RPGSkillData::_InitFromProperties},
@@ -1408,10 +1547,12 @@ namespace __Generated
 		{"ActionDeciderBase", &ActionDeciderBase::_InitFromProperties},
 		{"ActionDeciderAI", &ActionDeciderAI::_InitFromProperties},
 		{"WorldGenerator", &WorldGenerator::_InitFromProperties},
+		{"MenuScreenSkillTree", &MenuScreenSkillTree::_InitFromProperties},
 		{"MenuScreenMain", &MenuScreenMain::_InitFromProperties},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_InitFromProperties},
 		{"MenuSystem", &MenuSystem::_InitFromProperties},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_InitFromProperties},
+		{"DragAndDropManager", &DragAndDropManager::_InitFromProperties},
 		{"TextRenderSystem", &TextRenderSystem::_InitFromProperties},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_InitFromProperties},
 		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_InitFromProperties},
@@ -1444,9 +1585,12 @@ namespace __Generated
 
 	std::unordered_map<std::string, void* (*)()> stringToCreateEmptyObjectFunction
 	{
+		{"SkillTreeMenuSkillSlotData", &SkillTreeMenuSkillSlotData::_CreateEmptyObject},
+		{"MainMenuButtonData", &MainMenuButtonData::_CreateEmptyObject},
 		{"MenuScreenClassSelectEntry", &MenuScreenClassSelectEntry::_CreateEmptyObject},
 		{"MenuScreenBase", &MenuScreenBase::_CreateEmptyObject},
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::_CreateEmptyObject},
+		{"IDragAndDroppable", &IDragAndDroppable::_CreateEmptyObject},
 		{"TextRenderCharacterData", &TextRenderCharacterData::_CreateEmptyObject},
 		{"TextboxParams", &TextboxParams::_CreateEmptyObject},
 		{"RPGSkillData", &RPGSkillData::_CreateEmptyObject},
@@ -1470,10 +1614,12 @@ namespace __Generated
 		{"ActionDeciderBase", &ActionDeciderBase::_CreateEmptyObject},
 		{"ActionDeciderAI", &ActionDeciderAI::_CreateEmptyObject},
 		{"WorldGenerator", &WorldGenerator::_CreateEmptyObject},
+		{"MenuScreenSkillTree", &MenuScreenSkillTree::_CreateEmptyObject},
 		{"MenuScreenMain", &MenuScreenMain::_CreateEmptyObject},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_CreateEmptyObject},
 		{"MenuSystem", &MenuSystem::_CreateEmptyObject},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_CreateEmptyObject},
+		{"DragAndDropManager", &DragAndDropManager::_CreateEmptyObject},
 		{"TextRenderSystem", &TextRenderSystem::_CreateEmptyObject},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_CreateEmptyObject},
 		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_CreateEmptyObject},
@@ -1506,9 +1652,12 @@ namespace __Generated
 
 	std::unordered_map<std::string, void (*)(void*, const std::vector<EditorTypePropertyBase*>&, int&)> stringToInitialiseExistingObjectFunction
 	{
+		{"SkillTreeMenuSkillSlotData", &SkillTreeMenuSkillSlotData::_InitFromPropertiesSubset},
+		{"MainMenuButtonData", &MainMenuButtonData::_InitFromPropertiesSubset},
 		{"MenuScreenClassSelectEntry", &MenuScreenClassSelectEntry::_InitFromPropertiesSubset},
 		{"MenuScreenBase", &MenuScreenBase::_InitFromPropertiesSubset},
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::_InitFromPropertiesSubset},
+		{"IDragAndDroppable", &IDragAndDroppable::_InitFromPropertiesSubset},
 		{"TextRenderCharacterData", &TextRenderCharacterData::_InitFromPropertiesSubset},
 		{"TextboxParams", &TextboxParams::_InitFromPropertiesSubset},
 		{"RPGSkillData", &RPGSkillData::_InitFromPropertiesSubset},
@@ -1532,10 +1681,12 @@ namespace __Generated
 		{"ActionDeciderBase", &ActionDeciderBase::_InitFromPropertiesSubset},
 		{"ActionDeciderAI", &ActionDeciderAI::_InitFromPropertiesSubset},
 		{"WorldGenerator", &WorldGenerator::_InitFromPropertiesSubset},
+		{"MenuScreenSkillTree", &MenuScreenSkillTree::_InitFromPropertiesSubset},
 		{"MenuScreenMain", &MenuScreenMain::_InitFromPropertiesSubset},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_InitFromPropertiesSubset},
 		{"MenuSystem", &MenuSystem::_InitFromPropertiesSubset},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_InitFromPropertiesSubset},
+		{"DragAndDropManager", &DragAndDropManager::_InitFromPropertiesSubset},
 		{"TextRenderSystem", &TextRenderSystem::_InitFromPropertiesSubset},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_InitFromPropertiesSubset},
 		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_InitFromPropertiesSubset},

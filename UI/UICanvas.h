@@ -13,6 +13,12 @@ struct UICanvasInitParams
 	// Size of quad in number of pixels
 	float sizeX = 0.0f, sizeY = 0.0f;
 
+	// Initial spawn position 
+	float posX = 0.0f, posY = 0.0f;
+
+	// Whether to start visible or not
+	bool bStartVisible = true;
+	
 	// render priority (UI/Menu) (see RenderPriorities.h)
 	float renderPriority = RenderPriority::HUD;
 
@@ -44,6 +50,13 @@ public:
 	// Set position of whole canvas
 	void SetPosition(float x, float y);
 
+	// Set whether this is visible
+	void SetVisible(bool bVisible);
+
+	// Get screen space metrics, this is useful if the UI needs to know where it is in screen space as by default all co-ordinates are in vector art space (as defined in the .svg)
+	Vec2f GetScreenSpacePosition() const; // Returns top left of the quad this UICanvas is rendered in.
+	Vec2f GetScreenSpaceScale() const; // Returns the scale you need to apply to get from vector art space to screen space 
+	
 	// Return the primitive directly under the cursor, or nullptr if not set
 	const VectorPrimitiveBase* FindPrimitiveUnderCursor() const;
 	

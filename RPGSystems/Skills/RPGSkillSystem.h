@@ -27,7 +27,7 @@ struct RPGSkillHighlightEntry
 	std::vector<TransientPtr<RendererObject>> pooledHighlightVisuals;
 
 	// This will point to the head of the stack of pooledHighlightVisuals.
-	// Anything less than this will be visible, anything more than this will be visible  
+	// Anything less than this will be visible, anything more than this will be invisible  
 	int pooledHighlightVisualsStackIndex = -1;
 
 	void AddVisual(Vec2i visualsGridPosition, const DirectoryData& directoryData);
@@ -56,6 +56,8 @@ public:
 	bool TryFireSkill(const RPGSkillData* pSkill, EntityId caster, const Vec2i& targetLocation);
 	bool TryFirePlayerAimedSkill(); // This will automatically cancel aiming if successful.
 
+	const std::string& GetSkillIconFileName() const { return skillIconFileName; }
+
 protected:
 
 	void ClearAllAimingVisuals();
@@ -75,6 +77,10 @@ protected:
 	EDITORPROPERTY()
 	const CameraSystem* pCameraSystem = nullptr;
 
+	// File name of the .svg with all skill icons in. This will be in the UI Shared directory 
+	EDITORPROPERTY()
+	std::string skillIconFileName;
+	
 	// Map of skill aim responses to their 
 	EDITORPROPERTY()
 	std::vector<RPGSkillHighlightEntry> skillHighlightVisuals;

@@ -40,7 +40,10 @@ u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 	// Draw children
 	for (VectorPrimitiveBase* child : children)
 	{
-		pBuffer = child->Serialize(pBuffer);
+		if (child->GetVisible())
+		{
+			pBuffer = child->Serialize(pBuffer);
+		}
 	}
 
 	// Pop layer translations

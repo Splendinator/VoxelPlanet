@@ -40,7 +40,7 @@ void MenuSystem::Tick(float deltaTime)
 
 void MenuSystem::UnInit()
 {
-	if (bMenuOpen)
+	if (bMainMenuOpen)
 	{
 		CloseMenu(OnInputActionDelegateParams());
 	}
@@ -84,7 +84,7 @@ void MenuSystem::PushMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenA
 
 void MenuSystem::PopMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset)
 {
-	DOMASSERT(!activeMenuScreens.empty())
+	DOMASSERT(!activeMenuScreens.empty()) // #TEMP: There's a crash here, I think when you hit ESC in the class select screen so disable it there.
 	
 	TInstancedAssetPtr<MenuScreenBase>* pOldScreen = activeMenuScreens.back();
 	if (&pMenuScreenAsset == pOldScreen)
@@ -120,7 +120,7 @@ void MenuSystem::CloseScreen(MenuScreenBase* pMenuScreen)
 
 void MenuSystem::OpenMenu(OnInputActionDelegateParams Params)
 {
-	bMenuOpen = true;
+	bMainMenuOpen = true;
 	
 	if (pInputSystem && pMenuInputContext)
 	{
@@ -132,12 +132,16 @@ void MenuSystem::OpenMenu(OnInputActionDelegateParams Params)
 
 void MenuSystem::CloseMenu(OnInputActionDelegateParams Params)
 {
-	bMenuOpen = false;
-	
-	if (pInputSystem && pMenuInputContext)
-	{
-		pInputSystem->PopInputContext(pMenuInputContext);
-	}
+	PopMenuScreen(*activeMenuScreens.back());
 
-	PopMenuScreen(pBaseMenuScreen);
+	if (bMainMenuOpen && activeMenuScreens.size() == 0)
+	{
+		// Menu system entirely closed
+		bMainMenuOpen = false;
+	
+		if (pInputSystem && pMenuInputContext)
+		{
+			pInputSystem->PopInputContext(pMenuInputContext);
+		}
+	}
 }
