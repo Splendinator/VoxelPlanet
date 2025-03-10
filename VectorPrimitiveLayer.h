@@ -20,9 +20,14 @@ public:
 	bool IsChildOfThis(const VectorPrimitiveBase* pPossibleChild) const override;
 	Box2f GetBoundingBox() const override { return currentBoundingBox; }
 	void AdjustPositionWithinLayer(Vec2f delta) override;
+	VectorPrimitiveBase* DeepCopy() const override;
+	VectorArtSpaceToLayerSpaceTransform GetVectorArtSpaceToLayerSpaceTransform() const override;
 	//~ End VectorPrimitiveBase Interface
 
 	const std::vector<VectorPrimitiveBase*>& GetChildren() const { return children; }
+
+	// You'll want to call RefreshBoundingBox() after finishing adding children
+	void AddChild(VectorPrimitiveBase* pChild) { children.push_back(pChild); }
 	
 	void SetPositionOffset(Vec2f inPositionOffset) { positionOffset = inPositionOffset; }
 
@@ -32,6 +37,11 @@ public:
 
 	// Steal the children from the passed in layer, useful to inject UI icons into existing vector art.
 	void StealChildrenFromLayer(VectorPrimitiveLayer* pOtherLayer);
+
+	// Copy the children from the passed in layer, useful to inject UI icons into existing vector art.
+	void CopyChildrenFromLayer(VectorPrimitiveLayer* pOtherLayer);
+
+	void ClearChildren();
 	
 	// This will refresh the layer's bounding box such that the top-left most child primitive has co-ordinates (0,0).
 	// Certain things like moving a primitive within a layer require the layer's bounding box to be refreshed for it to be accurate

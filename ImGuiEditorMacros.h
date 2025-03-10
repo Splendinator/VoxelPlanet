@@ -6,10 +6,10 @@
 // Goes above classes that the assetManager should know about
 // Has these parameters:
 // Abstract - This class cannot be created in the assetManager as an asset. Useful for classes that just want to be used as base classes like interfaces
-// Instanced/Singleton - This describes how the class will be handled when instantiated in-game.
-//	Instanced - Three pointers to the same asset will create 3 identical objects
-//	Singleton - Three pointers to the same asset will create 1 shared object and all point to it.
-//	If neither Instanced/Singleton are in the macro then it will use the base class / engine default
+// Instanced/Singleton - This describes how the class will be handled when instantiated in-game. 
+//	Instanced - Three pointers to the same asset will create 3 identical objects. *** EDITORPROPERTIES() to Instanced objects need to be deleted by the system using them  ***
+//	Singleton - Three pointers to the same asset will create 1 shared object and all point to it. *** EDITORPROPERTIES() to Singleton objects do not need deleting, the asset manager is in charge of them.  *** 
+//	If neither Instanced/Singleton are in the macro then it will use the engine default of Instanced
 // EditInlineNew - When creating a new property pointer to this class you create it inline instead of linking to an external asset (like with structs)
 #define EDITORCLASS(...)
 

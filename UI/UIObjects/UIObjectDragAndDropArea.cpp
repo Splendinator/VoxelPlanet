@@ -43,12 +43,22 @@ void UIObjectDragAndDropArea::Init(VectorPrimitiveLayer* pRoot)
 	pReplaceThis->SetVisible(false);
 
 	// Set up dragAndDropAreaBoundingBox to a screen space bounding box around the icon.
-	// #TODO: This probably doesn't work with non-uniform VectorArtPrimitiveLayer scaling or if you're not on the root layer.
-	// #TODO: We need a way to recursively go down the layers from the root to get the cumulative translation so we can do Layer Space -> Vector Art Space -> Screen Space
+
+	// 1. Layer space -> Vector art space 
+	VectorArtSpaceToLayerSpaceTransform transform = pRoot->GetVectorArtSpaceToLayerSpaceTransform();
+	dragAndDropAreaBoundingBox = {};
+	dragAndDropAreaBoundingBox.width = iconSize.width;
+	dragAndDropAreaBoundingBox.height = iconSize.height;
+
+	dragAndDropAreaBoundingBox.left += transform.position.x;
+	dragAndDropAreaBoundingBox.top += transform.position.y;
+	dragAndDropAreaBoundingBox.width *= transform.scale.x;
+	dragAndDropAreaBoundingBox.height *= transform.scale.y;
+
+	// 2. Vector art space -> Screen space
 	const Vec2f screenSpacePosition = pParentCanvas->GetScreenSpacePosition();
 	const Vec2f screenSpaceScale = pParentCanvas->GetScreenSpaceScale();
-	dragAndDropAreaBoundingBox = iconSize;
-
+	
 	dragAndDropAreaBoundingBox.left *= screenSpaceScale.x;
 	dragAndDropAreaBoundingBox.top *= screenSpaceScale.y;
 	dragAndDropAreaBoundingBox.width *= screenSpaceScale.x;

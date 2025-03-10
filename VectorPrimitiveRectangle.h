@@ -15,6 +15,7 @@ public:
 	const VectorPrimitiveBase* FindPrimitiveUnderCursor(Vec2i cursorPos) const override;
 	Box2f GetBoundingBox() const override;
 	void AdjustPositionWithinLayer(Vec2f delta) override;
+	VectorPrimitiveBase* DeepCopy() const override;
 	//~ End VectorPrimitiveBase Interface
 	
 	u32 GetWidth() const { return width; }

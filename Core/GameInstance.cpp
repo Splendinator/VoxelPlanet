@@ -69,7 +69,7 @@ void GameInstance::TickImGui(float deltaTime)
 		{
 			if (pGameSystems[i])
 			{
-				std::string name = Game::GetAssetManager().FindNameFromObject(pGameSystems[i]);
+				std::string name = Game::GetAssetManager().FindNameFromSingletonSlow(pGameSystems[i]);
 				ImGui::Checkbox(name.c_str(), &bDrawGameSystemDebug[i].bBool);
 				if (bDrawGameSystemDebug[i].bBool)
 				{

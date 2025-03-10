@@ -34,10 +34,10 @@ void InputSystem::DrawImGui(float deltaTime)
 		{
 			for (int i = 0; i < pActiveInputContexts.size() - 1; ++i)
 			{
-				std::string contextName = Game::GetAssetManager().FindNameFromObject(pActiveInputContexts[i]);
+				std::string contextName = Game::GetAssetManager().FindNameFromSingletonSlow(pActiveInputContexts[i]);
 				ImGui::TextColored(ImGui::Colour::Gray, contextName.c_str()); 
 			}
-			std::string contextName = Game::GetAssetManager().FindNameFromObject(pActiveInputContexts.back());
+			std::string contextName = Game::GetAssetManager().FindNameFromSingletonSlow(pActiveInputContexts.back());
 			ImGui::Text(contextName.c_str()); 
 		
 		}
@@ -59,7 +59,7 @@ void InputSystem::DrawImGui(float deltaTime)
 					drawGreenTimes[i] = 1.0f;	
 				}
 				
-				std::string actionName = Game::GetAssetManager().FindNameFromObject(pAction);
+				std::string actionName = Game::GetAssetManager().FindNameFromSingletonSlow(pAction);
 				ImVec4 colour = (ImGui::Colour::Green * drawGreenTimes[i]) + ImGui::Colour::Red * (1.0f - drawGreenTimes[i]);
 				ImGui::TextColored(colour, actionName.c_str());
 			}

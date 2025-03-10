@@ -3,10 +3,7 @@
 
 #include "VectorPrimitiveLayer.h"
 
-void VectorPrimitiveBase::RefreshParentLayerBoundingBox()
+VectorArtSpaceToLayerSpaceTransform VectorPrimitiveBase::GetVectorArtSpaceToLayerSpaceTransform() const
 {
-	if (pParent)
-	{
-		pParent->RefreshBoundingBox();
-	}
+	return pParent->GetVectorArtSpaceToLayerSpaceTransform();
 }

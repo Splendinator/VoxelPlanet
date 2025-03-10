@@ -23,8 +23,6 @@ void AssetManager::Init()
 	ImportAssets(ImGuiEditorGlobals::editorBaseDirectory);	
 }
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
 void AssetManager::UnInit()
 {
 	for (auto& [key, value] : templateClassTypes)
@@ -47,6 +45,7 @@ void AssetManager::UnInit()
 	
 	for (auto& [key, value] : singletonMap)
 	{
+		// If you crash here it's because something else called delete on a singleton, use the log below to figure out what.
 		DOMLOG_INFO("Deleting singleton:", key->GetName(), key->GetEditorType()->name)
 		
 		auto it = __Generated::stringToDeleteObjectFunction.find(key->GetEditorType()->name);
@@ -59,7 +58,6 @@ void AssetManager::UnInit()
 	
 	assets.clear();
 }
-#pragma optimize("", on)
 
 void AssetManager::AddAsset(std::shared_ptr<EditorAssetBase> pAsset)
 {
@@ -277,7 +275,7 @@ EditorTypeEnum* AssetManager::FindEnumType(const std::string& enumName) const
 	return static_cast<EditorTypeEnum*>(FindType(enumName, templateEnumTypes));
 }
 
-std::string AssetManager::FindNameFromObject(void* pObject)
+std::string AssetManager::FindNameFromSingletonSlow(void* pObject)
 {
 	for (auto it : singletonMap)
 	{

@@ -7,6 +7,12 @@
 
 class VectorPrimitiveLayer;
 
+struct VectorArtSpaceToLayerSpaceTransform
+{
+	Vec2f position = {0.0f, 0.0f};
+	Vec2f scale = {1.0f, 1.0f};
+};
+
 /** VectorPrimitiveBase
 *
 * This class is used to represent a single primitive (circle, square, layer etc.) of a piece of vector art.
@@ -28,6 +34,9 @@ public:
 	// Should returns the 2d bounding box of this shape
 	virtual Box2f GetBoundingBox() const = 0;
 
+	// Deep copy primitive. Remember that newly copied primitive will not have a parent.
+	virtual VectorPrimitiveBase* DeepCopy() const = 0;
+
 	// Children should override this to change their X and Y co-ordinates.
 	// This is just used to adjust primitives within a layer to keep them relative to the top left of the layer's bounding box.
 	// **Do not use this** to move all primitives in a layer. Use VectorPrimitiveLayer::SetPositionOffset()
@@ -43,16 +52,18 @@ public:
 	// Recursively goes through the layers until it finds one with the correct label
 	virtual VectorPrimitiveLayer* FindLayerByLabel(const std::string& label) { return nullptr; }
 	
-	// This is the layer directly above this; this will be nullptr for the root layer in a file.
-	VectorPrimitiveLayer* pParent = nullptr;
-
 	void SetVisible(bool bInVisible) { bVisible = bInVisible; }
 	bool GetVisible() const { return bVisible; }
+
+	// By default all primitives are stored with co-ordinates relative to their layer ("Layer space")
+	// This function will recursively work up the pParent chain to figure out the total transform of all parent layers added together.
+	// i.e it will return your primitive's transform in "Vector art space"
+	virtual VectorArtSpaceToLayerSpaceTransform GetVectorArtSpaceToLayerSpaceTransform() const;
+
+	// This is the layer directly above this; this will be nullptr for the root layer in a file.
+	VectorPrimitiveLayer* pParent = nullptr;
 	
 protected:
 
 	bool bVisible = true;
-	
-	// Child classes will need to call this whenever they change shape/size to keep the layer bounding box accurate
-	void RefreshParentLayerBoundingBox();
 };

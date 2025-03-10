@@ -15,6 +15,7 @@ struct UIObjectDragAndDropSetupParams
 	DragAndDropAreaRegisterParams areaParams = {};
 };
 
+// #TODO: Needs non-essential functionality moving to external systems via delegates 
 class UIObjectDragAndDropArea : public UIObjectIconLoader, public IDragAndDropArea
 {
 

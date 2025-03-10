@@ -53,3 +53,15 @@ void VectorPrimitiveCircle::AdjustPositionWithinLayer(Vec2f delta)
 	x += (i32)delta.x;
 	y += (i32)delta.y;
 }
+
+VectorPrimitiveBase* VectorPrimitiveCircle::DeepCopy() const
+{
+	VectorPrimitiveCircle* pNewCircle = new VectorPrimitiveCircle(*this);
+	pNewCircle->x = x;
+	pNewCircle->y = y;
+	pNewCircle->rad = rad;
+
+	SetupDeepCopiedShape(pNewCircle);
+
+	return pNewCircle;
+}

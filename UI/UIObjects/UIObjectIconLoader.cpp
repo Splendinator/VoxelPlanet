@@ -1,13 +1,13 @@
 ﻿#include "pch.h"
 
-#include "UI/UICanvas.h"
 #include "UIObjectIconLoader.h"
 #include "VectorArt.h"
 
 void UIObjectIconLoader::LoadUIIcon(const std::string& file, const std::string& primitiveName /*= ""*/)
 {
 	std::unique_ptr<VectorArt> pLoadedVectorArt(new VectorArt(file.c_str()));
-	
+
+	TransientPtr<VectorPrimitiveLayer> pReplaceWithThis = nullptr;
 	if (primitiveName.empty())
 	{
 		pReplaceWithThis = pLoadedVectorArt->GetRootLayer();

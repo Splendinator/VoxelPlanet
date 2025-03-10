@@ -10,7 +10,11 @@ EDITORCLASS(Singleton)
 class RPGSkillData : public IDragAndDroppable
 {
 	EDITORBODY()
+
 public:
+
+	~RPGSkillData();
+	
 	bool IsValid() const { return pAimModule && pEffectModule; }
 
 	// Name of the layer of the icon that shows this skill

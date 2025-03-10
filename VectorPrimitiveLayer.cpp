@@ -16,6 +16,8 @@ VectorPrimitiveLayer::~VectorPrimitiveLayer()
 	}
 }
 
+// #TEMP: Optimisation
+#pragma optimize("", off)
 u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 {
 	// Push translation data that recursively effects any objects that are children of this layer
@@ -52,6 +54,7 @@ u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 
 	return pBuffer;
 }
+#pragma optimize("", on)
 
 std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 {
@@ -173,6 +176,36 @@ void VectorPrimitiveLayer::AdjustPositionWithinLayer(Vec2f delta)
 	positionOffset.y += delta.y;
 }
 
+VectorPrimitiveBase* VectorPrimitiveLayer::DeepCopy() const
+{
+	VectorPrimitiveLayer* pReturnedLayer = new VectorPrimitiveLayer();
+
+	pReturnedLayer->opacity = opacity;
+	pReturnedLayer->positionOffset = positionOffset;
+	pReturnedLayer->scale = scale;
+	pReturnedLayer->currentBoundingBox = currentBoundingBox;
+	pReturnedLayer->layerLabel = layerLabel;
+
+	for (VectorPrimitiveBase* pChild : children)
+	{
+		VectorPrimitiveBase* pDeepCopiedPrimitive = pChild->DeepCopy();
+		pDeepCopiedPrimitive->pParent = const_cast<VectorPrimitiveLayer*>(this); // Debatable whether I should use const_cast here.
+		pReturnedLayer->children.push_back(pDeepCopiedPrimitive);
+	}
+
+	return pReturnedLayer;
+}
+
+VectorArtSpaceToLayerSpaceTransform VectorPrimitiveLayer::GetVectorArtSpaceToLayerSpaceTransform() const
+{
+	VectorArtSpaceToLayerSpaceTransform transform = pParent ? pParent->GetVectorArtSpaceToLayerSpaceTransform() : VectorArtSpaceToLayerSpaceTransform();
+
+	transform.position += (positionOffset * transform.scale);
+	transform.scale *= scale;
+
+	return transform;
+}
+
 void VectorPrimitiveLayer::StealChildrenFromLayer(VectorPrimitiveLayer* pOtherLayer)
 {
 	if (pOtherLayer == nullptr)
@@ -180,16 +213,43 @@ void VectorPrimitiveLayer::StealChildrenFromLayer(VectorPrimitiveLayer* pOtherLa
 		return;
 	}
 	
-	for (VectorPrimitiveBase* child : children)
-	{
-		delete child;
-	}
+	ClearChildren();
 
 	children = std::move(pOtherLayer->children);
 	
 	// Steal size of bounding box from other layer, but keep our own position/scale etc.
 	currentBoundingBox.SetWidth(pOtherLayer->currentBoundingBox.GetWidth());
 	currentBoundingBox.SetHeight(pOtherLayer->currentBoundingBox.GetHeight());
+}
+
+void VectorPrimitiveLayer::CopyChildrenFromLayer(VectorPrimitiveLayer* pOtherLayer)
+{
+	if (pOtherLayer == nullptr)
+	{
+		return;
+	}
+	
+	ClearChildren();
+
+	for (VectorPrimitiveBase* pChild : pOtherLayer->children)
+	{
+		VectorPrimitiveBase* pCopiedChild = pChild->DeepCopy();
+		pCopiedChild->pParent = this;
+		children.push_back(pCopiedChild);
+	}
+
+	// Steal size of bounding box from other layer, but keep our own position/scale etc.
+	currentBoundingBox.SetWidth(pOtherLayer->currentBoundingBox.GetWidth());
+	currentBoundingBox.SetHeight(pOtherLayer->currentBoundingBox.GetHeight());
+}
+
+void VectorPrimitiveLayer::ClearChildren()
+{
+	for (VectorPrimitiveBase* child : children)
+	{
+		delete child;
+	}
+	children.clear();
 }
 
 void VectorPrimitiveLayer::RefreshBoundingBox()

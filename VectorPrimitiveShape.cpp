@@ -31,3 +31,10 @@ std::istream& VectorPrimitiveShape::PopulateFromFile(std::istream& stream)
 
 	return stream;
 }
+
+void VectorPrimitiveShape::SetupDeepCopiedShape(VectorPrimitiveShape* pDeepCopy) const
+{
+	pDeepCopy->red = red;
+	pDeepCopy->green = green;
+	pDeepCopy->blue = blue;
+}

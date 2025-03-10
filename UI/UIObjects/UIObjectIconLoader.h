@@ -32,7 +32,6 @@ protected:
 	// This box is used to resize the new vector art to fit
 	Box2f iconSize = {};
 	
-	TransientPtr<VectorPrimitiveLayer> pReplaceWithThis = nullptr; 
 	TransientPtr<VectorPrimitiveLayer> pReplaceThis = nullptr;
 
 	const u32 newIconXPos = 0;

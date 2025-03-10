@@ -30,6 +30,8 @@
 #include "..\Roguelike\ECS\Systems\ECSSystemNameslate.h"
 #include "..\Roguelike\ECS\Systems\ECSSystemPhysics.h"
 #include "..\Roguelike\ECS\Systems\ECSSystemRender.h"
+#include "..\Roguelike\HotbarManager\HotbarManager.h"
+#include "..\Roguelike\HotbarManager\IHotbarItem.h"
 #include "..\Roguelike\ImGuiEditor.h"
 #include "..\Roguelike\Input\InputAction.h"
 #include "..\Roguelike\Input\InputContext.h"
@@ -46,22 +48,77 @@
 #include "..\Roguelike\RPGSystems\Skills\RPGSkillData.h"
 #include "..\Roguelike\RPGSystems\Skills\RPGSkillsShared.h"
 #include "..\Roguelike\RPGSystems\Skills\RPGSkillSystem.h"
-#include "..\Roguelike\TextRenderSystem\TextRenderSystem.h"
 #include "..\Roguelike\UI\DragAndDrop\DragAndDropManager.h"
 #include "..\Roguelike\UI\DragAndDrop\IDragAndDroppable.h"
 #include "..\Roguelike\UI\HUD\HUD.h"
 #include "..\Roguelike\UI\HUD\HUDAnchorPoint.h"
 #include "..\Roguelike\UI\HUD\HUDObjects\HUDObjectBase.h"
 #include "..\Roguelike\UI\HUD\HUDObjects\HUDObjectHealth.h"
+#include "..\Roguelike\UI\HUD\HUDObjects\HUDObjectHotbar.h"
 #include "..\Roguelike\UI\HUD\HUDObjects\HUDObjectXP.h"
 #include "..\Roguelike\UI\Menu\MenuSystem.h"
 #include "..\Roguelike\UI\Menu\Screens\MenuScreenBase.h"
 #include "..\Roguelike\UI\Menu\Screens\MenuScreenClassSelect.h"
 #include "..\Roguelike\UI\Menu\Screens\MenuScreenMain.h"
 #include "..\Roguelike\UI\Menu\Screens\MenuScreenSkillTree.h"
+#include "..\Roguelike\UI\TextRenderSystem\TextRenderSystem.h"
 #include "..\Roguelike\WorldGenerator.h"
 
 #pragma warning( disable : 4189 )
+
+// TextRenderCharacterData
+void TextRenderCharacterData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	TextRenderCharacterData* pTextRenderCharacterData = static_cast<TextRenderCharacterData*>(pObject);
+	pTextRenderCharacterData->fileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pTextRenderCharacterData->character = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+}
+
+void* TextRenderCharacterData::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	TextRenderCharacterData* pTextRenderCharacterData = new TextRenderCharacterData;
+	int propertyIndex = 0;
+	TextRenderCharacterData::_InitFromPropertiesSubset(pTextRenderCharacterData, properties, propertyIndex);
+	return pTextRenderCharacterData;
+}
+
+void* TextRenderCharacterData::_CreateEmptyObject()
+{
+	return new TextRenderCharacterData;
+}
+
+void TextRenderCharacterData::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<TextRenderCharacterData*>(pObject);
+}
+
+// TextboxParams
+void TextboxParams::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	TextboxParams* pTextboxParams = static_cast<TextboxParams*>(pObject);
+	pTextboxParams->text = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pTextboxParams->xPos = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pTextboxParams->yPos = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pTextboxParams->fontSize = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+}
+
+void* TextboxParams::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	TextboxParams* pTextboxParams = new TextboxParams;
+	int propertyIndex = 0;
+	TextboxParams::_InitFromPropertiesSubset(pTextboxParams, properties, propertyIndex);
+	return pTextboxParams;
+}
+
+void* TextboxParams::_CreateEmptyObject()
+{
+	return new TextboxParams;
+}
+
+void TextboxParams::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<TextboxParams*>(pObject);
+}
 
 // SkillTreeMenuSkillSlotData
 void SkillTreeMenuSkillSlotData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
@@ -214,60 +271,6 @@ void* IDragAndDroppable::_CreateEmptyObject()
 void IDragAndDroppable::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<IDragAndDroppable*>(pObject);
-}
-
-// TextRenderCharacterData
-void TextRenderCharacterData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	TextRenderCharacterData* pTextRenderCharacterData = static_cast<TextRenderCharacterData*>(pObject);
-	pTextRenderCharacterData->fileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pTextRenderCharacterData->character = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
-}
-
-void* TextRenderCharacterData::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	TextRenderCharacterData* pTextRenderCharacterData = new TextRenderCharacterData;
-	int propertyIndex = 0;
-	TextRenderCharacterData::_InitFromPropertiesSubset(pTextRenderCharacterData, properties, propertyIndex);
-	return pTextRenderCharacterData;
-}
-
-void* TextRenderCharacterData::_CreateEmptyObject()
-{
-	return new TextRenderCharacterData;
-}
-
-void TextRenderCharacterData::_DeleteObject(void* pObject)
-{
-	delete reinterpret_cast<TextRenderCharacterData*>(pObject);
-}
-
-// TextboxParams
-void TextboxParams::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	TextboxParams* pTextboxParams = static_cast<TextboxParams*>(pObject);
-	pTextboxParams->text = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pTextboxParams->xPos = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
-	pTextboxParams->yPos = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
-	pTextboxParams->fontSize = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
-}
-
-void* TextboxParams::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	TextboxParams* pTextboxParams = new TextboxParams;
-	int propertyIndex = 0;
-	TextboxParams::_InitFromPropertiesSubset(pTextboxParams, properties, propertyIndex);
-	return pTextboxParams;
-}
-
-void* TextboxParams::_CreateEmptyObject()
-{
-	return new TextboxParams;
-}
-
-void TextboxParams::_DeleteObject(void* pObject)
-{
-	delete reinterpret_cast<TextboxParams*>(pObject);
 }
 
 // RPGSkillData
@@ -536,6 +539,55 @@ void* InputActionBase::_CreateEmptyObject()
 void InputActionBase::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<InputActionBase*>(pObject);
+}
+
+// IHotbarItem
+void IHotbarItem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	IHotbarItem* pIHotbarItem = static_cast<IHotbarItem*>(pObject);
+}
+
+void* IHotbarItem::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	IHotbarItem* pIHotbarItem = new IHotbarItem;
+	int propertyIndex = 0;
+	IHotbarItem::_InitFromPropertiesSubset(pIHotbarItem, properties, propertyIndex);
+	return pIHotbarItem;
+}
+
+void* IHotbarItem::_CreateEmptyObject()
+{
+	return new IHotbarItem;
+}
+
+void IHotbarItem::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<IHotbarItem*>(pObject);
+}
+
+// HotbarSlot
+void HotbarSlot::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	HotbarSlot* pHotbarSlot = static_cast<HotbarSlot*>(pObject);
+	pHotbarSlot->pInputAction = static_cast<InputActionBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* HotbarSlot::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	HotbarSlot* pHotbarSlot = new HotbarSlot;
+	int propertyIndex = 0;
+	HotbarSlot::_InitFromPropertiesSubset(pHotbarSlot, properties, propertyIndex);
+	return pHotbarSlot;
+}
+
+void* HotbarSlot::_CreateEmptyObject()
+{
+	return new HotbarSlot;
+}
+
+void HotbarSlot::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<HotbarSlot*>(pObject);
 }
 
 // ECSSystemBase
@@ -829,6 +881,39 @@ void WorldGenerator::_DeleteObject(void* pObject)
 	delete reinterpret_cast<WorldGenerator*>(pObject);
 }
 
+// TextRenderSystem
+void TextRenderSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	TextRenderSystem* pTextRenderSystem = static_cast<TextRenderSystem*>(pObject);
+	GameSystem::_InitFromPropertiesSubset(static_cast<GameSystem*>(pTextRenderSystem), properties, propertyIndex);
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pTextRenderSystem->characterDatas.push_back(*static_cast<TextRenderCharacterData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+		}
+	}
+	pTextRenderSystem->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* TextRenderSystem::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	TextRenderSystem* pTextRenderSystem = new TextRenderSystem;
+	int propertyIndex = 0;
+	TextRenderSystem::_InitFromPropertiesSubset(pTextRenderSystem, properties, propertyIndex);
+	return pTextRenderSystem;
+}
+
+void* TextRenderSystem::_CreateEmptyObject()
+{
+	return new TextRenderSystem;
+}
+
+void TextRenderSystem::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<TextRenderSystem*>(pObject);
+}
+
 // MenuScreenSkillTree
 void MenuScreenSkillTree::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1019,39 +1104,6 @@ void* DragAndDropManager::_CreateEmptyObject()
 void DragAndDropManager::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<DragAndDropManager*>(pObject);
-}
-
-// TextRenderSystem
-void TextRenderSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	TextRenderSystem* pTextRenderSystem = static_cast<TextRenderSystem*>(pObject);
-	GameSystem::_InitFromPropertiesSubset(static_cast<GameSystem*>(pTextRenderSystem), properties, propertyIndex);
-	{
-		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
-		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
-		{
-			pTextRenderSystem->characterDatas.push_back(*static_cast<TextRenderCharacterData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
-		}
-	}
-	pTextRenderSystem->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-}
-
-void* TextRenderSystem::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	TextRenderSystem* pTextRenderSystem = new TextRenderSystem;
-	int propertyIndex = 0;
-	TextRenderSystem::_InitFromPropertiesSubset(pTextRenderSystem, properties, propertyIndex);
-	return pTextRenderSystem;
-}
-
-void* TextRenderSystem::_CreateEmptyObject()
-{
-	return new TextRenderSystem;
-}
-
-void TextRenderSystem::_DeleteObject(void* pObject)
-{
-	delete reinterpret_cast<TextRenderSystem*>(pObject);
 }
 
 // RPGSkillHighlightEntry
@@ -1309,6 +1361,37 @@ void* ImGuiEditor::_CreateEmptyObject()
 void ImGuiEditor::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<ImGuiEditor*>(pObject);
+}
+
+// HotbarManager
+void HotbarManager::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	HotbarManager* pHotbarManager = static_cast<HotbarManager*>(pObject);
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pHotbarManager->hotbarSlots.push_back(*static_cast<HotbarSlot*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+		}
+	}
+}
+
+void* HotbarManager::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	HotbarManager* pHotbarManager = new HotbarManager;
+	int propertyIndex = 0;
+	HotbarManager::_InitFromPropertiesSubset(pHotbarManager, properties, propertyIndex);
+	return pHotbarManager;
+}
+
+void* HotbarManager::_CreateEmptyObject()
+{
+	return new HotbarManager;
+}
+
+void HotbarManager::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<HotbarManager*>(pObject);
 }
 
 // ECSSystemRender
@@ -1804,6 +1887,36 @@ void HUDObjectXP::_DeleteObject(void* pObject)
 	delete reinterpret_cast<HUDObjectXP*>(pObject);
 }
 
+// HUDObjectHotbar
+void HUDObjectHotbar::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	HUDObjectHotbar* pHUDObjectHotbar = static_cast<HUDObjectHotbar*>(pObject);
+	HUDObjectBase::_InitFromPropertiesSubset(static_cast<HUDObjectBase*>(pHUDObjectHotbar), properties, propertyIndex);
+	pHUDObjectHotbar->slotSpawnAreaLayerName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pHUDObjectHotbar->slotLayerName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pHUDObjectHotbar->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pHUDObjectHotbar->pHotbarManager = static_cast<HotbarManager*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pHUDObjectHotbar->pDragAndDropManager = static_cast<DragAndDropManager*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* HUDObjectHotbar::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	HUDObjectHotbar* pHUDObjectHotbar = new HUDObjectHotbar;
+	int propertyIndex = 0;
+	HUDObjectHotbar::_InitFromPropertiesSubset(pHUDObjectHotbar, properties, propertyIndex);
+	return pHUDObjectHotbar;
+}
+
+void* HUDObjectHotbar::_CreateEmptyObject()
+{
+	return new HUDObjectHotbar;
+}
+
+void HUDObjectHotbar::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<HUDObjectHotbar*>(pObject);
+}
+
 // HUDObjectHealth
 void HUDObjectHealth::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1833,14 +1946,14 @@ namespace __Generated
 {
 	std::unordered_map<std::string, void* (*)(const std::vector<EditorTypePropertyBase*>&)> stringToCreateObjectFunction
 	{
+		{"TextRenderCharacterData", &TextRenderCharacterData::_InitFromProperties},
+		{"TextboxParams", &TextboxParams::_InitFromProperties},
 		{"SkillTreeMenuSkillSlotData", &SkillTreeMenuSkillSlotData::_InitFromProperties},
 		{"MainMenuButtonData", &MainMenuButtonData::_InitFromProperties},
 		{"MenuScreenClassSelectEntry", &MenuScreenClassSelectEntry::_InitFromProperties},
 		{"MenuScreenBase", &MenuScreenBase::_InitFromProperties},
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::_InitFromProperties},
 		{"IDragAndDroppable", &IDragAndDroppable::_InitFromProperties},
-		{"TextRenderCharacterData", &TextRenderCharacterData::_InitFromProperties},
-		{"TextboxParams", &TextboxParams::_InitFromProperties},
 		{"RPGSkillData", &RPGSkillData::_InitFromProperties},
 		{"RPGSkillEffectModuleBase", &RPGSkillEffectModuleBase::_InitFromProperties},
 		{"RPGSkillAimModuleBase", &RPGSkillAimModuleBase::_InitFromProperties},
@@ -1851,6 +1964,8 @@ namespace __Generated
 		{"RPGClassData", &RPGClassData::_InitFromProperties},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_InitFromProperties},
 		{"InputActionBase", &InputActionBase::_InitFromProperties},
+		{"IHotbarItem", &IHotbarItem::_InitFromProperties},
+		{"HotbarSlot", &HotbarSlot::_InitFromProperties},
 		{"ECSSystemBase", &ECSSystemBase::_InitFromProperties},
 		{"ECSSystemAction", &ECSSystemAction::_InitFromProperties},
 		{"DirectoryData", &DirectoryData::_InitFromProperties},
@@ -1862,13 +1977,13 @@ namespace __Generated
 		{"ActionDeciderBase", &ActionDeciderBase::_InitFromProperties},
 		{"ActionDeciderAI", &ActionDeciderAI::_InitFromProperties},
 		{"WorldGenerator", &WorldGenerator::_InitFromProperties},
+		{"TextRenderSystem", &TextRenderSystem::_InitFromProperties},
 		{"MenuScreenSkillTree", &MenuScreenSkillTree::_InitFromProperties},
 		{"MenuScreenMain", &MenuScreenMain::_InitFromProperties},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_InitFromProperties},
 		{"MenuSystem", &MenuSystem::_InitFromProperties},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_InitFromProperties},
 		{"DragAndDropManager", &DragAndDropManager::_InitFromProperties},
-		{"TextRenderSystem", &TextRenderSystem::_InitFromProperties},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_InitFromProperties},
 		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_InitFromProperties},
 		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_InitFromProperties},
@@ -1878,6 +1993,7 @@ namespace __Generated
 		{"InputContext", &InputContext::_InitFromProperties},
 		{"InputActionPress", &InputActionPress::_InitFromProperties},
 		{"ImGuiEditor", &ImGuiEditor::_InitFromProperties},
+		{"HotbarManager", &HotbarManager::_InitFromProperties},
 		{"ECSSystemRender", &ECSSystemRender::_InitFromProperties},
 		{"ECSSystemPhysics", &ECSSystemPhysics::_InitFromProperties},
 		{"ECSSystemNameslate", &ECSSystemNameslate::_InitFromProperties},
@@ -1895,19 +2011,20 @@ namespace __Generated
 		{"RPGSystem", &RPGSystem::_InitFromProperties},
 		{"RPGAttributeMaxHealth", &RPGAttributeMaxHealth::_InitFromProperties},
 		{"HUDObjectXP", &HUDObjectXP::_InitFromProperties},
+		{"HUDObjectHotbar", &HUDObjectHotbar::_InitFromProperties},
 		{"HUDObjectHealth", &HUDObjectHealth::_InitFromProperties},
 	};
 
 	std::unordered_map<std::string, void* (*)()> stringToCreateEmptyObjectFunction
 	{
+		{"TextRenderCharacterData", &TextRenderCharacterData::_CreateEmptyObject},
+		{"TextboxParams", &TextboxParams::_CreateEmptyObject},
 		{"SkillTreeMenuSkillSlotData", &SkillTreeMenuSkillSlotData::_CreateEmptyObject},
 		{"MainMenuButtonData", &MainMenuButtonData::_CreateEmptyObject},
 		{"MenuScreenClassSelectEntry", &MenuScreenClassSelectEntry::_CreateEmptyObject},
 		{"MenuScreenBase", &MenuScreenBase::_CreateEmptyObject},
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::_CreateEmptyObject},
 		{"IDragAndDroppable", &IDragAndDroppable::_CreateEmptyObject},
-		{"TextRenderCharacterData", &TextRenderCharacterData::_CreateEmptyObject},
-		{"TextboxParams", &TextboxParams::_CreateEmptyObject},
 		{"RPGSkillData", &RPGSkillData::_CreateEmptyObject},
 		{"RPGSkillEffectModuleBase", &RPGSkillEffectModuleBase::_CreateEmptyObject},
 		{"RPGSkillAimModuleBase", &RPGSkillAimModuleBase::_CreateEmptyObject},
@@ -1918,6 +2035,8 @@ namespace __Generated
 		{"RPGClassData", &RPGClassData::_CreateEmptyObject},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_CreateEmptyObject},
 		{"InputActionBase", &InputActionBase::_CreateEmptyObject},
+		{"IHotbarItem", &IHotbarItem::_CreateEmptyObject},
+		{"HotbarSlot", &HotbarSlot::_CreateEmptyObject},
 		{"ECSSystemBase", &ECSSystemBase::_CreateEmptyObject},
 		{"ECSSystemAction", &ECSSystemAction::_CreateEmptyObject},
 		{"DirectoryData", &DirectoryData::_CreateEmptyObject},
@@ -1929,13 +2048,13 @@ namespace __Generated
 		{"ActionDeciderBase", &ActionDeciderBase::_CreateEmptyObject},
 		{"ActionDeciderAI", &ActionDeciderAI::_CreateEmptyObject},
 		{"WorldGenerator", &WorldGenerator::_CreateEmptyObject},
+		{"TextRenderSystem", &TextRenderSystem::_CreateEmptyObject},
 		{"MenuScreenSkillTree", &MenuScreenSkillTree::_CreateEmptyObject},
 		{"MenuScreenMain", &MenuScreenMain::_CreateEmptyObject},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_CreateEmptyObject},
 		{"MenuSystem", &MenuSystem::_CreateEmptyObject},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_CreateEmptyObject},
 		{"DragAndDropManager", &DragAndDropManager::_CreateEmptyObject},
-		{"TextRenderSystem", &TextRenderSystem::_CreateEmptyObject},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_CreateEmptyObject},
 		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_CreateEmptyObject},
 		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_CreateEmptyObject},
@@ -1945,6 +2064,7 @@ namespace __Generated
 		{"InputContext", &InputContext::_CreateEmptyObject},
 		{"InputActionPress", &InputActionPress::_CreateEmptyObject},
 		{"ImGuiEditor", &ImGuiEditor::_CreateEmptyObject},
+		{"HotbarManager", &HotbarManager::_CreateEmptyObject},
 		{"ECSSystemRender", &ECSSystemRender::_CreateEmptyObject},
 		{"ECSSystemPhysics", &ECSSystemPhysics::_CreateEmptyObject},
 		{"ECSSystemNameslate", &ECSSystemNameslate::_CreateEmptyObject},
@@ -1962,19 +2082,20 @@ namespace __Generated
 		{"RPGSystem", &RPGSystem::_CreateEmptyObject},
 		{"RPGAttributeMaxHealth", &RPGAttributeMaxHealth::_CreateEmptyObject},
 		{"HUDObjectXP", &HUDObjectXP::_CreateEmptyObject},
+		{"HUDObjectHotbar", &HUDObjectHotbar::_CreateEmptyObject},
 		{"HUDObjectHealth", &HUDObjectHealth::_CreateEmptyObject},
 	};
 
 	std::unordered_map<std::string, void (*)(void*, const std::vector<EditorTypePropertyBase*>&, int&)> stringToInitialiseExistingObjectFunction
 	{
+		{"TextRenderCharacterData", &TextRenderCharacterData::_InitFromPropertiesSubset},
+		{"TextboxParams", &TextboxParams::_InitFromPropertiesSubset},
 		{"SkillTreeMenuSkillSlotData", &SkillTreeMenuSkillSlotData::_InitFromPropertiesSubset},
 		{"MainMenuButtonData", &MainMenuButtonData::_InitFromPropertiesSubset},
 		{"MenuScreenClassSelectEntry", &MenuScreenClassSelectEntry::_InitFromPropertiesSubset},
 		{"MenuScreenBase", &MenuScreenBase::_InitFromPropertiesSubset},
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::_InitFromPropertiesSubset},
 		{"IDragAndDroppable", &IDragAndDroppable::_InitFromPropertiesSubset},
-		{"TextRenderCharacterData", &TextRenderCharacterData::_InitFromPropertiesSubset},
-		{"TextboxParams", &TextboxParams::_InitFromPropertiesSubset},
 		{"RPGSkillData", &RPGSkillData::_InitFromPropertiesSubset},
 		{"RPGSkillEffectModuleBase", &RPGSkillEffectModuleBase::_InitFromPropertiesSubset},
 		{"RPGSkillAimModuleBase", &RPGSkillAimModuleBase::_InitFromPropertiesSubset},
@@ -1985,6 +2106,8 @@ namespace __Generated
 		{"RPGClassData", &RPGClassData::_InitFromPropertiesSubset},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_InitFromPropertiesSubset},
 		{"InputActionBase", &InputActionBase::_InitFromPropertiesSubset},
+		{"IHotbarItem", &IHotbarItem::_InitFromPropertiesSubset},
+		{"HotbarSlot", &HotbarSlot::_InitFromPropertiesSubset},
 		{"ECSSystemBase", &ECSSystemBase::_InitFromPropertiesSubset},
 		{"ECSSystemAction", &ECSSystemAction::_InitFromPropertiesSubset},
 		{"DirectoryData", &DirectoryData::_InitFromPropertiesSubset},
@@ -1996,13 +2119,13 @@ namespace __Generated
 		{"ActionDeciderBase", &ActionDeciderBase::_InitFromPropertiesSubset},
 		{"ActionDeciderAI", &ActionDeciderAI::_InitFromPropertiesSubset},
 		{"WorldGenerator", &WorldGenerator::_InitFromPropertiesSubset},
+		{"TextRenderSystem", &TextRenderSystem::_InitFromPropertiesSubset},
 		{"MenuScreenSkillTree", &MenuScreenSkillTree::_InitFromPropertiesSubset},
 		{"MenuScreenMain", &MenuScreenMain::_InitFromPropertiesSubset},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_InitFromPropertiesSubset},
 		{"MenuSystem", &MenuSystem::_InitFromPropertiesSubset},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_InitFromPropertiesSubset},
 		{"DragAndDropManager", &DragAndDropManager::_InitFromPropertiesSubset},
-		{"TextRenderSystem", &TextRenderSystem::_InitFromPropertiesSubset},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_InitFromPropertiesSubset},
 		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_InitFromPropertiesSubset},
 		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_InitFromPropertiesSubset},
@@ -2012,6 +2135,7 @@ namespace __Generated
 		{"InputContext", &InputContext::_InitFromPropertiesSubset},
 		{"InputActionPress", &InputActionPress::_InitFromPropertiesSubset},
 		{"ImGuiEditor", &ImGuiEditor::_InitFromPropertiesSubset},
+		{"HotbarManager", &HotbarManager::_InitFromPropertiesSubset},
 		{"ECSSystemRender", &ECSSystemRender::_InitFromPropertiesSubset},
 		{"ECSSystemPhysics", &ECSSystemPhysics::_InitFromPropertiesSubset},
 		{"ECSSystemNameslate", &ECSSystemNameslate::_InitFromPropertiesSubset},
@@ -2029,18 +2153,19 @@ namespace __Generated
 		{"RPGSystem", &RPGSystem::_InitFromPropertiesSubset},
 		{"RPGAttributeMaxHealth", &RPGAttributeMaxHealth::_InitFromPropertiesSubset},
 		{"HUDObjectXP", &HUDObjectXP::_InitFromPropertiesSubset},
+		{"HUDObjectHotbar", &HUDObjectHotbar::_InitFromPropertiesSubset},
 		{"HUDObjectHealth", &HUDObjectHealth::_InitFromPropertiesSubset},
 	};
 	std::unordered_map<std::string, void (*)(void*)> stringToDeleteObjectFunction
 	{
+		{"TextRenderCharacterData", &TextRenderCharacterData::_DeleteObject},
+		{"TextboxParams", &TextboxParams::_DeleteObject},
 		{"SkillTreeMenuSkillSlotData", &SkillTreeMenuSkillSlotData::_DeleteObject},
 		{"MainMenuButtonData", &MainMenuButtonData::_DeleteObject},
 		{"MenuScreenClassSelectEntry", &MenuScreenClassSelectEntry::_DeleteObject},
 		{"MenuScreenBase", &MenuScreenBase::_DeleteObject},
 		{"HUDObjectSharedInitParams", &HUDObjectSharedInitParams::_DeleteObject},
 		{"IDragAndDroppable", &IDragAndDroppable::_DeleteObject},
-		{"TextRenderCharacterData", &TextRenderCharacterData::_DeleteObject},
-		{"TextboxParams", &TextboxParams::_DeleteObject},
 		{"RPGSkillData", &RPGSkillData::_DeleteObject},
 		{"RPGSkillEffectModuleBase", &RPGSkillEffectModuleBase::_DeleteObject},
 		{"RPGSkillAimModuleBase", &RPGSkillAimModuleBase::_DeleteObject},
@@ -2051,6 +2176,8 @@ namespace __Generated
 		{"RPGClassData", &RPGClassData::_DeleteObject},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_DeleteObject},
 		{"InputActionBase", &InputActionBase::_DeleteObject},
+		{"IHotbarItem", &IHotbarItem::_DeleteObject},
+		{"HotbarSlot", &HotbarSlot::_DeleteObject},
 		{"ECSSystemBase", &ECSSystemBase::_DeleteObject},
 		{"ECSSystemAction", &ECSSystemAction::_DeleteObject},
 		{"DirectoryData", &DirectoryData::_DeleteObject},
@@ -2062,13 +2189,13 @@ namespace __Generated
 		{"ActionDeciderBase", &ActionDeciderBase::_DeleteObject},
 		{"ActionDeciderAI", &ActionDeciderAI::_DeleteObject},
 		{"WorldGenerator", &WorldGenerator::_DeleteObject},
+		{"TextRenderSystem", &TextRenderSystem::_DeleteObject},
 		{"MenuScreenSkillTree", &MenuScreenSkillTree::_DeleteObject},
 		{"MenuScreenMain", &MenuScreenMain::_DeleteObject},
 		{"MenuScreenClassSelect", &MenuScreenClassSelect::_DeleteObject},
 		{"MenuSystem", &MenuSystem::_DeleteObject},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_DeleteObject},
 		{"DragAndDropManager", &DragAndDropManager::_DeleteObject},
-		{"TextRenderSystem", &TextRenderSystem::_DeleteObject},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_DeleteObject},
 		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_DeleteObject},
 		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_DeleteObject},
@@ -2078,6 +2205,7 @@ namespace __Generated
 		{"InputContext", &InputContext::_DeleteObject},
 		{"InputActionPress", &InputActionPress::_DeleteObject},
 		{"ImGuiEditor", &ImGuiEditor::_DeleteObject},
+		{"HotbarManager", &HotbarManager::_DeleteObject},
 		{"ECSSystemRender", &ECSSystemRender::_DeleteObject},
 		{"ECSSystemPhysics", &ECSSystemPhysics::_DeleteObject},
 		{"ECSSystemNameslate", &ECSSystemNameslate::_DeleteObject},
@@ -2095,6 +2223,7 @@ namespace __Generated
 		{"RPGSystem", &RPGSystem::_DeleteObject},
 		{"RPGAttributeMaxHealth", &RPGAttributeMaxHealth::_DeleteObject},
 		{"HUDObjectXP", &HUDObjectXP::_DeleteObject},
+		{"HUDObjectHotbar", &HUDObjectHotbar::_DeleteObject},
 		{"HUDObjectHealth", &HUDObjectHealth::_DeleteObject},
 	};
 }

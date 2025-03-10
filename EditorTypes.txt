@@ -1,3 +1,13 @@
+Struct TextRenderCharacterData
+string fileName ""
+int character 0
+;
+Struct TextboxParams
+string text ""
+float xPos 0
+float yPos 0
+float fontSize 0
+;
 Struct SkillTreeMenuSkillSlotData
 string buttonLayerName ""
 ;
@@ -34,16 +44,6 @@ float screenEdgePadding 0.05
 ;
 Class IDragAndDroppable
 meta Abstract
-;
-Struct TextRenderCharacterData
-string fileName ""
-int character 0
-;
-Struct TextboxParams
-string text ""
-float xPos 0
-float yPos 0
-float fontSize 0
 ;
 Enum ERPGSkillHighlightType
 None 0
@@ -202,6 +202,12 @@ bool bCtrl false
 bool bShift false
 bool bAlt false
 ;
+Class IHotbarItem
+meta Abstract
+;
+Struct HotbarSlot
+class InputActionBase pInputAction nullptr
+;
 Class ECSSystemBase
 meta Abstract
 meta Singleton
@@ -254,6 +260,11 @@ Class WorldGenerator
 Child GameSystem
 class ECS pEcs nullptr
 ;
+Class TextRenderSystem
+Child GameSystem
+vector characterDatas TextRenderCharacterData
+class DirectoryData pDirectoryData nullptr
+;
 Class MenuScreenSkillTree
 Child MenuScreenBase
 vector skillSlotDatas SkillTreeMenuSkillSlotData
@@ -294,11 +305,6 @@ string floatingIconFileName ""
 string iconLoaderLayerName ""
 float floatingIconXOffset 0
 float floatingIconYOffset 0
-class DirectoryData pDirectoryData nullptr
-;
-Class TextRenderSystem
-Child GameSystem
-vector characterDatas TextRenderCharacterData
 class DirectoryData pDirectoryData nullptr
 ;
 Struct RPGSkillHighlightEntry
@@ -343,6 +349,10 @@ Class ImGuiEditor
 Child GameSystem
 class InputSystem pInputSystem nullptr
 class InputContext pEditorInputContext nullptr
+;
+Class HotbarManager
+meta Singleton
+vector hotbarSlots HotbarSlot
 ;
 Class ECSSystemRender
 Child ECSSystemBase
@@ -421,6 +431,14 @@ Child RPGAttributeBase
 Class HUDObjectXP
 Child HUDObjectBase
 class RPGSystem pRpgSystem nullptr
+;
+Class HUDObjectHotbar
+Child HUDObjectBase
+string slotSpawnAreaLayerName ""
+string slotLayerName ""
+class DirectoryData pDirectoryData nullptr
+class HotbarManager pHotbarManager nullptr
+class DragAndDropManager pDragAndDropManager nullptr
 ;
 Class HUDObjectHealth
 Child HUDObjectBase

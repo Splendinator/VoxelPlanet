@@ -2,6 +2,7 @@
 
 namespace FilePath
 {
+	// #TODO: Remove these and make them data driven
 	namespace VectorArt
 	{
 		extern const char* grass;

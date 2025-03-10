@@ -9,6 +9,15 @@
 #include "RPGSystems/Races/RPGRaceData.h"
 
 // RPGAttributeBase
+RPGAttributeBase::~RPGAttributeBase()
+{
+	for (RPGAttributeModifierBase* pModifier : pModifiers)
+	{
+		delete pModifier;
+	}
+	pModifiers.clear();
+}
+
 int RPGAttributeBase::GetAttributeValue(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const
 {
 	if (!CanApplyAttribute(entity, sharedData))

@@ -10,6 +10,9 @@ public:
 	std::istream& PopulateFromFile(std::istream& stream) override;
 	//~ End VectorPrimitiveBase Interface
 
+	// Call by parents when deep copying to get shape data copied over
+	void SetupDeepCopiedShape(VectorPrimitiveShape* pDeepCopy) const;
+	
 	void SetColour(u8 R, u8 G, u8 B) { red = R; green = G; blue = B; }
 	Vec3<u8> GetColour() const { return Vec3<u8>((u8)red, (u8)green, (u8)blue); }
 	

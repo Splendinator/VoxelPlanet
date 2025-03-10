@@ -32,8 +32,9 @@
 #include "DomMath/Vec3.h"
 #include "DomMath/Vec4.h"
 #include "DomMath/Box2.h"
+#include "DomUtils/DomUtils.h"
 #include "DomUtils/Pointers.h"
 #include "DomUtils/Delegate.h"
 #include "Game.h"
-#include "AssetManager/AssetManager.h" // Contains utils for ENUMSTRING() so useful to be here
+#include "AssetManager/AssetManager.h" // Contains ENUMSTRING() so useful to be here
 #include "AssetManager/InstancedAssetPtr.h"

@@ -21,6 +21,9 @@ void EditorWindowFilesystem::Draw()
 	{
 		Game::RestartGame();
 	}
+
+	ImGui::Separator();
+	
 	DrawDirectory(rootDirectory);
 }
 

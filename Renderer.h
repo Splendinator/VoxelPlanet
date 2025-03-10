@@ -1,13 +1,10 @@
 #pragma once
 
-#include "DomMath/Mat4.h"
-#include "DomUtils/DomUtils.h"
-#include "DomUtils/Pointers.h"
-
 class RendererObject;
 class VectorArt;
 
 // #TODO: Cull all the quads not on screen
+// #TODO: We need to render from back to front or transparent shit doesn't show what's behind it
 
 namespace dmgf
 {

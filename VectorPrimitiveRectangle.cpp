@@ -57,3 +57,16 @@ void VectorPrimitiveRectangle::AdjustPositionWithinLayer(Vec2f delta)
 	x += (i32)delta.x;
 	y += (i32)delta.y;
 }
+
+VectorPrimitiveBase* VectorPrimitiveRectangle::DeepCopy() const
+{
+	VectorPrimitiveRectangle* pNewRectangle = new VectorPrimitiveRectangle();
+	pNewRectangle->x = x;
+	pNewRectangle->y = y;
+	pNewRectangle->width = width;
+	pNewRectangle->height = height;
+
+	SetupDeepCopiedShape(pNewRectangle);
+
+	return pNewRectangle;
+}

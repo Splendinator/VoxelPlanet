@@ -29,6 +29,8 @@ protected:
 	virtual void Uninit() {};
 	virtual void Tick(ECS& ecs, EntityId player, float deltaTime) {} // Should populate UIObjects with the player's data
 
+	const std::string& GetOwnFileName() const {return fileName; }
+	
 private:
 	
 	// Anchor points that the UI object uses to attach to the screen

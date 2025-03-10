@@ -8,7 +8,9 @@ class EditorTypeClass;
 class EditorTypeStruct;
 class EditorTypeEnum;
 
-#define ENUMSTRING(enum, value) (sizeof(enum)/*will compile error if misspelled*/, Game::GetAssetManager().GetEnumValueNameFromValue(#enum, (int)value))
+#define ENUMSTRING(enum, value) ((int)enum)/*will compile error if misspelled or non-enum type*/, Game::GetAssetManager().GetEnumValueNameFromValue(#enum, (int)value))
+
+// #TODO: Maybe look into a way to extend _DeleteObject to automatically delete member instanced pointers
 
 /** Asset Manager
  *
@@ -24,7 +26,9 @@ public:
 	void AddAsset(std::shared_ptr<EditorAssetBase> pAsset);
 	void RemoveAsset(std::shared_ptr<EditorAssetBase> pAsset);
 	
-	// Get the type of a specified class, should be the same as the C++ class/struct/enum name
+	// There is one template for each class/struct/enum. They are created with all of the default values set up,
+	// so if someone makes a struct with a member "float health = 2.0f" the template EditorTypeStruct will have a EditorTypePropertyFloat with value 2.0f.
+	// They are deep copied when you create a new asset of a given type such that the asset spawns with all the correct default values.
 	EditorTypeBase* FindTemplateType(const std::string& typeName) const; // Finds *all* types (struct/class/enum)
 	EditorTypeClass* FindClassTemplateType(const std::string& typeName) const;
 	std::vector<std::string> GetAllClassTemplateNames(bool bIgnoreAbstract) const;
@@ -45,16 +49,16 @@ public:
 	std::string GetEnumValueNameFromValue(const std::string& enumName, int value) const;
 	int GetEnumValueFromValueName(const std::string& enumName, const std::string& valueName) const;
 	EditorTypeEnum* FindEnumType(const std::string& enumName) const;
-	
-	// Get editor name from object if possible, this is slow so just use it for debug.
-	// Right now this can only be done for singleton objects
-	std::string FindNameFromObject(void* pObject);
 
 	// Find the object with a given asset name. (i.e pass in "Health" and the object represented by Health.asset will be returned 
 	template<typename T>
 	T* LoadObjectFromAssetName(const std::string& name);
 	template<typename T>
 	T* LoadObjectFromAsset(EditorAssetBase* pAsset);
+	
+	// Get editor name from object if possible, this is slow so just use it for debug.
+	// Right now this can only be done for singleton objects
+	std::string FindNameFromSingletonSlow(void* pObject);
 	
 private:
 	

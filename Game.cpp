@@ -47,13 +47,6 @@ void GameplayTick(float deltaTime)
 		pGameInstance->TickImGui(deltaTime);
 #endif
 	}
-
-	if (bRestartRequested)
-	{
-		Game::UnInit();
-		Game::Init();
-		bRestartRequested = false;
-	}
 }
 
 #ifdef DOMIMGUI
@@ -89,6 +82,13 @@ void Game::Tick(float deltaTime)
 #endif //~ #ifdef DOMIMGUI
 	
 	GameplayTick(deltaTime);
+
+	if (bRestartRequested)
+	{
+		UnInit();
+		Init();
+		bRestartRequested = false;
+	}
 }
 
 bool Game::CanClose()

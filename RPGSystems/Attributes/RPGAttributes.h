@@ -17,6 +17,8 @@ class RPGAttributeBase
 	EDITORBODY()
 
 public:
+
+	~RPGAttributeBase();
 	
 	virtual void ApplyAttribute(EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const { PUREVIRTUAL() }
 	virtual int GetBaseAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const { PUREVIRTUAL() return 0; }

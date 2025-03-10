@@ -1355,6 +1355,8 @@
     <ClCompile Include="EditorTypePropertyEnum.cpp" />
     <ClCompile Include="FilePaths.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="HotbarManager\HotbarManager.cpp" />
+    <ClCompile Include="HotbarManager\IHotbarItem.cpp" />
     <ClCompile Include="ImGuiEditor.cpp" />
     <ClCompile Include="ImGuiEditorGlobals.cpp" />
     <ClCompile Include="Input\InputAction.cpp" />
@@ -1379,83 +1381,6 @@
     <ClCompile Include="RPGSystems\Skills\EffectModule\RPGSkillEffectModules.cpp" />
     <ClCompile Include="RPGSystems\Skills\RPGSkillData.cpp" />
     <ClCompile Include="RPGSystems\Skills\RPGSkillSystem.cpp" />
-    <ClCompile Include="TextRenderSystem\Textbox.cpp" />
-    <ClCompile Include="TextRenderSystem\TextRenderSystem.cpp">
-      <AssemblerOutput>NoListing</AssemblerOutput>
-      <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
-      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
-      <BrowseInformation>false</BrowseInformation>
-      <BrowseInformationFile>x64\Release\</BrowseInformationFile>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <CompileAs>Default</CompileAs>
-      <ConformanceMode>true</ConformanceMode>
-      <DiagnosticsFormat>Column</DiagnosticsFormat>
-      <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <ErrorReporting>Prompt</ErrorReporting>
-      <ExpandAttributedSource>false</ExpandAttributedSource>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <EnableASAN>false</EnableASAN>
-      <EnableFuzzer>false</EnableFuzzer>
-      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Precise</FloatingPointModel>
-      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
-      <GenerateModuleDependencies>false</GenerateModuleDependencies>
-      <GenerateSourceDependencies>false</GenerateSourceDependencies>
-      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
-      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <LanguageStandard_C>Default</LanguageStandard_C>
-      <MinimalRebuild>false</MinimalRebuild>
-      <ModuleDependenciesFile>x64\Release\</ModuleDependenciesFile>
-      <ModuleOutputFile>x64\Release\</ModuleOutputFile>
-      <OmitDefaultLibName>false</OmitDefaultLibName>
-      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
-      <Optimization>MaxSpeed</Optimization>
-      <ObjectFileName>x64\Release\</ObjectFileName>
-      <CallingConvention>Cdecl</CallingConvention>
-      <ProgramDataBaseFileName>x64\Release\vc143.pdb</ProgramDataBaseFileName>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>x64\Release\Roguelike.pch</PrecompiledHeaderOutputFile>
-      <PreprocessToFile>false</PreprocessToFile>
-      <PreprocessKeepComments>false</PreprocessKeepComments>
-      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
-      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
-      <RuntimeLibrary>MultiThreadedDll</RuntimeLibrary>
-      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
-      <ShowIncludes>false</ShowIncludes>
-      <SourceDependenciesFile>x64\Release\</SourceDependenciesFile>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
-      <SmallerTypeCheck>false</SmallerTypeCheck>
-      <SpectreMitigation>false</SpectreMitigation>
-      <StructMemberAlignment>Default</StructMemberAlignment>
-      <SupportJustMyCode>false</SupportJustMyCode>
-      <TrackerLogDirectory>x64\Release\Roguelike.tlog\</TrackerLogDirectory>
-      <TranslateIncludes>false</TranslateIncludes>
-      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <UseFullPaths>true</UseFullPaths>
-      <WarningLevel>Level4</WarningLevel>
-      <XMLDocumentationFileName>x64\Release\</XMLDocumentationFileName>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <IntelJCCErratum>false</IntelJCCErratum>
-      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
-      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
-      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
-      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
-      <PreprocessorDefinitions>_MBCS;DOMIMGUI;_MBCS;</PreprocessorDefinitions>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Dominic\Desktop\Big Folder of Userfulness\C++\My Headers;C:\VulkanSDK\1.2.198.1\Include</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
-      <LinkCompiled>true</LinkCompiled>
-    </ClCompile>
     <ClCompile Include="UI\DragAndDrop\DragAndDropManager.cpp" />
     <ClCompile Include="UI\DragAndDrop\DragAndDropShared.cpp" />
     <ClCompile Include="UI\DragAndDrop\IDragAndDropArea.cpp" />
@@ -1768,6 +1693,7 @@
       <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="UI\HUD\HUDObjects\HUDObjectHotbar.cpp" />
     <ClCompile Include="UI\HUD\HUDObjects\HUDObjectXP.cpp" />
     <ClCompile Include="UI\Menu\MenuSystem.cpp" />
     <ClCompile Include="UI\Menu\Screens\MenuScreenBase.cpp">
@@ -1926,6 +1852,8 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="UI\Menu\Screens\MenuScreenSkillTree.cpp" />
+    <ClCompile Include="UI\TextRenderSystem\Textbox.cpp" />
+    <ClCompile Include="UI\TextRenderSystem\TextRenderSystem.cpp" />
     <ClCompile Include="UI\UICanvas.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
@@ -2160,6 +2088,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="UI\UIObjects\UIObjectDragAndDropArea.cpp" />
+    <ClCompile Include="UI\UIObjects\UIObjectHotbarSlot.cpp" />
     <ClCompile Include="UI\UIObjects\UIObjectIconLoader.cpp" />
     <ClCompile Include="UI\UIObjects\UIObjectProgressBar.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
@@ -2238,6 +2167,7 @@
       <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="UI\UIObjects\UIObjectSubObjectSpawner.cpp" />
     <ClCompile Include="UI\UIUtils.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
@@ -2484,6 +2414,8 @@
     <ClInclude Include="FilePaths.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="EditorTypePropertyBase.h" />
+    <ClInclude Include="HotbarManager\HotbarManager.h" />
+    <ClInclude Include="HotbarManager\IHotbarItem.h" />
     <ClInclude Include="ImGuiEditor.h" />
     <ClInclude Include="ImGuiEditorGlobals.h" />
     <ClInclude Include="ImGuiEditorMacros.h" />
@@ -2508,8 +2440,6 @@
     <ClInclude Include="RPGSystems\Skills\RPGSkillData.h" />
     <ClInclude Include="RPGSystems\Skills\RPGSkillsShared.h" />
     <ClInclude Include="RPGSystems\Skills\RPGSkillSystem.h" />
-    <ClInclude Include="TextRenderSystem\Textbox.h" />
-    <ClInclude Include="TextRenderSystem\TextRenderSystem.h" />
     <ClInclude Include="UI\DragAndDrop\DragAndDropManager.h" />
     <ClInclude Include="UI\DragAndDrop\DragAndDropShared.h" />
     <ClInclude Include="UI\DragAndDrop\IDragAndDropArea.h" />
@@ -2518,20 +2448,25 @@
     <ClInclude Include="UI\HUD\HUDAnchorPoint.h" />
     <ClInclude Include="UI\HUD\HUDObjects\HUDObjectBase.h" />
     <ClInclude Include="UI\HUD\HUDObjects\HUDObjectHealth.h" />
+    <ClInclude Include="UI\HUD\HUDObjects\HUDObjectHotbar.h" />
     <ClInclude Include="UI\HUD\HUDObjects\HUDObjectXP.h" />
     <ClInclude Include="UI\Menu\MenuSystem.h" />
     <ClInclude Include="UI\Menu\Screens\MenuScreenBase.h" />
     <ClInclude Include="UI\Menu\Screens\MenuScreenClassSelect.h" />
     <ClInclude Include="UI\Menu\Screens\MenuScreenMain.h" />
     <ClInclude Include="UI\Menu\Screens\MenuScreenSkillTree.h" />
+    <ClInclude Include="UI\TextRenderSystem\Textbox.h" />
+    <ClInclude Include="UI\TextRenderSystem\TextRenderSystem.h" />
     <ClInclude Include="UI\UICanvas.h" />
     <ClInclude Include="UI\UIObjects\UIObjectBase.h" />
     <ClInclude Include="UI\UIObjects\UIObjectButton.h" />
     <ClInclude Include="UI\UIObjects\UIObjectButtonWithIcon.h" />
     <ClInclude Include="UI\UIObjects\UIObjectContainer.h" />
     <ClInclude Include="UI\UIObjects\UIObjectDragAndDropArea.h" />
+    <ClInclude Include="UI\UIObjects\UIObjectHotbarSlot.h" />
     <ClInclude Include="UI\UIObjects\UIObjectIconLoader.h" />
     <ClInclude Include="UI\UIObjects\UIObjectProgressBar.h" />
+    <ClInclude Include="UI\UIObjects\UIObjectSubObjectSpawner.h" />
     <ClInclude Include="UI\UIUtils.h" />
     <ClInclude Include="VectorPrimitiveBase.h" />
     <ClInclude Include="VectorPrimitiveCircle.h" />

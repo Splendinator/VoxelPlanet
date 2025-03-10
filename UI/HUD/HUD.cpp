@@ -10,7 +10,7 @@ void HUD::Init()
 	if (pEcs)
 	{
 		hudObjectSharedInitParams.pEcs = pEcs;
-		for(HUDObjectBase* pHudObject : pHudObjects)
+		for (HUDObjectBase* pHudObject : pHudObjects)
 		{
 			if (pHudObject)
 			{
@@ -22,7 +22,7 @@ void HUD::Init()
 
 void HUD::UnInit()
 {
-	for(HUDObjectBase* pHudObject : pHudObjects)
+	for (HUDObjectBase* pHudObject : pHudObjects)
 	{
 		if (pHudObject)
 		{
@@ -35,7 +35,7 @@ void HUD::UnInit()
 
 void HUD::Tick(float deltaTime)
 {
-	for(HUDObjectBase* pHudObject : pHudObjects)
+	for (HUDObjectBase* pHudObject : pHudObjects)
 	{
 		if (pHudObject)
 		{
