@@ -16,8 +16,6 @@ VectorPrimitiveLayer::~VectorPrimitiveLayer()
 	}
 }
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
 u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 {
 	// Push translation data that recursively effects any objects that are children of this layer
@@ -54,7 +52,6 @@ u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 
 	return pBuffer;
 }
-#pragma optimize("", on)
 
 std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 {

@@ -51,13 +51,6 @@ Valid 1
 Invalid 2
 AffectedArea 3
 ;
-Class RPGSkillData
-Child IDragAndDroppable
-meta Singleton
-string iconLayerName ""
-class RPGSkillAimModuleBase pAimModule nullptr
-class RPGSkillEffectModuleBase pEffectModule nullptr
-;
 Class RPGSkillEffectModuleBase
 meta Abstract
 meta EditInlineNew
@@ -78,13 +71,6 @@ int maxHealth 100
 Class RPGClassSpecialisationData
 meta Singleton
 string displayName ""
-;
-Class RPGClassData
-meta Singleton
-string displayName ""
-string vectorArtFileName ""
-vector specialisations RPGClassSpecialisationData
-vector classSkills RPGSkillData
 ;
 Class RPGAttributeModifierBase
 meta Abstract
@@ -202,6 +188,10 @@ bool bCtrl false
 bool bShift false
 bool bAlt false
 ;
+Class StatefulHotbarActionBase
+meta Abstract
+meta Instanced
+;
 Class IHotbarItem
 meta Abstract
 ;
@@ -311,6 +301,14 @@ Struct RPGSkillHighlightEntry
 enum ERPGSkillHighlightType highlight Valid
 string fileName ""
 ;
+Class RPGSkillData
+Child IDragAndDroppable
+Child IHotbarItem
+meta Singleton
+string iconLayerName ""
+class RPGSkillAimModuleBase pAimModule nullptr
+class RPGSkillEffectModuleBase pEffectModule nullptr
+;
 Class RPGSkillEffectModuleTemp
 Child RPGSkillEffectModuleBase
 int damage 0
@@ -326,6 +324,13 @@ string displayName ""
 struct RPGRaceInitialAttributeValues initialAttributes
 struct RPGRacePerLevelAttributeValues perLevelAttributes
 string vectorArtFileName ""
+;
+Class RPGClassData
+meta Singleton
+string displayName ""
+string vectorArtFileName ""
+vector specialisations RPGClassSpecialisationData
+vector classSkills RPGSkillData
 ;
 Class RPGAttributeBase
 meta Abstract
@@ -350,7 +355,17 @@ Child GameSystem
 class InputSystem pInputSystem nullptr
 class InputContext pEditorInputContext nullptr
 ;
+Class StatefulHotbarActionCastSkill
+Child StatefulHotbarActionBase
+class RPGSkillSystem pSkillSystem nullptr
+class InputSystem pInputSystem nullptr
+class InputContext pAimingSkillInputContext nullptr
+class InputActionBase pConfirmSkillAction nullptr
+class InputActionBase pCancelSkillAction nullptr
+class ActionHandlerSkill pActionHandlerSkill nullptr
+;
 Class HotbarManager
+Child GameSystem
 meta Singleton
 vector hotbarSlots HotbarSlot
 ;
@@ -389,9 +404,8 @@ Child ActionHandlerBase
 ;
 Class ActionDeciderPlayer
 Child ActionDeciderBase
-class RPGSkillSystem pSkillSystem nullptr
+class HotbarManager pHotbarManager nullptr
 class ActionHandlerWait pWaitAction nullptr
-class ActionHandlerSkill pSkillAction nullptr
 ;
 Class HUDObjectBase
 meta Abstract
@@ -416,6 +430,7 @@ class ECSSystemEntityMap pEcsEntityMap nullptr
 class RPGSystem pRpgSystem nullptr
 class CameraSystem pCameraSystem nullptr
 string skillIconFileName ""
+instancedassetptr StatefulHotbarActionCastSkill pCastSkillHotbarAction nullptr
 vector skillHighlightVisuals RPGSkillHighlightEntry
 ;
 Class RPGSystem

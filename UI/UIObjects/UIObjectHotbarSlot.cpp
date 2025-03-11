@@ -2,34 +2,88 @@
 
 #include "UIObjectHotbarSlot.h"
 
+#include "HotbarManager/IHotbarItem.h"
+#include "UI/DragAndDrop/IDragAndDroppable.h"
+#include "UIObjectDragAndDropArea.h"
+#include "HotbarManager/HotbarManager.h"
+
 void UIObjectHotbarSlot::Init(VectorPrimitiveLayer* pRoot)
 {
-	// #TEMP: Dont make this derrive from thingy just make it a composite thing
+	onDropEventDelegate.Bind(this, &UIObjectHotbarSlot::OnDropEvent);
+	onDragEventDelegate.Bind(this, &UIObjectHotbarSlot::OnDragEvent);
+	onSlotUpdatedDelegate.Bind(this, &UIObjectHotbarSlot::OnHotbarUpdated);
 	
-	VectorPrimitiveLayer* pDragAndDropArea = pRoot->FindLayerByLabel("Icon");
+	pDragAndDropArea = AddUIObject<UIObjectDragAndDropArea>(pRoot, "Icon");
 
-	UIObjectDragAndDropArea::Init(pDragAndDropArea ? pDragAndDropArea : pRoot); // We're only using the "icon" sub-portion of this object as a drag and droppable
-	
-	// #TEMP: Bind to hotbar manager delegates
+	if (pDragAndDropArea)
+	{
+		pDragAndDropArea->SetShouldDraggingClear(true);
+		pDragAndDropArea->onDropEventDelegates.Add(onDropEventDelegate);
+		pDragAndDropArea->onDragEventDelegates.Add(onDragEventDelegate);
+	}
 }
 
 void UIObjectHotbarSlot::Uninit()
 {
-	// #TEMP: Unbind from hotbar manager delegates
-	
-	UIObjectDragAndDropArea::Uninit();
+	pDragAndDropArea.Clear();
+	if (pHotbarManager)
+	{
+		pHotbarManager->onHotbarSlotUpdatedDelegates.Remove(onSlotUpdatedDelegate);
+	}
 }
 
-void UIObjectHotbarSlot::RecievedDragEvent(IDragAndDroppable*& pOutDroppable)
+void UIObjectHotbarSlot::Setup(const UIObjectHotbarSlotSetupParams& params)
 {
-	UIObjectDragAndDropArea::RecievedDragEvent(pOutDroppable);
+	if (pDragAndDropArea)
+	{
+		pDragAndDropArea->Setup(params.dragAndDropParams);
+	}
 
-	SetDroppable(nullptr);
+	pHotbarManager = &params.hotbarManager;
+	slotIndex = params.slotIndex;
+
+	pHotbarManager->onHotbarSlotUpdatedDelegates.Add(onSlotUpdatedDelegate);
 }
 
-void UIObjectHotbarSlot::RecievedDropEvent(IDragAndDroppable& droppable)
+void UIObjectHotbarSlot::OnDropEvent(const UIObjectDragAndDropDelegateParams& params)
 {
-	UIObjectDragAndDropArea::RecievedDropEvent(droppable);
+	if (pHotbarManager)
+	{
+		if (IHotbarItem* pHotbarItem = dynamic_cast<IHotbarItem*>(params.pDragAndDroppable))
+		{
+			pHotbarManager->SetHotbarItem(slotIndex, pHotbarItem);	
+		}
+	}
+}
 
-	SetDroppable(&droppable);
+void UIObjectHotbarSlot::OnDragEvent(const UIObjectDragAndDropDelegateParams& params)
+{
+	if (pHotbarManager)
+	{
+		pHotbarManager->ClearHotbarItem(slotIndex);
+	}
+}
+
+void UIObjectHotbarSlot::OnHotbarUpdated(const OnHotbarSlotUpdatedDelegateParams& params)
+{
+	if (pDragAndDropArea)
+	{
+		if (params.slotIndex == slotIndex)
+		{
+			if (params.pCurrentItem == nullptr)
+			{
+				pDragAndDropArea->SetDroppable(nullptr);
+				return;
+			}
+			
+			if (IDragAndDroppable* pDragAndDroppable = dynamic_cast<IDragAndDroppable*>(params.pCurrentItem))
+			{
+				pDragAndDropArea->SetDroppable(pDragAndDroppable);
+			}
+			else
+			{
+				DOMLOG_ERROR("Hotbar items must be IDragAndDroppable to work with the hotbar HUD")
+			}
+		}
+	}
 }

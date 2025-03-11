@@ -10,8 +10,8 @@ namespace dmgf
 {
 	enum class ERenderObjectType
 	{
-		InGame,		// Rendered as an in-game object subject to camera movement
-		UI			// Rendered as a UI object, stuck to the screen
+		InGame,		// Rendered as an in-game object subject to camera movement (affected by model matrix)
+		UI			// Rendered as a UI object, stuck to the screen (ignores model matrix)
 	};
 
 	// Initialise graphics -- Must be called after the window has been initialised.

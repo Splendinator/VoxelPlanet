@@ -12,12 +12,12 @@ void MenuSystem::Init()
 	if (pOpenMenuAction)
 	{
 		OpenMenuDelegate.Bind(this, &MenuSystem::OpenMenu);
-		pOpenMenuAction->OnActionActivated.Add(OpenMenuDelegate);
+		pOpenMenuAction->onActionActivatedDelegates.Add(OpenMenuDelegate);
 	}
 	if (pCloseMenuAction)
 	{
 		CloseMenuDelegate.Bind(this, &MenuSystem::CloseMenu);
-		pCloseMenuAction->OnActionActivated.Add(CloseMenuDelegate);
+		pCloseMenuAction->onActionActivatedDelegates.Add(CloseMenuDelegate);
 	}
 
 	if (pGameStartMenuScreen.IsAssetSet())
@@ -31,7 +31,7 @@ void MenuSystem::Tick(float deltaTime)
 	if (activeMenuScreens.size() > 0)
 	{
 		// Only tick the top level screen
-		TInstancedAssetPtr<MenuScreenBase>* topLevelMenuScreen = activeMenuScreens.back();
+		InstancedAssetPtr<MenuScreenBase>* topLevelMenuScreen = activeMenuScreens.back();
 		DOMASSERT(topLevelMenuScreen->IsLoaded())
 
 		(*topLevelMenuScreen)->BaseTick(deltaTime);
@@ -53,15 +53,15 @@ void MenuSystem::UnInit()
 	
 	if (pOpenMenuAction)
 	{
-		pOpenMenuAction->OnActionActivated.Remove(OpenMenuDelegate);
+		pOpenMenuAction->onActionActivatedDelegates.Remove(OpenMenuDelegate);
 	}
 	if (pCloseMenuAction)
 	{
-		pCloseMenuAction->OnActionActivated.Remove(CloseMenuDelegate);
+		pCloseMenuAction->onActionActivatedDelegates.Remove(CloseMenuDelegate);
 	}
 }
 
-void MenuSystem::PushMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset)
+void MenuSystem::PushMenuScreen(InstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset)
 {
 	DOMASSERT(!pMenuScreenAsset.IsLoaded())
 
@@ -70,7 +70,7 @@ void MenuSystem::PushMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenA
 	{
 		if (activeMenuScreens.size() > 0)
 		{
-			TInstancedAssetPtr<MenuScreenBase>* pOldScreen = activeMenuScreens.back();
+			InstancedAssetPtr<MenuScreenBase>* pOldScreen = activeMenuScreens.back();
 			(*pOldScreen)->BaseUnInit();
 		}
 
@@ -79,11 +79,12 @@ void MenuSystem::PushMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenA
 	}
 }
 
-void MenuSystem::PopMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset)
+void MenuSystem::PopMenuScreen(InstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset)
 {
-	DOMASSERT(!activeMenuScreens.empty()) // #TEMP: There's a crash here, I think when you hit ESC in the class select screen so disable it there.
+	// #TEMP: There's a crash here, I think when you hit ESC in the class select screen so disable it there using inputcontext_frontend maybe
+	DOMASSERT(!activeMenuScreens.empty()) 
 	
-	TInstancedAssetPtr<MenuScreenBase>* pOldScreen = activeMenuScreens.back();
+	InstancedAssetPtr<MenuScreenBase>* pOldScreen = activeMenuScreens.back();
 	if (&pMenuScreenAsset == pOldScreen)
 	{
 		pMenuScreenAsset->BaseUnInit();
@@ -94,7 +95,7 @@ void MenuSystem::PopMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAs
 
 	if (activeMenuScreens.size() > 0)
 	{
-		TInstancedAssetPtr<MenuScreenBase>* pNewScreen = activeMenuScreens.back();
+		InstancedAssetPtr<MenuScreenBase>* pNewScreen = activeMenuScreens.back();
 		if (pNewScreen != pOldScreen)
 		{
 			(*pNewScreen)->BaseInit(this);
@@ -105,7 +106,7 @@ void MenuSystem::PopMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAs
 
 void MenuSystem::CloseScreen(MenuScreenBase* pMenuScreen)
 {
-	for (TInstancedAssetPtr<MenuScreenBase>* pActiveMenuScreen : activeMenuScreens)
+	for (InstancedAssetPtr<MenuScreenBase>* pActiveMenuScreen : activeMenuScreens)
 	{
 		if (pActiveMenuScreen->Get() == pMenuScreen)
 		{
@@ -115,7 +116,7 @@ void MenuSystem::CloseScreen(MenuScreenBase* pMenuScreen)
 	}
 }
 
-void MenuSystem::OpenMenu(OnInputActionDelegateParams Params)
+void MenuSystem::OpenMenu(const OnInputActionDelegateParams& Params)
 {
 	bMainMenuOpen = true;
 	
@@ -127,7 +128,7 @@ void MenuSystem::OpenMenu(OnInputActionDelegateParams Params)
 	PushMenuScreen(pBaseMenuScreen);
 }
 
-void MenuSystem::CloseMenu(OnInputActionDelegateParams Params)
+void MenuSystem::CloseMenu(const OnInputActionDelegateParams& Params)
 {
 	PopMenuScreen(*activeMenuScreens.back());
 

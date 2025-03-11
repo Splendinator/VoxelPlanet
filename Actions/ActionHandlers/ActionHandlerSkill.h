@@ -11,6 +11,9 @@ class ActionHandlerSkill : public ActionHandlerBase
 {
 	EDITORBODY()
 public:
+
+	void Setup(const RPGSkillData* pInSkill, Vec2i inAimLocation);
+	
 	
 	//~ Begin ActionHandlerBase Interface
 	void DoAction(ECS& ecs, EntityId e) override;
@@ -19,6 +22,9 @@ public:
 
 	EDITORPROPERTY()
 	RPGSkillSystem* pSkillSystem = nullptr;
+
+protected:
 	
 	const RPGSkillData* pSkill = nullptr;
+	Vec2i aimLocation;
 };

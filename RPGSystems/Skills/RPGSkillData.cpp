@@ -22,3 +22,11 @@ std::string RPGSkillData::GetDragAndDropIconFile(DirectoryData& directoryData) c
 	}
 	return "";
 }
+
+void RPGSkillData::OnHotbarItemUsed(OnHotbarItemUsedParams& params) const
+{
+	if (RPGSkillSystem* pSkillSystem = Game::GetGameInstance().FindGameSystemSlow<RPGSkillSystem>())
+	{
+		params.pOutStatefulPlayerAction = pSkillSystem->CreateStatefulHotbarActionCastSkillInstanceForSkill(this);
+	}
+}

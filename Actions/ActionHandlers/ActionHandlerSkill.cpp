@@ -4,16 +4,22 @@
 
 #include "RPGSystems/Skills/RPGSkillSystem.h"
 
+void ActionHandlerSkill::Setup(const RPGSkillData* pInSkill, Vec2i inAimLocation)
+{
+	pSkill = pInSkill;
+	aimLocation = inAimLocation;
+}
+
 void ActionHandlerSkill::DoAction(ECS& ecs, EntityId e)
 {
 	if (pSkillSystem)
 	{
-		// #TODO: The handling is done in ActionDeciderPlayer right now and I don't care to move it here
-		//pSkillSystem->TryFireSkill(pSkill)
+		pSkillSystem->TryFireSkill(pSkill, e, aimLocation);
 	}
 }
 
 void ActionHandlerSkill::Reset()
 {
 	pSkill = nullptr;
+	aimLocation = {0,0};
 }

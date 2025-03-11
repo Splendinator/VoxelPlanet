@@ -4,8 +4,8 @@
 
 /** EditorTypePropertyInstancedAssetPtr
 *
-* This class is a instanced asset ptr property (TInstancedAssetPtr<TClass> pAsset)
-* See TInstancedAssetPtr
+* This class is a instanced asset ptr property (InstancedAssetPtr<TClass> pAsset)
+* See InstancedAssetPtr
 */
 class EditorTypePropertyInstancedAssetPtr : public EditorTypePropertyBase
 {

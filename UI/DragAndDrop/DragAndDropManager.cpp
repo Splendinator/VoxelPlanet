@@ -6,7 +6,6 @@
 #include "DomWindow/DomWindow.h"
 #include "IDragAndDropArea.h"
 #include "IDragAndDroppable.h"
-
 #include "UI/UICanvas.h"
 #include "UI/UIObjects/UIObjectIconLoader.h"
 

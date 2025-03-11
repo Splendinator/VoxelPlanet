@@ -5,9 +5,10 @@
 #include "RPGSkillsShared.h"
 
 class CameraSystem;
+class DirectoryData;
 class RPGSkillData;
 class RendererObject;
-class DirectoryData;
+class StatefulHotbarActionCastSkill;
 
 // Map of responses to their player-facing graphics
 EDITORSTRUCT()
@@ -45,18 +46,20 @@ public:
 
 	//~ Begin GameSystem Interface
 	void Init() override;
-	void Tick(float deltaTime) override;
 	void UnInit() override;
+	void Tick(float deltaTime) override;
 	//~ End GameSystem Interface
 
 	void PlayerStartAimingSkill(const RPGSkillData* pSkill);
 	void StopAimingSkill();
+	Vec2i GetPlayerAimLocation() const;
 
 	// Try and fire the skill at location, will return false if the skill can't be fired at the location.
 	bool TryFireSkill(const RPGSkillData* pSkill, EntityId caster, const Vec2i& targetLocation);
-	bool TryFirePlayerAimedSkill(); // This will automatically cancel aiming if successful.
 
 	const std::string& GetSkillIconFileName() const { return skillIconFileName; }
+
+	std::unique_ptr<StatefulHotbarActionCastSkill> CreateStatefulHotbarActionCastSkillInstanceForSkill(const RPGSkillData* pSkill);
 
 protected:
 
@@ -80,6 +83,10 @@ protected:
 	// File name of the .svg with all skill icons in. This will be in the UI Shared directory 
 	EDITORPROPERTY()
 	std::string skillIconFileName;
+
+	// Editor exposed stateful hotbar action to cast a skill. This is here just for convenience of setting up the data in a central place that all skills can access
+	EDITORPROPERTY()
+	InstancedAssetPtr<StatefulHotbarActionCastSkill> pCastSkillHotbarAction;
 	
 	// Map of skill aim responses to their 
 	EDITORPROPERTY()

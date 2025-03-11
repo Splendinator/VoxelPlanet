@@ -50,6 +50,18 @@ void RPGSkillSystem::Init()
 	DOMLOG_ERROR_IF(pEcsEntityMap == nullptr)
 }
 
+void RPGSkillSystem::UnInit()
+{
+	for (RPGSkillHighlightEntry& skillVisualEntry : skillHighlightVisuals)
+	{
+		for (TransientPtr<RendererObject> pooledVisual : skillVisualEntry.pooledHighlightVisuals)
+		{
+			dmgf::RemoveObject(pooledVisual);
+		}
+	}
+}
+
+
 void RPGSkillSystem::Tick(float deltaTime)
 {
 	if (pPlayerCurrentlyAimedSkill && pPlayerCurrentlyAimedSkill->IsValid())
@@ -99,11 +111,6 @@ void RPGSkillSystem::Tick(float deltaTime)
 	}
 }
 
-void RPGSkillSystem::UnInit()
-{
-	
-}
-
 void RPGSkillSystem::PlayerStartAimingSkill(const RPGSkillData* pSkill)
 {
 	pPlayerCurrentlyAimedSkill = pSkill;
@@ -115,21 +122,11 @@ void RPGSkillSystem::StopAimingSkill()
 	ClearAllAimingVisuals();
 }
 
-bool RPGSkillSystem::TryFirePlayerAimedSkill()
+Vec2i RPGSkillSystem::GetPlayerAimLocation() const
 {
-	if (!pCameraSystem || !pEcs)
-	{
-		return false;
-	}
+	DOMLOG_ERROR_IF(pPlayerCurrentlyAimedSkill == nullptr, "Not aiming")
 
-	const bool bSkillFired = TryFireSkill(pPlayerCurrentlyAimedSkill, pEcs->GetPlayerEntityId(), pCameraSystem->GetWorldGridCoordinateUnderMouse());
-
-	if (bSkillFired)
-	{
-		StopAimingSkill();
-	}
-
-	return bSkillFired;
+	return pCameraSystem->GetWorldGridCoordinateUnderMouse();
 }
 
 bool RPGSkillSystem::TryFireSkill(const RPGSkillData* pSkill, EntityId caster, const Vec2i& targetLocation)
@@ -161,4 +158,11 @@ void RPGSkillSystem::ClearAllAimingVisuals()
 	{
 		skillHighlightVisual.ClearVisualsStack();
 	}
+}
+
+std::unique_ptr<StatefulHotbarActionCastSkill> RPGSkillSystem::CreateStatefulHotbarActionCastSkillInstanceForSkill(const RPGSkillData* pSkill)
+{
+	std::unique_ptr<StatefulHotbarActionCastSkill> pHotbarAction = pCastSkillHotbarAction.MakeUnique();
+	pHotbarAction->Setup(pSkill);
+	return pHotbarAction;
 }

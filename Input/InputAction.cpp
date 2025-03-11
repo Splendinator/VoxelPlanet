@@ -20,7 +20,7 @@ void InputActionPress::Tick()
 		if (dmwi::isPressed((dmwi::Button)baseKey))
 		{
 			bActivated = true;
-			OnActionActivated.Invoke(OnInputActionDelegateParams());
+			onActionActivatedDelegates.Invoke({ this });
 		}
 	}
 }

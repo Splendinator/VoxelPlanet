@@ -2,9 +2,9 @@
 
 #include "ActionDeciderBase.h"
 
-class ActionHandlerWait;
 class ActionHandlerSkill;
-class RPGSkillSystem;
+class ActionHandlerWait;
+class HotbarManager;
 
 /** ActionDeciderPlayer
 *
@@ -20,14 +20,11 @@ public:
 	ActionHandlerBase* DecideAction(ECS& ecs, EntityId e) override;
 	//~ End ActionDeciderBase Interface
 
+	// Used to query the hotbar for possible player actions
 	EDITORPROPERTY()
-	RPGSkillSystem* pSkillSystem = nullptr;
+	HotbarManager* pHotbarManager = nullptr;
 
 	// Singleton actions
 	EDITORPROPERTY()
 	ActionHandlerWait* pWaitAction = nullptr;
-	EDITORPROPERTY()
-	ActionHandlerSkill* pSkillAction = nullptr;
-	
-	bool bAimingSkill = false;
 };

@@ -2,9 +2,11 @@
 
 #include "InputKey.h"
 
+class InputActionBase;
+
 struct OnInputActionDelegateParams
 {
-	
+	InputActionBase* pInputAction = nullptr;
 };
 
 // A single action fired when the corresponding input conditions are met.
@@ -19,13 +21,13 @@ public:
 	// Children should override this to change bActivated
 	virtual void Tick() {}
 	
-	bool IsActive() const {return bActivated;}
+	bool IsActive() const { return bActivated; }
 	
 	// Fires when the action should activate
-	DelegateList<OnInputActionDelegateParams> OnActionActivated;
+	DelegateList<const OnInputActionDelegateParams&> onActionActivatedDelegates;
 
 	// Fires when the action deactivates, this will only work for "stateful" input actions like "Hold"
-	DelegateList<OnInputActionDelegateParams> OnActionDeactivated;
+	DelegateList<const OnInputActionDelegateParams&> onActionDeactivatedDelegates;
 
 protected:
 	

@@ -4,6 +4,8 @@
 
 #include "DirectoryData.h"
 #include "HotbarManager/HotbarManager.h"
+#include "UI/DragAndDrop/DragAndDropShared.h"
+#include "UI/UIObjects/UIObjectDragAndDropArea.h"
 #include "UI/UIObjects/UIObjectHotbarSlot.h"
 #include "UI/UIObjects/UIObjectSubObjectSpawner.h"
 
@@ -22,12 +24,16 @@ void HUDObjectHotbar::Init(UICanvas& canvas)
 		
 		spawnedHotbarSlots = pHotbarSlotSpawner->SpawnSubobjectsAs<UIObjectHotbarSlot>(spawnParams);
 
-		UIObjectDragAndDropSetupParams setupParams = {pDirectoryData, pDragAndDropManager};
-		setupParams.areaParams.priority = EDragAndDropAreaPriority::HUD;
+		UIObjectDragAndDropSetupParams dragAndDropParams = {pDirectoryData, pDragAndDropManager};
+		dragAndDropParams.areaParams.priority = EDragAndDropAreaPriority::HUD;
+
+		UIObjectHotbarSlotSetupParams hotbarSlotParams = {dragAndDropParams, *pHotbarManager};
+		hotbarSlotParams.slotIndex = 0;
 		
-		for (TransientPtr<UIObjectHotbarSlot> spawnedHotbarSlot : spawnedHotbarSlots)
+		for (int i = 0; i < spawnedHotbarSlots.size(); ++i)
 		{
-			spawnedHotbarSlot->Setup(setupParams);
+			hotbarSlotParams.slotIndex = i;
+			spawnedHotbarSlots[i]->Setup(hotbarSlotParams);
 		}
 	}
 }

@@ -1,13 +1,14 @@
 ﻿#pragma once
 
 #include "UI/DragAndDrop/IDragAndDroppable.h"
+#include "HotbarManager/IHotbarItem.h"
 
 class RPGSkillEffectModuleBase;
 class RPGSkillAimModuleBase;
 
 // Data asset describing a single spell
 EDITORCLASS(Singleton)
-class RPGSkillData : public IDragAndDroppable
+class RPGSkillData : public IDragAndDroppable, public IHotbarItem
 {
 	EDITORBODY()
 
@@ -33,4 +34,8 @@ protected:
 	std::string GetDragAndDropIconFile(DirectoryData& directoryData) const override;
 	std::string GetOptionalDragAndDropIconLayer() const override { return iconLayerName; }
 	//~ End IDragAndDroppable Interface
+
+	//~ Begin IHotbarItem Interface
+	void OnHotbarItemUsed(OnHotbarItemUsedParams& params) const override;
+	//~ End IHotbarItem Interface
 };

@@ -15,7 +15,7 @@ struct MainMenuButtonData
 	std::string buttonLayerName;
 	
 	EDITORPROPERTY()
-	TInstancedAssetPtr<MenuScreenBase> pMenuScreenToOpen;
+	InstancedAssetPtr<MenuScreenBase> pMenuScreenToOpen;
 
 	TransientPtr<UIObjectButton> pButton = nullptr;
 };

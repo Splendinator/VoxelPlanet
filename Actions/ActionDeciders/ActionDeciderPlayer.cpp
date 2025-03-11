@@ -5,8 +5,7 @@
 #include "Actions/ActionHandlers/ActionHandlerWait.h"
 #include "DomWindow/DomWindow.h"
 #include "ECS/ECS.h"
-#include "RPGSystems/Skills/RPGSkillData.h"
-#include "RPGSystems/Skills/RPGSkillSystem.h"
+#include "HotbarManager/HotbarManager.h"
 
 ActionHandlerBase* ActionDeciderPlayer::DecideAction(ECS& ecs, EntityId e)
 {
@@ -22,30 +21,15 @@ ActionHandlerBase* ActionDeciderPlayer::DecideAction(ECS& ecs, EntityId e)
 
 	// Wait
 	if (dmwi::isPressed(dmwi::Button::NUMPAD5)) { return pWaitAction; }
-	
-	// Cast Spell 
-	if (pSkillSystem)
+
+	// Query hotbar
+	if (pHotbarManager)
 	{
-		if (dmwi::isPressed(dmwi::Button::NUM1))
+		TransientPtr<ActionHandlerBase> pHotbarItemAction = pHotbarManager->GetRequestedPlayerAction();
+		if (pHotbarItemAction)
 		{
-			bAimingSkill = true;
-			pSkillSystem->PlayerStartAimingSkill(Game::GetAssetManager().LoadObjectFromAssetName<RPGSkillData>("RPGSkillData_Temp"));
-		}
-		if (dmwi::isPressed(dmwi::Button::RMB))
-		{
-			bAimingSkill = false;
-			pSkillSystem->StopAimingSkill();
-		}
-		if (dmwi::isPressed(dmwi::Button::LMB))
-		{
-			if (bAimingSkill)
-			{
-				const bool bFired = pSkillSystem->TryFirePlayerAimedSkill();
-				if (bFired)
-				{
-					return pWaitAction;
-				}
-			}
+			pHotbarManager->ClearRequestedPlayerAction();
+			return pHotbarItemAction;
 		}
 	}
 

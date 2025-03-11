@@ -81,9 +81,16 @@ void UIObjectDragAndDropArea::Uninit()
 void UIObjectDragAndDropArea::RecievedDragEvent(IDragAndDroppable*& pOutDroppable)
 {
 	pOutDroppable = pShownDragAndDroppable.Get();
+
+	if (bShouldDraggingClear)
+	{
+		SetDroppable(nullptr);	
+	}
+
+	onDragEventDelegates.Invoke({this, pOutDroppable});
 }
 
 void UIObjectDragAndDropArea::RecievedDropEvent(IDragAndDroppable& droppable)
 {
-	
+	onDropEventDelegates.Invoke({this, &droppable});
 }

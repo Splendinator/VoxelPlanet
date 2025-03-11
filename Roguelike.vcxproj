@@ -1356,13 +1356,13 @@
     <ClCompile Include="FilePaths.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="HotbarManager\HotbarManager.cpp" />
+    <ClCompile Include="HotbarManager\StatefulHotbarActions.cpp" />
     <ClCompile Include="HotbarManager\IHotbarItem.cpp" />
     <ClCompile Include="ImGuiEditor.cpp" />
     <ClCompile Include="ImGuiEditorGlobals.cpp" />
     <ClCompile Include="Input\InputAction.cpp" />
     <ClCompile Include="Input\InputContext.cpp" />
     <ClCompile Include="Input\InputSystem.cpp" />
-    <ClCompile Include="Input\MouseSystem.cpp" />
     <ClCompile Include="JumpGame.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -2415,6 +2415,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="EditorTypePropertyBase.h" />
     <ClInclude Include="HotbarManager\HotbarManager.h" />
+    <ClInclude Include="HotbarManager\StatefulHotbarActions.h" />
     <ClInclude Include="HotbarManager\IHotbarItem.h" />
     <ClInclude Include="ImGuiEditor.h" />
     <ClInclude Include="ImGuiEditorGlobals.h" />
@@ -2423,7 +2424,6 @@
     <ClInclude Include="Input\InputContext.h" />
     <ClInclude Include="Input\InputKey.h" />
     <ClInclude Include="Input\InputSystem.h" />
-    <ClInclude Include="Input\MouseSystem.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Renderer.h" />

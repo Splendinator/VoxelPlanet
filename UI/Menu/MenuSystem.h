@@ -25,8 +25,8 @@ public:
 	//~ End GameSystem Interface
 
 	// Push / Pop a screen
-	void PushMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset);
-	void PopMenuScreen(TInstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset);
+	void PushMenuScreen(InstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset);
+	void PopMenuScreen(InstancedAssetPtr<MenuScreenBase>& pMenuScreenAsset);
 
 	void CloseScreen(MenuScreenBase* pMenuScreen);
 
@@ -51,24 +51,24 @@ private:
 
 	// Base menu screen to open
 	EDITORPROPERTY()
-	TInstancedAssetPtr<MenuScreenBase> pBaseMenuScreen;
+	InstancedAssetPtr<MenuScreenBase> pBaseMenuScreen;
 
 	// Menu screen to open when the game first starts
 	EDITORPROPERTY()
-	TInstancedAssetPtr<MenuScreenBase> pGameStartMenuScreen;
+	InstancedAssetPtr<MenuScreenBase> pGameStartMenuScreen;
 
 	// Size of menus relative to the size of the screen (1.0f = fullscreen) 
 	EDITORPROPERTY()
 	float menuSizeFraction = 1.0f;
 	
-	void OpenMenu(OnInputActionDelegateParams Params);
-	void CloseMenu(OnInputActionDelegateParams Params);
+	void OpenMenu(const OnInputActionDelegateParams& Params);
+	void CloseMenu(const OnInputActionDelegateParams& Params);
 
 	// Stack of active menus screens, only the screen at the top of the stack will be initialised and ticking.
-	std::vector<TInstancedAssetPtr<MenuScreenBase>*> activeMenuScreens;
+	std::vector<InstancedAssetPtr<MenuScreenBase>*> activeMenuScreens;
 	
-	DelegateClass<MenuSystem, OnInputActionDelegateParams> OpenMenuDelegate;
-	DelegateClass<MenuSystem, OnInputActionDelegateParams> CloseMenuDelegate;
+	DelegateClass<MenuSystem, const OnInputActionDelegateParams&> OpenMenuDelegate;
+	DelegateClass<MenuSystem, const OnInputActionDelegateParams&> CloseMenuDelegate;
 
 	bool bMainMenuOpen = false;
 };

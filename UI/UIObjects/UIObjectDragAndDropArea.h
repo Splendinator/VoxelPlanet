@@ -5,6 +5,7 @@
 #include "UI/DragAndDrop/DragAndDropShared.h"
 #include "UI/DragAndDrop/IDragAndDropArea.h"
 
+class UIObjectDragAndDropArea;
 class DirectoryData;
 
 struct UIObjectDragAndDropSetupParams
@@ -15,7 +16,12 @@ struct UIObjectDragAndDropSetupParams
 	DragAndDropAreaRegisterParams areaParams = {};
 };
 
-// #TODO: Needs non-essential functionality moving to external systems via delegates 
+struct UIObjectDragAndDropDelegateParams
+{
+	UIObjectDragAndDropArea* pDragAndDropArea = nullptr;
+	IDragAndDroppable* pDragAndDroppable = nullptr;
+};
+
 class UIObjectDragAndDropArea : public UIObjectIconLoader, public IDragAndDropArea
 {
 
@@ -26,6 +32,11 @@ public:
 	
 	// Fill this slot with the droppable
 	void SetDroppable(IDragAndDroppable* pDroppable);
+	
+	void SetShouldDraggingClear(bool bInShouldDraggingClear) { bShouldDraggingClear = bInShouldDraggingClear; }
+	
+	DelegateList<const UIObjectDragAndDropDelegateParams&> onDragEventDelegates;
+	DelegateList<const UIObjectDragAndDropDelegateParams&> onDropEventDelegates;
 
 protected:
 	//~ Begin UIObjectBase Interface
@@ -41,4 +52,6 @@ protected:
 	TransientPtr<IDragAndDroppable> pShownDragAndDroppable = nullptr;
 	TransientPtr<DirectoryData> pDirectoryData = nullptr;
 	TransientPtr<DragAndDropManager> pDragAndDropManager = nullptr;
+
+	bool bShouldDraggingClear = false; // When you drag the item out of this area should it clear it?
 };

@@ -10,18 +10,18 @@ class EditorAssetBase;
 // It's primary use case is when you want to load an asset on demand, e.g. in the menu you'd load up individual menu screens on the fly when opening the menu.
 // This class is designed to be used with the EDITORPROPERTY() tag. It works similar to UClass in unreal. 
 template<class T>
-class TInstancedAssetPtr
+class InstancedAssetPtr
 {
 public:
 
-	TInstancedAssetPtr() = default;
-	~TInstancedAssetPtr() { if (pInstance) Unload(); }
-	TInstancedAssetPtr(const TInstancedAssetPtr<T>& other)
+	InstancedAssetPtr() = default;
+	~InstancedAssetPtr() { if (pInstance) Unload(); }
+	InstancedAssetPtr(const InstancedAssetPtr<T>& other)
 	{
 		assetName = other.assetName;
 		DOMLOG_ERROR_IF(other.pInstance, "Trying to copy instanced asset pointer with loaded instance, This won't work as instance is deleted in destructor. Try move semantics.")
 	}
-	TInstancedAssetPtr(TInstancedAssetPtr<T>&& other)
+	InstancedAssetPtr(InstancedAssetPtr<T>&& other)
 	{
 		assetName = std::move(other.assetName);
 		pInstance = other.pInstance;
@@ -42,6 +42,9 @@ public:
 	void Load();
 	void Unload();
 
+	// Make a unique ptr using the instanced asset as a template.
+	std::unique_ptr<T> MakeUnique();
+
 	bool IsLoaded() const { return pInstance != nullptr; }
 
 	// This isn't checking the assetName actually resolves to a valid asset 
@@ -55,7 +58,7 @@ private:
 };
 
 template <class T>
-void TInstancedAssetPtr<T>::Load()
+void InstancedAssetPtr<T>::Load()
 {
 	DOMLOG_ERROR_IF(pInstance, "Loading while already loaded?")
 	
@@ -73,10 +76,29 @@ void TInstancedAssetPtr<T>::Load()
 }
 
 template <class T>
-void TInstancedAssetPtr<T>::Unload()
+void InstancedAssetPtr<T>::Unload()
 {
 	DOMLOG_ERROR_IF(pInstance == nullptr, "What the fuck are you trying to unload?")
 
 	delete pInstance;
 	pInstance = nullptr;
+}
+
+template <class T>
+std::unique_ptr<T> InstancedAssetPtr<T>::MakeUnique()
+{
+	std::unique_ptr<T> pUniquePtr;
+
+	if (pInstance == nullptr)
+	{
+		Load();
+	}
+	
+	if (pInstance != nullptr)
+	{
+		pUniquePtr.reset(pInstance);
+		pInstance = nullptr; // We don't own the instance any more
+	}
+
+	return pUniquePtr;
 }
