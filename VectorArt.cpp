@@ -3,19 +3,20 @@
 #include "VectorArt.h"
 
 #include "DomImport/XMLUtils.h"
-#include "VectorPrimitiveFactoryCircle.h"
-#include "VectorPrimitiveFactoryLayer.h"
-#include "VectorPrimitiveFactoryRectangle.h"
 
 #include <fstream>
 #include <string>
 
 VectorArt::VectorArt(const char* pFilePath)
 {
+	if (!std::filesystem::exists(pFilePath))
+	{
+		DOMLOG_ERROR("Cannot find file: ", pFilePath);
+		return;
+	}
+	
 	std::fstream svgFile(pFilePath);
-
-	DOMLOG_ERROR_IF(svgFile.bad(), "Cannot find file: ", pFilePath);
-
+	
 	pRootLayer = std::make_unique<VectorPrimitiveLayer>();
 
 	std::string tag;
@@ -56,7 +57,10 @@ void VectorArt::Serialize(u32* pBuffer)
 	*pBuffer = pageHeight;
 	++pBuffer;
 
-	pRootLayer->Serialize(pBuffer);
+	if (pRootLayer)
+	{
+		pRootLayer->Serialize(pBuffer);
+	}
 }
 
 VectorPrimitiveLayer* VectorArt::FindLayerByLabel(const std::string& label)

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unordered_map>
 #include <map>
+#include <set>
 #include <vector>
 #include <stack>
 #include <filesystem>
@@ -26,6 +27,7 @@
 
 // MY HEADERS
 #include "ImGuiEditorMacros.h"
+#include "DomMath/Constants.h"
 #include "DomMath/Types.h"
 #include "DomLog/DomLog.h"
 #include "DomMath/Vec2.h"

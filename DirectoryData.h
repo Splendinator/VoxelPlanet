@@ -45,4 +45,8 @@ public:
 	// path to skill .svg's
 	EDITORPROPERTY()
 	std::string rpgSkillVisuals;
+
+	// path to world gen tile .svg's
+	EDITORPROPERTY()
+	std::string worldGenerationTiles;
 };

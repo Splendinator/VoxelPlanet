@@ -4,7 +4,6 @@
 
 #include "Actions/ActionDeciders/ActionDeciderPlayer.h"
 #include "RendererObject.h"
-#include "WorldGenerator.h"
 
 void ECS::RegisterSystemCallback(std::unique_ptr<ECSSystemCallbackBase>&& pSystemCallback)
 {
@@ -27,9 +26,6 @@ void ECS::Init()
 		e.components.AddComponent(EComponents::ComponentAction);
 		e.components.AddComponent(EComponents::ComponentFaction);
 		e.components.AddComponent(EComponents::ComponentRigid);
-
-		GetComponent<ComponentTransform>(playerEntity).x = WORLD_START_X;
-		GetComponent<ComponentTransform>(playerEntity).y = WORLD_START_Y;
 		
 		GetComponent<ComponentAction>(playerEntity).pActionDecider = pPlayerActionDecider;
 		GetComponent<ComponentAction>(playerEntity).maxEnergy = 100;

@@ -63,9 +63,117 @@
 #include "..\Roguelike\UI\Menu\Screens\MenuScreenMain.h"
 #include "..\Roguelike\UI\Menu\Screens\MenuScreenSkillTree.h"
 #include "..\Roguelike\UI\TextRenderSystem\TextRenderSystem.h"
-#include "..\Roguelike\WorldGenerator.h"
+#include "..\Roguelike\WorldGeneration\WorldGenerationContinent.h"
+#include "..\Roguelike\WorldGeneration\WorldGenerationLogic.h"
+#include "..\Roguelike\WorldGeneration\WorldGenerationTileDefinition.h"
+#include "..\Roguelike\WorldGeneration\WorldGenerationUtils.h"
+#include "..\Roguelike\WorldGeneration\WorldGenerator.h"
 
 #pragma warning( disable : 4189 )
+
+// BasicNoiseParams
+void BasicNoiseParams::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	BasicNoiseParams* pBasicNoiseParams = static_cast<BasicNoiseParams*>(pObject);
+	pBasicNoiseParams->gridSize = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pBasicNoiseParams->magnitude = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+}
+
+void* BasicNoiseParams::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	BasicNoiseParams* pBasicNoiseParams = new BasicNoiseParams;
+	int propertyIndex = 0;
+	BasicNoiseParams::_InitFromPropertiesSubset(pBasicNoiseParams, properties, propertyIndex);
+	return pBasicNoiseParams;
+}
+
+void* BasicNoiseParams::_CreateEmptyObject()
+{
+	return new BasicNoiseParams;
+}
+
+void BasicNoiseParams::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<BasicNoiseParams*>(pObject);
+}
+
+// WorldGenerationTileDefinition
+void WorldGenerationTileDefinition::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	WorldGenerationTileDefinition* pWorldGenerationTileDefinition = static_cast<WorldGenerationTileDefinition*>(pObject);
+	pWorldGenerationTileDefinition->fileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationTileDefinition->bRigidBody = static_cast<EditorTypePropertyBool*>(properties[propertyIndex++])->GetValue();
+}
+
+void* WorldGenerationTileDefinition::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	WorldGenerationTileDefinition* pWorldGenerationTileDefinition = new WorldGenerationTileDefinition;
+	int propertyIndex = 0;
+	WorldGenerationTileDefinition::_InitFromPropertiesSubset(pWorldGenerationTileDefinition, properties, propertyIndex);
+	return pWorldGenerationTileDefinition;
+}
+
+void* WorldGenerationTileDefinition::_CreateEmptyObject()
+{
+	return new WorldGenerationTileDefinition;
+}
+
+void WorldGenerationTileDefinition::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<WorldGenerationTileDefinition*>(pObject);
+}
+
+// WorldGenerationLogicBase
+void WorldGenerationLogicBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	WorldGenerationLogicBase* pWorldGenerationLogicBase = static_cast<WorldGenerationLogicBase*>(pObject);
+	pWorldGenerationLogicBase->bMutateSeedAfterLogic = static_cast<EditorTypePropertyBool*>(properties[propertyIndex++])->GetValue();
+}
+
+void* WorldGenerationLogicBase::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	WorldGenerationLogicBase* pWorldGenerationLogicBase = new WorldGenerationLogicBase;
+	int propertyIndex = 0;
+	WorldGenerationLogicBase::_InitFromPropertiesSubset(pWorldGenerationLogicBase, properties, propertyIndex);
+	return pWorldGenerationLogicBase;
+}
+
+void* WorldGenerationLogicBase::_CreateEmptyObject()
+{
+	return new WorldGenerationLogicBase;
+}
+
+void WorldGenerationLogicBase::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<WorldGenerationLogicBase*>(pObject);
+}
+
+// WorldGenerationShorelineParams
+void WorldGenerationShorelineParams::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	WorldGenerationShorelineParams* pWorldGenerationShorelineParams = static_cast<WorldGenerationShorelineParams*>(pObject);
+	pWorldGenerationShorelineParams->baseDistanceFromEdge = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationShorelineParams->maxShorelineAngle = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationShorelineParams->pShorelineDistanceDeltaLogic = static_cast<WorldGenerationLogicBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* WorldGenerationShorelineParams::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	WorldGenerationShorelineParams* pWorldGenerationShorelineParams = new WorldGenerationShorelineParams;
+	int propertyIndex = 0;
+	WorldGenerationShorelineParams::_InitFromPropertiesSubset(pWorldGenerationShorelineParams, properties, propertyIndex);
+	return pWorldGenerationShorelineParams;
+}
+
+void* WorldGenerationShorelineParams::_CreateEmptyObject()
+{
+	return new WorldGenerationShorelineParams;
+}
+
+void WorldGenerationShorelineParams::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<WorldGenerationShorelineParams*>(pObject);
+}
 
 // TextRenderCharacterData
 void TextRenderCharacterData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
@@ -607,6 +715,7 @@ void DirectoryData::_InitFromPropertiesSubset(void* pObject, const std::vector<E
 	pDirectoryData->rpgClassVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 	pDirectoryData->rpgRaceVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 	pDirectoryData->rpgSkillVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDirectoryData->worldGenerationTiles = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
 }
 
 void* DirectoryData::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -818,6 +927,7 @@ void WorldGenerator::_InitFromPropertiesSubset(void* pObject, const std::vector<
 	WorldGenerator* pWorldGenerator = static_cast<WorldGenerator*>(pObject);
 	GameSystem::_InitFromPropertiesSubset(static_cast<GameSystem*>(pWorldGenerator), properties, propertyIndex);
 	pWorldGenerator->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pWorldGenerator->pContinent = static_cast<WorldGenerationContinent*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 }
 
 void* WorldGenerator::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -836,6 +946,94 @@ void* WorldGenerator::_CreateEmptyObject()
 void WorldGenerator::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<WorldGenerator*>(pObject);
+}
+
+// WorldGenerationLogicBasicNoise1D
+void WorldGenerationLogicBasicNoise1D::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	WorldGenerationLogicBasicNoise1D* pWorldGenerationLogicBasicNoise1D = static_cast<WorldGenerationLogicBasicNoise1D*>(pObject);
+	WorldGenerationLogicBase::_InitFromPropertiesSubset(static_cast<WorldGenerationLogicBase*>(pWorldGenerationLogicBasicNoise1D), properties, propertyIndex);
+	{
+		BasicNoiseParams* temp = static_cast<BasicNoiseParams*>(static_cast<EditorTypePropertyStruct*>(properties[propertyIndex++])->GetValue());
+		pWorldGenerationLogicBasicNoise1D->params = *temp;
+		delete temp;
+	}
+}
+
+void* WorldGenerationLogicBasicNoise1D::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	WorldGenerationLogicBasicNoise1D* pWorldGenerationLogicBasicNoise1D = new WorldGenerationLogicBasicNoise1D;
+	int propertyIndex = 0;
+	WorldGenerationLogicBasicNoise1D::_InitFromPropertiesSubset(pWorldGenerationLogicBasicNoise1D, properties, propertyIndex);
+	return pWorldGenerationLogicBasicNoise1D;
+}
+
+void* WorldGenerationLogicBasicNoise1D::_CreateEmptyObject()
+{
+	return new WorldGenerationLogicBasicNoise1D;
+}
+
+void WorldGenerationLogicBasicNoise1D::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<WorldGenerationLogicBasicNoise1D*>(pObject);
+}
+
+// WorldGenerationLogicAdd
+void WorldGenerationLogicAdd::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	WorldGenerationLogicAdd* pWorldGenerationLogicAdd = static_cast<WorldGenerationLogicAdd*>(pObject);
+	WorldGenerationLogicBase::_InitFromPropertiesSubset(static_cast<WorldGenerationLogicBase*>(pWorldGenerationLogicAdd), properties, propertyIndex);
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pWorldGenerationLogicAdd->pLogicToAdd.push_back(static_cast<WorldGenerationLogicBase*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
+		}
+	}
+}
+
+void* WorldGenerationLogicAdd::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	WorldGenerationLogicAdd* pWorldGenerationLogicAdd = new WorldGenerationLogicAdd;
+	int propertyIndex = 0;
+	WorldGenerationLogicAdd::_InitFromPropertiesSubset(pWorldGenerationLogicAdd, properties, propertyIndex);
+	return pWorldGenerationLogicAdd;
+}
+
+void* WorldGenerationLogicAdd::_CreateEmptyObject()
+{
+	return new WorldGenerationLogicAdd;
+}
+
+void WorldGenerationLogicAdd::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<WorldGenerationLogicAdd*>(pObject);
+}
+
+// WorldGenerationTileEntry
+void WorldGenerationTileEntry::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	WorldGenerationTileEntry* pWorldGenerationTileEntry = static_cast<WorldGenerationTileEntry*>(pObject);
+	pWorldGenerationTileEntry->type = static_cast<EWorldGenerationTile>(static_cast<EditorTypePropertyEnum*>(properties[propertyIndex++])->GetValue());
+	pWorldGenerationTileEntry->pDefinition = static_cast<WorldGenerationTileDefinition*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* WorldGenerationTileEntry::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	WorldGenerationTileEntry* pWorldGenerationTileEntry = new WorldGenerationTileEntry;
+	int propertyIndex = 0;
+	WorldGenerationTileEntry::_InitFromPropertiesSubset(pWorldGenerationTileEntry, properties, propertyIndex);
+	return pWorldGenerationTileEntry;
+}
+
+void* WorldGenerationTileEntry::_CreateEmptyObject()
+{
+	return new WorldGenerationTileEntry;
+}
+
+void WorldGenerationTileEntry::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<WorldGenerationTileEntry*>(pObject);
 }
 
 // TextRenderSystem
@@ -1738,6 +1936,47 @@ void ActionDeciderPlayer::_DeleteObject(void* pObject)
 	delete reinterpret_cast<ActionDeciderPlayer*>(pObject);
 }
 
+// WorldGenerationContinent
+void WorldGenerationContinent::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	WorldGenerationContinent* pWorldGenerationContinent = static_cast<WorldGenerationContinent*>(pObject);
+	pWorldGenerationContinent->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pWorldGenerationContinent->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pWorldGenerationContinent->continentSize = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationContinent->bRandomSeed = static_cast<EditorTypePropertyBool*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationContinent->debugSeed = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pWorldGenerationContinent->tileData.push_back(*static_cast<WorldGenerationTileEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+		}
+	}
+	{
+		WorldGenerationShorelineParams* temp = static_cast<WorldGenerationShorelineParams*>(static_cast<EditorTypePropertyStruct*>(properties[propertyIndex++])->GetValue());
+		pWorldGenerationContinent->shorelineParams = *temp;
+		delete temp;
+	}
+}
+
+void* WorldGenerationContinent::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	WorldGenerationContinent* pWorldGenerationContinent = new WorldGenerationContinent;
+	int propertyIndex = 0;
+	WorldGenerationContinent::_InitFromPropertiesSubset(pWorldGenerationContinent, properties, propertyIndex);
+	return pWorldGenerationContinent;
+}
+
+void* WorldGenerationContinent::_CreateEmptyObject()
+{
+	return new WorldGenerationContinent;
+}
+
+void WorldGenerationContinent::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<WorldGenerationContinent*>(pObject);
+}
+
 // HUDObjectBase
 void HUDObjectBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -2004,6 +2243,10 @@ namespace __Generated
 {
 	std::unordered_map<std::string, void* (*)(const std::vector<EditorTypePropertyBase*>&)> stringToCreateObjectFunction
 	{
+		{"BasicNoiseParams", &BasicNoiseParams::_InitFromProperties},
+		{"WorldGenerationTileDefinition", &WorldGenerationTileDefinition::_InitFromProperties},
+		{"WorldGenerationLogicBase", &WorldGenerationLogicBase::_InitFromProperties},
+		{"WorldGenerationShorelineParams", &WorldGenerationShorelineParams::_InitFromProperties},
 		{"TextRenderCharacterData", &TextRenderCharacterData::_InitFromProperties},
 		{"TextboxParams", &TextboxParams::_InitFromProperties},
 		{"SkillTreeMenuSkillSlotData", &SkillTreeMenuSkillSlotData::_InitFromProperties},
@@ -2034,6 +2277,9 @@ namespace __Generated
 		{"ActionDeciderBase", &ActionDeciderBase::_InitFromProperties},
 		{"ActionDeciderAI", &ActionDeciderAI::_InitFromProperties},
 		{"WorldGenerator", &WorldGenerator::_InitFromProperties},
+		{"WorldGenerationLogicBasicNoise1D", &WorldGenerationLogicBasicNoise1D::_InitFromProperties},
+		{"WorldGenerationLogicAdd", &WorldGenerationLogicAdd::_InitFromProperties},
+		{"WorldGenerationTileEntry", &WorldGenerationTileEntry::_InitFromProperties},
 		{"TextRenderSystem", &TextRenderSystem::_InitFromProperties},
 		{"MenuScreenSkillTree", &MenuScreenSkillTree::_InitFromProperties},
 		{"MenuScreenMain", &MenuScreenMain::_InitFromProperties},
@@ -2065,6 +2311,7 @@ namespace __Generated
 		{"ActionHandlerSkill", &ActionHandlerSkill::_InitFromProperties},
 		{"ActionHandlerMove", &ActionHandlerMove::_InitFromProperties},
 		{"ActionDeciderPlayer", &ActionDeciderPlayer::_InitFromProperties},
+		{"WorldGenerationContinent", &WorldGenerationContinent::_InitFromProperties},
 		{"HUDObjectBase", &HUDObjectBase::_InitFromProperties},
 		{"HUD", &HUD::_InitFromProperties},
 		{"RPGSkillSystem", &RPGSkillSystem::_InitFromProperties},
@@ -2077,6 +2324,10 @@ namespace __Generated
 
 	std::unordered_map<std::string, void* (*)()> stringToCreateEmptyObjectFunction
 	{
+		{"BasicNoiseParams", &BasicNoiseParams::_CreateEmptyObject},
+		{"WorldGenerationTileDefinition", &WorldGenerationTileDefinition::_CreateEmptyObject},
+		{"WorldGenerationLogicBase", &WorldGenerationLogicBase::_CreateEmptyObject},
+		{"WorldGenerationShorelineParams", &WorldGenerationShorelineParams::_CreateEmptyObject},
 		{"TextRenderCharacterData", &TextRenderCharacterData::_CreateEmptyObject},
 		{"TextboxParams", &TextboxParams::_CreateEmptyObject},
 		{"SkillTreeMenuSkillSlotData", &SkillTreeMenuSkillSlotData::_CreateEmptyObject},
@@ -2107,6 +2358,9 @@ namespace __Generated
 		{"ActionDeciderBase", &ActionDeciderBase::_CreateEmptyObject},
 		{"ActionDeciderAI", &ActionDeciderAI::_CreateEmptyObject},
 		{"WorldGenerator", &WorldGenerator::_CreateEmptyObject},
+		{"WorldGenerationLogicBasicNoise1D", &WorldGenerationLogicBasicNoise1D::_CreateEmptyObject},
+		{"WorldGenerationLogicAdd", &WorldGenerationLogicAdd::_CreateEmptyObject},
+		{"WorldGenerationTileEntry", &WorldGenerationTileEntry::_CreateEmptyObject},
 		{"TextRenderSystem", &TextRenderSystem::_CreateEmptyObject},
 		{"MenuScreenSkillTree", &MenuScreenSkillTree::_CreateEmptyObject},
 		{"MenuScreenMain", &MenuScreenMain::_CreateEmptyObject},
@@ -2138,6 +2392,7 @@ namespace __Generated
 		{"ActionHandlerSkill", &ActionHandlerSkill::_CreateEmptyObject},
 		{"ActionHandlerMove", &ActionHandlerMove::_CreateEmptyObject},
 		{"ActionDeciderPlayer", &ActionDeciderPlayer::_CreateEmptyObject},
+		{"WorldGenerationContinent", &WorldGenerationContinent::_CreateEmptyObject},
 		{"HUDObjectBase", &HUDObjectBase::_CreateEmptyObject},
 		{"HUD", &HUD::_CreateEmptyObject},
 		{"RPGSkillSystem", &RPGSkillSystem::_CreateEmptyObject},
@@ -2150,6 +2405,10 @@ namespace __Generated
 
 	std::unordered_map<std::string, void (*)(void*, const std::vector<EditorTypePropertyBase*>&, int&)> stringToInitialiseExistingObjectFunction
 	{
+		{"BasicNoiseParams", &BasicNoiseParams::_InitFromPropertiesSubset},
+		{"WorldGenerationTileDefinition", &WorldGenerationTileDefinition::_InitFromPropertiesSubset},
+		{"WorldGenerationLogicBase", &WorldGenerationLogicBase::_InitFromPropertiesSubset},
+		{"WorldGenerationShorelineParams", &WorldGenerationShorelineParams::_InitFromPropertiesSubset},
 		{"TextRenderCharacterData", &TextRenderCharacterData::_InitFromPropertiesSubset},
 		{"TextboxParams", &TextboxParams::_InitFromPropertiesSubset},
 		{"SkillTreeMenuSkillSlotData", &SkillTreeMenuSkillSlotData::_InitFromPropertiesSubset},
@@ -2180,6 +2439,9 @@ namespace __Generated
 		{"ActionDeciderBase", &ActionDeciderBase::_InitFromPropertiesSubset},
 		{"ActionDeciderAI", &ActionDeciderAI::_InitFromPropertiesSubset},
 		{"WorldGenerator", &WorldGenerator::_InitFromPropertiesSubset},
+		{"WorldGenerationLogicBasicNoise1D", &WorldGenerationLogicBasicNoise1D::_InitFromPropertiesSubset},
+		{"WorldGenerationLogicAdd", &WorldGenerationLogicAdd::_InitFromPropertiesSubset},
+		{"WorldGenerationTileEntry", &WorldGenerationTileEntry::_InitFromPropertiesSubset},
 		{"TextRenderSystem", &TextRenderSystem::_InitFromPropertiesSubset},
 		{"MenuScreenSkillTree", &MenuScreenSkillTree::_InitFromPropertiesSubset},
 		{"MenuScreenMain", &MenuScreenMain::_InitFromPropertiesSubset},
@@ -2211,6 +2473,7 @@ namespace __Generated
 		{"ActionHandlerSkill", &ActionHandlerSkill::_InitFromPropertiesSubset},
 		{"ActionHandlerMove", &ActionHandlerMove::_InitFromPropertiesSubset},
 		{"ActionDeciderPlayer", &ActionDeciderPlayer::_InitFromPropertiesSubset},
+		{"WorldGenerationContinent", &WorldGenerationContinent::_InitFromPropertiesSubset},
 		{"HUDObjectBase", &HUDObjectBase::_InitFromPropertiesSubset},
 		{"HUD", &HUD::_InitFromPropertiesSubset},
 		{"RPGSkillSystem", &RPGSkillSystem::_InitFromPropertiesSubset},
@@ -2222,6 +2485,10 @@ namespace __Generated
 	};
 	std::unordered_map<std::string, void (*)(void*)> stringToDeleteObjectFunction
 	{
+		{"BasicNoiseParams", &BasicNoiseParams::_DeleteObject},
+		{"WorldGenerationTileDefinition", &WorldGenerationTileDefinition::_DeleteObject},
+		{"WorldGenerationLogicBase", &WorldGenerationLogicBase::_DeleteObject},
+		{"WorldGenerationShorelineParams", &WorldGenerationShorelineParams::_DeleteObject},
 		{"TextRenderCharacterData", &TextRenderCharacterData::_DeleteObject},
 		{"TextboxParams", &TextboxParams::_DeleteObject},
 		{"SkillTreeMenuSkillSlotData", &SkillTreeMenuSkillSlotData::_DeleteObject},
@@ -2252,6 +2519,9 @@ namespace __Generated
 		{"ActionDeciderBase", &ActionDeciderBase::_DeleteObject},
 		{"ActionDeciderAI", &ActionDeciderAI::_DeleteObject},
 		{"WorldGenerator", &WorldGenerator::_DeleteObject},
+		{"WorldGenerationLogicBasicNoise1D", &WorldGenerationLogicBasicNoise1D::_DeleteObject},
+		{"WorldGenerationLogicAdd", &WorldGenerationLogicAdd::_DeleteObject},
+		{"WorldGenerationTileEntry", &WorldGenerationTileEntry::_DeleteObject},
 		{"TextRenderSystem", &TextRenderSystem::_DeleteObject},
 		{"MenuScreenSkillTree", &MenuScreenSkillTree::_DeleteObject},
 		{"MenuScreenMain", &MenuScreenMain::_DeleteObject},
@@ -2283,6 +2553,7 @@ namespace __Generated
 		{"ActionHandlerSkill", &ActionHandlerSkill::_DeleteObject},
 		{"ActionHandlerMove", &ActionHandlerMove::_DeleteObject},
 		{"ActionDeciderPlayer", &ActionDeciderPlayer::_DeleteObject},
+		{"WorldGenerationContinent", &WorldGenerationContinent::_DeleteObject},
 		{"HUDObjectBase", &HUDObjectBase::_DeleteObject},
 		{"HUD", &HUD::_DeleteObject},
 		{"RPGSkillSystem", &RPGSkillSystem::_DeleteObject},

@@ -2,5 +2,5 @@
 
 using EntityId = int;
 
-static constexpr int INVALID_ENTITY_ID = -1;
-static constexpr int NUM_ENTITIES = 4096;
+static constexpr EntityId INVALID_ENTITY_ID = -1;
+static constexpr EntityId NUM_ENTITIES = 16384;

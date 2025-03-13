@@ -1,3 +1,31 @@
+Struct BasicNoiseParams
+float gridSize 1
+float magnitude 1
+;
+Class WorldGenerationTileDefinition
+meta Singleton
+string fileName ""
+bool bRigidBody false
+;
+Class WorldGenerationLogicBase
+meta Abstract
+meta Instanced
+meta EditInlineNew
+bool bMutateSeedAfterLogic false
+;
+Struct WorldGenerationShorelineParams
+float baseDistanceFromEdge 0
+float maxShorelineAngle 1
+class WorldGenerationLogicBase pShorelineDistanceDeltaLogic nullptr
+;
+Enum EWorldGenerationTile
+Water 0
+Grass 1
+Dirt 2
+Sand 3
+Snow 4
+COUNT 5
+;
 Struct TextRenderCharacterData
 string fileName ""
 int character 0
@@ -214,6 +242,7 @@ string sharedUI ""
 string rpgClassVisuals ""
 string rpgRaceVisuals ""
 string rpgSkillVisuals ""
+string worldGenerationTiles ""
 ;
 Class GameSystem
 meta Abstract
@@ -249,6 +278,19 @@ class ActionHandlerWait pWaitAction nullptr
 Class WorldGenerator
 Child GameSystem
 class ECS pEcs nullptr
+class WorldGenerationContinent pContinent nullptr
+;
+Class WorldGenerationLogicBasicNoise1D
+Child WorldGenerationLogicBase
+struct BasicNoiseParams params
+;
+Class WorldGenerationLogicAdd
+Child WorldGenerationLogicBase
+vector pLogicToAdd WorldGenerationLogicBase
+;
+Struct WorldGenerationTileEntry
+enum EWorldGenerationTile type Grass
+class WorldGenerationTileDefinition pDefinition nullptr
 ;
 Class TextRenderSystem
 Child GameSystem
@@ -406,6 +448,16 @@ Class ActionDeciderPlayer
 Child ActionDeciderBase
 class HotbarManager pHotbarManager nullptr
 class ActionHandlerWait pWaitAction nullptr
+;
+Class WorldGenerationContinent
+meta Singleton
+class ECS pEcs nullptr
+class DirectoryData pDirectoryData nullptr
+int continentSize 0
+bool bRandomSeed true
+int debugSeed 0
+vector tileData WorldGenerationTileEntry
+struct WorldGenerationShorelineParams shorelineParams
 ;
 Class HUDObjectBase
 meta Abstract

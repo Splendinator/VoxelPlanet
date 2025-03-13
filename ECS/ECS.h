@@ -30,7 +30,7 @@ EDITORCLASS()
 class ECS : public GameSystem
 {
 	EDITORBODY()
-
+	
 	// #TODO: We need to handle adding new component / removing components calling the appropriate functions like HandleEntityDeletion() and HandleEntityCreation() maybe
 	// #TODO: Right now if we remove the rendering component we won't call ECSSystemRender::OnEntityDeleted() so it'll stick around forever (until the entity is re-used)
 public:
