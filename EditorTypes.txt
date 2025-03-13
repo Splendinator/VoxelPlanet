@@ -13,10 +13,25 @@ meta Instanced
 meta EditInlineNew
 bool bMutateSeedAfterLogic false
 ;
+Struct WorldGenerationTreeParams
+float distanceFromOceanTreesBegin 0
+float distanceFromOceanTreesEnd 0
+float treePercentageAtMinimumDistance 0
+float treePercentageAtMaximumDistance 0
+class WorldGenerationTileDefinition pTreeTileDefinition nullptr
+;
+Struct WorldGenerationSandParams
+float baseDistanceFromOcean 0
+class WorldGenerationLogicBase pSandDistanceFromShoreDeltaLogic nullptr
+;
 Struct WorldGenerationShorelineParams
 float baseDistanceFromEdge 0
 float maxShorelineAngle 1
 class WorldGenerationLogicBase pShorelineDistanceDeltaLogic nullptr
+;
+Enum EWorldGenerationForegroundTile
+None 6
+Tree 7
 ;
 Enum EWorldGenerationTile
 Water 0
@@ -458,6 +473,8 @@ bool bRandomSeed true
 int debugSeed 0
 vector tileData WorldGenerationTileEntry
 struct WorldGenerationShorelineParams shorelineParams
+struct WorldGenerationSandParams sandParams
+struct WorldGenerationTreeParams treeParams
 ;
 Class HUDObjectBase
 meta Abstract

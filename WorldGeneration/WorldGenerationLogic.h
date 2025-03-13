@@ -29,7 +29,7 @@ class WorldGenerationLogicAdd : public WorldGenerationLogicBase
 	EDITORBODY()
 public:
 	//~ Begin WorldGenerationLogicBase Interface
-	float DoLogic(RandSeed& inOutSeed, float inOutX, float inOutY) const override;
+	float DoLogic(RandSeed& inOutSeed, float x, float y) const override;
 	//~ End WorldGenerationLogicBase Interface
 
 protected:
@@ -38,6 +38,7 @@ protected:
 	std::vector<WorldGenerationLogicBase*> pLogicToAdd;
 };
 
+// Basic 1d noise, ignores the y value
 EDITORCLASS()
 class WorldGenerationLogicBasicNoise1D : public WorldGenerationLogicBase
 {
@@ -45,7 +46,7 @@ class WorldGenerationLogicBasicNoise1D : public WorldGenerationLogicBase
 public:
 
 	//~ Begin WorldGenerationLogicBase Interface
-	float DoLogic(RandSeed& inOutSeed, float inOutX, float inOutY) const override;
+	float DoLogic(RandSeed& inOutSeed, float x, float y) const override;
 	//~ End WorldGenerationLogicBase Interface
 
 protected:

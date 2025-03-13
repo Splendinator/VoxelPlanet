@@ -21,6 +21,13 @@ enum class EWorldGenerationTile : u8
 	COUNT
 };
 
+EDITORENUM()
+enum class EWorldGenerationForegroundTile : u8
+{
+	None,
+	Tree
+};
+
 EDITORSTRUCT()
 struct WorldGenerationTileEntry
 {
@@ -52,6 +59,40 @@ struct WorldGenerationShorelineParams
 	WorldGenerationLogicBase* pShorelineDistanceDeltaLogic = nullptr;
 };
 
+EDITORSTRUCT()
+struct WorldGenerationSandParams
+{
+	EDITORBODY()
+
+	// The base number of tiles away from ocean before we generate sand  
+	EDITORPROPERTY()
+	float baseDistanceFromOcean = 0.0f;
+
+	EDITORPROPERTY()
+	WorldGenerationLogicBase* pSandDistanceFromShoreDeltaLogic = nullptr;
+};
+
+EDITORSTRUCT()
+struct WorldGenerationTreeParams
+{
+	EDITORBODY()
+	
+	EDITORPROPERTY()
+	float distanceFromOceanTreesBegin;
+
+	EDITORPROPERTY()
+	float distanceFromOceanTreesEnd;
+
+	EDITORPROPERTY()
+	float treePercentageAtMinimumDistance;
+
+	EDITORPROPERTY()
+	float treePercentageAtMaximumDistance;
+
+	EDITORPROPERTY()
+	WorldGenerationTileDefinition* pTreeTileDefinition;
+};
+
 // See WorldGenerator
 EDITORCLASS(Singleton)
 class WorldGenerationContinent
@@ -70,9 +111,10 @@ public:
 
 protected:
 
-	EntityId CreateTileEntity(EWorldGenerationTile tile, EWorldGenerationLayer layer, Vec2i position) const;
+	EntityId CreateTileEntityInternal(EWorldGenerationTile tile, EWorldGenerationLayer layer, Vec2i position) const;
 
 	EWorldGenerationTile& GetTileRef(Vec2i position) const;
+	int GetTileIndex(Vec2i position) const { return (position.x * continentSize) + position.y; }
 	
 	EDITORPROPERTY()
 	ECS* pEcs = nullptr;
@@ -97,11 +139,22 @@ protected:
 	EDITORPROPERTY()
 	WorldGenerationShorelineParams shorelineParams;
 
+	// Used to generate sand around shoreline
+	EDITORPROPERTY()
+	WorldGenerationSandParams sandParams;
+
+	// Used to generate trees inland
+	EDITORPROPERTY()
+	WorldGenerationTreeParams treeParams;
+
 	// Enum hash map of tile enums to their definitions
 	const WorldGenerationTileDefinition* tileMap[(int)EWorldGenerationTile::COUNT];
 	
 	// 2d array of all tiles [continentWidth, continentHeight]
 	EWorldGenerationTile* pTiles;
+
+	// #JANK: I can't be fucked to data drive trees, it's 11pm right now.
+	EWorldGenerationForegroundTile* pForegroundTiles;
 	
 	RandSeed seed = {};
 

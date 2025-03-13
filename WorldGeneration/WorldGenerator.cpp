@@ -129,7 +129,7 @@ void WorldGenerator::UnInit()
 #ifdef DOMIMGUI
 void WorldGenerator::DrawImGui(float deltaTime)
 {
-	ImGui::Text("Seed: %d", pContinent->GetSeed().seed);
+	ImGui::Text("Seed: %llu", pContinent->GetSeed().seed);
 	
 	ImGui::Text("Click to teleport!");
 	if (CameraSystem* pCameraSystem = Game::GetGameInstance().FindGameSystemSlow<CameraSystem>())

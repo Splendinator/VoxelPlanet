@@ -148,6 +148,61 @@ void WorldGenerationLogicBase::_DeleteObject(void* pObject)
 	delete reinterpret_cast<WorldGenerationLogicBase*>(pObject);
 }
 
+// WorldGenerationTreeParams
+void WorldGenerationTreeParams::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	WorldGenerationTreeParams* pWorldGenerationTreeParams = static_cast<WorldGenerationTreeParams*>(pObject);
+	pWorldGenerationTreeParams->distanceFromOceanTreesBegin = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationTreeParams->distanceFromOceanTreesEnd = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationTreeParams->treePercentageAtMinimumDistance = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationTreeParams->treePercentageAtMaximumDistance = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationTreeParams->pTreeTileDefinition = static_cast<WorldGenerationTileDefinition*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* WorldGenerationTreeParams::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	WorldGenerationTreeParams* pWorldGenerationTreeParams = new WorldGenerationTreeParams;
+	int propertyIndex = 0;
+	WorldGenerationTreeParams::_InitFromPropertiesSubset(pWorldGenerationTreeParams, properties, propertyIndex);
+	return pWorldGenerationTreeParams;
+}
+
+void* WorldGenerationTreeParams::_CreateEmptyObject()
+{
+	return new WorldGenerationTreeParams;
+}
+
+void WorldGenerationTreeParams::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<WorldGenerationTreeParams*>(pObject);
+}
+
+// WorldGenerationSandParams
+void WorldGenerationSandParams::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	WorldGenerationSandParams* pWorldGenerationSandParams = static_cast<WorldGenerationSandParams*>(pObject);
+	pWorldGenerationSandParams->baseDistanceFromOcean = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationSandParams->pSandDistanceFromShoreDeltaLogic = static_cast<WorldGenerationLogicBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* WorldGenerationSandParams::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	WorldGenerationSandParams* pWorldGenerationSandParams = new WorldGenerationSandParams;
+	int propertyIndex = 0;
+	WorldGenerationSandParams::_InitFromPropertiesSubset(pWorldGenerationSandParams, properties, propertyIndex);
+	return pWorldGenerationSandParams;
+}
+
+void* WorldGenerationSandParams::_CreateEmptyObject()
+{
+	return new WorldGenerationSandParams;
+}
+
+void WorldGenerationSandParams::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<WorldGenerationSandParams*>(pObject);
+}
+
 // WorldGenerationShorelineParams
 void WorldGenerationShorelineParams::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1957,6 +2012,16 @@ void WorldGenerationContinent::_InitFromPropertiesSubset(void* pObject, const st
 		pWorldGenerationContinent->shorelineParams = *temp;
 		delete temp;
 	}
+	{
+		WorldGenerationSandParams* temp = static_cast<WorldGenerationSandParams*>(static_cast<EditorTypePropertyStruct*>(properties[propertyIndex++])->GetValue());
+		pWorldGenerationContinent->sandParams = *temp;
+		delete temp;
+	}
+	{
+		WorldGenerationTreeParams* temp = static_cast<WorldGenerationTreeParams*>(static_cast<EditorTypePropertyStruct*>(properties[propertyIndex++])->GetValue());
+		pWorldGenerationContinent->treeParams = *temp;
+		delete temp;
+	}
 }
 
 void* WorldGenerationContinent::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -2246,6 +2311,8 @@ namespace __Generated
 		{"BasicNoiseParams", &BasicNoiseParams::_InitFromProperties},
 		{"WorldGenerationTileDefinition", &WorldGenerationTileDefinition::_InitFromProperties},
 		{"WorldGenerationLogicBase", &WorldGenerationLogicBase::_InitFromProperties},
+		{"WorldGenerationTreeParams", &WorldGenerationTreeParams::_InitFromProperties},
+		{"WorldGenerationSandParams", &WorldGenerationSandParams::_InitFromProperties},
 		{"WorldGenerationShorelineParams", &WorldGenerationShorelineParams::_InitFromProperties},
 		{"TextRenderCharacterData", &TextRenderCharacterData::_InitFromProperties},
 		{"TextboxParams", &TextboxParams::_InitFromProperties},
@@ -2327,6 +2394,8 @@ namespace __Generated
 		{"BasicNoiseParams", &BasicNoiseParams::_CreateEmptyObject},
 		{"WorldGenerationTileDefinition", &WorldGenerationTileDefinition::_CreateEmptyObject},
 		{"WorldGenerationLogicBase", &WorldGenerationLogicBase::_CreateEmptyObject},
+		{"WorldGenerationTreeParams", &WorldGenerationTreeParams::_CreateEmptyObject},
+		{"WorldGenerationSandParams", &WorldGenerationSandParams::_CreateEmptyObject},
 		{"WorldGenerationShorelineParams", &WorldGenerationShorelineParams::_CreateEmptyObject},
 		{"TextRenderCharacterData", &TextRenderCharacterData::_CreateEmptyObject},
 		{"TextboxParams", &TextboxParams::_CreateEmptyObject},
@@ -2408,6 +2477,8 @@ namespace __Generated
 		{"BasicNoiseParams", &BasicNoiseParams::_InitFromPropertiesSubset},
 		{"WorldGenerationTileDefinition", &WorldGenerationTileDefinition::_InitFromPropertiesSubset},
 		{"WorldGenerationLogicBase", &WorldGenerationLogicBase::_InitFromPropertiesSubset},
+		{"WorldGenerationTreeParams", &WorldGenerationTreeParams::_InitFromPropertiesSubset},
+		{"WorldGenerationSandParams", &WorldGenerationSandParams::_InitFromPropertiesSubset},
 		{"WorldGenerationShorelineParams", &WorldGenerationShorelineParams::_InitFromPropertiesSubset},
 		{"TextRenderCharacterData", &TextRenderCharacterData::_InitFromPropertiesSubset},
 		{"TextboxParams", &TextboxParams::_InitFromPropertiesSubset},
@@ -2488,6 +2559,8 @@ namespace __Generated
 		{"BasicNoiseParams", &BasicNoiseParams::_DeleteObject},
 		{"WorldGenerationTileDefinition", &WorldGenerationTileDefinition::_DeleteObject},
 		{"WorldGenerationLogicBase", &WorldGenerationLogicBase::_DeleteObject},
+		{"WorldGenerationTreeParams", &WorldGenerationTreeParams::_DeleteObject},
+		{"WorldGenerationSandParams", &WorldGenerationSandParams::_DeleteObject},
 		{"WorldGenerationShorelineParams", &WorldGenerationShorelineParams::_DeleteObject},
 		{"TextRenderCharacterData", &TextRenderCharacterData::_DeleteObject},
 		{"TextboxParams", &TextboxParams::_DeleteObject},
