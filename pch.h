@@ -21,9 +21,9 @@
 #include <vulkan/vulkan.h>
 
 // WINDOWS
-#define WIN32_LEAN_AND_MEAN  
-#define NOMINMAX
-#include <Windows.h>
+//#define WIN32_LEAN_AND_MEAN  
+//#define NOMINMAX
+//#include <Windows.h>
 
 // MY HEADERS
 #include "ImGuiEditorMacros.h"
@@ -35,8 +35,11 @@
 #include "DomMath/Vec4.h"
 #include "DomMath/Box2.h"
 #include "DomUtils/DomUtils.h"
+#include "DomUtils/HeapAlloc.h"
 #include "DomUtils/Pointers.h"
 #include "DomUtils/Delegate.h"
 #include "Game.h"
 #include "AssetManager/AssetManager.h" // Contains ENUMSTRING() so useful to be here
 #include "AssetManager/InstancedAssetPtr.h"
+
+using namespace dmut;

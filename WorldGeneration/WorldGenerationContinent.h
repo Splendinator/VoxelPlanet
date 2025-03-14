@@ -3,6 +3,8 @@
 #include "WorldGenerationTypes.h"
 #include "WorldGenerationUtils.h"
 
+#include "DomUtils/HeapAlloc.h"
+
 #include "ECS/ECSTypes.h"
 
 class WorldGenerationLogicBase;
@@ -13,19 +15,14 @@ class WorldGenerationTileDefinition;
 EDITORENUM()
 enum class EWorldGenerationTile : u8
 {
+	None,
 	Water,
 	Grass,
 	Dirt,
 	Sand,
 	Snow,
+	Tree,
 	COUNT
-};
-
-EDITORENUM()
-enum class EWorldGenerationForegroundTile : u8
-{
-	None,
-	Tree
 };
 
 EDITORSTRUCT()
@@ -88,9 +85,6 @@ struct WorldGenerationTreeParams
 
 	EDITORPROPERTY()
 	float treePercentageAtMaximumDistance;
-
-	EDITORPROPERTY()
-	WorldGenerationTileDefinition* pTreeTileDefinition;
 };
 
 // See WorldGenerator
@@ -113,8 +107,13 @@ protected:
 
 	EntityId CreateTileEntityInternal(EWorldGenerationTile tile, EWorldGenerationLayer layer, Vec2i position) const;
 
-	EWorldGenerationTile& GetTileRef(Vec2i position) const;
-	int GetTileIndex(Vec2i position) const { return (position.x * continentSize) + position.y; }
+	EWorldGenerationTile& GetBackgroundTileRef(Vec2i position) const { return GetTileRef(position, EWorldGenerationLayer::Background); }
+	EWorldGenerationTile& GetForegroundTileRef(Vec2i position) const { return GetTileRef(position, EWorldGenerationLayer::Foreground); }
+	EWorldGenerationTile& GetTileRef(Vec2i position, EWorldGenerationLayer layer) const;
+	
+	int GetBackgroundTileIndex(Vec2i position) const { return GetTileIndex(position, EWorldGenerationLayer::Background); }
+	int GetForegroundTileIndex(Vec2i position) const { return GetTileIndex(position, EWorldGenerationLayer::Foreground); }
+	int GetTileIndex(Vec2i position, EWorldGenerationLayer layer) const { return (position.x * continentSize) + position.y + (int)layer * continentSize * continentSize; }
 	
 	EDITORPROPERTY()
 	ECS* pEcs = nullptr;
@@ -148,13 +147,10 @@ protected:
 	WorldGenerationTreeParams treeParams;
 
 	// Enum hash map of tile enums to their definitions
-	const WorldGenerationTileDefinition* tileMap[(int)EWorldGenerationTile::COUNT];
+	const WorldGenerationTileDefinition* tileMap[(int)EWorldGenerationTile::COUNT] = {};
 	
 	// 2d array of all tiles [continentWidth, continentHeight]
-	EWorldGenerationTile* pTiles;
-
-	// #JANK: I can't be fucked to data drive trees, it's 11pm right now.
-	EWorldGenerationForegroundTile* pForegroundTiles;
+	HeapAllocSize<EWorldGenerationTile> pTiles;
 	
 	RandSeed seed = {};
 

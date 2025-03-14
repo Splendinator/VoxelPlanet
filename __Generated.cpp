@@ -156,7 +156,6 @@ void WorldGenerationTreeParams::_InitFromPropertiesSubset(void* pObject, const s
 	pWorldGenerationTreeParams->distanceFromOceanTreesEnd = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
 	pWorldGenerationTreeParams->treePercentageAtMinimumDistance = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
 	pWorldGenerationTreeParams->treePercentageAtMaximumDistance = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
-	pWorldGenerationTreeParams->pTreeTileDefinition = static_cast<WorldGenerationTileDefinition*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 }
 
 void* WorldGenerationTreeParams::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)

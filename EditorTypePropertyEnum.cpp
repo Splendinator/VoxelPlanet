@@ -75,6 +75,8 @@ void EditorTypePropertyEnum::ReadFromFile(std::ifstream& file)
 
 void EditorTypePropertyEnum::WriteToFile(std::ofstream& file)
 {
+	// #TEMP: Write the enum name to the file, not the number. If people re-arrage enums it shouldn't break.
+	
 	// "enum EMyEnum myEnum 4"
 	file << "enum " << enumName  << " " << name << " " << value << std::endl;
 }

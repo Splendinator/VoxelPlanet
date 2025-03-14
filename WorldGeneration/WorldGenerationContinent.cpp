@@ -38,16 +38,20 @@ void WorldGenerationContinent::Init()
 	{
 		tileMap[(int)entry.type] = entry.pDefinition;
 	}
-	
+
+	const int numTilesToReserve = continentSize * continentSize * (int)EWorldGenerationLayer::COUNT;
 	// Reserve space for all background tiles on the island
-	pTiles = new EWorldGenerationTile[continentSize * continentSize];
-	pForegroundTiles = new EWorldGenerationForegroundTile[continentSize * continentSize];
+	pTiles.Alloc(numTilesToReserve);
+	for (EWorldGenerationTile& tile : pTiles)
+	{
+		tile = EWorldGenerationTile::None;
+	}
 
 	const int halfContinentSize = (int)(continentSize * 0.5f);
 
 	// 1. Generate shoreline.
 	// This algorithm works by generating a circle around the center point, then the radius of that circle changes based off a noise algorithm.
-	dmut::HeapAlloc<float> tileDistanceFromOcean;
+	HeapAlloc<float> tileDistanceFromOcean;
 	tileDistanceFromOcean.Alloc((size_t)(continentSize * continentSize));
 	memset(tileDistanceFromOcean.RawPtr(), -1, sizeof(float) * continentSize * continentSize);
 	{
@@ -73,7 +77,7 @@ void WorldGenerationContinent::Init()
 			 
 				if (tileDistanceFromCenter < finalShorelineRadius)
 				{
-					GetTileRef({x,y}) = EWorldGenerationTile::Grass;
+					GetBackgroundTileRef({x,y}) = EWorldGenerationTile::Grass;
 
 					// Calculate distance from shore, adding noise 
 					float distanceFromShore = finalShorelineRadius - tileDistanceFromCenter;
@@ -83,12 +87,12 @@ void WorldGenerationContinent::Init()
 						WorldGenerationUtils::MutateSeed(sandSeed);
 						distanceFromShore += sandParams.pSandDistanceFromShoreDeltaLogic->BaseDoLogic(sandSeed, adjustedShorelineAngle, 0.0f);
 					}
-					tileDistanceFromOcean[GetTileIndex({x,y})] = std::max(1.0f, distanceFromShore);
+					tileDistanceFromOcean[GetBackgroundTileIndex({x,y})] = std::max(1.0f, distanceFromShore);
 				}
 				else
 				{
-					GetTileRef({x,y}) = EWorldGenerationTile::Water;
-					tileDistanceFromOcean[GetTileIndex({x,y})] = 0.0f;
+					GetBackgroundTileRef({x,y}) = EWorldGenerationTile::Water;
+					tileDistanceFromOcean[GetBackgroundTileIndex({x,y})] = 0.0f;
 				}
 			}
 		}
@@ -104,7 +108,7 @@ void WorldGenerationContinent::Init()
 				// Sand
 				if (tileDistanceFromOcean[x * continentSize + y] > 0.0f && tileDistanceFromOcean[x * continentSize + y] <= sandParams.baseDistanceFromOcean)
 				{
-					GetTileRef({x,y}) = EWorldGenerationTile::Sand;
+					GetBackgroundTileRef({x,y}) = EWorldGenerationTile::Sand;
 				}
 
 				// Trees
@@ -118,7 +122,7 @@ void WorldGenerationContinent::Init()
 					WorldGenerationUtils::MutateSeed(treeSeed);
 					if (WorldGenerationUtils::RandFloat(treeSeed) <= treePercentage)
 					{
-						pForegroundTiles[GetTileIndex({x,y})] = EWorldGenerationForegroundTile::Tree;
+						GetForegroundTileRef({x,y}) = EWorldGenerationTile::Tree;
 					}
 				}
 			}
@@ -128,8 +132,7 @@ void WorldGenerationContinent::Init()
 
 void WorldGenerationContinent::UnInit()
 {
-	delete[] pTiles;
-	delete[] pForegroundTiles;
+	
 }
 
 EntityId WorldGenerationContinent::CreateTileEntity(EWorldGenerationLayer layer, Vec2i position) const
@@ -137,52 +140,13 @@ EntityId WorldGenerationContinent::CreateTileEntity(EWorldGenerationLayer layer,
 	position.x -= CONTINENT_ORIGIN_X;
 	position.y -= CONTINENT_ORIGIN_Y;
 	
-	if (layer == EWorldGenerationLayer::Foreground)
-	{
-		if (pForegroundTiles[GetTileIndex(position)] == EWorldGenerationForegroundTile::Tree)
-		{
-			// #TEMP: Copied from CreateTileEntityInternal() what the fuck am I doing
-			if (pEcs && pDirectoryData && treeParams.pTreeTileDefinition)
-			{
-				EntityId newTile = pEcs->GetNextFreeEntity();
-			
-				// Transform
-				ComponentTransform& transformComponent = pEcs->AddComponent<ComponentTransform>(newTile);
-				transformComponent.x = position.x + CONTINENT_ORIGIN_X;
-				transformComponent.y = position.y + CONTINENT_ORIGIN_Y;
-			
-				// Mesh
-				ComponentMesh& meshComponent = pEcs->AddComponent<ComponentMesh>(newTile);
-				meshComponent.pRendererObject = dmgf::AddObjectFromSVG(DirectoryData::ConcatenateSVGFilePathChecked(pDirectoryData->worldGenerationTiles, treeParams.pTreeTileDefinition->fileName).c_str());
-				ECSSystemRender::SetupRenderObjectOnGrid(meshComponent.pRendererObject);
-			
-				constexpr float renderPriorities[(int)EWorldGenerationLayer::COUNT]
-				{
-					/*EWorldGenerationLayer::Background*/ RenderPriority::background,
-					/*EWorldGenerationLayer::Foreground*/ RenderPriority::foreground,
-				};
-				meshComponent.pRendererObject->SetRenderPriority(renderPriorities[(int)layer]);
-			
-				// Rigid
-				if (treeParams.pTreeTileDefinition->bRigidBody)
-				{
-					pEcs->AddComponent<ComponentRigid>(newTile);
-				}
-				
-				return newTile;
-			}
-		}
-		
-		return INVALID_ENTITY_ID;
-	}
-	
 	if (position.x < 0 || position.x >= continentSize || position.y < 0 || position.y >= continentSize)
 	{
 		// Out of bounds, spawn water
-		return CreateTileEntityInternal(EWorldGenerationTile::Water, layer, position);
+		return layer == EWorldGenerationLayer::Background ? CreateTileEntityInternal(EWorldGenerationTile::Water, layer, position) : INVALID_ENTITY_ID;
 	}
 
-	return CreateTileEntityInternal(GetTileRef(position), layer, position);
+	return CreateTileEntityInternal(GetTileRef(position, layer), layer, position);
 }
 
 Vec2i WorldGenerationContinent::GetPlayerSpawnPoint() const
@@ -192,7 +156,7 @@ Vec2i WorldGenerationContinent::GetPlayerSpawnPoint() const
 	{
 		const int yCoordinate = continentSize-xCoordinate-1;
 		
-		if (GetTileRef({xCoordinate, yCoordinate}) == EWorldGenerationTile::Grass)
+		if (GetTileRef({xCoordinate, yCoordinate}, EWorldGenerationLayer::Background) == EWorldGenerationTile::Grass)
 		{
 			return {CONTINENT_ORIGIN_X + xCoordinate, CONTINENT_ORIGIN_Y + yCoordinate};
 		}
@@ -240,8 +204,8 @@ EntityId WorldGenerationContinent::CreateTileEntityInternal(EWorldGenerationTile
 	return INVALID_ENTITY_ID;
 }
 
-EWorldGenerationTile& WorldGenerationContinent::GetTileRef(Vec2i position) const
+EWorldGenerationTile& WorldGenerationContinent::GetTileRef(Vec2i position, EWorldGenerationLayer layer) const
 {
 	DOMLOG_ERROR_IF(position.x < 0 || position.x >= continentSize || position.y < 0 || position.y >= continentSize)
-	return pTiles[GetTileIndex(position)];
+	return pTiles[GetTileIndex(position, layer)];
 }

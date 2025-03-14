@@ -82,8 +82,7 @@ EntityId ECS::GetNextFreeEntity()
 			return entity;
 		}
 	}
-
-
+	
 	DOMLOG_ERROR("Out of entitites! Increase NUM_ENTITIES!");
 	return INVALID_ENTITY_ID;
 }
