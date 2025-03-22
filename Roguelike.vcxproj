@@ -1367,6 +1367,8 @@
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Performance\PerformanceMetricsManager.cpp" />
+    <ClCompile Include="Performance\ScopedPerformanceMarker.cpp" />
     <ClCompile Include="PlanetGenerate.cpp" />
     <ClCompile Include="OLD_Renderer.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -2578,6 +2580,8 @@
     <ClInclude Include="Input\InputSystem.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Performance\PerformanceMetricsManager.h" />
+    <ClInclude Include="Performance\ScopedPerformanceMarker.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RendererObject.h" />
     <ClInclude Include="RenderPriorities.h" />

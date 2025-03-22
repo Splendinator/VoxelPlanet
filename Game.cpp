@@ -77,6 +77,8 @@ void TickImGuiFramerateWindow(float deltaTime)
 
 void Game::Tick(float deltaTime)
 {
+	SCOPED_PERFORMANCE_MARKER(GameTick);
+	
 #ifdef DOMIMGUI
 	TickImGuiFramerateWindow(deltaTime);
 #endif //~ #ifdef DOMIMGUI

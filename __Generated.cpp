@@ -38,6 +38,7 @@
 #include "..\Roguelike\Input\InputContext.h"
 #include "..\Roguelike\Input\InputKey.h"
 #include "..\Roguelike\Input\InputSystem.h"
+#include "..\Roguelike\Performance\PerformanceMetricsManager.h"
 #include "..\Roguelike\RPGSystems\Attributes\RPGAttributeModifiers.h"
 #include "..\Roguelike\RPGSystems\Attributes\RPGAttributes.h"
 #include "..\Roguelike\RPGSystems\Classes\RPGClassData.h"
@@ -1561,6 +1562,31 @@ void RPGAttributeBase::_DeleteObject(void* pObject)
 	delete reinterpret_cast<RPGAttributeBase*>(pObject);
 }
 
+// PerformanceMetricsManager
+void PerformanceMetricsManager::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	PerformanceMetricsManager* pPerformanceMetricsManager = static_cast<PerformanceMetricsManager*>(pObject);
+	GameSystem::_InitFromPropertiesSubset(static_cast<GameSystem*>(pPerformanceMetricsManager), properties, propertyIndex);
+}
+
+void* PerformanceMetricsManager::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	PerformanceMetricsManager* pPerformanceMetricsManager = new PerformanceMetricsManager;
+	int propertyIndex = 0;
+	PerformanceMetricsManager::_InitFromPropertiesSubset(pPerformanceMetricsManager, properties, propertyIndex);
+	return pPerformanceMetricsManager;
+}
+
+void* PerformanceMetricsManager::_CreateEmptyObject()
+{
+	return new PerformanceMetricsManager;
+}
+
+void PerformanceMetricsManager::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<PerformanceMetricsManager*>(pObject);
+}
+
 // InputSystem
 void InputSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -2397,6 +2423,7 @@ namespace __Generated
 		{"RPGRaceData", &RPGRaceData::_InitFromProperties},
 		{"RPGClassData", &RPGClassData::_InitFromProperties},
 		{"RPGAttributeBase", &RPGAttributeBase::_InitFromProperties},
+		{"PerformanceMetricsManager", &PerformanceMetricsManager::_InitFromProperties},
 		{"InputSystem", &InputSystem::_InitFromProperties},
 		{"InputContext", &InputContext::_InitFromProperties},
 		{"InputActionPress", &InputActionPress::_InitFromProperties},
@@ -2481,6 +2508,7 @@ namespace __Generated
 		{"RPGRaceData", &RPGRaceData::_CreateEmptyObject},
 		{"RPGClassData", &RPGClassData::_CreateEmptyObject},
 		{"RPGAttributeBase", &RPGAttributeBase::_CreateEmptyObject},
+		{"PerformanceMetricsManager", &PerformanceMetricsManager::_CreateEmptyObject},
 		{"InputSystem", &InputSystem::_CreateEmptyObject},
 		{"InputContext", &InputContext::_CreateEmptyObject},
 		{"InputActionPress", &InputActionPress::_CreateEmptyObject},
@@ -2565,6 +2593,7 @@ namespace __Generated
 		{"RPGRaceData", &RPGRaceData::_InitFromPropertiesSubset},
 		{"RPGClassData", &RPGClassData::_InitFromPropertiesSubset},
 		{"RPGAttributeBase", &RPGAttributeBase::_InitFromPropertiesSubset},
+		{"PerformanceMetricsManager", &PerformanceMetricsManager::_InitFromPropertiesSubset},
 		{"InputSystem", &InputSystem::_InitFromPropertiesSubset},
 		{"InputContext", &InputContext::_InitFromPropertiesSubset},
 		{"InputActionPress", &InputActionPress::_InitFromPropertiesSubset},
@@ -2648,6 +2677,7 @@ namespace __Generated
 		{"RPGRaceData", &RPGRaceData::_DeleteObject},
 		{"RPGClassData", &RPGClassData::_DeleteObject},
 		{"RPGAttributeBase", &RPGAttributeBase::_DeleteObject},
+		{"PerformanceMetricsManager", &PerformanceMetricsManager::_DeleteObject},
 		{"InputSystem", &InputSystem::_DeleteObject},
 		{"InputContext", &InputContext::_DeleteObject},
 		{"InputActionPress", &InputActionPress::_DeleteObject},

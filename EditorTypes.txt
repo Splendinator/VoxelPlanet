@@ -400,6 +400,9 @@ meta Singleton
 string displayName ""
 vector pModifiers RPGAttributeModifierBase
 ;
+Class PerformanceMetricsManager
+Child GameSystem
+;
 Class InputSystem
 Child GameSystem
 class InputContext pDefaultInputContext nullptr

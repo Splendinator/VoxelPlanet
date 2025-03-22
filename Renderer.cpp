@@ -31,18 +31,30 @@ namespace
 	{
 		std::string fileName;
 		std::shared_ptr<VectorArt> pVectorArt;
-		VkDescriptorSet handleDescriptorSet = VK_NULL_HANDLE; // Descriptor set to bind
-		VkBuffer handleBuffer = VK_NULL_HANDLE; // Buffer big enough to hold serilized vector art
-		VkDeviceMemory handleDeviceMemory = VK_NULL_HANDLE; // Memory to hold buffer
+
+		// Serialised vector art uniform buffer
+		VkDescriptorSet handleDescriptorSetVectorArt = VK_NULL_HANDLE; 
+		VkBuffer handleBufferVectorArt = VK_NULL_HANDLE; 
+		VkDeviceMemory handleDeviceMemoryVectorArt = VK_NULL_HANDLE;
+
+		// Model matrix storage buffer (for instanced rendering)
+		VkDescriptorSet handleDescriptorSetModelMatrix = VK_NULL_HANDLE;
+		VkBuffer handleBufferModelMatrix = VK_NULL_HANDLE; 
+		VkDeviceMemory handleDeviceMemoryModelMatrix = VK_NULL_HANDLE;
+		
 		std::vector<std::unique_ptr<RendererObject>> rendererObjects; // #TODO: This memory will be fragmented to FUCK and accessed every frame, we need an allocator later on
 	};
 
 	// #TODO: These needs to be grabbed from the surface
-	const int EXTENT_WIDTH = 1776; // Width of renderable portion of screen
-	const int EXTENT_HEIGHT = 969; // Height of renderable portion of screen
+	constexpr int EXTENT_WIDTH = 1776; // Width of renderable portion of screen
+	constexpr int EXTENT_HEIGHT = 969; // Height of renderable portion of screen
 
-	const int VERTEX_BUFFER_SIZE = 6; // Num vertices in our vertex buffer
+	constexpr int VERTEX_BUFFER_SIZE = 6; // Num vertices in our vertex buffer
 
+	constexpr int MAX_NUM_INSTANCES = 8192; // Max quads that can be rendered in one go
+
+	void WaitForPreviousFrameToRender();
+	
 	// #TODO: Functions and variables that are together should probably be moved to a class. i.e VulkanDevice will contain QueueFamily + NumQueues + GetNextFreeQueue()
 	void PrintInstanceExtensions();
 	void PrintInstanceLayers();
@@ -68,16 +80,18 @@ namespace
 
 	VkBuffer CreateVertexBuffer();
 	VkBuffer CreateUniformBuffer(size_t size);
+	VkBuffer CreateStorageBuffer(size_t size);
 
 	VkRenderPass CreateRenderPass();
 
 	VkDescriptorPool CreateDescriptorPool();
 
-	VkDescriptorSetLayout CreateDescriptorSetLayout(VkShaderStageFlagBits shaderStage, uint32_t bindingNumber);
+	VkDescriptorSetLayout CreateDescriptorSetLayout(VkShaderStageFlagBits shaderStage, uint32_t bindingNumber, VkDescriptorType type = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
 
 	VkDescriptorSet CreateDescriptorSet(VkDescriptorSetLayout layout);
 
 	void UpdateVectorBuffer(RenderedObjectEntry& entry); // Update the buffer with the vector art data
+	void UpdateModelMatrixBuffer(RenderedObjectEntry& entry); // Initialise model matrix buffer at the start
 	void UpdateViewBuffer(float deltaTime); // Update the view buffer with the view matrix 
 	void UpdateProjectionBuffer(); // Update the projection buffer with the projection matrix
 	void UpdateViewBufferHUD(); // Update the UI view buffer with the view matrix for UI objects
@@ -119,7 +133,8 @@ namespace
 	VkRenderPass handleRenderPass = VK_NULL_HANDLE;
 	VkDescriptorPool handleDescriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSetLayout handleDescriptorSetLayoutProjection = VK_NULL_HANDLE; // Updated once at start
-	VkDescriptorSetLayout handleDescriptorSetLayoutView = VK_NULL_HANDLE; // Updated once per frame 
+	VkDescriptorSetLayout handleDescriptorSetLayoutView = VK_NULL_HANDLE; // Updated once per frame
+	VkDescriptorSetLayout handleDescriptorSetLayoutModel = VK_NULL_HANDLE; // Updated once per vector art
 	VkDescriptorSetLayout handleDescriptorSetLayoutVector = VK_NULL_HANDLE; // Updated once per vector art
 	
 	VkDescriptorSet handleDescriptorSetProjection = VK_NULL_HANDLE; // Projection used for in-game objects
@@ -154,6 +169,9 @@ namespace
 	VkImage handleDepthImage = VK_NULL_HANDLE;
 	VkImageView handleDepthImageView = VK_NULL_HANDLE;
 
+	VkFence handleSubmitDrawCommandsFence = VK_NULL_HANDLE; // Fence to stop us from rendering before the previous frame finishes
+	VkSemaphore handleSubmitDrawCommandsSemaphore = VK_NULL_HANDLE; // Semaphore to stop us drawing before the swapchain has aquired the next image
+	
 	// Unused
 	VkBuffer handleStagingBuffer = VK_NULL_HANDLE;
 	VkDeviceMemory handleDeviceMemoryVertexBuffer = VK_NULL_HANDLE;
@@ -233,11 +251,10 @@ namespace dmgf
 		handleDescriptorPool = CreateDescriptorPool();
 		handleDescriptorSetLayoutProjection = CreateDescriptorSetLayout(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 0); 
 		handleDescriptorSetLayoutView = CreateDescriptorSetLayout(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 1);       
-		handleDescriptorSetLayoutVector = CreateDescriptorSetLayout(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, 0); 
+		handleDescriptorSetLayoutModel = CreateDescriptorSetLayout(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 2, VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER); // Too large so we need larger, slower storage buffer
+		handleDescriptorSetLayoutVector = CreateDescriptorSetLayout(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, 0);
 		handleDescriptorSetView = CreateDescriptorSet(handleDescriptorSetLayoutView);
 		handleDescriptorSetProjection = CreateDescriptorSet(handleDescriptorSetLayoutProjection);
-		handleDescriptorSetViewHUD = CreateDescriptorSet(handleDescriptorSetLayoutView);
-		handleDescriptorSetProjectionHUD = CreateDescriptorSet(handleDescriptorSetLayoutProjection);
 		handleDescriptorSetViewHUD = CreateDescriptorSet(handleDescriptorSetLayoutView);
 		handleDescriptorSetProjectionHUD = CreateDescriptorSet(handleDescriptorSetLayoutProjection);
 		handlePipelineLayout = CreatePipelineLayout();
@@ -274,7 +291,6 @@ namespace dmgf
 		handleBufferProjectionHUD = CreateUniformBuffer(projectionBufferSizeHUD);
 		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, handleBufferProjectionHUD, handleDeviceMemoryProjectionBufferHUD, 0), "BindUniformBuffer");
 		UpdateProjectionBufferHUD();
-		
 
 #ifdef DOMIMGUI
 		
@@ -332,6 +348,8 @@ namespace dmgf
 
 	void UnInit()
 	{
+		WaitForPreviousFrameToRender();
+		
 #ifdef DOMIMGUI
 		ImGui_ImplVulkan_Shutdown();
 #endif //~ #ifdef DOMIMGUI
@@ -363,6 +381,7 @@ namespace dmgf
 		vkDestroyPipeline(handleDevice, handlePipeline, nullptr);
 		vkDestroyPipelineLayout(handleDevice, handlePipelineLayout, nullptr);
 		vkDestroyDescriptorSetLayout(handleDevice, handleDescriptorSetLayoutVector, nullptr);
+		vkDestroyDescriptorSetLayout(handleDevice, handleDescriptorSetLayoutModel, nullptr);
 		vkDestroyDescriptorSetLayout(handleDevice, handleDescriptorSetLayoutView, nullptr);
 		vkDestroyDescriptorSetLayout(handleDevice, handleDescriptorSetLayoutProjection, nullptr);
 		vkDestroyDescriptorPool(handleDevice, handleDescriptorPool, nullptr);
@@ -382,11 +401,32 @@ namespace dmgf
 
 	void Tick(float deltaTime)
 	{
+		SCOPED_PERFORMANCE_MARKER(GraphicsTick);
+
+		WaitForPreviousFrameToRender();
+		
 		UpdateViewBuffer(deltaTime);
 		SubmitDrawCommand();
 #ifdef DOMIMGUI
 		ImGui_ImplVulkan_NewFrame();
 #endif //~ #ifdef DOMIMGUI
+	}
+
+	void SetupRenderedObjectEntryBuffers(RenderedObjectEntry& entry)
+	{
+		// Vector art buffer
+		const size_t vectorBufferSize = sizeof(int) * 4 * 4096; // #TODO: Figure out how large the serialized vector art is (Bear in mind it can change if you load in icons)
+		entry.handleDescriptorSetVectorArt = CreateDescriptorSet(handleDescriptorSetLayoutVector);
+		entry.handleDeviceMemoryVectorArt = CreateDeviceMemory(vectorBufferSize, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		entry.handleBufferVectorArt = CreateUniformBuffer(vectorBufferSize);
+		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, entry.handleBufferVectorArt, entry.handleDeviceMemoryVectorArt, 0), "BindUniformBuffer");
+
+		// Model matrix buffer
+		const size_t matrixBufferSize = sizeof(Mat4f) * MAX_NUM_INSTANCES;
+		entry.handleDescriptorSetModelMatrix = CreateDescriptorSet(handleDescriptorSetLayoutModel);
+		entry.handleDeviceMemoryModelMatrix = CreateDeviceMemory(matrixBufferSize, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		entry.handleBufferModelMatrix = CreateStorageBuffer(matrixBufferSize);
+		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, entry.handleBufferModelMatrix, entry.handleDeviceMemoryModelMatrix, 0), "BindStorageBuffer");
 	}
 
 	TransientPtr<RendererObject> AddObjectFromSVG(const char* pFileName, ERenderObjectType renderObjectType /*= ERenderObjectType::InGame*/)
@@ -407,13 +447,8 @@ namespace dmgf
 			pEntry = &renderedObjects.back();
 			pEntry->fileName = pFileName;
 			pEntry->pVectorArt = std::make_shared<VectorArt>(pFileName);
-			
-			// Set up vulkan handles (descriptor set + memory)
-			const size_t vectorBufferSize = sizeof(int) * 4 * 4096; // #TODO: Figure out how large the serialized vector art is (Bear in mind it can change if you load in icons)
-			pEntry->handleDescriptorSet = CreateDescriptorSet(handleDescriptorSetLayoutVector);
-			pEntry->handleDeviceMemory = CreateDeviceMemory(vectorBufferSize, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-			pEntry->handleBuffer = CreateUniformBuffer(vectorBufferSize);
-			VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, pEntry->handleBuffer, pEntry->handleDeviceMemory, 0), "BindUniformBuffer");
+
+			SetupRenderedObjectEntryBuffers(*pEntry);
 		}
 		else
 		{
@@ -430,18 +465,14 @@ namespace dmgf
 		std::vector<RenderedObjectEntry>& renderedObjects = GetRenderedObjectsList(renderObjectType);
 
 		renderedObjects.resize(renderedObjects.size() + 1);
-		RenderedObjectEntry& pEntry = renderedObjects.back();
+		RenderedObjectEntry& entry = renderedObjects.back();
 		
-		pEntry.pVectorArt = vectorArt;
-	
-		const size_t vectorBufferSize = sizeof(int) * 4 * 4096; // #TODO: Figure out how large the serialized vector art is (Bear in mind it can change if you load in icons)
-		pEntry.handleDescriptorSet = CreateDescriptorSet(handleDescriptorSetLayoutVector);
-		pEntry.handleDeviceMemory = CreateDeviceMemory(vectorBufferSize, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-		pEntry.handleBuffer = CreateUniformBuffer(vectorBufferSize);
-		VulkanUtils::ErrorCheck(vkBindBufferMemory(handleDevice, pEntry.handleBuffer, pEntry.handleDeviceMemory, 0), "BindUniformBuffer");
+		entry.pVectorArt = vectorArt;
+
+		SetupRenderedObjectEntryBuffers(entry);
 		
-		pEntry.rendererObjects.emplace_back(std::make_unique<RendererObject>());
-		return pEntry.rendererObjects.back().get();
+		entry.rendererObjects.emplace_back(std::make_unique<RendererObject>());
+		return entry.rendererObjects.back().get();
 	}
 
 	void RemoveObject(TransientPtr<RendererObject> pRendererObject)
@@ -833,6 +864,25 @@ namespace
 		return returnedHandle;
 	}
 
+	// Storage buffers are slower but larger than uniform buffers
+	VkBuffer CreateStorageBuffer(size_t size)
+	{
+
+		VkBufferCreateInfo createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		createInfo.pNext = nullptr;
+		createInfo.flags = 0;
+		createInfo.usage = VkBufferUsageFlagBits::VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+		createInfo.size = size;
+		createInfo.queueFamilyIndexCount = 0;
+		createInfo.pQueueFamilyIndices = nullptr;
+		createInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		VkBuffer returnedHandle = VK_NULL_HANDLE;
+		VulkanUtils::ErrorCheck(vkCreateBuffer(handleDevice, &createInfo, nullptr, &returnedHandle), "StorageBuffer");
+		return returnedHandle;
+	}
+
 	VkRenderPass CreateRenderPass()
 	{
 		VkAttachmentDescription attachments[2] = {};
@@ -964,14 +1014,14 @@ namespace
 
 	}
 
-	VkDescriptorSetLayout CreateDescriptorSetLayout(VkShaderStageFlagBits shaderStage, uint32_t bindingNumber)
+	VkDescriptorSetLayout CreateDescriptorSetLayout(VkShaderStageFlagBits shaderStage, uint32_t bindingNumber, VkDescriptorType type)
 {
 		VkDescriptorSetLayoutBinding binding;
 		binding.binding = bindingNumber;
 		binding.descriptorCount = 1;
 		binding.stageFlags = shaderStage; // This uniform buffer will hold the array of vector art primitives
 		binding.pImmutableSamplers = (VkSampler*)nullptr;
-		binding.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		binding.descriptorType = type;
 
 		VkDescriptorSetLayoutCreateInfo createInfo;
 		createInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -1008,24 +1058,24 @@ namespace
 		entry.pVectorArt->Serialize(data);
 
 		void* pDeviceData = nullptr;
-		vkMapMemory(handleDevice, entry.handleDeviceMemory, 0, sizeof(data), 0, &pDeviceData);
+		vkMapMemory(handleDevice, entry.handleDeviceMemoryVectorArt, 0, sizeof(data), 0, &pDeviceData);
 		int* pDeviceInts = (int*)pDeviceData;
 		for (int i = 0; i < 1024; ++i)
 		{
 			// #TODO: Try and understand why there's a fucking 16 byte stride or whatever in the GPU memory
 			pDeviceInts[i * 4] = data[i];
 		}
-		vkUnmapMemory(handleDevice, entry.handleDeviceMemory);
+		vkUnmapMemory(handleDevice, entry.handleDeviceMemoryVectorArt);
 
 		VkDescriptorBufferInfo descriptorBufferInfo = {};
-		descriptorBufferInfo.buffer = entry.handleBuffer;
+		descriptorBufferInfo.buffer = entry.handleBufferVectorArt;
 		descriptorBufferInfo.offset = 0;
 		descriptorBufferInfo.range = VK_WHOLE_SIZE;
 
 		VkWriteDescriptorSet descriptorSetWrite = {};
 		descriptorSetWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorSetWrite.pNext = nullptr;
-		descriptorSetWrite.dstSet = entry.handleDescriptorSet;
+		descriptorSetWrite.dstSet = entry.handleDescriptorSetVectorArt;
 		descriptorSetWrite.dstBinding = 0;
 		descriptorSetWrite.dstArrayElement = 0;
 		descriptorSetWrite.descriptorCount = 1;
@@ -1038,6 +1088,8 @@ namespace
 
 	void UpdateViewBuffer(float deltaTime)
 	{
+		SCOPED_PERFORMANCE_MARKER(UpdateViewBuffer);
+		
 		void* pDeviceData = nullptr;
 		vkMapMemory(handleDevice, handleDeviceMemoryViewBuffer, 0, sizeof(Mat4f), 0, &pDeviceData);
 		memcpy(pDeviceData, &viewMatrix, sizeof(Mat4f));
@@ -1153,15 +1205,60 @@ namespace
 		vkUpdateDescriptorSets(handleDevice, 1, &descriptorSetWrite, 0, nullptr);
 	}
 
+	void UpdateModelMatrixBuffer(RenderedObjectEntry& entry)
+	{
+		static Mat4f modelMatrixes[MAX_NUM_INSTANCES];
+		const int numInstances = (int)entry.rendererObjects.size();
+		
+		DOMLOG_ERROR_IF(numInstances > MAX_NUM_INSTANCES, "Too many instances!");
+
+		for (int i = 0; i < numInstances; ++i)
+		{
+			if (entry.rendererObjects[i]->IsVisible())
+			{
+				modelMatrixes[i] = entry.rendererObjects[i]->GetModelMatrix();
+			}
+			else
+			{
+				// If we have an invisible render object, just zero out the model matrix
+				// #OPTIMISE: Maybe this isn't great as we're still rendering them technically.
+				modelMatrixes[i] = {};
+			}
+		}
+
+		void* pDeviceData = nullptr;
+		vkMapMemory(handleDevice, entry.handleDeviceMemoryModelMatrix, 0, sizeof(Mat4f) * numInstances, 0, &pDeviceData);
+		memcpy(pDeviceData, &modelMatrixes, sizeof(Mat4f) * numInstances);
+		vkUnmapMemory(handleDevice, entry.handleDeviceMemoryModelMatrix);
+		
+		VkDescriptorBufferInfo modelMatrixBufferInfo = {};
+		modelMatrixBufferInfo.buffer = entry.handleBufferModelMatrix;
+		modelMatrixBufferInfo.offset = 0;
+		modelMatrixBufferInfo.range = VK_WHOLE_SIZE;
+		
+		VkWriteDescriptorSet descriptorSetWriteModelMatrixBuffer = {};
+		descriptorSetWriteModelMatrixBuffer.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorSetWriteModelMatrixBuffer.pNext = nullptr;
+		descriptorSetWriteModelMatrixBuffer.dstSet = entry.handleDescriptorSetModelMatrix;
+		descriptorSetWriteModelMatrixBuffer.dstBinding = 2;
+		descriptorSetWriteModelMatrixBuffer.dstArrayElement = 0;
+		descriptorSetWriteModelMatrixBuffer.descriptorCount = 1;
+		descriptorSetWriteModelMatrixBuffer.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		descriptorSetWriteModelMatrixBuffer.pImageInfo = nullptr;
+		descriptorSetWriteModelMatrixBuffer.pBufferInfo = &modelMatrixBufferInfo;
+		descriptorSetWriteModelMatrixBuffer.pTexelBufferView = nullptr;
+		vkUpdateDescriptorSets(handleDevice, 1, &descriptorSetWriteModelMatrixBuffer, 0, nullptr);
+	}
+	
 	VkPipelineLayout CreatePipelineLayout()
 	{
-		// Model matrix
-		VkPushConstantRange pushConstantRange = {};
-		pushConstantRange.offset = 0;
-		pushConstantRange.size = sizeof(Mat4f); 
-		pushConstantRange.stageFlags = VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT;
+		// #TEMP: Old model matrix -- Replace this?
+		//VkPushConstantRange pushConstantRange = {};
+		//pushConstantRange.offset = 0;
+		//pushConstantRange.size = sizeof(Mat4f); 
+		//pushConstantRange.stageFlags = VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT;
 
-		VkDescriptorSetLayout layouts[] = { handleDescriptorSetLayoutProjection, handleDescriptorSetLayoutView, handleDescriptorSetLayoutVector };
+		VkDescriptorSetLayout layouts[] = { handleDescriptorSetLayoutProjection, handleDescriptorSetLayoutView, handleDescriptorSetLayoutVector, handleDescriptorSetLayoutModel};
 
 		VkPipelineLayoutCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -1169,8 +1266,7 @@ namespace
 		createInfo.flags = 0;
 		createInfo.setLayoutCount = DMUT_ARRAY_SIZE(layouts);
 		createInfo.pSetLayouts = layouts;
-		createInfo.pushConstantRangeCount = 1;
-		createInfo.pPushConstantRanges = &pushConstantRange;
+		createInfo.pushConstantRangeCount = 0;
 
 		VkPipelineLayout returnedLayout = VK_NULL_HANDLE;
 		VulkanUtils::ErrorCheck(vkCreatePipelineLayout(handleDevice, &createInfo, nullptr, &returnedLayout), "PipelineLayout");
@@ -1438,15 +1534,14 @@ namespace
 	void SubmitDrawCommand()
 	{
 		static uint32_t currentBuffer = 0; // Which framebuffer to use (swapchain swaps between 2 framebuffers)
-
-		VkSemaphore handleSemaphore;
+		
 		VkSemaphoreCreateInfo semaphoreCreateInfo;
 		semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 		semaphoreCreateInfo.pNext = nullptr;
 		semaphoreCreateInfo.flags = 0;
-		VulkanUtils::ErrorCheck(vkCreateSemaphore(handleDevice, &semaphoreCreateInfo, nullptr, &handleSemaphore));
+		VulkanUtils::ErrorCheck(vkCreateSemaphore(handleDevice, &semaphoreCreateInfo, nullptr, &handleSubmitDrawCommandsSemaphore));
 
-		VulkanUtils::ErrorCheck(vkAcquireNextImageKHR(handleDevice, handleSwapChain, UINT64_MAX, handleSemaphore, VK_NULL_HANDLE, &currentBuffer));
+		VulkanUtils::ErrorCheck(vkAcquireNextImageKHR(handleDevice, handleSwapChain, UINT64_MAX, handleSubmitDrawCommandsSemaphore, VK_NULL_HANDLE, &currentBuffer));
 
 		VkCommandBuffer handleCommandBuffer = currentBuffer == 0 ? handleCommandBuffer1 : handleCommandBuffer2;
 		VkCommandBufferBeginInfo commandBufferBegin = {};
@@ -1500,23 +1595,20 @@ namespace
 			for (auto& renderObject : inRenderObjects)
 			{
 				UpdateVectorBuffer(renderObject);
-				vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 2, 1, &renderObject.handleDescriptorSet, 0, nullptr);
+				vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 2, 1, &renderObject.handleDescriptorSetVectorArt, 0, nullptr);
+				
+				UpdateModelMatrixBuffer(renderObject);
+				vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 3, 1, &renderObject.handleDescriptorSetModelMatrix, 0, nullptr);
 
-				for (auto& rendererObject : renderObject.rendererObjects)
-				{
-					if (rendererObject->IsVisible())
-					{
-						Mat4f modelMatrix = rendererObject->GetModelMatrix();
-						vkCmdPushConstants(handleCommandBuffer, handlePipelineLayout, VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Mat4f), &modelMatrix);
-
-						vkCmdDraw(handleCommandBuffer, DMUT_ARRAY_SIZE(quad), 1, 0, 0);
-					}
-				}
+				// Batch draw all instances
+				const int numInstancesToRender = (int)renderObject.rendererObjects.size();
+				vkCmdDraw(handleCommandBuffer, DMUT_ARRAY_SIZE(quad), numInstancesToRender, 0, 0);
 			}
 		};
-
+		
 		// Render all in-game objects
 		{
+			SCOPED_PERFORMANCE_MARKER(DrawInGame);
 			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 0, 1, &handleDescriptorSetProjection, 0, nullptr);
 			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 1, 1, &handleDescriptorSetView, 0, nullptr);
 
@@ -1525,6 +1617,7 @@ namespace
 
 		// Render all UI objects
 		{
+			SCOPED_PERFORMANCE_MARKER(DrawUI);
 			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 0, 1, &handleDescriptorSetProjectionHUD, 0, nullptr);
 			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 1, 1, &handleDescriptorSetViewHUD, 0, nullptr);
 
@@ -1540,20 +1633,19 @@ namespace
 
 		vkCmdEndRenderPass(handleCommandBuffer);
 		vkEndCommandBuffer(handleCommandBuffer);
-
-		VkFence handleFence;
+		
 		VkFenceCreateInfo fenceInfo;
 		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceInfo.pNext = nullptr;
 		fenceInfo.flags = 0;
-		VulkanUtils::ErrorCheck(vkCreateFence(handleDevice, &fenceInfo, nullptr, &handleFence));
+		VulkanUtils::ErrorCheck(vkCreateFence(handleDevice, &fenceInfo, nullptr, &handleSubmitDrawCommandsFence));
 
 		VkPipelineStageFlags pipeStageFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		VkSubmitInfo submitInfo[1] = {};
 		submitInfo[0].pNext = nullptr;
 		submitInfo[0].sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submitInfo[0].waitSemaphoreCount = 1;
-		submitInfo[0].pWaitSemaphores = &handleSemaphore;
+		submitInfo[0].pWaitSemaphores = &handleSubmitDrawCommandsSemaphore;
 		submitInfo[0].pWaitDstStageMask = &pipeStageFlags;
 		submitInfo[0].commandBufferCount = 1;
 		submitInfo[0].pCommandBuffers = &handleCommandBuffer;
@@ -1561,13 +1653,8 @@ namespace
 		submitInfo[0].pSignalSemaphores = nullptr;
 
 		// Submit queue
-		VulkanUtils::ErrorCheck(vkQueueSubmit(handleGraphicsQueue, 1, submitInfo, handleFence));
-
-		// Wait for queue to finish rendering on to the ***BACK Buffer***
-		vkWaitForFences(handleDevice, 1, &handleFence, VK_TRUE, UINT64_MAX);
-
-		vkDestroyFence(handleDevice, handleFence, nullptr);
-
+		VulkanUtils::ErrorCheck(vkQueueSubmit(handleGraphicsQueue, 1, submitInfo, handleSubmitDrawCommandsFence));
+		
 		// Swap back buffer and present buffer
 		VkPresentInfoKHR present;
 		present.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -1581,15 +1668,31 @@ namespace
 
 		VulkanUtils::ErrorCheck(vkQueuePresentKHR(handleGraphicsQueue, &present));
 
-		vkDestroySemaphore(handleDevice, handleSemaphore, nullptr);
-
 		currentBuffer ^= 1;
 	}
 
 	void CleanUpEntry(RenderedObjectEntry& entry)
 	{
-		vkDestroyBuffer(handleDevice, entry.handleBuffer, nullptr);
-		vkFreeMemory(handleDevice, entry.handleDeviceMemory, nullptr);
-		vkFreeDescriptorSets(handleDevice, handleDescriptorPool, 1, &entry.handleDescriptorSet);
+		vkDestroyBuffer(handleDevice, entry.handleBufferVectorArt, nullptr);
+		vkFreeMemory(handleDevice, entry.handleDeviceMemoryVectorArt, nullptr);
+		vkFreeDescriptorSets(handleDevice, handleDescriptorPool, 1, &entry.handleDescriptorSetVectorArt);
+
+		vkDestroyBuffer(handleDevice, entry.handleBufferModelMatrix, nullptr);
+		vkFreeMemory(handleDevice, entry.handleDeviceMemoryModelMatrix, nullptr);
+		vkFreeDescriptorSets(handleDevice, handleDescriptorPool, 1, &entry.handleDescriptorSetModelMatrix);
+	}
+
+	void WaitForPreviousFrameToRender()
+	{
+		// Wait for the previous frame's draw command to finish before we start a new one
+		if (handleSubmitDrawCommandsFence != VK_NULL_HANDLE)
+		{
+			SCOPED_PERFORMANCE_MARKER(WaitForFence);
+			vkWaitForFences(handleDevice, 1, &handleSubmitDrawCommandsFence, VK_TRUE, UINT64_MAX);
+
+			vkDestroyFence(handleDevice, handleSubmitDrawCommandsFence, nullptr);
+			vkDestroySemaphore(handleDevice, handleSubmitDrawCommandsSemaphore, nullptr);
+		}
 	}
 }
+
