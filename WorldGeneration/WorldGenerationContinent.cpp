@@ -2,9 +2,12 @@
 
 #include "WorldGenerationContinent.h"
 
+#include "Actions/ActionDeciders/ActionDeciderAI.h"
 #include "DirectoryData.h"
+#include "DomUtils/HeapAlloc.h"
 #include "ECS/ECS.h"
 #include "ECS/Systems/ECSSystemRender.h"
+#include "RPGSystems/RPGSystem.h"
 #include "RenderPriorities.h"
 #include "Renderer.h"
 #include "RendererObject.h"
@@ -12,7 +15,6 @@
 #include "WorldGenerationTileDefinition.h"
 #include "WorldGenerationUtils.h"
 
-#include "DomUtils/HeapAlloc.h"
 
 // We can't spawn at 0,0 or it bugs out so we just do an extra 100 in each direction
 constexpr int CONTINENT_ORIGIN_X = 100;
@@ -50,7 +52,8 @@ void WorldGenerationContinent::Init()
 	const int halfContinentSize = (int)(continentSize * 0.5f);
 
 	// 1. Generate shoreline.
-	// This algorithm works by generating a circle around the center point, then the radius of that circle changes based off a noise algorithm.
+	// This algorithm works by generating a circle around the center point, then the radius of that circle changes as you go around based off 1D noise.
+	// We also calculate the "distance from ocean" and store it in tileDistanceFromOcean while we're here for use in later stages.
 	HeapAlloc<float> tileDistanceFromOcean;
 	tileDistanceFromOcean.Alloc((size_t)(continentSize * continentSize));
 	memset(tileDistanceFromOcean.RawPtr(), -1, sizeof(float) * continentSize * continentSize);
@@ -128,11 +131,48 @@ void WorldGenerationContinent::Init()
 			}
 		}
 	}
+
+	// 3. Generate enemies
+	{
+		pEnemySpawnData.Alloc((size_t)(continentSize * continentSize));
+		memset((void*)pEnemySpawnData.RawPtr(), 0, pEnemySpawnData.GetSize() * sizeof(pEnemySpawnData[0]));
+		
+		Vec2i playerSpawnPoint = GetPlayerSpawnPoint();
+		playerSpawnPoint -= {CONTINENT_ORIGIN_X, CONTINENT_ORIGIN_Y}; // Player spawn point in "continent space"
+		
+		RandSeed enemySeed = seed;
+		for (int x = 0; x < continentSize; ++x)
+		{
+			for (int y = 0; y < continentSize; ++y)
+			{
+				if (GetBackgroundTileRef({x,y}) == EWorldGenerationTile::Water || GetForegroundTileRef({x,y}) == EWorldGenerationTile::Tree)
+				{
+					// #TODO: This should be figured out dynamically with WorldGenerationTileData::bRigidBody
+					// Can't spawn on unwalkable terrain
+					continue;
+				}
+				if (Vec2i::DistanceSq(playerSpawnPoint, Vec2i(x,y)) < enemyParams.minDistanceFromPlayerSpawnSq)
+				{
+					// Too close to player spawn point
+					 continue;
+				}
+
+				WorldGenerationUtils::MutateSeed(enemySeed);
+				if (WorldGenerationUtils::RandFloat(enemySeed) <= enemyParams.enemySpawnChanceAlpha)
+				{
+					EnemySpawnData& enemyData = GetEnemyDataRef({x,y});
+					enemyData.pRaceData = enemyParams.pBanditRaceData;
+					enemyData.level = 0; // #TEMP: Higher level further away
+				}
+			}
+		}
+	}
 }
 
 void WorldGenerationContinent::UnInit()
 {
-	
+	delete sandParams.pSandDistanceFromShoreDeltaLogic;
+	delete shorelineParams.pShorelineDistanceDeltaLogic;
 }
 
 EntityId WorldGenerationContinent::CreateTileEntity(EWorldGenerationLayer layer, Vec2i position) const
@@ -146,6 +186,18 @@ EntityId WorldGenerationContinent::CreateTileEntity(EWorldGenerationLayer layer,
 		return layer == EWorldGenerationLayer::Background ? CreateTileEntityInternal(EWorldGenerationTile::Water, layer, position) : INVALID_ENTITY_ID;
 	}
 
+	// Spawn enemies in foreground
+	// #TEMP: Hacky as fuck, needs a real enemy spawn manager system
+	if (layer == EWorldGenerationLayer::Foreground)
+	{
+		EnemySpawnData& enemySpawnData = GetEnemyDataRef(position);
+		if (enemySpawnData.pRaceData)
+		{
+			CreateEnemyEntityInternal(enemySpawnData, position);
+			return INVALID_ENTITY_ID; // Don't pass a entity id of the enemy, as we don't want to chunk to own it.
+		}
+	}
+	
 	return CreateTileEntityInternal(GetTileRef(position, layer), layer, position);
 }
 
@@ -163,7 +215,7 @@ Vec2i WorldGenerationContinent::GetPlayerSpawnPoint() const
 	}
 
 	DOMLOG_WARN("Couldn't find suitable spawn for player, falling back to origin")
-	return {CONTINENT_ORIGIN_X, CONTINENT_ORIGIN_Y + CONTINENT_ORIGIN_Y - 1};
+	return {CONTINENT_ORIGIN_X, CONTINENT_ORIGIN_Y + continentSize - 1};
 }
 
 EntityId WorldGenerationContinent::CreateTileEntityInternal(EWorldGenerationTile tile, EWorldGenerationLayer layer, Vec2i position) const
@@ -202,6 +254,32 @@ EntityId WorldGenerationContinent::CreateTileEntityInternal(EWorldGenerationTile
 	}
 
 	return INVALID_ENTITY_ID;
+}
+
+void WorldGenerationContinent::CreateEnemyEntityInternal(EnemySpawnData& spawnData, Vec2i position) const
+{
+	if (pEcs && pDirectoryData && pRPGSystem)
+	{
+		EntityId enemyEntity = pEcs->GetNextFreeEntity();
+
+		// Transform
+		ComponentTransform& transform = pEcs->AddComponent<ComponentTransform>(enemyEntity);
+		transform.x = position.x + CONTINENT_ORIGIN_X;
+		transform.y = position.y + CONTINENT_ORIGIN_Y;
+
+		// Action
+		ComponentAction& action = pEcs->AddComponent<ComponentAction>(enemyEntity);
+		action.pActionDecider = enemyParams.pEnemyActionDecider;
+
+		// Faction
+		ComponentFaction& faction = pEcs->AddComponent<ComponentFaction>(enemyEntity);
+		faction.factionFlags = ComponentFaction::EFactionFlags::Enemy;
+
+		RPGEntitySetupParams params = {};
+		params.pRaceData = spawnData.pRaceData;
+		params.startLevel = spawnData.level;
+		pRPGSystem->SetupRPGEntity(enemyEntity, params);
+	}
 }
 
 EWorldGenerationTile& WorldGenerationContinent::GetTileRef(Vec2i position, EWorldGenerationLayer layer) const

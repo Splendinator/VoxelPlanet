@@ -11,8 +11,6 @@
 
 #include "DomWindow/DomWindow.h"
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
 void WorldGenerator::Init()
 {
 	if (pContinent)
@@ -148,4 +146,3 @@ void WorldGenerator::DrawImGui(float deltaTime)
 	}
 }
 #endif
-#pragma optimize("", on)

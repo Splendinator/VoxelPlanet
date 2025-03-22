@@ -51,7 +51,7 @@ void GameplayTick(float deltaTime)
 
 #ifdef DOMIMGUI
 // #TEMP: This is the FPS counter, will need removing / moving to an EditorWindow.
-void CreateImGuiWindow(float deltaTime)
+void TickImGuiFramerateWindow(float deltaTime)
 {
 	static int numFrames = 0;
 	static float totalTime = 0.0f;
@@ -78,7 +78,7 @@ void CreateImGuiWindow(float deltaTime)
 void Game::Tick(float deltaTime)
 {
 #ifdef DOMIMGUI
-	CreateImGuiWindow(deltaTime);
+	TickImGuiFramerateWindow(deltaTime);
 #endif //~ #ifdef DOMIMGUI
 	
 	GameplayTick(deltaTime);

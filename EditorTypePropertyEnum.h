@@ -26,5 +26,6 @@ public:
 
 protected:
 	int value = 0;
+	std::string valueName;
 	std::string enumName;
 };

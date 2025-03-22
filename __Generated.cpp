@@ -77,6 +77,7 @@ void BasicNoiseParams::_InitFromPropertiesSubset(void* pObject, const std::vecto
 	BasicNoiseParams* pBasicNoiseParams = static_cast<BasicNoiseParams*>(pObject);
 	pBasicNoiseParams->gridSize = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
 	pBasicNoiseParams->magnitude = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pBasicNoiseParams->gridModulus = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
 }
 
 void* BasicNoiseParams::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -146,6 +147,34 @@ void* WorldGenerationLogicBase::_CreateEmptyObject()
 void WorldGenerationLogicBase::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<WorldGenerationLogicBase*>(pObject);
+}
+
+// WorldGenerationEnemyParams
+void WorldGenerationEnemyParams::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	WorldGenerationEnemyParams* pWorldGenerationEnemyParams = static_cast<WorldGenerationEnemyParams*>(pObject);
+	pWorldGenerationEnemyParams->minDistanceFromPlayerSpawnSq = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationEnemyParams->enemySpawnChanceAlpha = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationEnemyParams->pBanditRaceData = static_cast<RPGRaceData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pWorldGenerationEnemyParams->pEnemyActionDecider = static_cast<ActionDeciderAI*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* WorldGenerationEnemyParams::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	WorldGenerationEnemyParams* pWorldGenerationEnemyParams = new WorldGenerationEnemyParams;
+	int propertyIndex = 0;
+	WorldGenerationEnemyParams::_InitFromPropertiesSubset(pWorldGenerationEnemyParams, properties, propertyIndex);
+	return pWorldGenerationEnemyParams;
+}
+
+void* WorldGenerationEnemyParams::_CreateEmptyObject()
+{
+	return new WorldGenerationEnemyParams;
+}
+
+void WorldGenerationEnemyParams::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<WorldGenerationEnemyParams*>(pObject);
 }
 
 // WorldGenerationTreeParams
@@ -955,6 +984,7 @@ void ActionDeciderAI::_InitFromPropertiesSubset(void* pObject, const std::vector
 	ActionDeciderAI* pActionDeciderAI = static_cast<ActionDeciderAI*>(pObject);
 	ActionDeciderBase::_InitFromPropertiesSubset(static_cast<ActionDeciderBase*>(pActionDeciderAI), properties, propertyIndex);
 	pActionDeciderAI->pWaitAction = static_cast<ActionHandlerWait*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pActionDeciderAI->aggroRange = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
 }
 
 void* ActionDeciderAI::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -1996,6 +2026,7 @@ void WorldGenerationContinent::_InitFromPropertiesSubset(void* pObject, const st
 	WorldGenerationContinent* pWorldGenerationContinent = static_cast<WorldGenerationContinent*>(pObject);
 	pWorldGenerationContinent->pEcs = static_cast<ECS*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pWorldGenerationContinent->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pWorldGenerationContinent->pRPGSystem = static_cast<RPGSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pWorldGenerationContinent->continentSize = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
 	pWorldGenerationContinent->bRandomSeed = static_cast<EditorTypePropertyBool*>(properties[propertyIndex++])->GetValue();
 	pWorldGenerationContinent->debugSeed = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
@@ -2019,6 +2050,11 @@ void WorldGenerationContinent::_InitFromPropertiesSubset(void* pObject, const st
 	{
 		WorldGenerationTreeParams* temp = static_cast<WorldGenerationTreeParams*>(static_cast<EditorTypePropertyStruct*>(properties[propertyIndex++])->GetValue());
 		pWorldGenerationContinent->treeParams = *temp;
+		delete temp;
+	}
+	{
+		WorldGenerationEnemyParams* temp = static_cast<WorldGenerationEnemyParams*>(static_cast<EditorTypePropertyStruct*>(properties[propertyIndex++])->GetValue());
+		pWorldGenerationContinent->enemyParams = *temp;
 		delete temp;
 	}
 }
@@ -2310,6 +2346,7 @@ namespace __Generated
 		{"BasicNoiseParams", &BasicNoiseParams::_InitFromProperties},
 		{"WorldGenerationTileDefinition", &WorldGenerationTileDefinition::_InitFromProperties},
 		{"WorldGenerationLogicBase", &WorldGenerationLogicBase::_InitFromProperties},
+		{"WorldGenerationEnemyParams", &WorldGenerationEnemyParams::_InitFromProperties},
 		{"WorldGenerationTreeParams", &WorldGenerationTreeParams::_InitFromProperties},
 		{"WorldGenerationSandParams", &WorldGenerationSandParams::_InitFromProperties},
 		{"WorldGenerationShorelineParams", &WorldGenerationShorelineParams::_InitFromProperties},
@@ -2393,6 +2430,7 @@ namespace __Generated
 		{"BasicNoiseParams", &BasicNoiseParams::_CreateEmptyObject},
 		{"WorldGenerationTileDefinition", &WorldGenerationTileDefinition::_CreateEmptyObject},
 		{"WorldGenerationLogicBase", &WorldGenerationLogicBase::_CreateEmptyObject},
+		{"WorldGenerationEnemyParams", &WorldGenerationEnemyParams::_CreateEmptyObject},
 		{"WorldGenerationTreeParams", &WorldGenerationTreeParams::_CreateEmptyObject},
 		{"WorldGenerationSandParams", &WorldGenerationSandParams::_CreateEmptyObject},
 		{"WorldGenerationShorelineParams", &WorldGenerationShorelineParams::_CreateEmptyObject},
@@ -2476,6 +2514,7 @@ namespace __Generated
 		{"BasicNoiseParams", &BasicNoiseParams::_InitFromPropertiesSubset},
 		{"WorldGenerationTileDefinition", &WorldGenerationTileDefinition::_InitFromPropertiesSubset},
 		{"WorldGenerationLogicBase", &WorldGenerationLogicBase::_InitFromPropertiesSubset},
+		{"WorldGenerationEnemyParams", &WorldGenerationEnemyParams::_InitFromPropertiesSubset},
 		{"WorldGenerationTreeParams", &WorldGenerationTreeParams::_InitFromPropertiesSubset},
 		{"WorldGenerationSandParams", &WorldGenerationSandParams::_InitFromPropertiesSubset},
 		{"WorldGenerationShorelineParams", &WorldGenerationShorelineParams::_InitFromPropertiesSubset},
@@ -2558,6 +2597,7 @@ namespace __Generated
 		{"BasicNoiseParams", &BasicNoiseParams::_DeleteObject},
 		{"WorldGenerationTileDefinition", &WorldGenerationTileDefinition::_DeleteObject},
 		{"WorldGenerationLogicBase", &WorldGenerationLogicBase::_DeleteObject},
+		{"WorldGenerationEnemyParams", &WorldGenerationEnemyParams::_DeleteObject},
 		{"WorldGenerationTreeParams", &WorldGenerationTreeParams::_DeleteObject},
 		{"WorldGenerationSandParams", &WorldGenerationSandParams::_DeleteObject},
 		{"WorldGenerationShorelineParams", &WorldGenerationShorelineParams::_DeleteObject},

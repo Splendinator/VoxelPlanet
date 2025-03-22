@@ -27,4 +27,6 @@ protected:
 	EDITORPROPERTY()
 	ActionHandlerWait* pWaitAction = nullptr;
 
+	EDITORPROPERTY()
+	int aggroRange;
 };

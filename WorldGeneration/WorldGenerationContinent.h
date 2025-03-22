@@ -7,10 +7,17 @@
 
 #include "ECS/ECSTypes.h"
 
-class WorldGenerationLogicBase;
+class ActionDeciderAI;
+class RPGSystem;
 class DirectoryData;
 class ECS;
+class RPGRaceData;
+class WorldGenerationLogicBase;
 class WorldGenerationTileDefinition;
+
+// #TODO: We need to have a serious think about enemies and what system should handle spawning them / despawning them / remembering how much HP they had, etc.
+// #TODO: Maybe certain things like enemies should be generated at runtime instead the first time you spawn a chunk so we don't have to lagspike for ages generating every single tile of the continent.
+// #TODO: We should try and make the world generation process more modular instead of the monolithic Init() function that we have now.
 
 EDITORENUM()
 enum class EWorldGenerationTile : u8
@@ -87,10 +94,36 @@ struct WorldGenerationTreeParams
 	float treePercentageAtMaximumDistance;
 };
 
+EDITORSTRUCT()
+struct WorldGenerationEnemyParams
+{
+	EDITORBODY()
+
+	// Minimum distance from player spawn before enemies can spawn
+	EDITORPROPERTY()
+	float minDistanceFromPlayerSpawnSq;
+
+	// [0.0, 1.0]
+	EDITORPROPERTY()
+	float enemySpawnChanceAlpha;
+	
+	EDITORPROPERTY()
+	RPGRaceData* pBanditRaceData = nullptr;
+
+	EDITORPROPERTY()
+	ActionDeciderAI* pEnemyActionDecider = nullptr;
+};
+
 // See WorldGenerator
 EDITORCLASS(Singleton)
 class WorldGenerationContinent
 {
+	struct EnemySpawnData
+	{
+		RPGRaceData* pRaceData = nullptr;
+		int level = 0;
+	};
+	
 	EDITORBODY()
 public:
 
@@ -106,10 +139,12 @@ public:
 protected:
 
 	EntityId CreateTileEntityInternal(EWorldGenerationTile tile, EWorldGenerationLayer layer, Vec2i position) const;
+	void CreateEnemyEntityInternal(EnemySpawnData& spawnData, Vec2i position) const;
 
 	EWorldGenerationTile& GetBackgroundTileRef(Vec2i position) const { return GetTileRef(position, EWorldGenerationLayer::Background); }
 	EWorldGenerationTile& GetForegroundTileRef(Vec2i position) const { return GetTileRef(position, EWorldGenerationLayer::Foreground); }
 	EWorldGenerationTile& GetTileRef(Vec2i position, EWorldGenerationLayer layer) const;
+	EnemySpawnData& GetEnemyDataRef(Vec2i position) const { return pEnemySpawnData[(position.x * continentSize) + position.y]; }
 	
 	int GetBackgroundTileIndex(Vec2i position) const { return GetTileIndex(position, EWorldGenerationLayer::Background); }
 	int GetForegroundTileIndex(Vec2i position) const { return GetTileIndex(position, EWorldGenerationLayer::Foreground); }
@@ -120,6 +155,9 @@ protected:
 
 	EDITORPROPERTY()
 	DirectoryData* pDirectoryData = nullptr;
+
+	EDITORPROPERTY()
+	RPGSystem* pRPGSystem = nullptr;
 
 	// Size of the whole map continent in tiles.
 	EDITORPROPERTY()
@@ -146,11 +184,18 @@ protected:
 	EDITORPROPERTY()
 	WorldGenerationTreeParams treeParams;
 
+	// Used to generate enemies
+	EDITORPROPERTY()
+	WorldGenerationEnemyParams enemyParams;
+
 	// Enum hash map of tile enums to their definitions
 	const WorldGenerationTileDefinition* tileMap[(int)EWorldGenerationTile::COUNT] = {};
 	
 	// 2d array of all tiles [continentWidth, continentHeight]
 	HeapAllocSize<EWorldGenerationTile> pTiles;
+	
+	// 2d array of all enemies to spawn
+	HeapAllocSize<EnemySpawnData> pEnemySpawnData;
 	
 	RandSeed seed = {};
 

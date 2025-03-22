@@ -9,6 +9,8 @@ class WorldGenerationLogicBase
 	EDITORBODY()
 public:
 
+	virtual ~WorldGenerationLogicBase() {}
+	
 	float BaseDoLogic(RandSeed& inOutSeed, float x, float y);
 	
 protected:
@@ -28,6 +30,8 @@ class WorldGenerationLogicAdd : public WorldGenerationLogicBase
 {
 	EDITORBODY()
 public:
+	~WorldGenerationLogicAdd() override;
+
 	//~ Begin WorldGenerationLogicBase Interface
 	float DoLogic(RandSeed& inOutSeed, float x, float y) const override;
 	//~ End WorldGenerationLogicBase Interface

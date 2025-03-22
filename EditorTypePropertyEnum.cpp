@@ -7,7 +7,6 @@
 #include "Game.h"
 #include "WritePropertyToFileUtils.h"
 
-
 void EditorTypePropertyEnum::DrawImGUI()
 {
 	std::string currentValue = Game::GetAssetManager().GetEnumValueNameFromValue(enumName, value);
@@ -62,26 +61,27 @@ bool EditorTypePropertyEnum::CanReadFromFile(std::ifstream& file) const
 
 void EditorTypePropertyEnum::ReadFromFile(std::ifstream& file)
 {
-	// "enum EMyEnum myEnum 4"
+	// "enum EColour myColour Red"
 	std::string unused;
-	file >> unused >> enumName >> name >> value;
-
-	if (Game::GetAssetManager().GetEnumValueNameFromValue(enumName, value) == "")
+	file >> unused >> enumName >> name >> valueName;
+	
+	if (valueName == "")
 	{
-		DOMLOG_WARN("Can't find enum value", enumName, value, "so setting to default")
-		value = Game::GetAssetManager().FindEnumType(enumName)->valueNamesToValues[0].value;
+		DOMLOG_WARN("Can't find enum value", enumName, valueName, "so setting to default")
+		valueName = Game::GetAssetManager().FindEnumType(enumName)->valueNamesToValues[0].valueName;
 	}
+
+	value = Game::GetAssetManager().GetEnumValueFromValueName(enumName, valueName);
 }
 
 void EditorTypePropertyEnum::WriteToFile(std::ofstream& file)
 {
-	// #TEMP: Write the enum name to the file, not the number. If people re-arrage enums it shouldn't break.
-	
-	// "enum EMyEnum myEnum 4"
-	file << "enum " << enumName  << " " << name << " " << value << std::endl;
+	// "enum EColour myColour Red"
+	file << "enum " << enumName  << " " << name << " " << valueName << std::endl;
 }
 
 void EditorTypePropertyEnum::ForceSetValue(const ForceSetValueParams& params)
 {
+	valueName = params.newValue;
 	value = Game::GetAssetManager().GetEnumValueFromValueName(enumName, params.newValue);
 }

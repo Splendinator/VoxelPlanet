@@ -16,6 +16,15 @@ float WorldGenerationLogicBase::BaseDoLogic(RandSeed& inOutSeed, float x, float 
 }
 
 // WorldGenerationLogicAdd
+WorldGenerationLogicAdd::~WorldGenerationLogicAdd()
+{
+	for (WorldGenerationLogicBase* pLogic : pLogicToAdd)
+	{
+		delete pLogic;
+	}
+	pLogicToAdd.clear();
+}
+
 float WorldGenerationLogicAdd::DoLogic(RandSeed& inOutSeed, float x, float y) const
 {
 	float totalValue = 0.0f;

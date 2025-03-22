@@ -45,7 +45,7 @@ struct RPGDamageParams
 	u32 damage;
 };
 
-// RPG system. Responsible for anything RPG, (levels, attributes, classes, races, skills, etc.).
+// RPG system. Responsible for anything RPG, (levels, attributes, classes, races, etc.). Skills are handled in the RPGSkillManager as they get quite complex 
 // This class is mostly just a house for all the data assets, the bulk of the RPG logic will be in the ECS as it happens to entities 
 EDITORCLASS()
 class RPGSystem : public GameSystem

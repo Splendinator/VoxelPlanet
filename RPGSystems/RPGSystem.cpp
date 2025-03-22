@@ -21,6 +21,12 @@ void RPGSystem::Init()
 
 void RPGSystem::RecalculateAttributesForEntity(EntityId entity)
 {
+	if (!attributeSharedData.pEcs)
+	{
+		DOMLOG_WARN("No ECS, can't recalculate attributes")
+		return;
+	}
+	
 	for (const RPGAttributeBase* pAttribute : attributes)
 	{
 		if (pAttribute)
@@ -45,6 +51,7 @@ void RPGSystem::SetupRPGEntity(EntityId entity, RPGEntitySetupParams params)
 		
 		ComponentMesh& meshComponent = pEcs->AddComponent<ComponentMesh>(entity);
 		ComponentProgression& progressionComponent = pEcs->AddComponent<ComponentProgression>(entity);
+		pEcs->AddComponent<ComponentRigid>(entity);
 		
 		// Level setup
 		progressionComponent.level = params.startLevel;
@@ -80,9 +87,12 @@ void RPGSystem::SetupRPGEntity(EntityId entity, RPGEntitySetupParams params)
 		// Attribute setup (this must be done last as it relies on prior data)
 		{
 			ComponentHealth& healthComponent = pEcs->AddComponent<ComponentHealth>(entity);
+			ComponentAction& actionComponent = pEcs->AddComponent<ComponentAction>(entity);
 			
 			RecalculateAttributesForEntity(entity);
-
+			
+			actionComponent.maxEnergy = 100; // #TEMP: Setup energy attribute
+			actionComponent.energy = actionComponent.maxEnergy;
 			healthComponent.health = healthComponent.maxHealth;
 		}
 	}

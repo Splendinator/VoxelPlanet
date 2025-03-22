@@ -1,6 +1,7 @@
 Struct BasicNoiseParams
 float gridSize 1
 float magnitude 1
+float gridModulus -1
 ;
 Class WorldGenerationTileDefinition
 meta Singleton
@@ -12,6 +13,12 @@ meta Abstract
 meta Instanced
 meta EditInlineNew
 bool bMutateSeedAfterLogic false
+;
+Struct WorldGenerationEnemyParams
+float minDistanceFromPlayerSpawnSq 0
+float enemySpawnChanceAlpha 0
+class RPGRaceData pBanditRaceData nullptr
+class ActionDeciderAI pEnemyActionDecider nullptr
 ;
 Struct WorldGenerationTreeParams
 float distanceFromOceanTreesBegin 0
@@ -286,6 +293,7 @@ class ActionHandlerMove pMoveAction nullptr
 Class ActionDeciderAI
 Child ActionDeciderBase
 class ActionHandlerWait pWaitAction nullptr
+int aggroRange 0
 ;
 Class WorldGenerator
 Child GameSystem
@@ -465,6 +473,7 @@ Class WorldGenerationContinent
 meta Singleton
 class ECS pEcs nullptr
 class DirectoryData pDirectoryData nullptr
+class RPGSystem pRPGSystem nullptr
 int continentSize 0
 bool bRandomSeed true
 int debugSeed 0
@@ -472,6 +481,7 @@ vector tileData WorldGenerationTileEntry
 struct WorldGenerationShorelineParams shorelineParams
 struct WorldGenerationSandParams sandParams
 struct WorldGenerationTreeParams treeParams
+struct WorldGenerationEnemyParams enemyParams
 ;
 Class HUDObjectBase
 meta Abstract

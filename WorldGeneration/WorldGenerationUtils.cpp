@@ -45,17 +45,32 @@ float WorldGenerationUtils::RandFloat(RandSeed randSeed)
 
 float WorldGenerationUtils::BasicNoise1D(float x, RandSeed seed, BasicNoiseParams params)
 {
-	// #TEMP: This once returned an insane number, see NosieBug.png on desktop
+	// #JANK: This once returned an insane number, see NosieBug.png on desktop
 	
 	const float gridSpace = x / (float)params.gridSize;
 	const float lowerGridCoordinate = floor(gridSpace) * params.gridSize;
 	const float upperGridCoordinate = ceil(gridSpace) * params.gridSize;
 
+	// Wrap grid co-ordinates around modulus if specified
+	float lowerGridCoordinateModulusAdjusted = lowerGridCoordinate;
+	float upperGridCoordinateModulusAdjusted = upperGridCoordinate;
+	if (params.gridModulus > 0.0f)
+	{
+		while (lowerGridCoordinateModulusAdjusted >= params.gridModulus)
+		{
+			lowerGridCoordinateModulusAdjusted -= params.gridModulus;
+		}
+		while (upperGridCoordinateModulusAdjusted >= params.gridModulus)
+		{
+			upperGridCoordinateModulusAdjusted -= params.gridModulus;
+		}
+	}
+	
 	// Get deterministic seeds for each grid point
 	RandSeed lowerGridSeed = seed;
 	RandSeed upperGridSeed = seed;
-	MutateSeedByByte(lowerGridSeed, (u8)lowerGridCoordinate);
-	MutateSeedByByte(upperGridSeed, (u8)upperGridCoordinate);
+	MutateSeedByByte(lowerGridSeed, (u8)lowerGridCoordinateModulusAdjusted);
+	MutateSeedByByte(upperGridSeed, (u8)upperGridCoordinateModulusAdjusted);
 
 	// Get random gradents (-0.5f, 0.5f)
 	const float lowerGridGradient = RandFloat(lowerGridSeed) - 0.5f;

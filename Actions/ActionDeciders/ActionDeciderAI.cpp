@@ -41,7 +41,7 @@ ActionHandlerBase* ActionDeciderAI::DecideAction(ECS& ecs, EntityId actor)
 						const int enemyY = enemyTransform.y;
 
 						const int distance = abs(actorX - enemyX) + abs(actorY - enemyY);
-						if (distance < closestEnemyData.enemyDistance)
+						if (distance < closestEnemyData.enemyDistance && distance <= aggroRange)
 						{
 							closestEnemyData.enemyDistance = distance;
 							closestEnemyData.enemyX = enemyX;
