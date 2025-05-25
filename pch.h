@@ -41,6 +41,7 @@
 #include "Game.h"
 #include "AssetManager/AssetManager.h" // Contains ENUMSTRING() so useful to be here
 #include "AssetManager/InstancedAssetPtr.h"
+#include "AssetManager/DataCompositeProperty.h"
 #include "Performance/ScopedPerformanceMarker.h"
 
 using namespace dmut;

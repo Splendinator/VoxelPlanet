@@ -50,7 +50,7 @@ void GameplayTick(float deltaTime)
 }
 
 #ifdef DOMIMGUI
-// #TEMP: This is the FPS counter, will need removing / moving to an EditorWindow.
+// #TODO: This is the FPS counter, will need removing / moving to an EditorWindow.
 void TickImGuiFramerateWindow(float deltaTime)
 {
 	static int numFrames = 0;

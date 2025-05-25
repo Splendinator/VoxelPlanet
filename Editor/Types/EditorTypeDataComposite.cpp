@@ -87,7 +87,7 @@ void EditorTypeDataComposite::ReadFromFile(std::ifstream& file)
 		// (see EditorTypePropertyFactoryClass::CreateType(), it literally just forwards to EditorTypePropertyClass::ReadFromFile())
 		// There are certain exceptions like structs so we handle those separately underneath.
 		// #JANK: We really shouldn't be re-using these factories for reading in DataComposite files, but it works for now and is a lot less code than writing a new set of factories just for this purpose.
-		// #JANK: We can't do vector types here because it's a lot of code (The solution would be similar to EditorTypePropertyFactoryVector::CreateType()). We can work around this by using a struct with a vector property inside it.
+		// #JANK: I didn't implement vector types here because it's a lot of code (The solution would be similar to EditorTypePropertyFactoryVector::CreateType()). We can work around this by using a struct with a vector property inside it.
 		static EditorTypePropertyFactoryBase* propertyFactories[] = 
 		{
 			&EditorTypeUtils::floatFactory,

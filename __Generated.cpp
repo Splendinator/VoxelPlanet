@@ -9,6 +9,8 @@
 #include "Editor/Types/Properties/EditorTypePropertyVector.h"
 #include "Editor/Types/Properties/EditorTypePropertyEnum.h"
 #include "Editor/Types/Properties/EditorTypePropertyInstancedAssetPtr.h"
+#include "Editor/Types/Properties/EditorTypePropertyDataCompositeProperty.h"
+#include "..\Roguelike\AaaaHeaderToolTest.h"
 #include "..\Roguelike\Actions\ActionDeciders\ActionDeciderAI.h"
 #include "..\Roguelike\Actions\ActionDeciders\ActionDeciderBase.h"
 #include "..\Roguelike\Actions\ActionDeciders\ActionDeciderPlayer.h"
@@ -31,7 +33,6 @@
 #include "..\Roguelike\ECS\Systems\ECSSystemPhysics.h"
 #include "..\Roguelike\ECS\Systems\ECSSystemRender.h"
 #include "..\Roguelike\Editor\ImGuiEditor.h"
-#include "..\Roguelike\Game.h"
 #include "..\Roguelike\HotbarManager\HotbarManager.h"
 #include "..\Roguelike\HotbarManager\IHotbarItem.h"
 #include "..\Roguelike\HotbarManager\StatefulHotbarActions.h"
@@ -746,37 +747,6 @@ void HotbarSlot::_DeleteObject(void* pObject)
 	delete reinterpret_cast<HotbarSlot*>(pObject);
 }
 
-// MyStruct
-void MyStruct::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	MyStruct* pMyStruct = static_cast<MyStruct*>(pObject);
-	{
-		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
-		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
-		{
-			pMyStruct->intVector.push_back(static_cast<EditorTypePropertyInt*>(instancedProperty.get())->GetValue());
-		}
-	}
-}
-
-void* MyStruct::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	MyStruct* pMyStruct = new MyStruct;
-	int propertyIndex = 0;
-	MyStruct::_InitFromPropertiesSubset(pMyStruct, properties, propertyIndex);
-	return pMyStruct;
-}
-
-void* MyStruct::_CreateEmptyObject()
-{
-	return new MyStruct;
-}
-
-void MyStruct::_DeleteObject(void* pObject)
-{
-	delete reinterpret_cast<MyStruct*>(pObject);
-}
-
 // ECSSystemBase
 void ECSSystemBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1042,6 +1012,38 @@ void* ActionDeciderAI::_CreateEmptyObject()
 void ActionDeciderAI::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<ActionDeciderAI*>(pObject);
+}
+
+// TestClass
+void TestClass::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	TestClass* pTestClass = static_cast<TestClass*>(pObject);
+	GameSystem::_InitFromPropertiesSubset(static_cast<GameSystem*>(pTestClass), properties, propertyIndex);
+	pTestClass->floatProperty = static_cast<EditorTypePropertyDataCompositeProperty*>(properties[propertyIndex++])->GetValue();
+	pTestClass->boolProperty = static_cast<EditorTypePropertyDataCompositeProperty*>(properties[propertyIndex++])->GetValue();
+	pTestClass->intProperty = static_cast<EditorTypePropertyDataCompositeProperty*>(properties[propertyIndex++])->GetValue();
+	pTestClass->stringProperty = static_cast<EditorTypePropertyDataCompositeProperty*>(properties[propertyIndex++])->GetValue();
+	pTestClass->directoryDataProperty = static_cast<EditorTypePropertyDataCompositeProperty*>(properties[propertyIndex++])->GetValue();
+	pTestClass->hudAnchorPointProperty = static_cast<EditorTypePropertyDataCompositeProperty*>(properties[propertyIndex++])->GetValue();
+	pTestClass->hudAnchorPointStructProperty = static_cast<EditorTypePropertyDataCompositeProperty*>(properties[propertyIndex++])->GetValue();
+}
+
+void* TestClass::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	TestClass* pTestClass = new TestClass;
+	int propertyIndex = 0;
+	TestClass::_InitFromPropertiesSubset(pTestClass, properties, propertyIndex);
+	return pTestClass;
+}
+
+void* TestClass::_CreateEmptyObject()
+{
+	return new TestClass;
+}
+
+void TestClass::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<TestClass*>(pObject);
 }
 
 // WorldGenerator
@@ -1822,35 +1824,6 @@ void HotbarManager::_DeleteObject(void* pObject)
 	delete reinterpret_cast<HotbarManager*>(pObject);
 }
 
-// MyClass
-void MyClass::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	MyClass* pMyClass = static_cast<MyClass*>(pObject);
-	{
-		MyStruct* temp = static_cast<MyStruct*>(static_cast<EditorTypePropertyStruct*>(properties[propertyIndex++])->GetValue());
-		pMyClass->myStruct = *temp;
-		delete temp;
-	}
-}
-
-void* MyClass::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	MyClass* pMyClass = new MyClass;
-	int propertyIndex = 0;
-	MyClass::_InitFromPropertiesSubset(pMyClass, properties, propertyIndex);
-	return pMyClass;
-}
-
-void* MyClass::_CreateEmptyObject()
-{
-	return new MyClass;
-}
-
-void MyClass::_DeleteObject(void* pObject)
-{
-	delete reinterpret_cast<MyClass*>(pObject);
-}
-
 // ImGuiEditor
 void ImGuiEditor::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -2513,7 +2486,6 @@ namespace __Generated
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_InitFromProperties},
 		{"IHotbarItem", &IHotbarItem::_InitFromProperties},
 		{"HotbarSlot", &HotbarSlot::_InitFromProperties},
-		{"MyStruct", &MyStruct::_InitFromProperties},
 		{"ECSSystemBase", &ECSSystemBase::_InitFromProperties},
 		{"ECSSystemAction", &ECSSystemAction::_InitFromProperties},
 		{"DirectoryData", &DirectoryData::_InitFromProperties},
@@ -2524,6 +2496,7 @@ namespace __Generated
 		{"ActionHandlerAttack", &ActionHandlerAttack::_InitFromProperties},
 		{"ActionDeciderBase", &ActionDeciderBase::_InitFromProperties},
 		{"ActionDeciderAI", &ActionDeciderAI::_InitFromProperties},
+		{"TestClass", &TestClass::_InitFromProperties},
 		{"WorldGenerator", &WorldGenerator::_InitFromProperties},
 		{"WorldGenerationLogicBasicNoise1D", &WorldGenerationLogicBasicNoise1D::_InitFromProperties},
 		{"WorldGenerationLogicAdd", &WorldGenerationLogicAdd::_InitFromProperties},
@@ -2550,7 +2523,6 @@ namespace __Generated
 		{"InputActionPress", &InputActionPress::_InitFromProperties},
 		{"StatefulHotbarActionCastSkill", &StatefulHotbarActionCastSkill::_InitFromProperties},
 		{"HotbarManager", &HotbarManager::_InitFromProperties},
-		{"MyClass", &MyClass::_InitFromProperties},
 		{"ImGuiEditor", &ImGuiEditor::_InitFromProperties},
 		{"ECSSystemRender", &ECSSystemRender::_InitFromProperties},
 		{"ECSSystemPhysics", &ECSSystemPhysics::_InitFromProperties},
@@ -2602,7 +2574,6 @@ namespace __Generated
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_CreateEmptyObject},
 		{"IHotbarItem", &IHotbarItem::_CreateEmptyObject},
 		{"HotbarSlot", &HotbarSlot::_CreateEmptyObject},
-		{"MyStruct", &MyStruct::_CreateEmptyObject},
 		{"ECSSystemBase", &ECSSystemBase::_CreateEmptyObject},
 		{"ECSSystemAction", &ECSSystemAction::_CreateEmptyObject},
 		{"DirectoryData", &DirectoryData::_CreateEmptyObject},
@@ -2613,6 +2584,7 @@ namespace __Generated
 		{"ActionHandlerAttack", &ActionHandlerAttack::_CreateEmptyObject},
 		{"ActionDeciderBase", &ActionDeciderBase::_CreateEmptyObject},
 		{"ActionDeciderAI", &ActionDeciderAI::_CreateEmptyObject},
+		{"TestClass", &TestClass::_CreateEmptyObject},
 		{"WorldGenerator", &WorldGenerator::_CreateEmptyObject},
 		{"WorldGenerationLogicBasicNoise1D", &WorldGenerationLogicBasicNoise1D::_CreateEmptyObject},
 		{"WorldGenerationLogicAdd", &WorldGenerationLogicAdd::_CreateEmptyObject},
@@ -2639,7 +2611,6 @@ namespace __Generated
 		{"InputActionPress", &InputActionPress::_CreateEmptyObject},
 		{"StatefulHotbarActionCastSkill", &StatefulHotbarActionCastSkill::_CreateEmptyObject},
 		{"HotbarManager", &HotbarManager::_CreateEmptyObject},
-		{"MyClass", &MyClass::_CreateEmptyObject},
 		{"ImGuiEditor", &ImGuiEditor::_CreateEmptyObject},
 		{"ECSSystemRender", &ECSSystemRender::_CreateEmptyObject},
 		{"ECSSystemPhysics", &ECSSystemPhysics::_CreateEmptyObject},
@@ -2691,7 +2662,6 @@ namespace __Generated
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_InitFromPropertiesSubset},
 		{"IHotbarItem", &IHotbarItem::_InitFromPropertiesSubset},
 		{"HotbarSlot", &HotbarSlot::_InitFromPropertiesSubset},
-		{"MyStruct", &MyStruct::_InitFromPropertiesSubset},
 		{"ECSSystemBase", &ECSSystemBase::_InitFromPropertiesSubset},
 		{"ECSSystemAction", &ECSSystemAction::_InitFromPropertiesSubset},
 		{"DirectoryData", &DirectoryData::_InitFromPropertiesSubset},
@@ -2702,6 +2672,7 @@ namespace __Generated
 		{"ActionHandlerAttack", &ActionHandlerAttack::_InitFromPropertiesSubset},
 		{"ActionDeciderBase", &ActionDeciderBase::_InitFromPropertiesSubset},
 		{"ActionDeciderAI", &ActionDeciderAI::_InitFromPropertiesSubset},
+		{"TestClass", &TestClass::_InitFromPropertiesSubset},
 		{"WorldGenerator", &WorldGenerator::_InitFromPropertiesSubset},
 		{"WorldGenerationLogicBasicNoise1D", &WorldGenerationLogicBasicNoise1D::_InitFromPropertiesSubset},
 		{"WorldGenerationLogicAdd", &WorldGenerationLogicAdd::_InitFromPropertiesSubset},
@@ -2728,7 +2699,6 @@ namespace __Generated
 		{"InputActionPress", &InputActionPress::_InitFromPropertiesSubset},
 		{"StatefulHotbarActionCastSkill", &StatefulHotbarActionCastSkill::_InitFromPropertiesSubset},
 		{"HotbarManager", &HotbarManager::_InitFromPropertiesSubset},
-		{"MyClass", &MyClass::_InitFromPropertiesSubset},
 		{"ImGuiEditor", &ImGuiEditor::_InitFromPropertiesSubset},
 		{"ECSSystemRender", &ECSSystemRender::_InitFromPropertiesSubset},
 		{"ECSSystemPhysics", &ECSSystemPhysics::_InitFromPropertiesSubset},
@@ -2779,7 +2749,6 @@ namespace __Generated
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_DeleteObject},
 		{"IHotbarItem", &IHotbarItem::_DeleteObject},
 		{"HotbarSlot", &HotbarSlot::_DeleteObject},
-		{"MyStruct", &MyStruct::_DeleteObject},
 		{"ECSSystemBase", &ECSSystemBase::_DeleteObject},
 		{"ECSSystemAction", &ECSSystemAction::_DeleteObject},
 		{"DirectoryData", &DirectoryData::_DeleteObject},
@@ -2790,6 +2759,7 @@ namespace __Generated
 		{"ActionHandlerAttack", &ActionHandlerAttack::_DeleteObject},
 		{"ActionDeciderBase", &ActionDeciderBase::_DeleteObject},
 		{"ActionDeciderAI", &ActionDeciderAI::_DeleteObject},
+		{"TestClass", &TestClass::_DeleteObject},
 		{"WorldGenerator", &WorldGenerator::_DeleteObject},
 		{"WorldGenerationLogicBasicNoise1D", &WorldGenerationLogicBasicNoise1D::_DeleteObject},
 		{"WorldGenerationLogicAdd", &WorldGenerationLogicAdd::_DeleteObject},
@@ -2816,7 +2786,6 @@ namespace __Generated
 		{"InputActionPress", &InputActionPress::_DeleteObject},
 		{"StatefulHotbarActionCastSkill", &StatefulHotbarActionCastSkill::_DeleteObject},
 		{"HotbarManager", &HotbarManager::_DeleteObject},
-		{"MyClass", &MyClass::_DeleteObject},
 		{"ImGuiEditor", &ImGuiEditor::_DeleteObject},
 		{"ECSSystemRender", &ECSSystemRender::_DeleteObject},
 		{"ECSSystemPhysics", &ECSSystemPhysics::_DeleteObject},

@@ -9,6 +9,7 @@
 #include "Editor/Types/Properties/EditorTypePropertyFactoryString.h"
 #include "Editor/Types/Properties/EditorTypePropertyFactoryStruct.h"
 #include "Editor/Types/Properties/EditorTypePropertyFactoryVector.h"
+#include "Editor/Types/Properties/EditorTypePropertyFactoryDataCompositeProperty.h"
 
 namespace EditorTypeUtils
 {
@@ -21,6 +22,7 @@ namespace EditorTypeUtils
 	static EditorTypePropertyFactoryVector vectorFactory;
 	static EditorTypePropertyFactoryEnum enumFactory;
 	static EditorTypePropertyFactoryInstancedAssetPtr instancedAssetFactory;
+	static EditorTypePropertyFactoryDataCompositeProperty instancedDataCompositePropertyFactory;
 
 	static EditorTypePropertyFactoryBase* propertyFactories[] = 
 	{
@@ -33,6 +35,7 @@ namespace EditorTypeUtils
 		&vectorFactory,
 		&enumFactory,
 		&instancedAssetFactory,
+		&instancedDataCompositePropertyFactory,
 	};
 
 }

@@ -260,9 +260,6 @@ meta Abstract
 Struct HotbarSlot
 class InputActionBase pInputAction nullptr
 ;
-Struct MyStruct
-vector intVector int
-;
 Class ECSSystemBase
 meta Abstract
 meta Singleton
@@ -312,6 +309,16 @@ Class ActionDeciderAI
 Child ActionDeciderBase
 class ActionHandlerWait pWaitAction nullptr
 int aggroRange 0
+;
+Class TestClass
+Child GameSystem
+datacompositeproperty floatProperty float nullptr none
+datacompositeproperty boolProperty bool nullptr none
+datacompositeproperty intProperty int nullptr none
+datacompositeproperty stringProperty std::string nullptr none
+datacompositeproperty directoryDataProperty DirectoryData nullptr none
+datacompositeproperty hudAnchorPointProperty EHUDAnchorPoint nullptr none
+datacompositeproperty hudAnchorPointStructProperty HUDAnchorPoint nullptr none
 ;
 Class WorldGenerator
 Child GameSystem
@@ -453,9 +460,6 @@ Class HotbarManager
 Child GameSystem
 meta Singleton
 vector hotbarSlots HotbarSlot
-;
-Class MyClass
-struct MyStruct myStruct
 ;
 Class ImGuiEditor
 Child GameSystem

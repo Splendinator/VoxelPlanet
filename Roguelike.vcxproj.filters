@@ -119,16 +119,7 @@
     <ClCompile Include="pch.cpp">
       <Filter>PCH</Filter>
     </ClCompile>
-    <ClCompile Include="StbImageCompile.cpp">
-      <Filter>ExternalCode</Filter>
-    </ClCompile>
     <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VectorPrimitiveBase.cpp">
@@ -167,164 +158,413 @@
     <ClCompile Include="RendererObject.cpp">
       <Filter>Systems\VectorRenderer</Filter>
     </ClCompile>
-    <ClCompile Include="SystemRender.cpp">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="ECS.cpp">
-      <Filter>Systems\ECS</Filter>
-    </ClCompile>
-    <ClCompile Include="Chunk.cpp">
-      <Filter>Systems\WorldGen</Filter>
-    </ClCompile>
-    <ClCompile Include="WorldGenerator.cpp">
-      <Filter>Systems\WorldGen</Filter>
-    </ClCompile>
-    <ClCompile Include="ChunkGeneratorGrass.cpp">
-      <Filter>Systems\WorldGen\ChunkGenerators</Filter>
-    </ClCompile>
-    <ClCompile Include="ActionDeciderAI.cpp">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="ActionDeciderBase.cpp">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="ActionDeciderPlayer.cpp">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="ActionHandlerBase.cpp">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="ActionHandlerMove.cpp">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemAction.cpp">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemPhysics.cpp">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemDamage.cpp">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemEntityMap.cpp">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="ActionHandlerAttack.cpp">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemNameslate.cpp">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClCompile>
     <ClCompile Include="FilePaths.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="ActionHandlerWait.cpp">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemCleanUp.cpp">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="HUD.cpp">
-      <Filter>Systems\UI\HUD</Filter>
-    </ClCompile>
-    <ClCompile Include="HUDObjectBase.cpp">
-      <Filter>Systems\UI\HUD</Filter>
-    </ClCompile>
-    <ClCompile Include="HUDObjectHealth.cpp">
-      <Filter>Systems\UI\HUD</Filter>
-    </ClCompile>
-    <ClCompile Include="HUDAnchorPoint.cpp">
-      <Filter>Systems\UI\HUD</Filter>
-    </ClCompile>
-    <ClCompile Include="UIObjectContainer.cpp">
-      <Filter>Systems\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="UICanvas.cpp">
-      <Filter>Systems\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="UIUtils.cpp">
-      <Filter>Systems\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="UIObjectBase.cpp">
-      <Filter>Systems\UI\UIObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="UIObjectProgressBar.cpp">
-      <Filter>Systems\UI\UIObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGuiEditor.cpp">
-      <Filter>Systems\ImGUIEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorTypeFactoryBase.cpp">
-      <Filter>Systems\ImGUIEditor\Types\EditorTypeFactories</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorTypeFactoryPropertiesBase.cpp">
-      <Filter>Systems\ImGUIEditor\Types\EditorTypeFactories</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorTypeFactoryClass.cpp">
-      <Filter>Systems\ImGUIEditor\Types\EditorTypeFactories</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorTypeBase.cpp">
-      <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorTypeClass.cpp">
-      <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorTypePropertiesBase.cpp">
-      <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGuiEditorGlobals.cpp">
-      <Filter>Systems\ImGUIEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorTypePropertyFloat.cpp">
-      <Filter>Systems\ImGUIEditor\Types\PropertyTypes</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorTypePropertyFactoryFloat.cpp">
-      <Filter>Systems\ImGUIEditor\Types\PropertyFactories</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorWindowFilesystem.cpp">
-      <Filter>Systems\ImGUIEditor\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorWindowCreateNewFolder.cpp">
-      <Filter>Systems\ImGUIEditor\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorWindowBase.cpp">
-      <Filter>Systems\ImGUIEditor\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorActionBase.cpp">
-      <Filter>Systems\ImGUIEditor\Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorActionCreateNewFolder.cpp">
-      <Filter>Systems\ImGUIEditor\Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorWindowActionQueue.cpp">
-      <Filter>Systems\ImGUIEditor\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorWindowCreateAsset.cpp">
-      <Filter>Systems\ImGUIEditor\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorAssetBase.cpp">
-      <Filter>Systems\ImGUIEditor\Types\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorAssetClass.cpp">
-      <Filter>Systems\ImGUIEditor\Types\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorActionCreateAsset.cpp">
-      <Filter>Systems\ImGUIEditor\Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorWindowEditAsset.cpp">
-      <Filter>Systems\ImGUIEditor\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorAssetFactoryBase.cpp">
-      <Filter>Systems\ImGUIEditor\Types\AssetFactories</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorAssetFactoryClass.cpp">
-      <Filter>Systems\ImGUIEditor\Types\AssetFactories</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorActionChangeProperty.cpp">
-      <Filter>Systems\ImGUIEditor\Actions</Filter>
-    </ClCompile>
     <ClCompile Include="__Generated.cpp">
       <Filter>Generated</Filter>
+    </ClCompile>
+    <ClCompile Include="Actions\ActionDeciders\ActionDeciderAI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actions\ActionDeciders\ActionDeciderBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actions\ActionDeciders\ActionDeciderPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actions\ActionHandlers\ActionHandlerAttack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actions\ActionHandlers\ActionHandlerBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actions\ActionHandlers\ActionHandlerMove.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actions\ActionHandlers\ActionHandlerSkill.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actions\ActionHandlers\ActionHandlerWait.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager\AssetManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager\DataCompositeProperty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager\InstancedAssetPtr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera\CameraSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GameInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GameSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectoryData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\ECS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\ECSSystemAction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\ECSSystemCleanUp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\ECSSystemDamage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\ECSSystemEntityMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\ECSSystemNameslate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\ECSSystemPhysics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\ECSSystemRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Actions\EditorActionBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Actions\EditorActionChangeProperty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Actions\EditorActionCreateAssetBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Actions\EditorActionCreateAssetClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Actions\EditorActionCreateAssetDataComposite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Actions\EditorActionCreateNewFolder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Actions\EditorActionDeleteFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Assets\EditorAssetBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Assets\EditorAssetClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Assets\EditorAssetDataComposite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Assets\EditorAssetFactoryBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Assets\EditorAssetFactoryClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Assets\EditorAssetFactoryDataComposite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ImGuiEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ImGuiEditorGlobals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\EditorTypeBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\EditorTypeClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\EditorTypeDataComposite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\EditorTypeEnum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\EditorTypeFactoryBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\EditorTypeFactoryClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\EditorTypeFactoryEnum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\EditorTypeFactoryPropertiesBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\EditorTypeFactoryStruct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\EditorTypePropertiesBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\EditorTypeStruct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\EditorTypeUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyBool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyDataCompositeProperty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyEnum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyFactoryBool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyFactoryClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyFactoryDataCompositeProperty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyFactoryEnum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyFactoryFloat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyFactoryInstancedAssetPtr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyFactoryInt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyFactoryString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyFactoryStruct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyFactoryVector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyFloat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyInstancedAssetPtr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyInt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyStruct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Types\Properties\EditorTypePropertyVector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Windows\EditorWindowActionQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Windows\EditorWindowBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Windows\EditorWindowChooseAssetType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Windows\EditorWindowCreateAssetBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Windows\EditorWindowCreateAssetClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Windows\EditorWindowCreateAssetDataComposite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Windows\EditorWindowCreateNewFolder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Windows\EditorWindowEditAsset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Windows\EditorWindowFilesystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Windows\EditorWindowInsertDataCompositeItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HotbarManager\HotbarManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HotbarManager\StatefulHotbarActions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HotbarManager\IHotbarItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\ImGuiItemListWithSearchBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\InputAction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\InputContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\InputSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\MouseSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Performance\PerformanceMetricsManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Performance\ScopedPerformanceMarker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RPGSystems\Attributes\RPGAttributeModifiers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RPGSystems\Attributes\RPGAttributes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RPGSystems\Races\RPGRaceData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RPGSystems\RPGLevelScalingNumber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RPGSystems\RPGSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RPGSystems\Skills\AimModule\RPGSkillAimModules.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RPGSystems\Skills\EffectModule\RPGSkillEffectModules.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RPGSystems\Skills\RPGSkillData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RPGSystems\Skills\RPGSkillSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\DragAndDrop\DragAndDropManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\DragAndDrop\DragAndDropShared.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\DragAndDrop\IDragAndDropArea.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\DragAndDrop\IDragAndDroppable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\HUD\HUD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\HUD\HUDAnchorPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\HUD\HUDObjects\HUDObjectBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\HUD\HUDObjects\HUDObjectHealth.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\HUD\HUDObjects\HUDObjectHotbar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\HUD\HUDObjects\HUDObjectXP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Menu\MenuSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Menu\Screens\MenuScreenBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Menu\Screens\MenuScreenClassSelect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Menu\Screens\MenuScreenMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Menu\Screens\MenuScreenSkillTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\TextRenderSystem\Textbox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\TextRenderSystem\TextRenderSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UICanvas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIObjects\UIObjectBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIObjects\UIObjectButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIObjects\UIObjectButtonWithIcon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIObjects\UIObjectContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIObjects\UIObjectDragAndDropArea.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIObjects\UIObjectHotbarSlot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIObjects\UIObjectIconLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIObjects\UIObjectProgressBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIObjects\UIObjectSubObjectSpawner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldGeneration\WorldGenerationChunk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldGeneration\WorldGenerationContinent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldGeneration\WorldGenerationLogic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldGeneration\WorldGenerationTileDefinition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldGeneration\WorldGenerationUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldGeneration\WorldGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WritePropertyToFileUtils.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -334,19 +574,7 @@
     <ClInclude Include="pch.h">
       <Filter>PCH</Filter>
     </ClInclude>
-    <ClInclude Include="stb_image.h">
-      <Filter>ExternalCode</Filter>
-    </ClInclude>
-    <ClInclude Include="tinyobj_loader.h">
-      <Filter>ExternalCode</Filter>
-    </ClInclude>
     <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VectorPrimitiveBase.h">
@@ -388,194 +616,461 @@
     <ClInclude Include="Renderer.h">
       <Filter>Systems\VectorRenderer</Filter>
     </ClInclude>
-    <ClInclude Include="ECS.h">
-      <Filter>Systems\ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="Components.h">
-      <Filter>Systems\ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity.h">
-      <Filter>Systems\ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemBase.h">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemRender.h">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemCallback.h">
-      <Filter>Systems\ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemCallbackBase.h">
-      <Filter>Systems\ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="Chunk.h">
-      <Filter>Systems\WorldGen</Filter>
-    </ClInclude>
-    <ClInclude Include="WorldGenerator.h">
-      <Filter>Systems\WorldGen</Filter>
-    </ClInclude>
-    <ClInclude Include="ChunkGeneratorBase.h">
-      <Filter>Systems\WorldGen\ChunkGenerators</Filter>
-    </ClInclude>
-    <ClInclude Include="ChunkGeneratorGrass.h">
-      <Filter>Systems\WorldGen\ChunkGenerators</Filter>
-    </ClInclude>
-    <ClInclude Include="ActionDeciderAI.h">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="ActionDeciderBase.h">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="ActionDeciderPlayer.h">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="ActionHandlerBase.h">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="ActionHandlerMove.h">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemPhysics.h">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemAction.h">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemDamage.h">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemEntityMap.h">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="ActionHandlerAttack.h">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemNameslate.h">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClInclude>
     <ClInclude Include="FilePaths.h">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="RenderPriorities.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="ActionHandlerWait.h">
-      <Filter>Systems\ActionSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemCleanUp.h">
-      <Filter>Systems\ECS\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="HUD.h">
-      <Filter>Systems\UI\HUD</Filter>
-    </ClInclude>
-    <ClInclude Include="HUDObjectBase.h">
-      <Filter>Systems\UI\HUD</Filter>
-    </ClInclude>
-    <ClInclude Include="HUDObjectHealth.h">
-      <Filter>Systems\UI\HUD</Filter>
-    </ClInclude>
-    <ClInclude Include="HUDAnchorPoint.h">
-      <Filter>Systems\UI\HUD</Filter>
-    </ClInclude>
-    <ClInclude Include="UIObjectContainer.h">
-      <Filter>Systems\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UICanvas.h">
-      <Filter>Systems\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UIUtils.h">
-      <Filter>Systems\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UIObjectProgressBar.h">
-      <Filter>Systems\UI\UIObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="UIObjectBase.h">
-      <Filter>Systems\UI\UIObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGuiEditor.h">
-      <Filter>Systems\ImGUIEditor</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGuiEditorMacros.h">
-      <Filter>Systems\ImGUIEditor</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorTypeFactoryBase.h">
-      <Filter>Systems\ImGUIEditor\Types\EditorTypeFactories</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorTypeFactoryPropertiesBase.h">
-      <Filter>Systems\ImGUIEditor\Types\EditorTypeFactories</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorTypeFactoryClass.h">
-      <Filter>Systems\ImGUIEditor\Types\EditorTypeFactories</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorTypeBase.h">
-      <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorTypeClass.h">
-      <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorTypePropertiesBase.h">
-      <Filter>Systems\ImGUIEditor\Types\EditorTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGuiEditorGlobals.h">
-      <Filter>Systems\ImGUIEditor</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorTypePropertyFactoryBase.h">
-      <Filter>Systems\ImGUIEditor\Types\PropertyFactories</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorTypePropertyBase.h">
-      <Filter>Systems\ImGUIEditor\Types\PropertyTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorTypePropertyFloat.h">
-      <Filter>Systems\ImGUIEditor\Types\PropertyTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorTypePropertyFactoryFloat.h">
-      <Filter>Systems\ImGUIEditor\Types\PropertyFactories</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorWindowFilesystem.h">
-      <Filter>Systems\ImGUIEditor\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorWindowBase.h">
-      <Filter>Systems\ImGUIEditor\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorWindowCreateNewFolder.h">
-      <Filter>Systems\ImGUIEditor\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorActionBase.h">
-      <Filter>Systems\ImGUIEditor\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorActionCreateNewFolder.h">
-      <Filter>Systems\ImGUIEditor\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorWindowActionQueue.h">
-      <Filter>Systems\ImGUIEditor\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorWindowCreateAsset.h">
-      <Filter>Systems\ImGUIEditor\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorAssetBase.h">
-      <Filter>Systems\ImGUIEditor\Types\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorAssetClass.h">
-      <Filter>Systems\ImGUIEditor\Types\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorActionCreateAsset.h">
-      <Filter>Systems\ImGUIEditor\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorWindowEditAsset.h">
-      <Filter>Systems\ImGUIEditor\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorAssetFactoryBase.h">
-      <Filter>Systems\ImGUIEditor\Types\AssetFactories</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorAssetFactoryClass.h">
-      <Filter>Systems\ImGUIEditor\Types\AssetFactories</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorActionChangeProperty.h">
-      <Filter>Systems\ImGUIEditor\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="__Generated.h">
       <Filter>Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Actions\ActionDeciders\ActionDeciderAI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Actions\ActionDeciders\ActionDeciderBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Actions\ActionDeciders\ActionDeciderPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Actions\ActionHandlers\ActionHandlerAttack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Actions\ActionHandlers\ActionHandlerBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Actions\ActionHandlers\ActionHandlerMove.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Actions\ActionHandlers\ActionHandlerSkill.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Actions\ActionHandlers\ActionHandlerWait.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager\AssetManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager\DataCompositeProperty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager\InstancedAssetPtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera\CameraSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GameInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GameSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectoryData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Components.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\ECS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\ECSTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\Callbacks\ECSSystemCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\Callbacks\ECSSystemCallbackBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\ECSSystemAction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\ECSSystemBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\ECSSystemCleanUp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\ECSSystemDamage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\ECSSystemEntityMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\ECSSystemNameslate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\ECSSystemPhysics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\ECSSystemRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Actions\EditorActionBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Actions\EditorActionChangeProperty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Actions\EditorActionCreateAssetBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Actions\EditorActionCreateAssetClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Actions\EditorActionCreateAssetDataComposite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Actions\EditorActionCreateNewFolder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Actions\EditorActionDeleteFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Assets\EditorAssetBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Assets\EditorAssetClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Assets\EditorAssetDataComposite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Assets\EditorAssetFactoryBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Assets\EditorAssetFactoryClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Assets\EditorAssetFactoryDataComposite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\ImGuiEditor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\ImGuiEditorGlobals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\ImGuiEditorMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\EditorTypeBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\EditorTypeClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\EditorTypeDataComposite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\EditorTypeEnum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\EditorTypeFactoryBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\EditorTypeFactoryClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\EditorTypeFactoryEnum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\EditorTypeFactoryPropertiesBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\EditorTypeFactoryStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\EditorTypePropertiesBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\EditorTypeStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\EditorTypeUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyBool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyDataCompositeProperty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyEnum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyFactoryBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyFactoryBool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyFactoryClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyFactoryDataCompositeProperty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyFactoryEnum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyFactoryFloat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyFactoryInstancedAssetPtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyFactoryInt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyFactoryString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyFactoryStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyFactoryVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyFloat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyInstancedAssetPtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyInt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Types\Properties\EditorTypePropertyVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Windows\EditorWindowActionQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Windows\EditorWindowBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Windows\EditorWindowChooseAssetType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Windows\EditorWindowCreateAssetBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Windows\EditorWindowCreateAssetClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Windows\EditorWindowCreateAssetDataComposite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Windows\EditorWindowCreateNewFolder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Windows\EditorWindowEditAsset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Windows\EditorWindowFilesystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Windows\EditorWindowInsertDataCompositeItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HotbarManager\HotbarManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HotbarManager\StatefulHotbarActions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HotbarManager\IHotbarItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\ImGuiItemListWithSearchBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\InputAction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\InputContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\InputKey.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\InputSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\MouseSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Performance\PerformanceMetricsManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Performance\ScopedPerformanceMarker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RPGSystems\Attributes\RPGAttributeModifiers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RPGSystems\Attributes\RPGAttributes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RPGSystems\Classes\RPGClassData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RPGSystems\Classes\RPGClassSpecialisationData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RPGSystems\Races\RPGRaceData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RPGSystems\RPGLevelScalingNumber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RPGSystems\RPGSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RPGSystems\Skills\AimModule\RPGSkillAimModules.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RPGSystems\Skills\EffectModule\RPGSkillEffectModules.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RPGSystems\Skills\RPGSkillData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RPGSystems\Skills\RPGSkillsShared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RPGSystems\Skills\RPGSkillSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\DragAndDrop\DragAndDropManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\DragAndDrop\DragAndDropShared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\DragAndDrop\IDragAndDropArea.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\DragAndDrop\IDragAndDroppable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\HUD\HUD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\HUD\HUDAnchorPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\HUD\HUDObjects\HUDObjectBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\HUD\HUDObjects\HUDObjectHealth.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\HUD\HUDObjects\HUDObjectHotbar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\HUD\HUDObjects\HUDObjectXP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Menu\MenuSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Menu\Screens\MenuScreenBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Menu\Screens\MenuScreenClassSelect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Menu\Screens\MenuScreenMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Menu\Screens\MenuScreenSkillTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\TextRenderSystem\Textbox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\TextRenderSystem\TextRenderSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UICanvas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIObjects\UIObjectBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIObjects\UIObjectButton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIObjects\UIObjectButtonWithIcon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIObjects\UIObjectContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIObjects\UIObjectDragAndDropArea.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIObjects\UIObjectHotbarSlot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIObjects\UIObjectIconLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIObjects\UIObjectProgressBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIObjects\UIObjectSubObjectSpawner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldGeneration\WorldGenerationChunk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldGeneration\WorldGenerationContinent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldGeneration\WorldGenerationLogic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldGeneration\WorldGenerationTileDefinition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldGeneration\WorldGenerationTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldGeneration\WorldGenerationUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldGeneration\WorldGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WritePropertyToFileUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AaaaHeaderToolTest.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

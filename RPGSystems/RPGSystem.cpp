@@ -39,8 +39,6 @@ void RPGSystem::RecalculateAttributesForEntity(EntityId entity)
 	}
 }
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
 void RPGSystem::SetupRPGEntity(EntityId entity, RPGEntitySetupParams params)
 {
 	if (pEcs && pDirectoryData)
@@ -93,13 +91,12 @@ void RPGSystem::SetupRPGEntity(EntityId entity, RPGEntitySetupParams params)
 			
 			RecalculateAttributesForEntity(entity);
 			
-			actionComponent.maxEnergy = 100; // #TEMP: Setup energy attribute
+			actionComponent.maxEnergy = 100; // #TODO: Setup energy attribute
 			actionComponent.energy = actionComponent.maxEnergy;
 			healthComponent.health = healthComponent.maxHealth;
 		}
 	}
 }
-#pragma optimize("", on)
 
 void RPGSystem::DealDamage(RPGDamageParams params)
 {

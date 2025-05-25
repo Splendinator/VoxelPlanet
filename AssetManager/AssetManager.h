@@ -44,6 +44,9 @@ public:
 	template<typename TAssetType = EditorAssetBase>
 	std::weak_ptr<TAssetType> FindAsset(const std::string& assetName) const;
 
+	template<typename TAssetType>
+	std::vector<std::weak_ptr<TAssetType>> GatherAssetsOfType() const;
+
 	// Gather all assets of a given class
 	// bGatherChildClasses - whether to also gather classes that are children of className
 	// RequiredFlags - Flags the asset must have (useful for only getting singletons etc.)
@@ -63,6 +66,8 @@ public:
 	// Get editor name from object if possible, this is slow so just use it for debug.
 	// Right now this can only be done for singleton objects
 	std::string FindNameFromSingletonSlow(void* pObject);
+
+	bool IsSingletonSlow(void* pObject);
 	
 private:
 	
@@ -114,6 +119,23 @@ std::weak_ptr<TAssetType> AssetManager::FindAsset(const std::string& assetName) 
 	DOMLOG_ERROR("Asset", assetName, "not found")
 	
 	return {};
+}
+
+template <typename TAssetType>
+std::vector<std::weak_ptr<TAssetType>> AssetManager::GatherAssetsOfType() const
+{
+	std::vector<std::weak_ptr<TAssetType>> gatheredAssets;
+
+	for (auto& it : assets)
+	{
+		std::shared_ptr<TAssetType> pAsset = std::dynamic_pointer_cast<TAssetType>(it.second);
+		if (pAsset)
+		{
+			gatheredAssets.push_back(pAsset);
+		}
+	}
+
+	return gatheredAssets;
 }
 
 template <typename T>

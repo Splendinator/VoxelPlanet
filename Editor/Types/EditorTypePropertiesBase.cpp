@@ -6,8 +6,6 @@
 #include "Editor/Types/Properties/EditorTypePropertyBase.h"
 #include "Game.h"
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
 EditorTypePropertiesBase::~EditorTypePropertiesBase()
 {
 	for (EditorTypePropertyBase* pProperty : pProperties)
@@ -16,7 +14,6 @@ EditorTypePropertiesBase::~EditorTypePropertiesBase()
 	}
 	pProperties.clear();
 }
-#pragma optimize("", on)
 
 void EditorTypePropertiesBase::DrawImGUI()
 {
@@ -101,7 +98,7 @@ void EditorTypePropertiesBase::AddAndSetupProperty(EditorTypePropertyBase* pProp
 {
 	pProperty->onPropertyChanged.Add(onPropertyChangedDelegate);
 
-	DOMLOG_ERROR_IF(insertIndex > pProperties.size(), "Out of range");
+	DOMLOG_ERROR_IF(insertIndex > (int)pProperties.size(), "Out of range");
 	
 	if (insertIndex < 0)
 	{

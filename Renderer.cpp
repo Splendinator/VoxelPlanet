@@ -1252,12 +1252,6 @@ namespace
 	
 	VkPipelineLayout CreatePipelineLayout()
 	{
-		// #TEMP: Old model matrix -- Replace this?
-		//VkPushConstantRange pushConstantRange = {};
-		//pushConstantRange.offset = 0;
-		//pushConstantRange.size = sizeof(Mat4f); 
-		//pushConstantRange.stageFlags = VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT;
-
 		VkDescriptorSetLayout layouts[] = { handleDescriptorSetLayoutProjection, handleDescriptorSetLayoutView, handleDescriptorSetLayoutVector, handleDescriptorSetLayoutModel};
 
 		VkPipelineLayoutCreateInfo createInfo = {};

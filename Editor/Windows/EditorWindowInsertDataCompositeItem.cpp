@@ -46,9 +46,11 @@ void EditorWindowInsertDataCompositeItem::Draw()
 	std::string selectedItem = propertyTypeList.GetSelectedItem();
 
 	ImGui::InputText("Property Name", propertyNameBuffer, sizeof(propertyNameBuffer));
-
+	
 	// #TODO: We don't currently support vectors, see #JANK comment in EditorTypeDataComposite::ReadFromFile()
 	//ImGui::Checkbox("Vector", &bCreateVector);
+
+	// #TODO: We don't currently support InstancedAssetPtrs but they should just work. Maybe add a bool like bCreateVector to create an instanced asset pointer property if you select an instanced class?
 
 	// Validation
 	{

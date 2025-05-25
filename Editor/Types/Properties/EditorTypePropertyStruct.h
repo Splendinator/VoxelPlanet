@@ -25,6 +25,8 @@ public:
 
 	void* GetValue() const;
 
+	std::string GetStructName() const { return structName; }
+
 protected:
 	std::string structName; // name of the struct. i.e "Vec3f" not "position"
 

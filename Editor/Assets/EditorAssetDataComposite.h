@@ -12,6 +12,9 @@ public:
 
     EditorAssetDataComposite(const std::string& assetName, const std::filesystem::path& inAssetfilePath);
 
+	std::vector<std::string> GetPropertyNames() const;
+	EditorTypePropertyBase* FindProperty(std::string propertyName) const;
+	
     //~ Begin EditorAssetBase Interface
     virtual void Draw() override;
     virtual void ReadFromFile(std::ifstream& file) override;

@@ -39,5 +39,10 @@ namespace PropertyFileUtils
 	inline void WriteInstancedAssetPtrToFile(std::ofstream& file, const std::string& propertyName, const std::string& className, const std::string& assetName = "")
 	{
 		file << "instancedassetptr " << className << " " << propertyName << " " << (assetName == "" ? "nullptr" : assetName) << std::endl;
-	}; 
+	};
+
+	inline void WriteDataCompositePropertyToFile(std::ofstream& file, const std::string& propertyName, const std::string& dataType, const std::string& assetName = "", const std::string& assetPropertyName = "")
+	{
+		file << "datacompositeproperty " << propertyName << " " << dataType << " " << (assetName == "" ? "nullptr" : assetName) << " " << (assetPropertyName == "" ? "none" : assetPropertyName) << std::endl;
+	};
 }

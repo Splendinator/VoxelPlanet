@@ -18,9 +18,6 @@
 
 #include "Editor/Assets/EditorAssetFactoryDataComposite.h"
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
-
 void AssetManager::Init()
 {
 	CreateTemplateTypes(ImGuiEditorGlobals::codeFilesBaseDirectory + "\\" + ImGuiEditorGlobals::editorTypesOutputFile);
@@ -295,6 +292,18 @@ std::string AssetManager::FindNameFromSingletonSlow(void* pObject)
 	return "";
 }
 
+bool AssetManager::IsSingletonSlow(void* pObject)
+{
+	for (auto it : singletonMap)
+	{
+		if (it.second == pObject)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void AssetManager::CreateTemplateTypes(const std::string& typesFile)
 {
 	std::ifstream inputFile(typesFile);
@@ -392,19 +401,13 @@ void AssetManager::ImportAssets(const std::string& assetsDirectory)
 	
 	EditorAssetFactoryClass editorAssetFactoryClass(*this);
 	EditorAssetFactoryDataComposite editorAssetFactoryDataComposite(*this);
-
-	// Because some assets depend on other assets being loaded first, we need to do a two-pass import.
+	
 	std::vector<EditorAssetFactoryBase*> pAssetFactoriesFirstPass =
 	{
 		&editorAssetFactoryClass,
-	};
-	ImportAssets(pAssetFactoriesFirstPass);
-	
-	std::vector<EditorAssetFactoryBase*> pAssetFactoriesSecondPass =
-	{
 		&editorAssetFactoryDataComposite,
 	};
-	ImportAssets(pAssetFactoriesSecondPass);
+	ImportAssets(pAssetFactoriesFirstPass);
 }
 
 void* AssetManager::LoadObjectFromAssetInternal(EditorAssetClass* pClassAsset)
@@ -480,4 +483,3 @@ std::vector<std::string> AssetManager::GetAllTypes(const std::unordered_map<std:
 
 	return types;
 }
-#pragma optimize("", on)

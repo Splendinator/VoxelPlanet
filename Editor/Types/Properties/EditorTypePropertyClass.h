@@ -28,6 +28,8 @@ public:
 
 	void* GetValue() const;
 
+	std::string GetClassName() const { return className; }
+
 protected:
 
 	void SetEditInlineNewClass(EditorTypeClass* editInlineNewClass);
