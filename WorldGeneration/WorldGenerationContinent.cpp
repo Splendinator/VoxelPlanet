@@ -109,15 +109,15 @@ void WorldGenerationContinent::Init()
 			for (int y = 0; y < continentSize; ++y)
 			{
 				// Sand
-				if (tileDistanceFromOcean[x * continentSize + y] > 0.0f && tileDistanceFromOcean[x * continentSize + y] <= sandParams.baseDistanceFromOcean)
+				if (tileDistanceFromOcean[GetBackgroundTileIndex({x,y})] > 0.0f && tileDistanceFromOcean[GetBackgroundTileIndex({x,y})] <= sandParams.baseDistanceFromOcean)
 				{
 					GetBackgroundTileRef({x,y}) = EWorldGenerationTile::Sand;
 				}
 
 				// Trees
-				if (tileDistanceFromOcean[x * continentSize + y] > treeParams.distanceFromOceanTreesBegin)
+				if (tileDistanceFromOcean[GetBackgroundTileIndex({x,y})] > treeParams.distanceFromOceanTreesBegin)
 				{
-					float treeAlpha = (tileDistanceFromOcean[x * continentSize + y] - treeParams.distanceFromOceanTreesBegin) / (treeParams.distanceFromOceanTreesEnd - treeParams.distanceFromOceanTreesBegin);
+					float treeAlpha = (tileDistanceFromOcean[GetBackgroundTileIndex({x,y})] - treeParams.distanceFromOceanTreesBegin) / (treeParams.distanceFromOceanTreesEnd - treeParams.distanceFromOceanTreesBegin);
 					treeAlpha = std::min(1.0f, treeAlpha);
 
 					const float treePercentage = treeAlpha * (treeParams.treePercentageAtMaximumDistance - treeParams.treePercentageAtMinimumDistance) + treeParams.treePercentageAtMinimumDistance;
@@ -151,18 +151,23 @@ void WorldGenerationContinent::Init()
 					// Can't spawn on unwalkable terrain
 					continue;
 				}
-				if (Vec2i::DistanceSq(playerSpawnPoint, Vec2i(x,y)) < enemyParams.minDistanceFromPlayerSpawnSq)
+
+				const float distanceFromSpawn = Vec2i::Distance(playerSpawnPoint, Vec2i(x,y));
+
+				if (distanceFromSpawn < enemyParams.minDistanceFromPlayerSpawn)
 				{
 					// Too close to player spawn point
 					 continue;
 				}
 
+				const float distanceFromOcean = tileDistanceFromOcean[GetBackgroundTileIndex({x,y})];
+
 				WorldGenerationUtils::MutateSeed(enemySeed);
 				if (WorldGenerationUtils::RandFloat(enemySeed) <= enemyParams.enemySpawnChanceAlpha)
 				{
 					EnemySpawnData& enemyData = GetEnemyDataRef({x,y});
-					enemyData.pRaceData = enemyParams.pBanditRaceData;
-					enemyData.level = 0; // #TEMP: Higher level further away
+					enemyData.pRaceData = (distanceFromOcean < enemyParams.crabSpawnDistance) ? enemyParams.pCrabRaceData : enemyParams.pBanditRaceData;
+					enemyData.level = (int)(std::min(1.0f,(distanceFromSpawn / enemyParams.maxLevelDistanceFromSpawn)) * (float)enemyParams.maxLevel);
 				}
 			}
 		}

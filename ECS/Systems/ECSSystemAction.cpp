@@ -2,6 +2,8 @@
 
 #include "ECSSystemAction.h"
 
+#include <algorithm>
+
 #include "Actions/ActionDeciders/ActionDeciderBase.h"
 #include "Actions/ActionHandlers/ActionHandlerBase.h"
 #include "ECS/Components.h"
@@ -24,10 +26,7 @@ void ECSSystemAction::PreTick(ECSSystemTickParams tickParams)
 			if (tickParams.pEcs->EntityHasComponents<ComponentAction>(e))
 			{
 				ComponentAction& action = tickParams.pEcs->GetComponent<ComponentAction>(e);
-				if (action.energy < lowestEnergy)
-				{
-					lowestEnergy = action.energy;
-				}
+				lowestEnergy = std::min(action.energy, lowestEnergy);
 			}
 		});
 
@@ -43,14 +42,13 @@ void ECSSystemAction::PreTick(ECSSystemTickParams tickParams)
 				}
 			});
 	}
-	
 }
 
 void ECSSystemAction::Tick(const ECSSystemTickParams& params, const std::tuple<ComponentAction*>& components)
 {
-	if (params.frame == frameLastActionTookPlace)
+	if (params.frame == 0)
 	{
-		// Something already took an action this turn
+		// Skip first frame to give other systems a chance to boot up correctly
 		return; 
 	}
 
@@ -68,8 +66,6 @@ void ECSSystemAction::Tick(const ECSSystemTickParams& params, const std::tuple<C
 		{
 			pActionHandler->DoAction(*params.pEcs, params.entityId);
 			pActionHandler->Reset();
-
-			frameLastActionTookPlace = params.frame;
 
 			pAction->energy = pAction->maxEnergy; // Took turn -- Reset energy to max
 		}

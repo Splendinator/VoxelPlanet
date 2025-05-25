@@ -39,6 +39,8 @@ void RPGSystem::RecalculateAttributesForEntity(EntityId entity)
 	}
 }
 
+// #TEMP: Optimisation
+#pragma optimize("", off)
 void RPGSystem::SetupRPGEntity(EntityId entity, RPGEntitySetupParams params)
 {
 	if (pEcs && pDirectoryData)
@@ -97,6 +99,7 @@ void RPGSystem::SetupRPGEntity(EntityId entity, RPGEntitySetupParams params)
 		}
 	}
 }
+#pragma optimize("", on)
 
 void RPGSystem::DealDamage(RPGDamageParams params)
 {

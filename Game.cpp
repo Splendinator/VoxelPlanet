@@ -20,7 +20,7 @@ void Game::Init()
 	// Set random seed based off time
 	srand((unsigned int)time(NULL));
 	
-	pGameInstance = assetManager.LoadObjectFromAssetName<GameInstance>("GameInstance");
+	pGameInstance = assetManager.LoadObjectFromClassAssetName<GameInstance>("GameInstance");
 	if (pGameInstance)
 	{
 		pGameInstance->InitGameSystems();
@@ -77,7 +77,7 @@ void TickImGuiFramerateWindow(float deltaTime)
 
 void Game::Tick(float deltaTime)
 {
-	SCOPED_PERFORMANCE_MARKER(GameTick);
+	SCOPED_FUNCTION_PERFORMANCE_MARKER();
 	
 #ifdef DOMIMGUI
 	TickImGuiFramerateWindow(deltaTime);

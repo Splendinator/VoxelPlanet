@@ -26,6 +26,4 @@ protected:
 	//~ Begin ECSSystemBase Interface
 	void InitialiseInternal(ECS* pEcs) override;
 	//~ End ECSSystemBase Interface
-
-	int frameLastActionTookPlace = 0; // Start this at 0 instead of -1 so that we skip the first turn and let other systems boot up correctly
 };

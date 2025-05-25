@@ -28,7 +28,7 @@ class ECSSystemEntityMap : public ECSSystemBase
 	EDITORBODY()
 
 private:
-	static constexpr int HASH_MAP_SIZE = 128; // Size of the hash map
+	static constexpr int HASH_MAP_SIZE = 256; // Size of the hash map
 
 public:
 	

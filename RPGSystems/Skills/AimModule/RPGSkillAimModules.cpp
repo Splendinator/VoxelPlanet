@@ -7,7 +7,7 @@ ERPGSkillHighlightType RPGSkillAimModuleLine::GetSkillHighlightTypeForLocation(c
 {
 	// #TODO: Do projectile line (make a line util)
 	// #TODO: Make the +0.25f for visually pleasing circles a thing (also make it a util)
-	
+
 	if (params.targetPos == location)
 	{
 		return (Vec2i::Distance(params.startPos, params.targetPos) < (float)maxRange + 0.25f) ? ERPGSkillHighlightType::Valid : ERPGSkillHighlightType::Invalid; 

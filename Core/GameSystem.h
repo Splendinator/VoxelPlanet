@@ -8,8 +8,8 @@ class GameSystem
 public:
 
 	virtual void Init() {}
-	virtual void Tick(float deltaTime) {}
 	virtual void UnInit() {}
+	virtual void Tick(float deltaTime) {}
 
 #ifdef DOMIMGUI
 	// A window is already created, so this should just contain the content.

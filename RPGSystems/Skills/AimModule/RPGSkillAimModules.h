@@ -10,6 +10,9 @@ class RPGSkillAimModuleBase
 	EDITORBODY()
 
 public:
+
+	RPGSkillAimModuleBase() = default;
+	virtual ~RPGSkillAimModuleBase() = default;
 	
 	// This returns the type of highlight we want at a given location, and will be unique to the skill being aimed.
 	// For example, with a fireball we might want to draw a green line showing the fireball projectile trajectory and a yellow circle around explosion area.

@@ -13,12 +13,12 @@ public:
 };
 
 EDITORCLASS()
-class RPGSkillEffectModuleTemp : public RPGSkillEffectModuleBase
+class RPGSkillDamageEffectModule : public RPGSkillEffectModuleBase
 {
-	EDITORBODY()
+    EDITORBODY()
 public:
-	void ApplyEffect(const RPGSkillParams& params) const override;
-
-	EDITORPROPERTY()
-	u32 damage = 0;
+    //~ Begin RPGSkillDamageEffectModule Interface
+    void ApplyEffect(const RPGSkillParams& params) const override;
+    //~ End RPGSkillDamageEffectModule Interface
 };
+

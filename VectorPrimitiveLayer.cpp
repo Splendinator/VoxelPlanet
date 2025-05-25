@@ -53,6 +53,8 @@ u32* VectorPrimitiveLayer::Serialize(u32* pBuffer)
 	return pBuffer;
 }
 
+// #TEMP: Optimisation
+#pragma optimize("", off)
 std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 {
 	layerLabel = dmim::GetNextAttribute(stream, "inkscape:label");
@@ -113,6 +115,7 @@ std::istream& VectorPrimitiveLayer::PopulateFromFile(std::istream& stream)
 	
 	return stream;
 }
+#pragma optimize("", on)
 
 VectorPrimitiveLayer* VectorPrimitiveLayer::FindLayerByLabel(const std::string& label)
 {

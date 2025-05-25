@@ -78,7 +78,7 @@ void domMain()
 
 	while (!ShouldCloseWindow())
 	{
-		SCOPED_PERFORMANCE_MARKER(MainTick);
+		SCOPED_PERFORMANCE_MARKER("Main::Tick")
 		float deltaTime = GetDeltaTime();
 
 #ifdef DOMIMGUI

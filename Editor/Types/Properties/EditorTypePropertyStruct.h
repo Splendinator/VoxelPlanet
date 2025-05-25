@@ -1,0 +1,37 @@
+﻿#pragma once
+
+#include "EditorTypePropertyBase.h"
+
+class EditorTypeStruct;
+
+/** EditorTypePropertyStruct
+*
+* This struct is used to represent a struct property ("MyStruct myStruct;")
+*/
+class EditorTypePropertyStruct : public EditorTypePropertyBase
+{
+public:
+	EditorTypePropertyStruct();
+	EditorTypePropertyStruct(const std::string& propertyName, const std::string& inStructName, EditorTypeStruct* pInStructType);
+
+	//~ Begin EditorTypePropertyBase Interface
+	void DrawImGUI() override;
+	EditorTypePropertyBase* DeepCopy() override;
+	bool CanReadFromFile(std::ifstream& file) const override;
+	void ReadFromFile(std::ifstream& file) override;
+	void WriteToFile(std::ofstream& file) override;
+	void ForceSetValue(const ForceSetValueParams& params) override;
+	//~ End EditorTypePropertyBase Interface
+
+	void* GetValue() const;
+
+protected:
+	std::string structName; // name of the struct. i.e "Vec3f" not "position"
+
+	std::unique_ptr<EditorTypeStruct> pStructType; // Deep copied struct type. This contains all the properties etc.
+	
+	DelegateClass<EditorTypePropertyStruct, const OnPropertyChangedData&> onInternalStructPropertyChangedDelegate;
+
+	void OnInternalStructPropertyChanged(const OnPropertyChangedData& OnPropertyChangedData);
+};
+

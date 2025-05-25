@@ -1,14 +1,16 @@
 ﻿#pragma once
 
-#include "EditorTypeBase.h"
+#include "Editor/Assets/EditorAssetClass.h"
+#include "Editor/Types/EditorTypeBase.h"
 
 class EditorAssetBase;
+class EditorAssetClass;
 class EditorTypeBase;
 class EditorTypeClass;
 class EditorTypeStruct;
 class EditorTypeEnum;
 
-#define ENUMSTRING(enum, value) ((int)enum)/*will compile error if misspelled or non-enum type*/, Game::GetAssetManager().GetEnumValueNameFromValue(#enum, (int)value))
+#define ENUMSTRING(enum, value) (sizeof(enum)/*will compile error if misspelled or non-enum type*/, Game::GetAssetManager().GetEnumValueNameFromValue(#enum, (int)value))
 
 // #TODO: Maybe look into a way to extend _DeleteObject to automatically delete member instanced pointers
 
@@ -34,16 +36,18 @@ public:
 	std::vector<std::string> GetAllClassTemplateNames(bool bIgnoreAbstract) const;
 	EditorTypeStruct* FindStructTemplateType(const std::string& typeName) const;
 	std::vector<std::string> GetAllStructTemplateNames(bool bIgnoreAbstract) const;
+	std::vector<std::string> GetAllEnumTypeNames() const;
 
 	// Gather the names of all child class templates that derrive from className (including className) optionally ignoring abstract classes
 	std::vector<std::string> GetAllChildClassTemplateNames(std::string className, bool bIgnoreAbstract) const;
 
-	std::weak_ptr<EditorAssetBase> FindAsset(const std::string& assetName) const;
+	template<typename TAssetType = EditorAssetBase>
+	std::weak_ptr<TAssetType> FindAsset(const std::string& assetName) const;
 
 	// Gather all assets of a given class
 	// bGatherChildClasses - whether to also gather classes that are children of className
 	// RequiredFlags - Flags the asset must have (useful for only getting singletons etc.)
-	std::vector<std::weak_ptr<EditorAssetBase>> GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses, EClassMetadataFlags requiredFlags = EClassMetadataFlags::None) const;
+	std::vector<std::weak_ptr<EditorAssetClass>> GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses, EClassMetadataFlags requiredFlags = EClassMetadataFlags::None) const;
 
 	// Enum utils
 	std::string GetEnumValueNameFromValue(const std::string& enumName, int value) const;
@@ -52,9 +56,9 @@ public:
 
 	// Find the object with a given asset name. (i.e pass in "Health" and the object represented by Health.asset will be returned 
 	template<typename T>
-	T* LoadObjectFromAssetName(const std::string& name);
+	T* LoadObjectFromClassAssetName(const std::string& name);
 	template<typename T>
-	T* LoadObjectFromAsset(EditorAssetBase* pAsset);
+	T* LoadObjectFromClassAsset(EditorAssetClass* pClassAsset);
 	
 	// Get editor name from object if possible, this is slow so just use it for debug.
 	// Right now this can only be done for singleton objects
@@ -68,7 +72,7 @@ private:
 	// Import assets from their files. see the assets map
 	void ImportAssets(const std::string& assetsDirectory);
 
-	void* LoadObjectFromAssetInternal(EditorAssetBase* pAsset);
+	void* LoadObjectFromAssetInternal(EditorAssetClass* pClassAsset);
 
 	// Find template types from a given type map (struct, class, enum)
 	EditorTypeBase* FindType(const std::string& typeName, const std::unordered_map<std::string, EditorTypeBase*>& templateTypes) const;
@@ -83,27 +87,44 @@ private:
 	std::unordered_map<std::string, EditorTypeBase*> templateEnumTypes; // EditorTypeEnum
 
 	// This map will contain names to their assets. so it might be "Fireball" to a fireball asset, etc.
+	// We use shared/weak pointers here because assets can be deleted at any time in the editor.
 	std::unordered_map<std::string, std::shared_ptr<EditorAssetBase>> assets;
 
-	// Map of assets to their singletons (if the asset represents a class with the Singleton EClassMetadataFlags)
-	std::unordered_map<EditorAssetBase*, void*> singletonMap;
+	// Map of class assets to their singletons (if the asset represents a class with the Singleton EClassMetadataFlags)
+	std::unordered_map<EditorAssetClass*, void*> singletonMap;
 };
 
-template <typename T>
-T* AssetManager::LoadObjectFromAssetName(const std::string& name)
+template <typename TAssetType>
+std::weak_ptr<TAssetType> AssetManager::FindAsset(const std::string& assetName) const
 {
-	auto it = assets.find(name);
+	auto it = assets.find(assetName);
 	if (it != assets.end())
 	{
-		return static_cast<T*>(LoadObjectFromAssetInternal(it->second.get()));
+		std::weak_ptr<TAssetType> pCastedAsset = std::dynamic_pointer_cast<TAssetType>(it->second);
+		if (!pCastedAsset.expired())
+		{
+			return pCastedAsset;
+		}
+		else
+		{
+			DOMLOG_ERROR("Asset", assetName, "is not expected type");
+		}
 	}
+
+	DOMLOG_ERROR("Asset", assetName, "not found")
 	
-	DOMLOG_WARN("No asset with name", name)
-	return nullptr;
+	return {};
 }
 
 template <typename T>
-T* AssetManager::LoadObjectFromAsset(EditorAssetBase* pAsset)
+T* AssetManager::LoadObjectFromClassAssetName(const std::string& name)
 {
-	return static_cast<T*>(LoadObjectFromAssetInternal(pAsset));
+	std::weak_ptr<EditorAssetClass> pClassAsset = FindAsset<EditorAssetClass>(name);
+	return static_cast<T*>(LoadObjectFromAssetInternal(pClassAsset.lock().get()));
+}
+
+template <typename T>
+T* AssetManager::LoadObjectFromClassAsset(EditorAssetClass* pClassAsset)
+{
+	return static_cast<T*>(LoadObjectFromAssetInternal(pClassAsset));
 }

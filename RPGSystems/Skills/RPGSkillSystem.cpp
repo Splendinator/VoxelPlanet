@@ -82,7 +82,7 @@ void RPGSkillSystem::Tick(float deltaTime)
 		ComponentTransform& transformComponent = pEcs->GetComponent<ComponentTransform>(params.caster);
 		params.startPos = { transformComponent.x, transformComponent.y };
 		
-		constexpr int MAX_VISUALS_DISTANCE_AROUND_PLAYER = 20;
+		constexpr int MAX_VISUALS_DISTANCE_AROUND_PLAYER = 40;
 		const int startX = params.startPos.x - MAX_VISUALS_DISTANCE_AROUND_PLAYER;
 		const int endX = params.startPos.x + MAX_VISUALS_DISTANCE_AROUND_PLAYER;
 		const int startY = params.startPos.y - MAX_VISUALS_DISTANCE_AROUND_PLAYER;

@@ -2,19 +2,24 @@
 
 #include "AssetManager.h"
 
-#include "EditorAssetBase.h"
-#include "EditorAssetClass.h"
-#include "EditorAssetFactoryClass.h"
-#include "EditorTypeBase.h"
-#include "EditorTypeClass.h"
-#include "EditorTypeEnum.h"
-#include "EditorTypeFactoryBase.h"
-#include "EditorTypeFactoryClass.h"
-#include "EditorTypeFactoryEnum.h"
-#include "EditorTypeFactoryStruct.h"
-#include "EditorTypeStruct.h"
-#include "ImGuiEditorGlobals.h"
+#include "Editor/Assets/EditorAssetBase.h"
+#include "Editor/Assets/EditorAssetClass.h"
+#include "Editor/Assets/EditorAssetFactoryClass.h"
+#include "Editor/Types/EditorTypeBase.h"
+#include "Editor/Types/EditorTypeClass.h"
+#include "Editor/Types/EditorTypeEnum.h"
+#include "Editor/Types/EditorTypeFactoryBase.h"
+#include "Editor/Types/EditorTypeFactoryClass.h"
+#include "Editor/Types/EditorTypeFactoryEnum.h"
+#include "Editor/Types/EditorTypeFactoryStruct.h"
+#include "Editor/Types/EditorTypeStruct.h"
+#include "Editor/ImGuiEditorGlobals.h"
 #include "__Generated.h"
+
+#include "Editor/Assets/EditorAssetFactoryDataComposite.h"
+
+// #TEMP: Optimisation
+#pragma optimize("", off)
 
 void AssetManager::Init()
 {
@@ -46,9 +51,9 @@ void AssetManager::UnInit()
 	for (auto& [key, value] : singletonMap)
 	{
 		// If you crash here it's because something else called delete on a singleton, use the log below to figure out what.
-		DOMLOG_INFO("Deleting singleton:", key->GetName(), key->GetEditorType()->name)
+		DOMLOG_INFO("Deleting singleton:", key->GetName(), key->GetClassEditorType()->name)
 		
-		auto it = __Generated::stringToDeleteObjectFunction.find(key->GetEditorType()->name);
+		auto it = __Generated::stringToDeleteObjectFunction.find(key->GetClassEditorType()->name);
 		if (it != __Generated::stringToDeleteObjectFunction.end())
 		{
 			it->second(value);
@@ -84,8 +89,14 @@ EditorTypeBase* AssetManager::FindTemplateType(const std::string& typeName) cons
 	{
 		return pFoundType;
 	}
-	
-	DOMASSERT(false) // #TODO: Handle enums here too if we ever want them
+
+	pFoundType = FindEnumType(typeName);
+	if (pFoundType)
+	{
+		return pFoundType;
+	}
+
+	DOMLOG_ERROR("Template type not found:", typeName);
 	return nullptr;
 }
 
@@ -107,6 +118,11 @@ EditorTypeStruct* AssetManager::FindStructTemplateType(const std::string& typeNa
 std::vector<std::string> AssetManager::GetAllStructTemplateNames(bool bIgnoreAbstract) const
 {
 	return GetAllTypes(templateStructTypes, bIgnoreAbstract);
+}
+
+std::vector<std::string> AssetManager::GetAllEnumTypeNames() const
+{
+	return GetAllTypes(templateEnumTypes, false);
 }
 
 std::vector<std::string> AssetManager::GetAllChildClassTemplateNames(std::string className, bool bIgnoreAbstract) const
@@ -161,22 +177,9 @@ std::vector<std::string> AssetManager::GetAllChildClassTemplateNames(std::string
 	return types;
 }
 
-std::weak_ptr<EditorAssetBase> AssetManager::FindAsset(const std::string& assetName) const
+std::vector<std::weak_ptr<EditorAssetClass>> AssetManager::GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses, EClassMetadataFlags requiredFlags) const
 {
-	auto it = assets.find(assetName);
-	if (it != assets.end())
-	{
-		return it->second;
-	}
-
-	DOMLOG_ERROR("Asset", assetName, "not found")
-	
-	return {};
-}
-
-std::vector<std::weak_ptr<EditorAssetBase>> AssetManager::GatherAssetsOfClass(const std::string& className, bool bGatherChildClasses, EClassMetadataFlags requiredFlags) const
-{
-	std::vector<std::weak_ptr<EditorAssetBase>> gatheredAssets;
+	std::vector<std::weak_ptr<EditorAssetClass>> gatheredAssets;
 
 	std::vector<std::string> classNamesToGather = {className};
 
@@ -215,13 +218,17 @@ std::vector<std::weak_ptr<EditorAssetBase>> AssetManager::GatherAssetsOfClass(co
 	
 	for (auto& asset : assets)
 	{
-		if (EditorTypeClass* pEditorClass = dynamic_cast<EditorTypeClass*>(asset.second->GetEditorType()))
+		std::weak_ptr<EditorAssetClass> pClassAssetPtr = std::dynamic_pointer_cast<EditorAssetClass>(asset.second);
+		if (EditorAssetClass* pClassAsset = pClassAssetPtr.lock().get())
 		{
-			if (std::find(classNamesToGather.begin(), classNamesToGather.end(), pEditorClass->name) != classNamesToGather.end())
+			if (EditorTypeClass* pEditorClass = pClassAsset->GetClassEditorType())
 			{
-				if (requiredFlags == EClassMetadataFlags::None || pEditorClass->HasMetadataFlag(requiredFlags))
+				if (std::find(classNamesToGather.begin(), classNamesToGather.end(), pEditorClass->name) != classNamesToGather.end())
 				{
-					gatheredAssets.push_back(asset.second);
+					if (requiredFlags == EClassMetadataFlags::None || pEditorClass->HasMetadataFlag(requiredFlags))
+					{
+						gatheredAssets.push_back(pClassAssetPtr);
+					}
 				}
 			}
 		}
@@ -343,62 +350,71 @@ void AssetManager::CreateTemplateTypes(const std::string& typesFile)
 
 void AssetManager::ImportAssets(const std::string& assetsDirectory)
 {
-	EditorAssetFactoryClass editorAssetFactoryClass(*this);
-
-	EditorAssetFactoryBase* pAssetFactories[] =
+	auto ImportAssets = [&](const std::vector<EditorAssetFactoryBase*>& pAssetFactories)
 	{
-		&editorAssetFactoryClass
-	};
+		std::filesystem::recursive_directory_iterator dirIter(assetsDirectory), end;
 
-	std::filesystem::recursive_directory_iterator dirIter(assetsDirectory), end;
-
-	while (dirIter != end)
-	{
-		if (dirIter->is_regular_file() && dirIter->path().extension() == ImGuiEditorGlobals::assetExtension)
+		while (dirIter != end)
 		{
-			std::ifstream assetFile(dirIter->path());
-			if (assetFile.is_open())
+			if (dirIter->is_regular_file() && dirIter->path().extension() == ImGuiEditorGlobals::assetExtension)
 			{
-				std::string keyword;
-				assetFile >> keyword;
-				for (EditorAssetFactoryBase* pAssetFactory : pAssetFactories)
+				std::ifstream assetFile(dirIter->path());
+				if (assetFile.is_open())
 				{
-					if (pAssetFactory->GetKeyword() == keyword)
+					std::string keyword;
+					assetFile >> keyword;
+					for (EditorAssetFactoryBase* pAssetFactory : pAssetFactories)
 					{
-						if (std::shared_ptr<EditorAssetBase> asset = pAssetFactory->CreateAsset(dirIter->path()))
+						if (pAssetFactory->GetKeyword() == keyword)
 						{
-							AddAsset(asset);
-							break;
+							if (std::shared_ptr<EditorAssetBase> asset = pAssetFactory->CreateAsset(dirIter->path()))
+							{
+								AddAsset(asset);
+								break;
+							}
 						}
 					}
 				}
 			}
+		
+			try
+			{
+				++dirIter;
+			}
+			catch (const std::filesystem::filesystem_error& e)
+			{
+				// This can fail due to permissions, etc.
+				DOMLOG_ERROR("Failed to iterate directory", e.what());
+				return;
+			}
 		}
+	};
+	
+	EditorAssetFactoryClass editorAssetFactoryClass(*this);
+	EditorAssetFactoryDataComposite editorAssetFactoryDataComposite(*this);
 
-		try
-		{
-			++dirIter;
-		}
-		catch (const std::filesystem::filesystem_error& e)
-		{
-			// This can fail due to permissions, etc.
-			DOMLOG_ERROR("Failed to iterate directory", e.what());
-			return;
-		}
-	}
+	// Because some assets depend on other assets being loaded first, we need to do a two-pass import.
+	std::vector<EditorAssetFactoryBase*> pAssetFactoriesFirstPass =
+	{
+		&editorAssetFactoryClass,
+	};
+	ImportAssets(pAssetFactoriesFirstPass);
+	
+	std::vector<EditorAssetFactoryBase*> pAssetFactoriesSecondPass =
+	{
+		&editorAssetFactoryDataComposite,
+	};
+	ImportAssets(pAssetFactoriesSecondPass);
 }
 
-void* AssetManager::LoadObjectFromAssetInternal(EditorAssetBase* pAsset)
+void* AssetManager::LoadObjectFromAssetInternal(EditorAssetClass* pClassAsset)
 {
-	if (pAsset)
+	if (pClassAsset)
 	{
-		EditorAssetClass* pClassAsset = dynamic_cast<EditorAssetClass*>(pAsset);
-		DOMLOG_ERROR_IF(pClassAsset == nullptr, "Right now we only support class assets");		
-
-		if (pClassAsset->GetEditorType()->HasMetadataFlag(EClassMetadataFlags::Instanced))
+		if (pClassAsset->GetClassEditorType()->HasMetadataFlag(EClassMetadataFlags::Instanced))
 		{
 			// Instanced -- Always create a new object using the __generated cpp function
-			auto it = __Generated::stringToCreateObjectFunction.find(pClassAsset->GetEditorType()->name);
+			auto it = __Generated::stringToCreateObjectFunction.find(pClassAsset->GetClassEditorType()->name);
 			if (it != __Generated::stringToCreateObjectFunction.end())
 			{
 				return it->second(pClassAsset->GetProperties());
@@ -408,7 +424,7 @@ void* AssetManager::LoadObjectFromAssetInternal(EditorAssetBase* pAsset)
 		{
 			// Singleton -- Create a new object using the __generated cpp function the first time, then always return that.
 			
-			DOMASSERT(pClassAsset->GetEditorType()->HasMetadataFlag(EClassMetadataFlags::Singleton)) // Must have at least 1 instancing flag
+			DOMASSERT(pClassAsset->GetClassEditorType()->HasMetadataFlag(EClassMetadataFlags::Singleton)) // Must have at least 1 instancing flag
 
 			auto foundSingleton = singletonMap.find(pClassAsset);
 			if (foundSingleton == singletonMap.end())
@@ -417,34 +433,25 @@ void* AssetManager::LoadObjectFromAssetInternal(EditorAssetBase* pAsset)
 				// 1. Create empty object in the singleton map (so that it may be referenced by other singleton propeties that reference this one)
 				// 2. Initialise the properties on the empty object afterwards.
 				
-				auto createEmptyObjectIt = __Generated::stringToCreateEmptyObjectFunction.find(pClassAsset->GetEditorType()->name);
+				auto createEmptyObjectIt = __Generated::stringToCreateEmptyObjectFunction.find(pClassAsset->GetClassEditorType()->name);
 				DOMLOG_ERROR_IF(createEmptyObjectIt == __Generated::stringToCreateEmptyObjectFunction.end(), "__generated code fucked up?")
 
 				void* newSingleton = createEmptyObjectIt->second();
 				singletonMap.emplace(pClassAsset, newSingleton);
 
-				auto initialiseExistingObjectIt = __Generated::stringToInitialiseExistingObjectFunction.find(pClassAsset->GetEditorType()->name);
+				auto initialiseExistingObjectIt = __Generated::stringToInitialiseExistingObjectFunction.find(pClassAsset->GetClassEditorType()->name);
 				DOMLOG_ERROR_IF(initialiseExistingObjectIt == __Generated::stringToInitialiseExistingObjectFunction.end(), "__generated code fucked up?")
 
 				int propertyIndex = 0;
 				initialiseExistingObjectIt->second(newSingleton, pClassAsset->GetProperties(), propertyIndex);
 				
 				return newSingleton;
-				
-				//// #TODO: If two singletons reference each other they infinite loop trying to create each other
-				//auto it = __Generated::stringToCreateObjectFunction.find(pClassAsset->GetEditorType()->name);
-				//if (it != __Generated::stringToCreateObjectFunction.end())
-				//{
-				//	void* newSingleton = it->second(pClassAsset->GetProperties());
-				//	singletonMap.emplace(pClassAsset, newSingleton);
-				//	return newSingleton;
-				//}
 			}
 			return foundSingleton->second;
 		}
 	}
 
-	DOMLOG_ERROR("Object", pAsset ? pAsset->GetName() : "<none>", "not found");
+	DOMLOG_ERROR("Object", pClassAsset ? pClassAsset->GetName() : "<none>", "not found");
 	return nullptr;
 }
 
@@ -473,3 +480,4 @@ std::vector<std::string> AssetManager::GetAllTypes(const std::unordered_map<std:
 
 	return types;
 }
+#pragma optimize("", on)

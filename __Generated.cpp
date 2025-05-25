@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "__Generated.h"
-#include "EditorTypePropertyClass.h"
-#include "EditorTypePropertyFloat.h"
-#include "EditorTypePropertyInt.h"
-#include "EditorTypePropertyBool.h"
-#include "EditorTypePropertyString.h"
-#include "EditorTypePropertyStruct.h"
-#include "EditorTypePropertyVector.h"
-#include "EditorTypePropertyEnum.h"
-#include "EditorTypePropertyInstancedAssetPtr.h"
+#include "Editor/Types/Properties/EditorTypePropertyClass.h"
+#include "Editor/Types/Properties/EditorTypePropertyFloat.h"
+#include "Editor/Types/Properties/EditorTypePropertyInt.h"
+#include "Editor/Types/Properties/EditorTypePropertyBool.h"
+#include "Editor/Types/Properties/EditorTypePropertyString.h"
+#include "Editor/Types/Properties/EditorTypePropertyStruct.h"
+#include "Editor/Types/Properties/EditorTypePropertyVector.h"
+#include "Editor/Types/Properties/EditorTypePropertyEnum.h"
+#include "Editor/Types/Properties/EditorTypePropertyInstancedAssetPtr.h"
 #include "..\Roguelike\Actions\ActionDeciders\ActionDeciderAI.h"
 #include "..\Roguelike\Actions\ActionDeciders\ActionDeciderBase.h"
 #include "..\Roguelike\Actions\ActionDeciders\ActionDeciderPlayer.h"
@@ -30,20 +30,23 @@
 #include "..\Roguelike\ECS\Systems\ECSSystemNameslate.h"
 #include "..\Roguelike\ECS\Systems\ECSSystemPhysics.h"
 #include "..\Roguelike\ECS\Systems\ECSSystemRender.h"
+#include "..\Roguelike\Editor\ImGuiEditor.h"
+#include "..\Roguelike\Game.h"
 #include "..\Roguelike\HotbarManager\HotbarManager.h"
 #include "..\Roguelike\HotbarManager\IHotbarItem.h"
 #include "..\Roguelike\HotbarManager\StatefulHotbarActions.h"
-#include "..\Roguelike\ImGuiEditor.h"
 #include "..\Roguelike\Input\InputAction.h"
 #include "..\Roguelike\Input\InputContext.h"
 #include "..\Roguelike\Input\InputKey.h"
 #include "..\Roguelike\Input\InputSystem.h"
+#include "..\Roguelike\Input\MouseSystem.h"
 #include "..\Roguelike\Performance\PerformanceMetricsManager.h"
 #include "..\Roguelike\RPGSystems\Attributes\RPGAttributeModifiers.h"
 #include "..\Roguelike\RPGSystems\Attributes\RPGAttributes.h"
 #include "..\Roguelike\RPGSystems\Classes\RPGClassData.h"
 #include "..\Roguelike\RPGSystems\Classes\RPGClassSpecialisationData.h"
 #include "..\Roguelike\RPGSystems\Races\RPGRaceData.h"
+#include "..\Roguelike\RPGSystems\RPGLevelScalingNumber.h"
 #include "..\Roguelike\RPGSystems\RPGSystem.h"
 #include "..\Roguelike\RPGSystems\Skills\AimModule\RPGSkillAimModules.h"
 #include "..\Roguelike\RPGSystems\Skills\EffectModule\RPGSkillEffectModules.h"
@@ -154,9 +157,13 @@ void WorldGenerationLogicBase::_DeleteObject(void* pObject)
 void WorldGenerationEnemyParams::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
 	WorldGenerationEnemyParams* pWorldGenerationEnemyParams = static_cast<WorldGenerationEnemyParams*>(pObject);
-	pWorldGenerationEnemyParams->minDistanceFromPlayerSpawnSq = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationEnemyParams->minDistanceFromPlayerSpawn = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
 	pWorldGenerationEnemyParams->enemySpawnChanceAlpha = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationEnemyParams->crabSpawnDistance = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationEnemyParams->maxLevel = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+	pWorldGenerationEnemyParams->maxLevelDistanceFromSpawn = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
 	pWorldGenerationEnemyParams->pBanditRaceData = static_cast<RPGRaceData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pWorldGenerationEnemyParams->pCrabRaceData = static_cast<RPGRaceData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 	pWorldGenerationEnemyParams->pEnemyActionDecider = static_cast<ActionDeciderAI*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 }
 
@@ -737,6 +744,37 @@ void* HotbarSlot::_CreateEmptyObject()
 void HotbarSlot::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<HotbarSlot*>(pObject);
+}
+
+// MyStruct
+void MyStruct::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MyStruct* pMyStruct = static_cast<MyStruct*>(pObject);
+	{
+		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
+		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
+		{
+			pMyStruct->intVector.push_back(static_cast<EditorTypePropertyInt*>(instancedProperty.get())->GetValue());
+		}
+	}
+}
+
+void* MyStruct::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MyStruct* pMyStruct = new MyStruct;
+	int propertyIndex = 0;
+	MyStruct::_InitFromPropertiesSubset(pMyStruct, properties, propertyIndex);
+	return pMyStruct;
+}
+
+void* MyStruct::_CreateEmptyObject()
+{
+	return new MyStruct;
+}
+
+void MyStruct::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<MyStruct*>(pObject);
 }
 
 // ECSSystemBase
@@ -1401,30 +1439,29 @@ void RPGSkillData::_DeleteObject(void* pObject)
 	delete reinterpret_cast<RPGSkillData*>(pObject);
 }
 
-// RPGSkillEffectModuleTemp
-void RPGSkillEffectModuleTemp::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+// RPGSkillDamageEffectModule
+void RPGSkillDamageEffectModule::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
-	RPGSkillEffectModuleTemp* pRPGSkillEffectModuleTemp = static_cast<RPGSkillEffectModuleTemp*>(pObject);
-	RPGSkillEffectModuleBase::_InitFromPropertiesSubset(static_cast<RPGSkillEffectModuleBase*>(pRPGSkillEffectModuleTemp), properties, propertyIndex);
-	pRPGSkillEffectModuleTemp->damage = static_cast<EditorTypePropertyInt*>(properties[propertyIndex++])->GetValue();
+	RPGSkillDamageEffectModule* pRPGSkillDamageEffectModule = static_cast<RPGSkillDamageEffectModule*>(pObject);
+	RPGSkillEffectModuleBase::_InitFromPropertiesSubset(static_cast<RPGSkillEffectModuleBase*>(pRPGSkillDamageEffectModule), properties, propertyIndex);
 }
 
-void* RPGSkillEffectModuleTemp::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+void* RPGSkillDamageEffectModule::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
 {
-	RPGSkillEffectModuleTemp* pRPGSkillEffectModuleTemp = new RPGSkillEffectModuleTemp;
+	RPGSkillDamageEffectModule* pRPGSkillDamageEffectModule = new RPGSkillDamageEffectModule;
 	int propertyIndex = 0;
-	RPGSkillEffectModuleTemp::_InitFromPropertiesSubset(pRPGSkillEffectModuleTemp, properties, propertyIndex);
-	return pRPGSkillEffectModuleTemp;
+	RPGSkillDamageEffectModule::_InitFromPropertiesSubset(pRPGSkillDamageEffectModule, properties, propertyIndex);
+	return pRPGSkillDamageEffectModule;
 }
 
-void* RPGSkillEffectModuleTemp::_CreateEmptyObject()
+void* RPGSkillDamageEffectModule::_CreateEmptyObject()
 {
-	return new RPGSkillEffectModuleTemp;
+	return new RPGSkillDamageEffectModule;
 }
 
-void RPGSkillEffectModuleTemp::_DeleteObject(void* pObject)
+void RPGSkillDamageEffectModule::_DeleteObject(void* pObject)
 {
-	delete reinterpret_cast<RPGSkillEffectModuleTemp*>(pObject);
+	delete reinterpret_cast<RPGSkillDamageEffectModule*>(pObject);
 }
 
 // RPGSkillAimModuleLine
@@ -1452,6 +1489,33 @@ void* RPGSkillAimModuleLine::_CreateEmptyObject()
 void RPGSkillAimModuleLine::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<RPGSkillAimModuleLine*>(pObject);
+}
+
+// RPGLevelScalingNumber
+void RPGLevelScalingNumber::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	RPGLevelScalingNumber* pRPGLevelScalingNumber = static_cast<RPGLevelScalingNumber*>(pObject);
+	pRPGLevelScalingNumber->scalingAlgorithm = static_cast<ELevelScalingAlgorithm>(static_cast<EditorTypePropertyEnum*>(properties[propertyIndex++])->GetValue());
+	pRPGLevelScalingNumber->baseValue = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pRPGLevelScalingNumber->perLevelScaleFactor = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+}
+
+void* RPGLevelScalingNumber::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	RPGLevelScalingNumber* pRPGLevelScalingNumber = new RPGLevelScalingNumber;
+	int propertyIndex = 0;
+	RPGLevelScalingNumber::_InitFromPropertiesSubset(pRPGLevelScalingNumber, properties, propertyIndex);
+	return pRPGLevelScalingNumber;
+}
+
+void* RPGLevelScalingNumber::_CreateEmptyObject()
+{
+	return new RPGLevelScalingNumber;
+}
+
+void RPGLevelScalingNumber::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGLevelScalingNumber*>(pObject);
 }
 
 // RPGRaceData
@@ -1587,6 +1651,31 @@ void PerformanceMetricsManager::_DeleteObject(void* pObject)
 	delete reinterpret_cast<PerformanceMetricsManager*>(pObject);
 }
 
+// MouseSystem
+void MouseSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MouseSystem* pMouseSystem = static_cast<MouseSystem*>(pObject);
+	GameSystem::_InitFromPropertiesSubset(static_cast<GameSystem*>(pMouseSystem), properties, propertyIndex);
+}
+
+void* MouseSystem::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MouseSystem* pMouseSystem = new MouseSystem;
+	int propertyIndex = 0;
+	MouseSystem::_InitFromPropertiesSubset(pMouseSystem, properties, propertyIndex);
+	return pMouseSystem;
+}
+
+void* MouseSystem::_CreateEmptyObject()
+{
+	return new MouseSystem;
+}
+
+void MouseSystem::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<MouseSystem*>(pObject);
+}
+
 // InputSystem
 void InputSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1670,33 +1759,6 @@ void InputActionPress::_DeleteObject(void* pObject)
 	delete reinterpret_cast<InputActionPress*>(pObject);
 }
 
-// ImGuiEditor
-void ImGuiEditor::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	ImGuiEditor* pImGuiEditor = static_cast<ImGuiEditor*>(pObject);
-	GameSystem::_InitFromPropertiesSubset(static_cast<GameSystem*>(pImGuiEditor), properties, propertyIndex);
-	pImGuiEditor->pInputSystem = static_cast<InputSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-	pImGuiEditor->pEditorInputContext = static_cast<InputContext*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
-}
-
-void* ImGuiEditor::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	ImGuiEditor* pImGuiEditor = new ImGuiEditor;
-	int propertyIndex = 0;
-	ImGuiEditor::_InitFromPropertiesSubset(pImGuiEditor, properties, propertyIndex);
-	return pImGuiEditor;
-}
-
-void* ImGuiEditor::_CreateEmptyObject()
-{
-	return new ImGuiEditor;
-}
-
-void ImGuiEditor::_DeleteObject(void* pObject)
-{
-	delete reinterpret_cast<ImGuiEditor*>(pObject);
-}
-
 // StatefulHotbarActionCastSkill
 void StatefulHotbarActionCastSkill::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1758,6 +1820,62 @@ void* HotbarManager::_CreateEmptyObject()
 void HotbarManager::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<HotbarManager*>(pObject);
+}
+
+// MyClass
+void MyClass::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MyClass* pMyClass = static_cast<MyClass*>(pObject);
+	{
+		MyStruct* temp = static_cast<MyStruct*>(static_cast<EditorTypePropertyStruct*>(properties[propertyIndex++])->GetValue());
+		pMyClass->myStruct = *temp;
+		delete temp;
+	}
+}
+
+void* MyClass::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MyClass* pMyClass = new MyClass;
+	int propertyIndex = 0;
+	MyClass::_InitFromPropertiesSubset(pMyClass, properties, propertyIndex);
+	return pMyClass;
+}
+
+void* MyClass::_CreateEmptyObject()
+{
+	return new MyClass;
+}
+
+void MyClass::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<MyClass*>(pObject);
+}
+
+// ImGuiEditor
+void ImGuiEditor::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ImGuiEditor* pImGuiEditor = static_cast<ImGuiEditor*>(pObject);
+	GameSystem::_InitFromPropertiesSubset(static_cast<GameSystem*>(pImGuiEditor), properties, propertyIndex);
+	pImGuiEditor->pInputSystem = static_cast<InputSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pImGuiEditor->pEditorInputContext = static_cast<InputContext*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* ImGuiEditor::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ImGuiEditor* pImGuiEditor = new ImGuiEditor;
+	int propertyIndex = 0;
+	ImGuiEditor::_InitFromPropertiesSubset(pImGuiEditor, properties, propertyIndex);
+	return pImGuiEditor;
+}
+
+void* ImGuiEditor::_CreateEmptyObject()
+{
+	return new ImGuiEditor;
+}
+
+void ImGuiEditor::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ImGuiEditor*>(pObject);
 }
 
 // ECSSystemRender
@@ -2395,6 +2513,7 @@ namespace __Generated
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_InitFromProperties},
 		{"IHotbarItem", &IHotbarItem::_InitFromProperties},
 		{"HotbarSlot", &HotbarSlot::_InitFromProperties},
+		{"MyStruct", &MyStruct::_InitFromProperties},
 		{"ECSSystemBase", &ECSSystemBase::_InitFromProperties},
 		{"ECSSystemAction", &ECSSystemAction::_InitFromProperties},
 		{"DirectoryData", &DirectoryData::_InitFromProperties},
@@ -2418,18 +2537,21 @@ namespace __Generated
 		{"DragAndDropManager", &DragAndDropManager::_InitFromProperties},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_InitFromProperties},
 		{"RPGSkillData", &RPGSkillData::_InitFromProperties},
-		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_InitFromProperties},
+		{"RPGSkillDamageEffectModule", &RPGSkillDamageEffectModule::_InitFromProperties},
 		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_InitFromProperties},
+		{"RPGLevelScalingNumber", &RPGLevelScalingNumber::_InitFromProperties},
 		{"RPGRaceData", &RPGRaceData::_InitFromProperties},
 		{"RPGClassData", &RPGClassData::_InitFromProperties},
 		{"RPGAttributeBase", &RPGAttributeBase::_InitFromProperties},
 		{"PerformanceMetricsManager", &PerformanceMetricsManager::_InitFromProperties},
+		{"MouseSystem", &MouseSystem::_InitFromProperties},
 		{"InputSystem", &InputSystem::_InitFromProperties},
 		{"InputContext", &InputContext::_InitFromProperties},
 		{"InputActionPress", &InputActionPress::_InitFromProperties},
-		{"ImGuiEditor", &ImGuiEditor::_InitFromProperties},
 		{"StatefulHotbarActionCastSkill", &StatefulHotbarActionCastSkill::_InitFromProperties},
 		{"HotbarManager", &HotbarManager::_InitFromProperties},
+		{"MyClass", &MyClass::_InitFromProperties},
+		{"ImGuiEditor", &ImGuiEditor::_InitFromProperties},
 		{"ECSSystemRender", &ECSSystemRender::_InitFromProperties},
 		{"ECSSystemPhysics", &ECSSystemPhysics::_InitFromProperties},
 		{"ECSSystemNameslate", &ECSSystemNameslate::_InitFromProperties},
@@ -2480,6 +2602,7 @@ namespace __Generated
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_CreateEmptyObject},
 		{"IHotbarItem", &IHotbarItem::_CreateEmptyObject},
 		{"HotbarSlot", &HotbarSlot::_CreateEmptyObject},
+		{"MyStruct", &MyStruct::_CreateEmptyObject},
 		{"ECSSystemBase", &ECSSystemBase::_CreateEmptyObject},
 		{"ECSSystemAction", &ECSSystemAction::_CreateEmptyObject},
 		{"DirectoryData", &DirectoryData::_CreateEmptyObject},
@@ -2503,18 +2626,21 @@ namespace __Generated
 		{"DragAndDropManager", &DragAndDropManager::_CreateEmptyObject},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_CreateEmptyObject},
 		{"RPGSkillData", &RPGSkillData::_CreateEmptyObject},
-		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_CreateEmptyObject},
+		{"RPGSkillDamageEffectModule", &RPGSkillDamageEffectModule::_CreateEmptyObject},
 		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_CreateEmptyObject},
+		{"RPGLevelScalingNumber", &RPGLevelScalingNumber::_CreateEmptyObject},
 		{"RPGRaceData", &RPGRaceData::_CreateEmptyObject},
 		{"RPGClassData", &RPGClassData::_CreateEmptyObject},
 		{"RPGAttributeBase", &RPGAttributeBase::_CreateEmptyObject},
 		{"PerformanceMetricsManager", &PerformanceMetricsManager::_CreateEmptyObject},
+		{"MouseSystem", &MouseSystem::_CreateEmptyObject},
 		{"InputSystem", &InputSystem::_CreateEmptyObject},
 		{"InputContext", &InputContext::_CreateEmptyObject},
 		{"InputActionPress", &InputActionPress::_CreateEmptyObject},
-		{"ImGuiEditor", &ImGuiEditor::_CreateEmptyObject},
 		{"StatefulHotbarActionCastSkill", &StatefulHotbarActionCastSkill::_CreateEmptyObject},
 		{"HotbarManager", &HotbarManager::_CreateEmptyObject},
+		{"MyClass", &MyClass::_CreateEmptyObject},
+		{"ImGuiEditor", &ImGuiEditor::_CreateEmptyObject},
 		{"ECSSystemRender", &ECSSystemRender::_CreateEmptyObject},
 		{"ECSSystemPhysics", &ECSSystemPhysics::_CreateEmptyObject},
 		{"ECSSystemNameslate", &ECSSystemNameslate::_CreateEmptyObject},
@@ -2565,6 +2691,7 @@ namespace __Generated
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_InitFromPropertiesSubset},
 		{"IHotbarItem", &IHotbarItem::_InitFromPropertiesSubset},
 		{"HotbarSlot", &HotbarSlot::_InitFromPropertiesSubset},
+		{"MyStruct", &MyStruct::_InitFromPropertiesSubset},
 		{"ECSSystemBase", &ECSSystemBase::_InitFromPropertiesSubset},
 		{"ECSSystemAction", &ECSSystemAction::_InitFromPropertiesSubset},
 		{"DirectoryData", &DirectoryData::_InitFromPropertiesSubset},
@@ -2588,18 +2715,21 @@ namespace __Generated
 		{"DragAndDropManager", &DragAndDropManager::_InitFromPropertiesSubset},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_InitFromPropertiesSubset},
 		{"RPGSkillData", &RPGSkillData::_InitFromPropertiesSubset},
-		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_InitFromPropertiesSubset},
+		{"RPGSkillDamageEffectModule", &RPGSkillDamageEffectModule::_InitFromPropertiesSubset},
 		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_InitFromPropertiesSubset},
+		{"RPGLevelScalingNumber", &RPGLevelScalingNumber::_InitFromPropertiesSubset},
 		{"RPGRaceData", &RPGRaceData::_InitFromPropertiesSubset},
 		{"RPGClassData", &RPGClassData::_InitFromPropertiesSubset},
 		{"RPGAttributeBase", &RPGAttributeBase::_InitFromPropertiesSubset},
 		{"PerformanceMetricsManager", &PerformanceMetricsManager::_InitFromPropertiesSubset},
+		{"MouseSystem", &MouseSystem::_InitFromPropertiesSubset},
 		{"InputSystem", &InputSystem::_InitFromPropertiesSubset},
 		{"InputContext", &InputContext::_InitFromPropertiesSubset},
 		{"InputActionPress", &InputActionPress::_InitFromPropertiesSubset},
-		{"ImGuiEditor", &ImGuiEditor::_InitFromPropertiesSubset},
 		{"StatefulHotbarActionCastSkill", &StatefulHotbarActionCastSkill::_InitFromPropertiesSubset},
 		{"HotbarManager", &HotbarManager::_InitFromPropertiesSubset},
+		{"MyClass", &MyClass::_InitFromPropertiesSubset},
+		{"ImGuiEditor", &ImGuiEditor::_InitFromPropertiesSubset},
 		{"ECSSystemRender", &ECSSystemRender::_InitFromPropertiesSubset},
 		{"ECSSystemPhysics", &ECSSystemPhysics::_InitFromPropertiesSubset},
 		{"ECSSystemNameslate", &ECSSystemNameslate::_InitFromPropertiesSubset},
@@ -2649,6 +2779,7 @@ namespace __Generated
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_DeleteObject},
 		{"IHotbarItem", &IHotbarItem::_DeleteObject},
 		{"HotbarSlot", &HotbarSlot::_DeleteObject},
+		{"MyStruct", &MyStruct::_DeleteObject},
 		{"ECSSystemBase", &ECSSystemBase::_DeleteObject},
 		{"ECSSystemAction", &ECSSystemAction::_DeleteObject},
 		{"DirectoryData", &DirectoryData::_DeleteObject},
@@ -2672,18 +2803,21 @@ namespace __Generated
 		{"DragAndDropManager", &DragAndDropManager::_DeleteObject},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_DeleteObject},
 		{"RPGSkillData", &RPGSkillData::_DeleteObject},
-		{"RPGSkillEffectModuleTemp", &RPGSkillEffectModuleTemp::_DeleteObject},
+		{"RPGSkillDamageEffectModule", &RPGSkillDamageEffectModule::_DeleteObject},
 		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_DeleteObject},
+		{"RPGLevelScalingNumber", &RPGLevelScalingNumber::_DeleteObject},
 		{"RPGRaceData", &RPGRaceData::_DeleteObject},
 		{"RPGClassData", &RPGClassData::_DeleteObject},
 		{"RPGAttributeBase", &RPGAttributeBase::_DeleteObject},
 		{"PerformanceMetricsManager", &PerformanceMetricsManager::_DeleteObject},
+		{"MouseSystem", &MouseSystem::_DeleteObject},
 		{"InputSystem", &InputSystem::_DeleteObject},
 		{"InputContext", &InputContext::_DeleteObject},
 		{"InputActionPress", &InputActionPress::_DeleteObject},
-		{"ImGuiEditor", &ImGuiEditor::_DeleteObject},
 		{"StatefulHotbarActionCastSkill", &StatefulHotbarActionCastSkill::_DeleteObject},
 		{"HotbarManager", &HotbarManager::_DeleteObject},
+		{"MyClass", &MyClass::_DeleteObject},
+		{"ImGuiEditor", &ImGuiEditor::_DeleteObject},
 		{"ECSSystemRender", &ECSSystemRender::_DeleteObject},
 		{"ECSSystemPhysics", &ECSSystemPhysics::_DeleteObject},
 		{"ECSSystemNameslate", &ECSSystemNameslate::_DeleteObject},

@@ -1,7 +1,8 @@
 ﻿#pragma once
+
 #include "AssetManager.h"
-#include "EditorAssetBase.h"
-#include "EditorTypeBase.h"
+#include "Editor/Assets/EditorAssetClass.h"
+#include "Editor/Types/EditorTypeClass.h"
 #include "Game.h"
 
 class EditorAssetBase;
@@ -47,7 +48,7 @@ public:
 
 	bool IsLoaded() const { return pInstance != nullptr; }
 
-	// This isn't checking the assetName actually resolves to a valid asset 
+	// This isn't checking if the assetName actually resolves to a valid asset
 	bool IsAssetSet() const { return assetName != "nullptr" && assetName != ""; }
 	
 
@@ -62,17 +63,17 @@ void InstancedAssetPtr<T>::Load()
 {
 	DOMLOG_ERROR_IF(pInstance, "Loading while already loaded?")
 	
-	std::weak_ptr<EditorAssetBase> foundAsset = Game::GetAssetManager().FindAsset(assetName);
+	std::weak_ptr<EditorAssetClass> foundAsset = Game::GetAssetManager().FindAsset<EditorAssetClass>(assetName);
 	if (foundAsset.expired())
 	{
 		DOMLOG_WARN("Loading invalid asset", assetName);
 		return;
 	}
 	
-	EditorAssetBase* pAsset = foundAsset.lock().get();
-	DOMLOG_ERROR_IF(!pAsset->GetEditorType()->HasMetadataFlag(EClassMetadataFlags::Instanced), "This only works with instanced classes");
+	EditorAssetClass* pAsset = foundAsset.lock().get();
+	DOMLOG_ERROR_IF(!pAsset->GetClassEditorType()->HasMetadataFlag(EClassMetadataFlags::Instanced), "This only works with instanced classes");
 	
-	pInstance = Game::GetAssetManager().LoadObjectFromAsset<T>(pAsset);
+	pInstance = Game::GetAssetManager().LoadObjectFromClassAsset<T>(pAsset);
 }
 
 template <class T>

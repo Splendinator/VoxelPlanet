@@ -47,6 +47,7 @@ void WorldGenerator::SetCenter(Vec2i center, bool bInit)
 	const int effectiveY = center.y;
 
 	// Min/max grid positions of the chunks
+	
 	const int minChunkX = effectiveX / WorldGenerationChunk::CHUNK_SIZE - NUM_CHUNKS;
 	const int maxChunkX = minChunkX + (CHUNK_SQUARE_SIZE - 1);
 	const int minChunkY = effectiveY / WorldGenerationChunk::CHUNK_SIZE - NUM_CHUNKS;

@@ -15,7 +15,7 @@ VectorArt::VectorArt(const char* pFilePath)
 		return;
 	}
 	
-	std::fstream svgFile(pFilePath);
+	std::ifstream svgFile(pFilePath, std::ios::binary); // We need to open in binary mode otherwise Tellg()/Seekg() will not work properly on Windows. (fuck microsoft)
 	
 	pRootLayer = std::make_unique<VectorPrimitiveLayer>();
 

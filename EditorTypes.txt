@@ -15,9 +15,13 @@ meta EditInlineNew
 bool bMutateSeedAfterLogic false
 ;
 Struct WorldGenerationEnemyParams
-float minDistanceFromPlayerSpawnSq 0
+float minDistanceFromPlayerSpawn 0
 float enemySpawnChanceAlpha 0
+float crabSpawnDistance 0
+int maxLevel 0
+float maxLevelDistanceFromSpawn 0
 class RPGRaceData pBanditRaceData nullptr
+class RPGRaceData pCrabRaceData nullptr
 class ActionDeciderAI pEnemyActionDecider nullptr
 ;
 Struct WorldGenerationTreeParams
@@ -109,6 +113,11 @@ meta EditInlineNew
 Struct RPGLevelProgressionData
 int requiredXp 0
 ;
+Enum ELevelScalingAlgorithm
+None 0
+Linear 1
+Exponential 2
+;
 Struct RPGRacePerLevelAttributeValues
 float maxHealthMultiplierPerLevel 1.1
 ;
@@ -122,6 +131,12 @@ string displayName ""
 Class RPGAttributeModifierBase
 meta Abstract
 meta EditInlineNew
+;
+Enum EMousePriority
+InGame 0
+Menu 1
+ImGuiEditor 2
+COUNT 3
 ;
 Enum EInputKey
 NONE 0
@@ -244,6 +259,9 @@ meta Abstract
 ;
 Struct HotbarSlot
 class InputActionBase pInputAction nullptr
+;
+Struct MyStruct
+vector intVector int
 ;
 Class ECSSystemBase
 meta Abstract
@@ -371,14 +389,18 @@ string iconLayerName ""
 class RPGSkillAimModuleBase pAimModule nullptr
 class RPGSkillEffectModuleBase pEffectModule nullptr
 ;
-Class RPGSkillEffectModuleTemp
+Class RPGSkillDamageEffectModule
 Child RPGSkillEffectModuleBase
-int damage 0
 ;
 Class RPGSkillAimModuleLine
 Child RPGSkillAimModuleBase
 int maxRange 0
 int areaRadius 0
+;
+Struct RPGLevelScalingNumber
+enum ELevelScalingAlgorithm scalingAlgorithm None
+float baseValue 0
+float perLevelScaleFactor 0
 ;
 Class RPGRaceData
 meta Singleton
@@ -403,6 +425,9 @@ vector pModifiers RPGAttributeModifierBase
 Class PerformanceMetricsManager
 Child GameSystem
 ;
+Class MouseSystem
+Child GameSystem
+;
 Class InputSystem
 Child GameSystem
 class InputContext pDefaultInputContext nullptr
@@ -414,11 +439,6 @@ vector pInputActions InputActionBase
 ;
 Class InputActionPress
 Child InputActionBase
-;
-Class ImGuiEditor
-Child GameSystem
-class InputSystem pInputSystem nullptr
-class InputContext pEditorInputContext nullptr
 ;
 Class StatefulHotbarActionCastSkill
 Child StatefulHotbarActionBase
@@ -433,6 +453,14 @@ Class HotbarManager
 Child GameSystem
 meta Singleton
 vector hotbarSlots HotbarSlot
+;
+Class MyClass
+struct MyStruct myStruct
+;
+Class ImGuiEditor
+Child GameSystem
+class InputSystem pInputSystem nullptr
+class InputContext pEditorInputContext nullptr
 ;
 Class ECSSystemRender
 Child ECSSystemBase

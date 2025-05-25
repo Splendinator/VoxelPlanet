@@ -1,0 +1,50 @@
+#include "pch.h"
+
+#include "EditorWindowCreateNewFolder.h"
+
+#include "Editor/Actions/EditorActionCreateNewFolder.h"
+#include "Editor/ImGuiEditor.h"
+
+void EditorWindowCreateNewFolder::Draw()
+{
+	CreateNewFolderWindow();
+}
+
+void EditorWindowCreateNewFolder::CreateNewFolderWindow()
+{
+	ImGui::Text("%s", targetFilePath.string().c_str());
+
+	// Add a text input field to specify the folder name
+	ImGui::InputText("Folder Name", folderNameBuffer, sizeof(folderNameBuffer));
+
+	// Check whether it's valid
+	std::string newFolderName(folderNameBuffer);
+	std::string errorMessage = GetErrorMessage(newFolderName);
+
+	// Show a red warning text if there's an error
+	if (!errorMessage.empty())
+	{
+		ImVec4 redColour(1.0f, 0.0f, 0.0f, 1.0f);
+		ImGui::PushStyleColor(ImGuiCol_Text, redColour);
+		ImGui::Text("%s", errorMessage.c_str());
+		ImGui::PopStyleColor();
+	}
+	else if (ImGui::Button("Create New Folder"))
+	{
+		pEditor->DoAction(std::make_unique<EditorActionCreateNewFolder>(targetFilePath, newFolderName));
+		RequestClose();
+	}
+}
+
+std::string EditorWindowCreateNewFolder::GetErrorMessage(const std::string& fileName)
+{
+	if (fileName.empty())
+	{
+		return "Invalid folder name";
+	}
+	if (std::filesystem::exists(targetFilePath / fileName))
+	{
+		return "Folder already exists";
+	}
+	return "";
+}

@@ -101,14 +101,29 @@ struct WorldGenerationEnemyParams
 
 	// Minimum distance from player spawn before enemies can spawn
 	EDITORPROPERTY()
-	float minDistanceFromPlayerSpawnSq;
+	float minDistanceFromPlayerSpawn;
 
 	// [0.0, 1.0]
 	EDITORPROPERTY()
 	float enemySpawnChanceAlpha;
+
+	// Distance from the coast that crabs spawn instead
+	EDITORPROPERTY()
+	float crabSpawnDistance;
+
+	// Max level of enemies to spawn
+	EDITORPROPERTY()
+	int maxLevel;
+
+	// Distance from the spawn point that max level enemies will spawn, we will lerp between (0, MaxLevel) as we move further from spawn.
+	EDITORPROPERTY()
+	float maxLevelDistanceFromSpawn;
 	
 	EDITORPROPERTY()
 	RPGRaceData* pBanditRaceData = nullptr;
+
+	EDITORPROPERTY()
+	RPGRaceData* pCrabRaceData = nullptr;
 
 	EDITORPROPERTY()
 	ActionDeciderAI* pEnemyActionDecider = nullptr;

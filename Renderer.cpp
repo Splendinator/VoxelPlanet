@@ -51,7 +51,7 @@ namespace
 
 	constexpr int VERTEX_BUFFER_SIZE = 6; // Num vertices in our vertex buffer
 
-	constexpr int MAX_NUM_INSTANCES = 8192; // Max quads that can be rendered in one go
+	constexpr int MAX_NUM_INSTANCES = 16384; // Max quads that can be rendered in one go
 
 	void WaitForPreviousFrameToRender();
 	
@@ -401,8 +401,7 @@ namespace dmgf
 
 	void Tick(float deltaTime)
 	{
-		SCOPED_PERFORMANCE_MARKER(GraphicsTick);
-
+		SCOPED_FUNCTION_PERFORMANCE_MARKER()
 		WaitForPreviousFrameToRender();
 		
 		UpdateViewBuffer(deltaTime);
@@ -477,6 +476,8 @@ namespace dmgf
 
 	void RemoveObject(TransientPtr<RendererObject> pRendererObject)
 	{
+		// #TODO: This is getting called while the frame is still rendering, which is causing CleanUpEntry to delete buffers that are in use (model + vector art).
+		
 		auto RemoveObjectFromList = [pRendererObject](std::vector<RenderedObjectEntry>& renderedObjects)
 		{
 			for (auto renderObjectEntryIterator = renderedObjects.begin(); renderObjectEntryIterator != renderedObjects.end(); ++renderObjectEntryIterator)
@@ -988,11 +989,12 @@ namespace
 	VkDescriptorPool CreateDescriptorPool()
 	{
 		// Increase this if we need more things rendered
-		const int maxDescriptorSets = 1024; // #TODO: This can be lowered a lot once we cull shit off-screen. Right now it's showing every health bar for every enemy in the game.
+		constexpr int maxDescriptorSets = 1024; // #TODO: This can be lowered a lot once we cull shit off-screen. Right now it's showing every health bar for every enemy in the game.
 
 		VkDescriptorPoolSize poolSizes[] =
 		{
-			{ VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, maxDescriptorSets }
+			{ VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, maxDescriptorSets },
+			{ VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, maxDescriptorSets }
 
 #ifdef DOMIMGUI
 			,
@@ -1088,8 +1090,6 @@ namespace
 
 	void UpdateViewBuffer(float deltaTime)
 	{
-		SCOPED_PERFORMANCE_MARKER(UpdateViewBuffer);
-		
 		void* pDeviceData = nullptr;
 		vkMapMemory(handleDevice, handleDeviceMemoryViewBuffer, 0, sizeof(Mat4f), 0, &pDeviceData);
 		memcpy(pDeviceData, &viewMatrix, sizeof(Mat4f));
@@ -1608,7 +1608,6 @@ namespace
 		
 		// Render all in-game objects
 		{
-			SCOPED_PERFORMANCE_MARKER(DrawInGame);
 			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 0, 1, &handleDescriptorSetProjection, 0, nullptr);
 			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 1, 1, &handleDescriptorSetView, 0, nullptr);
 
@@ -1617,7 +1616,6 @@ namespace
 
 		// Render all UI objects
 		{
-			SCOPED_PERFORMANCE_MARKER(DrawUI);
 			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 0, 1, &handleDescriptorSetProjectionHUD, 0, nullptr);
 			vkCmdBindDescriptorSets(handleCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, handlePipelineLayout, 1, 1, &handleDescriptorSetViewHUD, 0, nullptr);
 
@@ -1687,7 +1685,6 @@ namespace
 		// Wait for the previous frame's draw command to finish before we start a new one
 		if (handleSubmitDrawCommandsFence != VK_NULL_HANDLE)
 		{
-			SCOPED_PERFORMANCE_MARKER(WaitForFence);
 			vkWaitForFences(handleDevice, 1, &handleSubmitDrawCommandsFence, VK_TRUE, UINT64_MAX);
 
 			vkDestroyFence(handleDevice, handleSubmitDrawCommandsFence, nullptr);
