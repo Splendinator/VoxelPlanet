@@ -273,6 +273,13 @@ meta Singleton
 Class ECSSystemAction
 Child ECSSystemBase
 ;
+Class GameSystem
+meta Abstract
+meta Singleton
+;
+Class GameInstance
+vector pGameSystems GameSystem
+;
 Class DirectoryData
 meta Singleton
 string fonts ""
@@ -283,13 +290,6 @@ string rpgClassVisuals ""
 string rpgRaceVisuals ""
 string rpgSkillVisuals ""
 string worldGenerationTiles ""
-;
-Class GameSystem
-meta Abstract
-meta Singleton
-;
-Class GameInstance
-vector pGameSystems GameSystem
 ;
 Class CameraSystem
 Child GameSystem

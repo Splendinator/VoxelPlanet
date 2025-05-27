@@ -2,7 +2,7 @@
 
 #include "HUDObjectHotbar.h"
 
-#include "DirectoryData.h"
+#include "Core/DirectoryData.h"
 #include "HotbarManager/HotbarManager.h"
 #include "UI/DragAndDrop/DragAndDropShared.h"
 #include "UI/UIObjects/UIObjectDragAndDropArea.h"

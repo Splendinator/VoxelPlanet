@@ -2,7 +2,7 @@
 
 #include "UIObjectSubObjectSpawner.h"
 
-#include "VectorArt.h"
+#include "Graphics/VectorArt/VectorArt.h"
 
 void UIObjectSubObjectSpawner::Init(VectorPrimitiveLayer* pRoot)
 {

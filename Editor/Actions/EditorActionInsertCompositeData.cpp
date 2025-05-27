@@ -18,11 +18,11 @@ void EditorActionInsertCompositeData::Undo()
 {
 	if (pDataCompositeAsset.expired() || !pDataCompositeAsset.lock()->IsInAssetManager())
 	{
-		DOMLOG_ERROR("I don't think this should even be hit unless the asset is deleted unexpectedly");
+		DOMLOG_ERROR("I don't think this should be hit unless the asset is deleted unexpectedly");
 		return;
 	}
 	
-	pDataCompositeAsset.lock()->GetEditorTypeDataComposite().RemoveProperty(pProperty);
+	pDataCompositeAsset.lock()->GetEditorTypeDataComposite().RemoveProperty(pProperty, false);
 	pDataCompositeAsset.lock()->SaveAsset();
 }
 
@@ -30,7 +30,7 @@ bool EditorActionInsertCompositeData::TryExecuteAction()
 {
 	if (pDataCompositeAsset.expired() || !pDataCompositeAsset.lock()->IsInAssetManager())
 	{
-		DOMLOG_ERROR("I don't think this should even be hit unless the asset is deleted unexpectedly");
+		DOMLOG_ERROR("I don't think this should be hit unless the asset is deleted unexpectedly");
 		return false;
 	}
 

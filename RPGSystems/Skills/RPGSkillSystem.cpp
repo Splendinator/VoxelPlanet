@@ -4,14 +4,14 @@
 
 #include "AimModule/RPGSkillAimModules.h"
 #include "Camera/CameraSystem.h"
-#include "DirectoryData.h"
+#include "Core/DirectoryData.h"
 #include "ECS/ECS.h"
 #include "ECS/Systems/ECSSystemRender.h"
 #include "EffectModule/RPGSkillEffectModules.h"
 #include "RPGSkillData.h"
-#include "RenderPriorities.h"
-#include "Renderer.h"
-#include "RendererObject.h"
+#include "Graphics/RenderPriorities.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/RendererObject.h"
 
 // RPGSkillHighlightEntry
 void RPGSkillHighlightEntry::AddVisual(Vec2i visualsGridPosition, const DirectoryData& directoryData)

@@ -2,9 +2,9 @@
 
 #include "TextRenderSystem.h"
 
-#include "DirectoryData.h"
+#include "Core/DirectoryData.h"
 #include "Textbox.h"
-#include "VectorArt.h"
+#include "Graphics/VectorArt/VectorArt.h"
 
 void TextRenderSystem::Init()
 {

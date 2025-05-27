@@ -5,7 +5,7 @@
 #include "ECS/Components.h"
 #include "ECS/ECS.h"
 #include "ECS/Systems/ECSSystemRender.h"
-#include "Renderer.h"
+#include "Graphics/Renderer.h"
 #include "DomWindow/DomWindow.h"
 
 void CameraSystem::Init()

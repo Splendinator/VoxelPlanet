@@ -40,7 +40,8 @@ public:
 	// insertIndex is the index to insert the property at, or -1 to append it to the end.
 	void AddAndSetupProperty(EditorTypePropertyBase* pProperty, int insertIndex = -1);
 	
-	void RemoveProperty(EditorTypePropertyBase* pProperty);
+	void RemoveProperty(EditorTypePropertyBase* pProperty, bool bDeleteProperty);
+	
 	const std::vector<EditorTypePropertyBase*>& GetProperties() const { return pProperties; }
 	
 	// Names of base classes if any. This will always be empty on deep copied versions as we only care about base classes on the template.

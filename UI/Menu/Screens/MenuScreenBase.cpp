@@ -2,7 +2,7 @@
 
 #include "MenuScreenBase.h"
 
-#include "DirectoryData.h"
+#include "Core/DirectoryData.h"
 #include "DomWindow/DomWindow.h"
 
 #include "UI/Menu/MenuSystem.h"

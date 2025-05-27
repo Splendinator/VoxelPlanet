@@ -4,7 +4,7 @@
 
 #include "AimModule/RPGSkillAimModules.h"
 #include "Core/GameInstance.h"
-#include "DirectoryData.h"
+#include "Core/DirectoryData.h"
 #include "EffectModule/RPGSkillEffectModules.h"
 #include "RPGSkillSystem.h"
 

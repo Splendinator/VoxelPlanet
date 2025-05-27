@@ -2,8 +2,6 @@
 
 #include "UIObjectProgressBar.h"
 
-#include "VectorPrimitiveRectangle.h"
-
 void UIObjectProgressBar::Init(VectorPrimitiveLayer* pRoot)
 {
 	progressBarTotalWidth = pRoot->GetBoundingBox().GetWidth();

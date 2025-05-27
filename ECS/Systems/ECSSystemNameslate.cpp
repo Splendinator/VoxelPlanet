@@ -5,8 +5,8 @@
 #include "ECS/Components.h"
 #include "ECS/Systems/Callbacks/ECSSystemCallback.h"
 #include "ECSSystemRender.h"
-#include "FilePaths.h"
-#include "RendererObject.h"
+#include "Core/FilePaths.h"
+#include "Graphics/RendererObject.h"
 #include "UI/UIObjects/UIObjectProgressBar.h"
 
 // HealthBarNameslate

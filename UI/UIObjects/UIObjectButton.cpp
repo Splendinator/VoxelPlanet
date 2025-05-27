@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 
 #include "UIObjectButton.h"
-#include "VectorPrimitiveShape.h"
+#include "Graphics/VectorArt/VectorPrimitiveShape.h"
 
 #include "DomWindow/DomWindow.h"
 

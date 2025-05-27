@@ -20,9 +20,9 @@
 #include "..\Roguelike\Actions\ActionHandlers\ActionHandlerSkill.h"
 #include "..\Roguelike\Actions\ActionHandlers\ActionHandlerWait.h"
 #include "..\Roguelike\Camera\CameraSystem.h"
+#include "..\Roguelike\Core\DirectoryData.h"
 #include "..\Roguelike\Core\GameInstance.h"
 #include "..\Roguelike\Core\GameSystem.h"
-#include "..\Roguelike\DirectoryData.h"
 #include "..\Roguelike\ECS\ECS.h"
 #include "..\Roguelike\ECS\Systems\ECSSystemAction.h"
 #include "..\Roguelike\ECS\Systems\ECSSystemBase.h"
@@ -798,38 +798,6 @@ void ECSSystemAction::_DeleteObject(void* pObject)
 	delete reinterpret_cast<ECSSystemAction*>(pObject);
 }
 
-// DirectoryData
-void DirectoryData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	DirectoryData* pDirectoryData = static_cast<DirectoryData*>(pObject);
-	pDirectoryData->fonts = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pDirectoryData->hudObjects = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pDirectoryData->menus = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pDirectoryData->sharedUI = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pDirectoryData->rpgClassVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pDirectoryData->rpgRaceVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pDirectoryData->rpgSkillVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-	pDirectoryData->worldGenerationTiles = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
-}
-
-void* DirectoryData::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	DirectoryData* pDirectoryData = new DirectoryData;
-	int propertyIndex = 0;
-	DirectoryData::_InitFromPropertiesSubset(pDirectoryData, properties, propertyIndex);
-	return pDirectoryData;
-}
-
-void* DirectoryData::_CreateEmptyObject()
-{
-	return new DirectoryData;
-}
-
-void DirectoryData::_DeleteObject(void* pObject)
-{
-	delete reinterpret_cast<DirectoryData*>(pObject);
-}
-
 // GameSystem
 void GameSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -883,6 +851,38 @@ void* GameInstance::_CreateEmptyObject()
 void GameInstance::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<GameInstance*>(pObject);
+}
+
+// DirectoryData
+void DirectoryData::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	DirectoryData* pDirectoryData = static_cast<DirectoryData*>(pObject);
+	pDirectoryData->fonts = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDirectoryData->hudObjects = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDirectoryData->menus = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDirectoryData->sharedUI = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDirectoryData->rpgClassVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDirectoryData->rpgRaceVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDirectoryData->rpgSkillVisuals = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pDirectoryData->worldGenerationTiles = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+}
+
+void* DirectoryData::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	DirectoryData* pDirectoryData = new DirectoryData;
+	int propertyIndex = 0;
+	DirectoryData::_InitFromPropertiesSubset(pDirectoryData, properties, propertyIndex);
+	return pDirectoryData;
+}
+
+void* DirectoryData::_CreateEmptyObject()
+{
+	return new DirectoryData;
+}
+
+void DirectoryData::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<DirectoryData*>(pObject);
 }
 
 // CameraSystem
@@ -2536,9 +2536,9 @@ namespace __Generated
 		{"HotbarSlot", &HotbarSlot::_InitFromProperties},
 		{"ECSSystemBase", &ECSSystemBase::_InitFromProperties},
 		{"ECSSystemAction", &ECSSystemAction::_InitFromProperties},
-		{"DirectoryData", &DirectoryData::_InitFromProperties},
 		{"GameSystem", &GameSystem::_InitFromProperties},
 		{"GameInstance", &GameInstance::_InitFromProperties},
+		{"DirectoryData", &DirectoryData::_InitFromProperties},
 		{"CameraSystem", &CameraSystem::_InitFromProperties},
 		{"ActionHandlerBase", &ActionHandlerBase::_InitFromProperties},
 		{"ActionHandlerAttack", &ActionHandlerAttack::_InitFromProperties},
@@ -2626,9 +2626,9 @@ namespace __Generated
 		{"HotbarSlot", &HotbarSlot::_CreateEmptyObject},
 		{"ECSSystemBase", &ECSSystemBase::_CreateEmptyObject},
 		{"ECSSystemAction", &ECSSystemAction::_CreateEmptyObject},
-		{"DirectoryData", &DirectoryData::_CreateEmptyObject},
 		{"GameSystem", &GameSystem::_CreateEmptyObject},
 		{"GameInstance", &GameInstance::_CreateEmptyObject},
+		{"DirectoryData", &DirectoryData::_CreateEmptyObject},
 		{"CameraSystem", &CameraSystem::_CreateEmptyObject},
 		{"ActionHandlerBase", &ActionHandlerBase::_CreateEmptyObject},
 		{"ActionHandlerAttack", &ActionHandlerAttack::_CreateEmptyObject},
@@ -2716,9 +2716,9 @@ namespace __Generated
 		{"HotbarSlot", &HotbarSlot::_InitFromPropertiesSubset},
 		{"ECSSystemBase", &ECSSystemBase::_InitFromPropertiesSubset},
 		{"ECSSystemAction", &ECSSystemAction::_InitFromPropertiesSubset},
-		{"DirectoryData", &DirectoryData::_InitFromPropertiesSubset},
 		{"GameSystem", &GameSystem::_InitFromPropertiesSubset},
 		{"GameInstance", &GameInstance::_InitFromPropertiesSubset},
+		{"DirectoryData", &DirectoryData::_InitFromPropertiesSubset},
 		{"CameraSystem", &CameraSystem::_InitFromPropertiesSubset},
 		{"ActionHandlerBase", &ActionHandlerBase::_InitFromPropertiesSubset},
 		{"ActionHandlerAttack", &ActionHandlerAttack::_InitFromPropertiesSubset},
@@ -2805,9 +2805,9 @@ namespace __Generated
 		{"HotbarSlot", &HotbarSlot::_DeleteObject},
 		{"ECSSystemBase", &ECSSystemBase::_DeleteObject},
 		{"ECSSystemAction", &ECSSystemAction::_DeleteObject},
-		{"DirectoryData", &DirectoryData::_DeleteObject},
 		{"GameSystem", &GameSystem::_DeleteObject},
 		{"GameInstance", &GameInstance::_DeleteObject},
+		{"DirectoryData", &DirectoryData::_DeleteObject},
 		{"CameraSystem", &CameraSystem::_DeleteObject},
 		{"ActionHandlerBase", &ActionHandlerBase::_DeleteObject},
 		{"ActionHandlerAttack", &ActionHandlerAttack::_DeleteObject},

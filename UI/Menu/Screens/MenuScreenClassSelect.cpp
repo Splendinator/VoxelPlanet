@@ -2,7 +2,7 @@
 
 #include "MenuScreenClassSelect.h"
 
-#include "DirectoryData.h"
+#include "Core/DirectoryData.h"
 #include "ECS/ECS.h"
 #include "RPGSystems/RPGSystem.h"
 #include "UI/UIObjects/UIObjectButtonWithIcon.h"

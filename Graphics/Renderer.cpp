@@ -9,7 +9,7 @@
 #include "DomMath/Math.h"
 #include "DomWindow/DomWindow.h"
 #include "RendererObject.h"
-#include "VectorArt.h"
+#include "Graphics/VectorArt/VectorArt.h"
 
 #include <vulkan/vulkan_win32.h>
 

@@ -3,7 +3,7 @@
 #include "ECS.h"
 
 #include "Actions/ActionDeciders/ActionDeciderPlayer.h"
-#include "RendererObject.h"
+#include "Graphics/RendererObject.h"
 
 void ECS::RegisterSystemCallback(std::unique_ptr<ECSSystemCallbackBase>&& pSystemCallback)
 {

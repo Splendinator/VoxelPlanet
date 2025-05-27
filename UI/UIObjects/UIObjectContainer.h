@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VectorPrimitiveLayer.h"
+#include "Graphics/VectorArt/VectorPrimitiveLayer.h"
 
 #include <type_traits>
 

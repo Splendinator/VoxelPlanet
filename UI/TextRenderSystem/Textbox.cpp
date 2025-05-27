@@ -2,8 +2,8 @@
 
 #include "Textbox.h"
 
-#include "Renderer.h"
-#include "RendererObject.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/RendererObject.h"
 #include "TextRenderSystem.h"
 
 // #TODO: Replace programmer art first-pass letters with actual letters when we have better vector art primitives

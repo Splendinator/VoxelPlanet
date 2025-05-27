@@ -4,12 +4,12 @@
 
 #include "Attributes/RPGAttributes.h"
 #include "Classes/RPGClassData.h"
-#include "DirectoryData.h"
+#include "Core/DirectoryData.h"
 #include "Ecs/Components.h"
 #include "Ecs/ECS.h"
-#include "RenderPriorities.h"
-#include "Renderer.h"
-#include "RendererObject.h"
+#include "Graphics/RenderPriorities.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/RendererObject.h"
 
 void RPGSystem::Init()
 {

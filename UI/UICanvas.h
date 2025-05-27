@@ -2,9 +2,9 @@
 
 #include "UI/UIObjects/UIObjectContainer.h"
 
-#include "RenderPriorities.h"
-#include "Renderer.h"
-#include "VectorArt.h"
+#include "Graphics/RenderPriorities.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/VectorArt/VectorArt.h"
 
 class RendererObject;
 

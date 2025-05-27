@@ -110,12 +110,17 @@ void EditorTypePropertiesBase::AddAndSetupProperty(EditorTypePropertyBase* pProp
 	}
 }
 
-void EditorTypePropertiesBase::RemoveProperty(EditorTypePropertyBase* pProperty)
+void EditorTypePropertiesBase::RemoveProperty(EditorTypePropertyBase* pProperty, bool bDeleteProperty)
 {
 	auto it = std::find(pProperties.begin(), pProperties.end(), pProperty);
 	if (it != pProperties.end())
 	{
 		pProperties.erase(it);
+
+		if (bDeleteProperty)
+		{
+			delete pProperty;
+		}
 	}
 	else
 	{

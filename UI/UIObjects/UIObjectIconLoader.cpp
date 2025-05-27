@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 
 #include "UIObjectIconLoader.h"
-#include "VectorArt.h"
+#include "Graphics/VectorArt/VectorArt.h"
 
 void UIObjectIconLoader::LoadUIIcon(const std::string& file, const std::string& primitiveName /*= ""*/)
 {

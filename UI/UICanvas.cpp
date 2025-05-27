@@ -2,7 +2,7 @@
 
 #include "UICanvas.h"
 
-#include "RendererObject.h"
+#include "Graphics/RendererObject.h"
 
 #include "DomWindow/DomWindow.h"
 

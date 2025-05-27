@@ -4,8 +4,8 @@
 #include "ECS/ECS.h"
 #include "ECS/Systems/Callbacks/ECSSystemCallback.h"
 #include "ECSSystemRender.h"
-#include "Renderer.h"
-#include "RendererObject.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/RendererObject.h"
 
 float ECSSystemRender::GRID_SIZE = 1.0f;
 
