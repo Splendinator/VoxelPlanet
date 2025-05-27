@@ -7246,31 +7246,6 @@
     <None Include="..\Graphics\Shaders\VectorVert.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Assets\Camera\CameraSystem.asset" />
-    <Content Include="..\Assets\Core\DirectoryData.asset" />
-    <Content Include="..\Assets\Core\GameInstance.asset" />
-    <Content Include="..\Assets\ECS\ECS.asset" />
-    <Content Include="..\Assets\ECS\Systems\ECSSystemAction.asset" />
-    <Content Include="..\Assets\ECS\Systems\ECSSystemCleanUp.asset" />
-    <Content Include="..\Assets\ECS\Systems\ECSSystemDamage.asset" />
-    <Content Include="..\Assets\ECS\Systems\ECSSystemEntityMap.asset" />
-    <Content Include="..\Assets\ECS\Systems\ECSSystemNameslate.asset" />
-    <Content Include="..\Assets\ECS\Systems\ECSSystemPhysics.asset" />
-    <Content Include="..\Assets\ECS\Systems\ECSSystemRender.asset" />
-    <Content Include="..\Assets\Input\InputActions\InputAction_CancelSkill.asset" />
-    <Content Include="..\Assets\Input\InputActions\InputAction_CloseMenu.asset" />
-    <Content Include="..\Assets\Input\InputActions\InputAction_ConfirmSkill.asset" />
-    <Content Include="..\Assets\Input\InputActions\InputAction_OpenMenu.asset" />
-    <Content Include="..\Assets\Input\InputActions\InputAction_UseHotbarSlot1.asset" />
-    <Content Include="..\Assets\Input\InputActions\InputAction_UseHotbarSlot2.asset" />
-    <Content Include="..\Assets\Input\InputActions\InputAction_UseHotbarSlot3.asset" />
-    <Content Include="..\Assets\Input\InputContexts\InputContext_AimingSkill.asset" />
-    <Content Include="..\Assets\Input\InputContexts\InputContext_Gameplay.asset" />
-    <Content Include="..\Assets\Input\InputContexts\InputContext_ImGuiEditor.asset" />
-    <Content Include="..\Assets\Input\InputContexts\InputContext_Menu.asset" />
-    <Content Include="..\Assets\Input\InputSystem.asset" />
-    <Content Include="..\Assets\Input\MouseSystem.asset" />
-    <Content Include="..\Assets\Performance\PerformanceMetricsManager.asset" />
     <Content Include="RPGSystems\Attributes\RPGAttributesShared.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

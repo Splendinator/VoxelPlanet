@@ -23,8 +23,27 @@ protected:
 
 	void DrawDirectory(const std::filesystem::path& path);
 
+	// Returns whether the search bar was rendered
+	bool DrawSearchBar();
+	
+	void DrawAsset(const std::filesystem::directory_entry& entry, bool bShowOpenFileLocation);
+
+	void RefreshSearchableAssets(const std::filesystem::path& path);
 private:
 
+	struct SearchableAssetData
+	{
+		std::string name;
+		std::filesystem::directory_entry directoryEntry;
+	};
+	
 	std::filesystem::path rootDirectory;
+
+	std::vector<SearchableAssetData> searchableAssets;
+
+	// User has requested to open a file at location. This will close all folders except the one containing this file.
+	std::filesystem::directory_entry openFileLocationRequest; 
+	
+	char searchBuffer[128] = {};
 
 };
