@@ -11,11 +11,15 @@ void EditorActionDeleteFile::Undo()
 	if (!outFile)
 	{
 		DOMLOG_ERROR("File cannot be re-created after deleting", targetFile);
+		return;
 	}
-
+	
 	outFile.write(deletedFileContents.RawPtr(), deletedFileContents.GetSize());
 
 	deletedFileContents.DeAlloc();
+
+	Game::GetAssetManager().AddAsset(pDeletedAsset);
+	pDeletedAsset.reset();
 }
 
 bool EditorActionDeleteFile::TryExecuteAction()
@@ -31,6 +35,13 @@ bool EditorActionDeleteFile::TryExecuteAction()
 	if (!fileStream.is_open())
 	{
 		DOMLOG_WARN("Can't open file", targetFile, ". Won't delete")
+		return false;
+	}
+
+	std::weak_ptr<EditorAssetBase> pAssetToDelete = Game::GetAssetManager().FindAsset(assetName);
+	if (pAssetToDelete.expired())
+	{
+		DOMLOG_WARN("Can't find asset to delete:", assetName)
 		return false;
 	}
 
@@ -51,6 +62,9 @@ bool EditorActionDeleteFile::TryExecuteAction()
 		deletedFileContents.DeAlloc();
 		return false;
 	}
+
+	pDeletedAsset = pAssetToDelete.lock();
+	Game::GetAssetManager().RemoveAsset(pDeletedAsset);
 	
 	return true;
 }

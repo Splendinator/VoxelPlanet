@@ -39,9 +39,9 @@ protected:
 	
 	// Range the projectile can be aimed
 	EDITORPROPERTY()
-	u32 maxRange = 0;
+	DataCompositeProperty<int> maxRange = 0;
 
 	// Area around target location the projectile will affect
 	EDITORPROPERTY()
-	u32 areaRadius = 0;
+	DataCompositeProperty<int> areaRadius = 2;
 };

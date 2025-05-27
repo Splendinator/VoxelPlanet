@@ -59,3 +59,13 @@ void EditorAssetDataComposite::WriteToFile(std::ofstream& file)
 
 	editorTypeDataComposite.WriteToFile(file);
 }
+
+void EditorAssetDataComposite::OnAddedToAssetManager()
+{
+	editorTypeDataComposite.SetOwningAsset(Game::GetAssetManager().FindAsset<EditorAssetDataComposite>(name));
+}
+
+void EditorAssetDataComposite::OnRemovedFromAssetManager()
+{
+	editorTypeDataComposite.ResetOwningAsset();
+}

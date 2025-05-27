@@ -39,7 +39,7 @@ struct HotbarSlot
 
 // Manages the gameplay side of the hotbar.
 // Anything with an IHotbarItem interface can be assigned to a slot and used when it's the player's turn.
-EDITORCLASS(Singleton)
+EDITORCLASS()
 class HotbarManager : public GameSystem
 {
 	EDITORBODY()

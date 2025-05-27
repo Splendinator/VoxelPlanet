@@ -2,6 +2,9 @@
 
 #include "EditorWindowInsertDataCompositeItem.h"
 
+#include "Editor/Actions/EditorActionInsertCompositeData.h"
+#include "Editor/Assets/EditorAssetDataComposite.h"
+#include "Editor/ImGuiEditor.h"
 #include "Editor/Types/EditorTypeEnum.h"
 #include "Editor/Types/EditorTypeStruct.h"
 #include "Editor/Types/Properties/EditorTypePropertyBool.h"
@@ -41,6 +44,12 @@ void EditorWindowInsertDataCompositeItem::Open()
 
 void EditorWindowInsertDataCompositeItem::Draw()
 {
+	if (dataCompositeAsset.expired() || !dataCompositeAsset.lock()->IsInAssetManager())
+	{
+		RequestClose();
+		return;
+	}
+	
 	propertyTypeList.Draw();
 
 	std::string selectedItem = propertyTypeList.GetSelectedItem();
@@ -115,8 +124,8 @@ void EditorWindowInsertDataCompositeItem::Draw()
 			EditorTypePropertyVector* pNewVectorProperty = new EditorTypePropertyVector(pNewProperty, propertyNameBuffer);
 			pNewProperty = pNewVectorProperty;
 		}
-		
-		dataComposite.AddAndSetupProperty(pNewProperty, insertIndex);
+
+		pEditor->DoAction(std::make_shared<EditorActionInsertCompositeData>(dataCompositeAsset, pNewProperty, insertIndex));
 		
 		RequestClose();
 	}

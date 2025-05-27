@@ -3,6 +3,7 @@
 #include "EditorTypeDataComposite.h"
 
 #include "Core/GameInstance.h"
+#include "Editor/Actions/EditorActionRemoveCompositeData.h"
 #include "Editor/ImGuiEditor.h"
 #include "Editor/Windows/EditorWindowInsertDataCompositeItem.h"
 #include "EditorTypeUtils.h"
@@ -12,7 +13,8 @@
 
 void EditorTypeDataComposite::DrawImGUI()
 {
-	// #TODO: Removing and Adding properties should be done using EditorTypePropertiesBase::onPropertyChanged or a new EditorActionBase
+	// #TODO: Removing and Adding properties should be done using EditorTypePropertiesBase::onPropertyChanged or a new EditorActionBase.
+	// #TODO: We should add a new EditorActionBase that keeps the property in memory, instead of just deleting it. Right now we crash if we delete it while it's still in the action queue.
 	
 	if (ImGui::BeginTable("DataComposite", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit))
 	{
@@ -30,13 +32,16 @@ void EditorTypeDataComposite::DrawImGUI()
 			{
 				if (ImGuiEditor* pEditor = Game::GetGameInstance().FindGameSystemSlow<ImGuiEditor>())
 				{
-					pEditor->AddWindow(std::make_shared<EditorWindowInsertDataCompositeItem>(*this, propertyIndex));
+					pEditor->AddWindow(std::make_shared<EditorWindowInsertDataCompositeItem>(pOwningAsset, propertyIndex));
 				}
 			}
 			
 			if (ImGui::Button("Remove"))
 			{
-				RemoveProperty(pProperty);
+				if (ImGuiEditor* pEditor = Game::GetGameInstance().FindGameSystemSlow<ImGuiEditor>())
+				{
+					pEditor->DoAction(std::make_shared<EditorActionRemoveCompositeData>(pOwningAsset, pProperty, propertyIndex));
+				}
 				ImGui::EndTable();
 				ImGui::PopID();
 				return;
@@ -56,7 +61,7 @@ void EditorTypeDataComposite::DrawImGUI()
 	{
 		if (ImGuiEditor* pEditor = Game::GetGameInstance().FindGameSystemSlow<ImGuiEditor>())
 		{
-			pEditor->AddWindow(std::make_shared<EditorWindowInsertDataCompositeItem>(*this));
+			pEditor->AddWindow(std::make_shared<EditorWindowInsertDataCompositeItem>(pOwningAsset));
 		}
 	}
 }

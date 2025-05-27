@@ -116,7 +116,6 @@ void EditorTypePropertiesBase::RemoveProperty(EditorTypePropertyBase* pProperty)
 	if (it != pProperties.end())
 	{
 		pProperties.erase(it);
-		delete pProperty;
 	}
 	else
 	{

@@ -24,7 +24,7 @@ void EditorWindowEditAsset::Close()
 
 void EditorWindowEditAsset::Draw()
 {
-	if (pAsset.expired())
+	if (pAsset.expired() || !pAsset.lock()->IsInAssetManager())
 	{
 		// In case of deletion mid-edit
 		RequestClose();

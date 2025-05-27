@@ -192,7 +192,7 @@ EntityId WorldGenerationContinent::CreateTileEntity(EWorldGenerationLayer layer,
 	}
 
 	// Spawn enemies in foreground
-	// #TEMP: Hacky as fuck, needs a real enemy spawn manager system
+	// #TODO: Hacky as fuck, needs a real enemy spawn manager system
 	if (layer == EWorldGenerationLayer::Foreground)
 	{
 		EnemySpawnData& enemySpawnData = GetEnemyDataRef(position);

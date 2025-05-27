@@ -7,6 +7,11 @@
 #include "Game.h"
 #include "WritePropertyToFileUtils.h"
 
+EditorTypePropertyEnum::EditorTypePropertyEnum(const std::string& propertyName, const std::string& inEnumName, int inValue): EditorTypePropertyBase(propertyName), enumName(inEnumName), value(inValue)
+{
+	valueName = Game::GetAssetManager().GetEnumValueNameFromValue(inEnumName, value);
+}
+
 void EditorTypePropertyEnum::DrawImGUI()
 {
 	std::string currentValue = Game::GetAssetManager().GetEnumValueNameFromValue(enumName, value);

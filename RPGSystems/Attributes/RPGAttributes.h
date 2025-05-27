@@ -25,6 +25,7 @@ public:
 
 	// Returns whether this attribute can be applied to an entities components.
 	// Some attributes don't have an associated component value and are calculated at runtime whenever used via GetAttributeValue() and will return false here.
+	// You don't need to override ApplyAttribute() if this returns false.
 	virtual bool CanApplyAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const { return false; }
 
 	int GetAttributeValue(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const;
@@ -51,9 +52,20 @@ class RPGAttributeMaxHealth : public RPGAttributeBase
 {
 	EDITORBODY()
 
-	//~ Begin RPGAttributeMaxHealth Interface
+	//~ Begin RPGAttributeBase Interface
 	bool CanApplyAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const override;
 	void ApplyAttribute(EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const override;
 	int GetBaseAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const override;
-	//~ End RPGAttributeMaxHealth Interface
+	//~ End RPGAttributeBase Interface
 };
+
+EDITORCLASS()
+class RPGAttributeSkillDamage : public RPGAttributeBase
+{
+	EDITORBODY()
+
+	//~ Begin RPGAttributeBase Interface
+	int GetBaseAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const override;
+	//~ End RPGAttributeBase Interface
+};
+

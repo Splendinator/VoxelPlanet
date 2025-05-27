@@ -8,6 +8,9 @@ struct RPGRaceInitialAttributeValues
 
 	EDITORPROPERTY()
 	int maxHealth = 100;
+
+	EDITORPROPERTY()
+	int spellDamage = 10;
 };
 
 EDITORSTRUCT()
@@ -17,6 +20,9 @@ struct RPGRacePerLevelAttributeValues
 
 	EDITORPROPERTY()
 	float maxHealthMultiplierPerLevel = 1.1f;
+
+	EDITORPROPERTY()
+	float spellDamageMultiplierPerLevel = 1.06f;
 };
 
 EDITORCLASS(Singleton)

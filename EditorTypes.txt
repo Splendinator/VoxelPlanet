@@ -110,6 +110,10 @@ Class RPGSkillAimModuleBase
 meta Abstract
 meta EditInlineNew
 ;
+Enum EDamageType
+Skill 0
+Physical 1
+;
 Struct RPGLevelProgressionData
 int requiredXp 0
 ;
@@ -120,9 +124,11 @@ Exponential 2
 ;
 Struct RPGRacePerLevelAttributeValues
 float maxHealthMultiplierPerLevel 1.1
+float spellDamageMultiplierPerLevel 1.06
 ;
 Struct RPGRaceInitialAttributeValues
 int maxHealth 100
+int spellDamage 10
 ;
 Class RPGClassSpecialisationData
 meta Singleton
@@ -310,16 +316,6 @@ Child ActionDeciderBase
 class ActionHandlerWait pWaitAction nullptr
 int aggroRange 0
 ;
-Class TestClass
-Child GameSystem
-datacompositeproperty floatProperty float nullptr none
-datacompositeproperty boolProperty bool nullptr none
-datacompositeproperty intProperty int nullptr none
-datacompositeproperty stringProperty std::string nullptr none
-datacompositeproperty directoryDataProperty DirectoryData nullptr none
-datacompositeproperty hudAnchorPointProperty EHUDAnchorPoint nullptr none
-datacompositeproperty hudAnchorPointStructProperty HUDAnchorPoint nullptr none
-;
 Class WorldGenerator
 Child GameSystem
 class ECS pEcs nullptr
@@ -396,13 +392,19 @@ string iconLayerName ""
 class RPGSkillAimModuleBase pAimModule nullptr
 class RPGSkillEffectModuleBase pEffectModule nullptr
 ;
-Class RPGSkillDamageEffectModule
+Class RPGSkillEffectModuleDamage
 Child RPGSkillEffectModuleBase
+datacompositeproperty damage RPGDamageMagnitude nullptr none
 ;
 Class RPGSkillAimModuleLine
 Child RPGSkillAimModuleBase
-int maxRange 0
-int areaRadius 0
+datacompositeproperty maxRange int nullptr none
+datacompositeproperty areaRadius int nullptr none
+;
+Struct RPGDamageMagnitude
+enum EDamageType damageType Skill
+float baseDamage 0
+float scaling 1
 ;
 Struct RPGLevelScalingNumber
 enum ELevelScalingAlgorithm scalingAlgorithm None
@@ -458,7 +460,6 @@ class ActionHandlerSkill pActionHandlerSkill nullptr
 ;
 Class HotbarManager
 Child GameSystem
-meta Singleton
 vector hotbarSlots HotbarSlot
 ;
 Class ImGuiEditor
@@ -498,6 +499,9 @@ class RPGSkillSystem pSkillSystem nullptr
 ;
 Class ActionHandlerMove
 Child ActionHandlerBase
+;
+Class ActionDeciderProjectile
+Child ActionDeciderBase
 ;
 Class ActionDeciderPlayer
 Child ActionDeciderBase
@@ -550,6 +554,9 @@ class ECS pEcs nullptr
 class DirectoryData pDirectoryData nullptr
 vector attributes RPGAttributeBase
 vector levelProgressionData RPGLevelProgressionData
+;
+Class RPGAttributeSkillDamage
+Child RPGAttributeBase
 ;
 Class RPGAttributeMaxHealth
 Child RPGAttributeBase

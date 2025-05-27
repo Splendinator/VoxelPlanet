@@ -10,7 +10,7 @@ class EditorTypePropertyEnum : public EditorTypePropertyBase
 	
 public:
 	EditorTypePropertyEnum() : EditorTypePropertyBase() {}
-	EditorTypePropertyEnum(const std::string& propertyName, const std::string& inEnumName, int inValue) : EditorTypePropertyBase(propertyName), enumName(inEnumName), value(inValue) {}
+	EditorTypePropertyEnum(const std::string& propertyName, const std::string& inEnumName, int inValue);
 
 	//~ Begin EditorTypePropertyBase Interface
 	void DrawImGUI() override;

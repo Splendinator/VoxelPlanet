@@ -22,6 +22,7 @@ enum class EComponents
 	ComponentClass,
 	ComponentProgression,
 	ComponentRace,
+	ComponentProjectile,
 };
 
 // Component to render something
@@ -42,8 +43,8 @@ struct ComponentTransform
 // Component to take an action based off energy
 struct ComponentAction
 {
-	short maxEnergy = 0; // How often to take a turn, something with 50 max energy will take an action twice as often as something with 100 max energy
-	short energy = 0;
+	u16 maxEnergy = 0; // How often to take a turn, something with 50 max energy will take an action twice as often as something with 100 max energy
+	u16 energy = 0;
 	TransientPtr<ActionDeciderBase> pActionDecider = nullptr;
 };
 
@@ -87,4 +88,12 @@ struct ComponentProgression
 struct ComponentRace
 {
 	const RPGRaceData* pRaceData = nullptr;
+};
+
+struct ComponentProjectile
+{
+	int startX = 0;
+	int startY = 0;
+	int targetX = 0;
+	int targetY = 0;
 };

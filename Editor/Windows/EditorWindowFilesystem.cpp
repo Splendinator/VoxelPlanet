@@ -72,13 +72,15 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 				const std::string extension = entry.path().extension().string();
 				if (extension == ImGuiEditorGlobals::assetExtension)
 				{
-					std::string assetName = entry.path().filename().string();
-					ImGui::PushID(assetName.c_str());
-					ImGui::Text("%s", assetName.c_str());
+					const std::string fileName = entry.path().filename().string();
+					const std::string assetName = fileName.substr(0, fileName.size() - ImGuiEditorGlobals::assetExtension.size());
+					
+					ImGui::PushID(fileName.c_str());
+					ImGui::Text("%s", fileName.c_str());
 					ImGui::SameLine();
+					
 					if (ImGui::Button("Edit"))
 					{
-						assetName = assetName.substr(0, assetName.size() - ImGuiEditorGlobals::assetExtension.size()); // Get rid of extension
 						std::weak_ptr<EditorAssetBase> pAsset = Game::GetAssetManager().FindAsset(assetName);
 						if (!pAsset.expired())
 						{
@@ -92,7 +94,7 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 					ImGui::SameLine();
 					if (ImGui::Button("Delete"))
 					{
-						pEditor->DoAction(std::make_shared<EditorActionDeleteFile>(entry.path()));
+						pEditor->DoAction(std::make_shared<EditorActionDeleteFile>(entry.path(), assetName));
 					}
 					ImGui::PopID();
 				}

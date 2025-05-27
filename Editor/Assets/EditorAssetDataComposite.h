@@ -14,11 +14,15 @@ public:
 
 	std::vector<std::string> GetPropertyNames() const;
 	EditorTypePropertyBase* FindProperty(std::string propertyName) const;
+
+	EditorTypeDataComposite& GetEditorTypeDataComposite() { return editorTypeDataComposite; }
 	
     //~ Begin EditorAssetBase Interface
     virtual void Draw() override;
     virtual void ReadFromFile(std::ifstream& file) override;
     virtual void WriteToFile(std::ofstream& file) override;
+	virtual void OnAddedToAssetManager() override;
+	virtual void OnRemovedFromAssetManager() override;
     //~ End EditorAssetBase Interface
 
 protected:

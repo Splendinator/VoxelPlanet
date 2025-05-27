@@ -7,6 +7,7 @@
 
 #include "Races/RPGRaceData.h"
 
+class RPGAttributeSkillDamage;
 class DirectoryData;
 class ECS;
 class RPGAttributeBase;
@@ -21,6 +22,31 @@ struct RPGLevelProgressionData
 	// XP to the next level
 	EDITORPROPERTY()
 	u32 requiredXp = 0;
+};
+
+EDITORENUM()
+enum class EDamageType : u8
+{
+	Skill,		// Scales off skill damage attribute.
+	Physical	// Scales off equipped weapon damage.
+};
+
+// Represents a damage number (e.g. 20 + 40% skill damage)
+EDITORSTRUCT()
+struct RPGDamageMagnitude
+{
+	EDITORBODY()
+
+	EDITORPROPERTY()
+	EDamageType damageType = EDamageType::Skill;
+
+	// Flat damage 
+	EDITORPROPERTY()
+	float baseDamage = 0.0f;
+	
+	// Damage scaling multiplier 
+	EDITORPROPERTY()
+	float scaling = 1.0f;
 };
 
 struct RPGEntitySetupParams
@@ -42,7 +68,7 @@ struct RPGDamageParams
 	EntityId attackerEntity;
 	EntityId targetEntity;
 
-	u32 damage;
+	RPGDamageMagnitude damageMagnitude;
 };
 
 // RPG system. Responsible for anything RPG, (levels, attributes, classes, races, etc.). Skills are handled in the RPGSkillManager as they get quite complex 
@@ -68,6 +94,9 @@ public:
 	// Returns nullptr if none can be found (usually means max level has been hit)
 	const RPGLevelProgressionData* GetLevelProgressionDataForLevel(u32 level) const;
 
+	template<typename TAttribute>
+	const TAttribute* GetAttributeByType() const;
+	
 protected:
 
 	EDITORPROPERTY()
@@ -84,6 +113,23 @@ protected:
 	// It is theoretically possible for units to be outside of this range, but you can't level up with XP past the number of levels in this array and they'll stop giving skill points etc. past the max
 	EDITORPROPERTY()
 	std::vector<RPGLevelProgressionData> levelProgressionData;
-
+	
+	const RPGAttributeSkillDamage* pSkillDamage = nullptr;
+	
 	RPGAttributeCalculationSharedData attributeSharedData = {};
 };
+
+template <typename TAttribute>
+const TAttribute* RPGSystem::GetAttributeByType() const
+{
+	for (const RPGAttributeBase* pAttribute : attributes)
+	{
+		if (const TAttribute* pCastedAttribute = dynamic_cast<const TAttribute*>(pAttribute))
+		{
+			return const_cast<TAttribute*>(pCastedAttribute);
+		}
+	}
+
+	return nullptr;
+}
+

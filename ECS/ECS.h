@@ -74,6 +74,7 @@ public:
 	REGISTER_COMPONENT(ComponentClass);
 	REGISTER_COMPONENT(ComponentProgression);
 	REGISTER_COMPONENT(ComponentRace);
+	REGISTER_COMPONENT(ComponentProjectile);
 
 private:
 	

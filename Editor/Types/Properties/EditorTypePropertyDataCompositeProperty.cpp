@@ -8,7 +8,7 @@
 
 void EditorTypePropertyDataCompositeProperty::DrawImGUI()
 {
-	std::string imGuiTreeLabel = name + " (DataCompositeProperty)";
+	std::string imGuiTreeLabel = name + " (DataCompositeProperty<" + dataType + ">)";
 	
 	if (ImGui::TreeNodeEx(imGuiTreeLabel.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 	{

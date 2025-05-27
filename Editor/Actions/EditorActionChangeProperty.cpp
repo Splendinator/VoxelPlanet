@@ -35,14 +35,7 @@ bool EditorActionChangeProperty::SetValue(const ForceSetValueParams& params)
 {
 	propertyChangeData.pProperty->ForceSetValue(params);
 
-	std::ofstream outFile(assetPath);
-	if (!outFile.is_open())
-	{
-		DOMLOG_ERROR("Cannot open asset path", assetPath.string());
-		return false;
-	}
-
-	pAsset.lock()->WriteToFile(outFile);
+	pAsset.lock()->SaveAsset();
 
 	return true;	
 }

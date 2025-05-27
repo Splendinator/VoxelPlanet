@@ -64,10 +64,14 @@ void AssetManager::UnInit()
 void AssetManager::AddAsset(std::shared_ptr<EditorAssetBase> pAsset)
 {
 	assets.insert({ pAsset->GetName(), pAsset });
+	
+	pAsset->BaseOnAddedToAssetManager();
 }
 
 void AssetManager::RemoveAsset(std::shared_ptr<EditorAssetBase> pAsset)
 {
+	pAsset->BaseOnRemovedFromAssetManager();
+	
 	assets.erase(pAsset->GetName());
 }
 

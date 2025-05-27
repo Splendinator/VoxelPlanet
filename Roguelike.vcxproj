@@ -376,6 +376,7 @@
       <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Actions\ActionDeciders\ActionDeciderProjectile.cpp" />
     <ClCompile Include="Actions\ActionHandlers\ActionHandlerAttack.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
@@ -1695,6 +1696,8 @@
       <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Editor\Actions\EditorActionInsertCompositeData.cpp" />
+    <ClCompile Include="Editor\Actions\EditorActionRemoveCompositeData.cpp" />
     <ClCompile Include="Editor\Assets\EditorAssetBase.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
@@ -6006,6 +6009,7 @@
     <ClInclude Include="Actions\ActionDeciders\ActionDeciderAI.h" />
     <ClInclude Include="Actions\ActionDeciders\ActionDeciderBase.h" />
     <ClInclude Include="Actions\ActionDeciders\ActionDeciderPlayer.h" />
+    <ClInclude Include="Actions\ActionDeciders\ActionDeciderProjectile.h" />
     <ClInclude Include="Actions\ActionHandlers\ActionHandlerAttack.h" />
     <ClInclude Include="Actions\ActionHandlers\ActionHandlerBase.h" />
     <ClInclude Include="Actions\ActionHandlers\ActionHandlerMove.h" />
@@ -6039,6 +6043,8 @@
     <ClInclude Include="Editor\Actions\EditorActionCreateAssetDataComposite.h" />
     <ClInclude Include="Editor\Actions\EditorActionCreateNewFolder.h" />
     <ClInclude Include="Editor\Actions\EditorActionDeleteFile.h" />
+    <ClInclude Include="Editor\Actions\EditorActionInsertCompositeData.h" />
+    <ClInclude Include="Editor\Actions\EditorActionRemoveCompositeData.h" />
     <ClInclude Include="Editor\Assets\EditorAssetBase.h" />
     <ClInclude Include="Editor\Assets\EditorAssetClass.h" />
     <ClInclude Include="Editor\Assets\EditorAssetDataComposite.h" />
@@ -6179,16 +6185,9 @@
     <None Include="..\Graphics\Shaders\VectorVert.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Assets\Actions\ActionDecider\ActionDeciderAI.asset" />
-    <Content Include="..\Assets\Actions\ActionDecider\ActionDeciderPlayer.asset" />
-    <Content Include="..\Assets\Actions\ActionHandlers\ActionHandlerAttack.asset" />
-    <Content Include="..\Assets\Actions\ActionHandlers\ActionHandlerMove.asset" />
-    <Content Include="..\Assets\Actions\ActionHandlers\ActionHandlerSkill.asset" />
-    <Content Include="..\Assets\Actions\ActionHandlers\ActionHandlerWait.asset" />
     <Content Include="..\Assets\Camera\CameraSystem.asset" />
     <Content Include="..\Assets\Core\DirectoryData.asset" />
     <Content Include="..\Assets\Core\GameInstance.asset" />
-    <Content Include="..\Assets\DragAndDrop\DragAndDropManager.asset" />
     <Content Include="..\Assets\ECS\ECS.asset" />
     <Content Include="..\Assets\ECS\Systems\ECSSystemAction.asset" />
     <Content Include="..\Assets\ECS\Systems\ECSSystemCleanUp.asset" />
@@ -6197,8 +6196,6 @@
     <Content Include="..\Assets\ECS\Systems\ECSSystemNameslate.asset" />
     <Content Include="..\Assets\ECS\Systems\ECSSystemPhysics.asset" />
     <Content Include="..\Assets\ECS\Systems\ECSSystemRender.asset" />
-    <Content Include="..\Assets\HotbarManager\HotbarManager.asset" />
-    <Content Include="..\Assets\ImGuiEditor\ImGuiEditor.asset" />
     <Content Include="..\Assets\Input\InputActions\InputAction_CancelSkill.asset" />
     <Content Include="..\Assets\Input\InputActions\InputAction_CloseMenu.asset" />
     <Content Include="..\Assets\Input\InputActions\InputAction_ConfirmSkill.asset" />
@@ -6213,36 +6210,6 @@
     <Content Include="..\Assets\Input\InputSystem.asset" />
     <Content Include="..\Assets\Input\MouseSystem.asset" />
     <Content Include="..\Assets\Performance\PerformanceMetricsManager.asset" />
-    <Content Include="..\Assets\RPG\Attributes\RPGAttribute_MaxHealth.asset" />
-    <Content Include="..\Assets\RPG\Classes\RPGClassData_Mage.asset" />
-    <Content Include="..\Assets\RPG\Classes\RPGClassData_Ranger.asset" />
-    <Content Include="..\Assets\RPG\Classes\RPGClassData_Warrior.asset" />
-    <Content Include="..\Assets\RPG\Races\RPGRaceData_Bandit.asset" />
-    <Content Include="..\Assets\RPG\Races\RPGRaceData_Crab.asset" />
-    <Content Include="..\Assets\RPG\Races\RPGRaceData_Human.asset" />
-    <Content Include="..\Assets\RPG\RPGSystem.asset" />
-    <Content Include="..\Assets\RPG\Skills\Mage\RPGSkillData_TempMageOne.asset" />
-    <Content Include="..\Assets\RPG\Skills\Mage\RPGSkillData_TempMageThree.asset" />
-    <Content Include="..\Assets\RPG\Skills\Mage\RPGSkillData_TempMageTwo.asset" />
-    <Content Include="..\Assets\RPG\Skills\RPGSkillSystem.asset" />
-    <Content Include="..\Assets\RPG\Skills\StatefulHotbarActionCastSkill.asset" />
-    <Content Include="..\Assets\TextRenderSystem\TextRenderSystem.asset" />
-    <Content Include="..\Assets\UI\HUD\HUD.asset" />
-    <Content Include="..\Assets\UI\HUD\HUDObjects\HUDObjectHealth.asset" />
-    <Content Include="..\Assets\UI\HUD\HUDObjects\HUDObjectHotbar.asset" />
-    <Content Include="..\Assets\UI\HUD\HUDObjects\HUDObjectXP.asset" />
-    <Content Include="..\Assets\UI\Menus\MenuSystem.asset" />
-    <Content Include="..\Assets\UI\Menus\Screens\MenuScreenClassSelect.asset" />
-    <Content Include="..\Assets\UI\Menus\Screens\MenuScreenMainMenu.asset" />
-    <Content Include="..\Assets\UI\Menus\Screens\MenuScreenSkillTree.asset" />
-    <Content Include="..\Assets\WorldGenerator\TileDefinitions\TileDefinition_Dirt.asset" />
-    <Content Include="..\Assets\WorldGenerator\TileDefinitions\TileDefinition_Grass.asset" />
-    <Content Include="..\Assets\WorldGenerator\TileDefinitions\TileDefinition_Sand.asset" />
-    <Content Include="..\Assets\WorldGenerator\TileDefinitions\TileDefinition_Snow.asset" />
-    <Content Include="..\Assets\WorldGenerator\TileDefinitions\TileDefinition_Tree.asset" />
-    <Content Include="..\Assets\WorldGenerator\TileDefinitions\TileDefinition_Water.asset" />
-    <Content Include="..\Assets\WorldGenerator\WorldGenerationContinent.asset" />
-    <Content Include="..\Assets\WorldGenerator\WorldGenerator.asset" />
     <Content Include="RPGSystems\Attributes\RPGAttributesShared.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

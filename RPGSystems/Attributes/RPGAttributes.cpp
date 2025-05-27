@@ -20,12 +20,6 @@ RPGAttributeBase::~RPGAttributeBase()
 
 int RPGAttributeBase::GetAttributeValue(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const
 {
-	if (!CanApplyAttribute(entity, sharedData))
-	{
-		DOMLOG_ERROR("Can't apply this");
-		return 0;
-	}
-	
 	DOMLOG_ERROR_IF(!sharedData.pEcs->EntityHasComponents<ComponentRace>(entity), "Without race there's no base value for attributes, if this is hit we're using uninitialised data")
 	int value = GetBaseAttribute(entity, sharedData);
 
@@ -71,3 +65,15 @@ int RPGAttributeMaxHealth::GetBaseAttribute(const EntityId& entity, const RPGAtt
 	ComponentProgression& progressionComponent = sharedData.pEcs->GetComponent<ComponentProgression>(entity);
 	return CalculateInitialExponentialAttribute(raceComponent.pRaceData->initialAttributes.maxHealth, raceComponent.pRaceData->perLevelAttributes.maxHealthMultiplierPerLevel, progressionComponent.level);
 }
+
+// RPGAttributeSkillDamage
+int RPGAttributeSkillDamage::GetBaseAttribute(const EntityId& entity, const RPGAttributeCalculationSharedData& sharedData) const
+{
+	ComponentRace& raceComponent = sharedData.pEcs->GetComponent<ComponentRace>(entity);
+	ComponentProgression& progressionComponent = sharedData.pEcs->GetComponent<ComponentProgression>(entity);
+	return CalculateInitialExponentialAttribute(raceComponent.pRaceData->initialAttributes.spellDamage, raceComponent.pRaceData->perLevelAttributes.spellDamageMultiplierPerLevel, progressionComponent.level);
+}
+
+
+
+

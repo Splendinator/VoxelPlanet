@@ -17,6 +17,9 @@ void RPGSystem::Init()
 	DOMLOG_ERROR_IF(pDirectoryData == nullptr, "Needs Directory Data")
 
 	attributeSharedData.pEcs = pEcs;
+	pSkillDamage = GetAttributeByType<RPGAttributeSkillDamage>();
+
+	DOMLOG_WARN_IF(pSkillDamage == nullptr, "RPGAttributeSkillDamage needed to calculate skill damage");
 }
 
 void RPGSystem::RecalculateAttributesForEntity(EntityId entity)
@@ -102,8 +105,32 @@ void RPGSystem::DealDamage(RPGDamageParams params)
 {
 	if (pEcs)
 	{
+		float calculatedDamage = 0;
+		
+		switch (params.damageMagnitude.damageType)
+		{
+		case EDamageType::Skill:
+		{
+			int skillDamage = pSkillDamage->GetAttributeValue(params.attackerEntity, attributeSharedData);
+			calculatedDamage = skillDamage * params.damageMagnitude.scaling;
+			break;
+		}
+
+		case EDamageType::Physical:
+		{
+			// #TODO: This should be calculated based on the weapon.
+			calculatedDamage = params.damageMagnitude.scaling * (20.f + pEcs->GetComponent<ComponentProgression>(params.attackerEntity).level * 10.f); 
+			break;
+		}
+
+		default:
+		{
+			DOMLOG_ERROR("Unknown damage type", ENUMSTRING(EDamageType, params.damageMagnitude.damageType))
+		}
+		}
+		
 		ComponentHealth& targetHealthComponent = pEcs->GetComponent<ComponentHealth>(params.targetEntity);
-		targetHealthComponent.health -= params.damage;
+		targetHealthComponent.health -= (int)calculatedDamage;
 		
 		if (targetHealthComponent.health <= 0)
 		{
@@ -161,14 +188,12 @@ void RPGSystem::DrawImGui(float deltaTime)
 					{
 						if (pAttribute)
 						{
-							if (pAttribute->CanApplyAttribute(entity, attributeSharedData))
-							{
-								ImGui::Text("%s: %d", pAttribute->displayName.c_str(), pAttribute->GetAttributeValue(entity, attributeSharedData));
-							}
+							ImGui::Text("%s: %d", pAttribute->displayName.c_str(), pAttribute->GetAttributeValue(entity, attributeSharedData));
 						}
 					}
+					ImGui::TreePop();
 				}
-
+				
 				ImGui::PopID();
 			}
 		}

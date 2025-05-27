@@ -2,7 +2,7 @@
 
 #include "Core/GameSystem.h"
 
-// #TEMP: I created this class to test github copilot. I'm not sure if we need it vs using the InputSystem with EButton::LMB etc.
+// #NOTE: I created this class to test github copilot. I'm not sure if we need it vs using the InputSystem with EButton::LMB etc.
 
 EDITORENUM()
 enum class EMousePriority

@@ -10,7 +10,7 @@ class EditorWindowInsertDataCompositeItem : public EditorWindowBase
 {
 public:
 
-	EditorWindowInsertDataCompositeItem(EditorTypeDataComposite& inDataComposite, int inInsertIndex = -1) : EditorWindowBase(), dataComposite(inDataComposite), insertIndex(inInsertIndex) {}
+	EditorWindowInsertDataCompositeItem(std::weak_ptr<EditorAssetDataComposite> inDataCompositeAsset, int inInsertIndex = -1) : EditorWindowBase(), dataCompositeAsset(inDataCompositeAsset), insertIndex(inInsertIndex) {}
 	
 	//~ Begin EditorWindowBase Interface
 	std::string GetWindowName() const override;
@@ -23,7 +23,7 @@ protected:
 	void Draw() override;
 	//~ End EditorWindowBase Interface
 	
-	EditorTypeDataComposite& dataComposite;
+	std::weak_ptr<EditorAssetDataComposite> dataCompositeAsset;
 
 	ImGuiItemListWithSearchBar propertyTypeList;
 

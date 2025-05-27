@@ -139,7 +139,7 @@ void ImGuiEditor::DoAction(const std::shared_ptr<EditorActionBase>& pAction)
 		executedActions.pop_back();
 	}
 
-	if (pAction->TryExecuteAction())
+	if (pAction->BaseTryExecuteAction())
 	{
 		executedActions.push_back(pAction);
 		executedActionsIndex = static_cast<int>(executedActions.size())-1;
@@ -152,7 +152,7 @@ void ImGuiEditor::Undo()
 	
 	if (executedActionsIndex > -1)
 	{
-		executedActions[executedActionsIndex]->Undo();
+		executedActions[executedActionsIndex]->BaseUndo();
 		--executedActionsIndex;
 	}
 }
@@ -163,7 +163,7 @@ void ImGuiEditor::Redo()
 
 	if (static_cast<int>(executedActions.size()) - 1 > executedActionsIndex)
 	{
-		if (executedActions[executedActionsIndex + 1]->TryExecuteAction())
+		if (executedActions[executedActionsIndex + 1]->BaseTryExecuteAction())
 		{
 			++executedActionsIndex;
 		}

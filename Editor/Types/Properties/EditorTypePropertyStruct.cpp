@@ -67,6 +67,7 @@ void EditorTypePropertyStruct::ReadFromFile(std::ifstream& file)
 		EditorTypeStruct* structTemplate = Game::GetAssetManager().FindStructTemplateType(structName);
 		DOMLOG_ERROR_IF(structTemplate == nullptr, "Cannot find struct template object with name", structName);
 		pStructType.reset(static_cast<EditorTypeStruct*>(structTemplate->DeepCopy()));
+		pStructType->onPropertyChanged.Add(onInternalStructPropertyChangedDelegate);
 	}
 	
 	pStructType->ReadFromFile(file);

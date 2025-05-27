@@ -9,7 +9,8 @@ void ActionHandlerAttack::DoAction(ECS& ecs, EntityId e)
 	if (pRpgSystem)
 	{
 		RPGDamageParams damageParams = {};
-		damageParams.damage = 20; // #TODO: Calculate this from some sort of basic attack damage attribute
+		damageParams.damageMagnitude.damageType = EDamageType::Physical;
+		damageParams.damageMagnitude.scaling = 1.0f;
 		damageParams.attackerEntity = e;
 		damageParams.targetEntity = target;
 

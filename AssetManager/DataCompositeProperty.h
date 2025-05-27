@@ -26,19 +26,28 @@ class DataCompositeProperty
 public:
 	DataCompositeProperty() = default;
 
+	// This constructor can be used to set the default value (i.e "DataCompositeProperty<int> myInt = 5;")
+	// If a EditorAssetDataComposite is not linked it will default to this instead.
+	DataCompositeProperty(T inValue) : value(inValue) { }
+
+	DataCompositeProperty(const DataCompositeProperty<T>& inProperty) = default;
+
 	~DataCompositeProperty() = default;
 	~DataCompositeProperty() requires std::is_pointer_v<T>;
 
 	// This can't be marked as explicit, but don't call this. It's just used when populating from the editor assets.
 	// If you somehow call this is shouldn't matter because it will likely error anyway.
 	// We use requires to specialise each type
-	DataCompositeProperty(const std::string& inValue) requires std::is_pointer_v<T>;
-	DataCompositeProperty(const std::string& inValue) requires std::is_enum_v<T>;
-	DataCompositeProperty(const std::string& inValue) requires std::is_integral_v<T> && !std::is_same_v<T, bool>;
-	DataCompositeProperty(const std::string& inValue) requires std::is_floating_point_v<T>;
-	DataCompositeProperty(const std::string& inValue) requires std::is_same_v<T, std::string>;
-	DataCompositeProperty(const std::string& inValue) requires std::is_same_v<T, bool>;
-	DataCompositeProperty(const std::string& inValue);
+	DataCompositeProperty<T>& operator=(const std::string& inValue) requires std::is_pointer_v<T>;
+	DataCompositeProperty<T>& operator=(const std::string& inValue) requires std::is_enum_v<T>;
+	DataCompositeProperty<T>& operator=(const std::string& inValue) requires std::is_integral_v<T> && !std::is_same_v<T, bool>;
+	DataCompositeProperty<T>& operator=(const std::string& inValue) requires std::is_floating_point_v<T>;
+	DataCompositeProperty<T>& operator=(const std::string& inValue) requires std::is_same_v<T, std::string>;
+	DataCompositeProperty<T>& operator=(const std::string& inValue) requires std::is_same_v<T, bool>;
+	DataCompositeProperty<T>& operator=(const std::string& inValue);
+	
+	operator T&() { return value; }
+	operator const T&() const { return value; }
 
 protected:
 
@@ -56,7 +65,7 @@ DataCompositeProperty<T>::~DataCompositeProperty() requires std::is_pointer_v<T>
 }
 
 template <typename T>
-DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue) requires std::is_pointer_v<T>
+DataCompositeProperty<T>& DataCompositeProperty<T>::operator=(const std::string& inValue) requires std::is_pointer_v<T>
 {
 	if (EditorTypePropertyBase* pProperty = DataCompositePropertyUtils::GetPropertyFromString(inValue))
 	{
@@ -68,10 +77,12 @@ DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue) requ
 			bResponsibleForCleanup = Game::GetAssetManager().FindClassTemplateType(pClassProperty->GetClassName())->HasMetadataFlag(EClassMetadataFlags::Instanced);
 		}
 	}
+
+	return *this;
 }
 
 template <typename T>
-DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue) requires std::is_enum_v<T>
+DataCompositeProperty<T>& DataCompositeProperty<T>::operator=(const std::string& inValue) requires std::is_enum_v<T>
 {
 	if (EditorTypePropertyBase* pProperty = DataCompositePropertyUtils::GetPropertyFromString(inValue))
 	{
@@ -83,11 +94,13 @@ DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue) requ
 		{
 			DOMLOG_ERROR("Unsupported type for DataCompositeProperty", inValue);
 		}
-	}	
+	}
+
+	return *this;
 }
 
 template <typename T>
-DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue) requires std::is_integral_v<T> && !std::is_same_v<T, bool>
+DataCompositeProperty<T>& DataCompositeProperty<T>::operator=(const std::string& inValue) requires std::is_integral_v<T> && !std::is_same_v<T, bool>
 {
 	if (EditorTypePropertyBase* pProperty = DataCompositePropertyUtils::GetPropertyFromString(inValue))
 	{
@@ -101,10 +114,12 @@ DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue) requ
 			DOMLOG_ERROR("Expected EditorTypePropertyInt for", inValue);
 		}
 	}
+
+	return *this;
 }
 
 template <typename T>
-DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue) requires std::is_floating_point_v<T>
+DataCompositeProperty<T>& DataCompositeProperty<T>::operator=(const std::string& inValue) requires std::is_floating_point_v<T>
 {
 	if (EditorTypePropertyBase* pProperty = DataCompositePropertyUtils::GetPropertyFromString(inValue))
 	{
@@ -118,10 +133,12 @@ DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue) requ
 			DOMLOG_ERROR("Expected EditorTypePropertyFloat for", inValue);
 		}
 	}
+
+	return *this;
 }
 
 template <typename T>
-DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue) requires std::is_same_v<T, std::string>
+DataCompositeProperty<T>& DataCompositeProperty<T>::operator=(const std::string& inValue) requires std::is_same_v<T, std::string>
 {
 	if (EditorTypePropertyBase* pProperty = DataCompositePropertyUtils::GetPropertyFromString(inValue))
 	{
@@ -135,10 +152,12 @@ DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue) requ
 			DOMLOG_ERROR("Expected EditorTypePropertyString for", inValue);
 		}
 	}
+
+	return *this;
 }
 
 template <typename T>
-DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue) requires std::is_same_v<T, bool>
+DataCompositeProperty<T>& DataCompositeProperty<T>::operator=(const std::string& inValue) requires std::is_same_v<T, bool>
 {
 	if (EditorTypePropertyBase* pProperty = DataCompositePropertyUtils::GetPropertyFromString(inValue))
 	{
@@ -152,10 +171,12 @@ DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue) requ
 			DOMLOG_ERROR("Expected EditorTypePropertyBool for", inValue);
 		}
 	}
+
+	return *this;
 }
 
 template <typename T>
-DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue)
+DataCompositeProperty<T>& DataCompositeProperty<T>::operator=(const std::string& inValue)
 {
 	if (EditorTypePropertyBase* pProperty = DataCompositePropertyUtils::GetPropertyFromString(inValue))
 	{
@@ -171,6 +192,8 @@ DataCompositeProperty<T>::DataCompositeProperty(const std::string& inValue)
 			DOMLOG_ERROR("Expected EditorTypePropertyStruct for", inValue);
 		}
 	}
+
+	return *this;
 }
 
 // We use template specializations for the different types we support.

@@ -20,7 +20,7 @@ void ECSSystemAction::PreTick(ECSSystemTickParams tickParams)
 	// Handle energy
 	
 	// Find lowest energy
-	short lowestEnergy = std::numeric_limits<short>::max();
+	u16 lowestEnergy = std::numeric_limits<short>::max();
 	tickParams.pEcs->ForEachEntity([&](EntityId e)
 		{
 			if (tickParams.pEcs->EntityHasComponents<ComponentAction>(e))
