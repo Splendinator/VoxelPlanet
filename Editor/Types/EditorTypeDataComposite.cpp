@@ -13,9 +13,6 @@
 
 void EditorTypeDataComposite::DrawImGUI()
 {
-	// #TODO: Removing and Adding properties should be done using EditorTypePropertiesBase::onPropertyChanged or a new EditorActionBase.
-	// #TODO: We should add a new EditorActionBase that keeps the property in memory, instead of just deleting it. Right now we crash if we delete it while it's still in the action queue.
-	
 	if (ImGui::BeginTable("DataComposite", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit))
 	{
 		ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, 100.0f);

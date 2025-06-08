@@ -10,15 +10,15 @@
 #include "Editor/Types/Properties/EditorTypePropertyEnum.h"
 #include "Editor/Types/Properties/EditorTypePropertyInstancedAssetPtr.h"
 #include "Editor/Types/Properties/EditorTypePropertyDataCompositeProperty.h"
-#include "..\Roguelike\Actions\ActionDeciders\ActionDeciderAI.h"
-#include "..\Roguelike\Actions\ActionDeciders\ActionDeciderBase.h"
-#include "..\Roguelike\Actions\ActionDeciders\ActionDeciderPlayer.h"
-#include "..\Roguelike\Actions\ActionDeciders\ActionDeciderProjectile.h"
-#include "..\Roguelike\Actions\ActionHandlers\ActionHandlerAttack.h"
-#include "..\Roguelike\Actions\ActionHandlers\ActionHandlerBase.h"
-#include "..\Roguelike\Actions\ActionHandlers\ActionHandlerMove.h"
-#include "..\Roguelike\Actions\ActionHandlers\ActionHandlerSkill.h"
-#include "..\Roguelike\Actions\ActionHandlers\ActionHandlerWait.h"
+#include "..\Roguelike\AI\Actions\ActionDeciders\ActionDeciderAI.h"
+#include "..\Roguelike\AI\Actions\ActionDeciders\ActionDeciderBase.h"
+#include "..\Roguelike\AI\Actions\ActionDeciders\ActionDeciderPlayer.h"
+#include "..\Roguelike\AI\Actions\ActionDeciders\ActionDeciderProjectile.h"
+#include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerAttack.h"
+#include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerBase.h"
+#include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerMove.h"
+#include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerSkill.h"
+#include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerWait.h"
 #include "..\Roguelike\Camera\CameraSystem.h"
 #include "..\Roguelike\Core\DirectoryData.h"
 #include "..\Roguelike\Core\GameInstance.h"
@@ -54,6 +54,7 @@
 #include "..\Roguelike\RPGSystems\Skills\RPGSkillData.h"
 #include "..\Roguelike\RPGSystems\Skills\RPGSkillsShared.h"
 #include "..\Roguelike\RPGSystems\Skills\RPGSkillSystem.h"
+#include "..\Roguelike\TestSuiteGameSystem.h"
 #include "..\Roguelike\UI\DragAndDrop\DragAndDropManager.h"
 #include "..\Roguelike\UI\DragAndDrop\IDragAndDroppable.h"
 #include "..\Roguelike\UI\HUD\HUD.h"
@@ -676,6 +677,31 @@ void InputActionBase::_DeleteObject(void* pObject)
 	delete reinterpret_cast<InputActionBase*>(pObject);
 }
 
+// MyTempClass
+void MyTempClass::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	MyTempClass* pMyTempClass = static_cast<MyTempClass*>(pObject);
+	pMyTempClass->inputKeyProperty = static_cast<EditorTypePropertyDataCompositeProperty*>(properties[propertyIndex++])->GetValue();
+}
+
+void* MyTempClass::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	MyTempClass* pMyTempClass = new MyTempClass;
+	int propertyIndex = 0;
+	MyTempClass::_InitFromPropertiesSubset(pMyTempClass, properties, propertyIndex);
+	return pMyTempClass;
+}
+
+void* MyTempClass::_CreateEmptyObject()
+{
+	return new MyTempClass;
+}
+
+void MyTempClass::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<MyTempClass*>(pObject);
+}
+
 // StatefulHotbarActionBase
 void StatefulHotbarActionBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -1140,7 +1166,9 @@ void TextRenderSystem::_InitFromPropertiesSubset(void* pObject, const std::vecto
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pTextRenderSystem->characterDatas.push_back(*static_cast<TextRenderCharacterData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+			TextRenderCharacterData* temp = static_cast<TextRenderCharacterData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue());
+			pTextRenderSystem->characterDatas.push_back(*temp);
+			delete temp;
 		}
 	}
 	pTextRenderSystem->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
@@ -1173,7 +1201,9 @@ void MenuScreenSkillTree::_InitFromPropertiesSubset(void* pObject, const std::ve
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pMenuScreenSkillTree->skillSlotDatas.push_back(*static_cast<SkillTreeMenuSkillSlotData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+			SkillTreeMenuSkillSlotData* temp = static_cast<SkillTreeMenuSkillSlotData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue());
+			pMenuScreenSkillTree->skillSlotDatas.push_back(*temp);
+			delete temp;
 		}
 	}
 	pMenuScreenSkillTree->pDragAndDropManager = static_cast<DragAndDropManager*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
@@ -1207,7 +1237,9 @@ void MenuScreenMain::_InitFromPropertiesSubset(void* pObject, const std::vector<
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pMenuScreenMain->buttonDatas.push_back(*static_cast<MainMenuButtonData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+			MainMenuButtonData* temp = static_cast<MainMenuButtonData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue());
+			pMenuScreenMain->buttonDatas.push_back(*temp);
+			delete temp;
 		}
 	}
 }
@@ -1243,7 +1275,9 @@ void MenuScreenClassSelect::_InitFromPropertiesSubset(void* pObject, const std::
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pMenuScreenClassSelect->classEntries.push_back(*static_cast<MenuScreenClassSelectEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+			MenuScreenClassSelectEntry* temp = static_cast<MenuScreenClassSelectEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue());
+			pMenuScreenClassSelect->classEntries.push_back(*temp);
+			delete temp;
 		}
 	}
 }
@@ -1354,6 +1388,31 @@ void* DragAndDropManager::_CreateEmptyObject()
 void DragAndDropManager::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<DragAndDropManager*>(pObject);
+}
+
+// TestSuiteGameSystem
+void TestSuiteGameSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	TestSuiteGameSystem* pTestSuiteGameSystem = static_cast<TestSuiteGameSystem*>(pObject);
+	GameSystem::_InitFromPropertiesSubset(static_cast<GameSystem*>(pTestSuiteGameSystem), properties, propertyIndex);
+}
+
+void* TestSuiteGameSystem::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	TestSuiteGameSystem* pTestSuiteGameSystem = new TestSuiteGameSystem;
+	int propertyIndex = 0;
+	TestSuiteGameSystem::_InitFromPropertiesSubset(pTestSuiteGameSystem, properties, propertyIndex);
+	return pTestSuiteGameSystem;
+}
+
+void* TestSuiteGameSystem::_CreateEmptyObject()
+{
+	return new TestSuiteGameSystem;
+}
+
+void TestSuiteGameSystem::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<TestSuiteGameSystem*>(pObject);
 }
 
 // RPGSkillHighlightEntry
@@ -1799,7 +1858,9 @@ void HotbarManager::_InitFromPropertiesSubset(void* pObject, const std::vector<E
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pHotbarManager->hotbarSlots.push_back(*static_cast<HotbarSlot*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+			HotbarSlot* temp = static_cast<HotbarSlot*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue());
+			pHotbarManager->hotbarSlots.push_back(*temp);
+			delete temp;
 		}
 	}
 }
@@ -2008,7 +2069,7 @@ void ECS::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypeP
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pECS->systems.push_back(static_cast<ECSSystemBase*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
+			pECS->pSystems.push_back(static_cast<ECSSystemBase*>(static_cast<EditorTypePropertyClass*>(instancedProperty.get())->GetValue()));
 		}
 	}
 	pECS->pPlayerActionDecider = static_cast<ActionDeciderPlayer*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
@@ -2113,6 +2174,7 @@ void ActionDeciderProjectile::_InitFromPropertiesSubset(void* pObject, const std
 {
 	ActionDeciderProjectile* pActionDeciderProjectile = static_cast<ActionDeciderProjectile*>(pObject);
 	ActionDeciderBase::_InitFromPropertiesSubset(static_cast<ActionDeciderBase*>(pActionDeciderProjectile), properties, propertyIndex);
+	pActionDeciderProjectile->pActionSystem = static_cast<ECSSystemAction*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 }
 
 void* ActionDeciderProjectile::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -2174,7 +2236,9 @@ void WorldGenerationContinent::_InitFromPropertiesSubset(void* pObject, const st
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pWorldGenerationContinent->tileData.push_back(*static_cast<WorldGenerationTileEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+			WorldGenerationTileEntry* temp = static_cast<WorldGenerationTileEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue());
+			pWorldGenerationContinent->tileData.push_back(*temp);
+			delete temp;
 		}
 	}
 	{
@@ -2309,7 +2373,9 @@ void RPGSkillSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pRPGSkillSystem->skillHighlightVisuals.push_back(*static_cast<RPGSkillHighlightEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+			RPGSkillHighlightEntry* temp = static_cast<RPGSkillHighlightEntry*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue());
+			pRPGSkillSystem->skillHighlightVisuals.push_back(*temp);
+			delete temp;
 		}
 	}
 }
@@ -2350,7 +2416,9 @@ void RPGSystem::_InitFromPropertiesSubset(void* pObject, const std::vector<Edito
 		EditorTypePropertyVector* pVectorProperty = static_cast<EditorTypePropertyVector*>(properties[propertyIndex++]);
 		for (std::unique_ptr<EditorTypePropertyBase>& instancedProperty : pVectorProperty->instancedProperties)
 		{
-			pRPGSystem->levelProgressionData.push_back(*static_cast<RPGLevelProgressionData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue()));
+			RPGLevelProgressionData* temp = static_cast<RPGLevelProgressionData*>(static_cast<EditorTypePropertyStruct*>(instancedProperty.get())->GetValue());
+			pRPGSystem->levelProgressionData.push_back(*temp);
+			delete temp;
 		}
 	}
 }
@@ -2531,6 +2599,7 @@ namespace __Generated
 		{"RPGClassSpecialisationData", &RPGClassSpecialisationData::_InitFromProperties},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_InitFromProperties},
 		{"InputActionBase", &InputActionBase::_InitFromProperties},
+		{"MyTempClass", &MyTempClass::_InitFromProperties},
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_InitFromProperties},
 		{"IHotbarItem", &IHotbarItem::_InitFromProperties},
 		{"HotbarSlot", &HotbarSlot::_InitFromProperties},
@@ -2555,6 +2624,7 @@ namespace __Generated
 		{"MenuSystem", &MenuSystem::_InitFromProperties},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_InitFromProperties},
 		{"DragAndDropManager", &DragAndDropManager::_InitFromProperties},
+		{"TestSuiteGameSystem", &TestSuiteGameSystem::_InitFromProperties},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_InitFromProperties},
 		{"RPGSkillData", &RPGSkillData::_InitFromProperties},
 		{"RPGSkillEffectModuleDamage", &RPGSkillEffectModuleDamage::_InitFromProperties},
@@ -2621,6 +2691,7 @@ namespace __Generated
 		{"RPGClassSpecialisationData", &RPGClassSpecialisationData::_CreateEmptyObject},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_CreateEmptyObject},
 		{"InputActionBase", &InputActionBase::_CreateEmptyObject},
+		{"MyTempClass", &MyTempClass::_CreateEmptyObject},
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_CreateEmptyObject},
 		{"IHotbarItem", &IHotbarItem::_CreateEmptyObject},
 		{"HotbarSlot", &HotbarSlot::_CreateEmptyObject},
@@ -2645,6 +2716,7 @@ namespace __Generated
 		{"MenuSystem", &MenuSystem::_CreateEmptyObject},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_CreateEmptyObject},
 		{"DragAndDropManager", &DragAndDropManager::_CreateEmptyObject},
+		{"TestSuiteGameSystem", &TestSuiteGameSystem::_CreateEmptyObject},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_CreateEmptyObject},
 		{"RPGSkillData", &RPGSkillData::_CreateEmptyObject},
 		{"RPGSkillEffectModuleDamage", &RPGSkillEffectModuleDamage::_CreateEmptyObject},
@@ -2711,6 +2783,7 @@ namespace __Generated
 		{"RPGClassSpecialisationData", &RPGClassSpecialisationData::_InitFromPropertiesSubset},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_InitFromPropertiesSubset},
 		{"InputActionBase", &InputActionBase::_InitFromPropertiesSubset},
+		{"MyTempClass", &MyTempClass::_InitFromPropertiesSubset},
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_InitFromPropertiesSubset},
 		{"IHotbarItem", &IHotbarItem::_InitFromPropertiesSubset},
 		{"HotbarSlot", &HotbarSlot::_InitFromPropertiesSubset},
@@ -2735,6 +2808,7 @@ namespace __Generated
 		{"MenuSystem", &MenuSystem::_InitFromPropertiesSubset},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_InitFromPropertiesSubset},
 		{"DragAndDropManager", &DragAndDropManager::_InitFromPropertiesSubset},
+		{"TestSuiteGameSystem", &TestSuiteGameSystem::_InitFromPropertiesSubset},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_InitFromPropertiesSubset},
 		{"RPGSkillData", &RPGSkillData::_InitFromPropertiesSubset},
 		{"RPGSkillEffectModuleDamage", &RPGSkillEffectModuleDamage::_InitFromPropertiesSubset},
@@ -2800,6 +2874,7 @@ namespace __Generated
 		{"RPGClassSpecialisationData", &RPGClassSpecialisationData::_DeleteObject},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_DeleteObject},
 		{"InputActionBase", &InputActionBase::_DeleteObject},
+		{"MyTempClass", &MyTempClass::_DeleteObject},
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_DeleteObject},
 		{"IHotbarItem", &IHotbarItem::_DeleteObject},
 		{"HotbarSlot", &HotbarSlot::_DeleteObject},
@@ -2824,6 +2899,7 @@ namespace __Generated
 		{"MenuSystem", &MenuSystem::_DeleteObject},
 		{"HUDAnchorPoint", &HUDAnchorPoint::_DeleteObject},
 		{"DragAndDropManager", &DragAndDropManager::_DeleteObject},
+		{"TestSuiteGameSystem", &TestSuiteGameSystem::_DeleteObject},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_DeleteObject},
 		{"RPGSkillData", &RPGSkillData::_DeleteObject},
 		{"RPGSkillEffectModuleDamage", &RPGSkillEffectModuleDamage::_DeleteObject},

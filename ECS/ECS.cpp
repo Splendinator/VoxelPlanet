@@ -2,7 +2,7 @@
 
 #include "ECS.h"
 
-#include "Actions/ActionDeciders/ActionDeciderPlayer.h"
+#include "AI/Actions/ActionDeciders/ActionDeciderPlayer.h"
 #include "Graphics/RendererObject.h"
 
 void ECS::RegisterSystemCallback(std::unique_ptr<ECSSystemCallbackBase>&& pSystemCallback)
@@ -12,7 +12,7 @@ void ECS::RegisterSystemCallback(std::unique_ptr<ECSSystemCallbackBase>&& pSyste
 
 void ECS::Init()
 {
-	for (ECSSystemBase* pSystem : systems)
+	for (ECSSystemBase* pSystem : pSystems)
 	{
 		pSystem->Initialise(this);
 	}
@@ -45,7 +45,7 @@ void ECS::Tick(float deltaTime)
 	params.entityId = INVALID_ENTITY_ID;
 	params.deltaTime = deltaTime;
 	params.frame = frame;
-	for (ECSSystemBase* pSystem : systems)
+	for (ECSSystemBase* pSystem : pSystems)
 	{
 		pSystem->PreTick(params);
 	}
@@ -67,7 +67,7 @@ void ECS::UnInit()
 	}
 	
 	systemCallbacks.clear();
-	systems.clear();
+	pSystems.clear();
 	
 	memset((void*)&systemCallbacks, 0, sizeof(systemCallbacks)); // #JANK: For some reason we get an error without this line here, maybe investigate later on if you can be arsed ever.
 }

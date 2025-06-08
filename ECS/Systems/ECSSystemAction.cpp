@@ -4,8 +4,8 @@
 
 #include <algorithm>
 
-#include "Actions/ActionDeciders/ActionDeciderBase.h"
-#include "Actions/ActionHandlers/ActionHandlerBase.h"
+#include "AI/Actions/ActionDeciders/ActionDeciderBase.h"
+#include "AI/Actions/ActionHandlers/ActionHandlerBase.h"
 #include "ECS/Components.h"
 #include "ECS/ECS.h"
 #include "ECS/Systems/Callbacks/ECSSystemCallback.h"

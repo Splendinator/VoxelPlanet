@@ -38,8 +38,7 @@ void InputSystem::DrawImGui(float deltaTime)
 				ImGui::TextColored(ImGui::Colour::Gray, contextName.c_str()); 
 			}
 			std::string contextName = Game::GetAssetManager().FindNameFromSingletonSlow(pActiveInputContexts.back());
-			ImGui::Text(contextName.c_str()); 
-		
+			ImGui::Text(contextName.c_str());
 		}
 
 		ImGui::Separator();

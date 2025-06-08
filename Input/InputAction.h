@@ -2,6 +2,16 @@
 
 #include "InputKey.h"
 
+// #TEMP: 
+EDITORCLASS()
+class MyTempClass
+{
+	EDITORBODY()
+
+	EDITORPROPERTY()
+	DataCompositeProperty<EInputKey> inputKeyProperty = EInputKey::NONE;
+};
+
 class InputActionBase;
 
 struct OnInputActionDelegateParams

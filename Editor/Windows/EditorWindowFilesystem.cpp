@@ -89,8 +89,6 @@ void EditorWindowFilesystem::DrawDirectory(const std::filesystem::path& path)
 		}
 		
 		ImGui::TreePop();
-
-		ImGui::Separator();
 	}
 	else
 	{
@@ -109,7 +107,7 @@ bool EditorWindowFilesystem::DrawSearchBar()
 		return false;
 	}
 
-	// #NOTE: If this window starts lagging we need to cache the searchable assets once at the start, then when adding/removing assets.
+	// #OPTIMISE: If this window starts lagging we need to cache the searchable assets once at the start, then when adding/removing assets.
 	searchableAssets.clear();
 	RefreshSearchableAssets(rootDirectory);
 	

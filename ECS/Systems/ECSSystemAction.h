@@ -21,9 +21,14 @@ public:
 	void Tick(const ECSSystemTickParams& params, const std::tuple<ComponentAction*>& components);
 	void OnEntityDeleted(const ECSSystemEntityDeletionParams& params, const std::tuple<ComponentAction*>& components);
 
+	u64 GetGameTime() const { return gameTime; }
+
 protected:
 	
 	//~ Begin ECSSystemBase Interface
 	void InitialiseInternal(ECS* pEcs) override;
 	//~ End ECSSystemBase Interface
+
+	// Energy units passed since game start (100 energy is a turn for an average entity)
+	u64 gameTime = 0;
 };

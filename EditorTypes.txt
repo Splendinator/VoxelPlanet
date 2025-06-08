@@ -256,6 +256,9 @@ bool bCtrl false
 bool bShift false
 bool bAlt false
 ;
+Class MyTempClass
+datacompositeproperty inputKeyProperty EInputKey nullptr none
+;
 Class StatefulHotbarActionBase
 meta Abstract
 meta Instanced
@@ -380,6 +383,9 @@ float floatingIconXOffset 0
 float floatingIconYOffset 0
 class DirectoryData pDirectoryData nullptr
 ;
+Class TestSuiteGameSystem
+Child GameSystem
+;
 Struct RPGSkillHighlightEntry
 enum ERPGSkillHighlightType highlight Valid
 string fileName ""
@@ -487,7 +493,7 @@ Child ECSSystemBase
 ;
 Class ECS
 Child GameSystem
-vector systems ECSSystemBase
+vector pSystems ECSSystemBase
 class ActionDeciderPlayer pPlayerActionDecider nullptr
 ;
 Class ActionHandlerWait
@@ -502,6 +508,7 @@ Child ActionHandlerBase
 ;
 Class ActionDeciderProjectile
 Child ActionDeciderBase
+class ECSSystemAction pActionSystem nullptr
 ;
 Class ActionDeciderPlayer
 Child ActionDeciderBase

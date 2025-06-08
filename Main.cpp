@@ -4,7 +4,7 @@
 #include "DomLog/DomLog.h"
 
 #include "Game.h"
-#include "Renderer.h"
+#include "Graphics/Renderer.h"
 
 #include <chrono>
 

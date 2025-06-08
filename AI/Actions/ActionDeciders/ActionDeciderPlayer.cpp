@@ -2,7 +2,7 @@
 
 #include "ActionDeciderPlayer.h"
 
-#include "Actions/ActionHandlers/ActionHandlerWait.h"
+#include "AI/Actions/ActionHandlers/ActionHandlerWait.h"
 #include "DomWindow/DomWindow.h"
 #include "ECS/ECS.h"
 #include "HotbarManager/HotbarManager.h"

@@ -2,7 +2,7 @@
 
 #include "ActionDeciderAI.h"
 
-#include "Actions/ActionHandlers/ActionHandlerWait.h"
+#include "AI/Actions/ActionHandlers/ActionHandlerWait.h"
 #include "ECS/Components.h"
 #include "ECS/ECS.h"
 #include "ECS/ECSTypes.h"

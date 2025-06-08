@@ -29,6 +29,7 @@ Textbox::Textbox(const TextboxParams& textboxParams, CharacterVectorArtMap& char
 			TransientPtr<RendererObject> pRendererObject = dmgf::AddObjectFromVectorArt(pVectorArt, dmgf::ERenderObjectType::UI);
 			pRendererObject->SetPosition(currentXPos, currentYPos);
 			pRendererObject->SetSize(textboxParams.fontSize,textboxParams.fontSize);
+			pRendererObject->SetRenderPriority(1.0f); // #TODO: IDK what this should be 
 			rendererObjects.push_back(pRendererObject);
 		}
 		else

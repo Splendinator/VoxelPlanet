@@ -2,8 +2,8 @@
 
 #include "ActionDeciderBase.h"
 
-#include "Actions/ActionHandlers/ActionHandlerAttack.h"
-#include "Actions/ActionHandlers/ActionHandlerMove.h"
+#include "AI/Actions/ActionHandlers/ActionHandlerAttack.h"
+#include "AI/Actions/ActionHandlers/ActionHandlerMove.h"
 #include "ECS/ECS.h"
 #include "ECS/ECSTypes.h"
 #include "ECS/Systems/ECSSystemEntityMap.h"

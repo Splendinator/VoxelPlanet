@@ -2,7 +2,7 @@
 
 #include "StatefulHotbarActions.h"
 
-#include "Actions/ActionHandlers/ActionHandlerSkill.h"
+#include "AI/Actions/ActionHandlers/ActionHandlerSkill.h"
 
 #include "Input/InputAction.h"
 #include "Input/InputSystem.h"

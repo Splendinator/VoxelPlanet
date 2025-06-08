@@ -83,7 +83,7 @@ private:
 	// The systems initialise and tick in the order they are in this array so order matters.
 	// e.g. ECSSystemRender will want to do at the end or you won't render the updated scene until next tick. 
 	EDITORPROPERTY()
-	std::vector<ECSSystemBase*> systems;
+	std::vector<ECSSystemBase*> pSystems;
 
 	// Player's action decider
 	EDITORPROPERTY()
@@ -107,7 +107,7 @@ bool ECS::EntityHasComponents(EntityId entityId) const
 template<typename T>
 T* ECS::GetSystem()
 {
-	for (ECSSystemBase* pSystem : systems)
+	for (ECSSystemBase* pSystem : pSystems)
 	{
 		if (T* pReturnedSystem = dynamic_cast<T*>(pSystem))
 		{

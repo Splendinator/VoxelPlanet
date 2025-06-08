@@ -92,6 +92,7 @@ struct ComponentRace
 
 struct ComponentProjectile
 {
+	float speed = 0.0f; // speed in tiles per turn (100 energy = 1 turn)
 	int startX = 0;
 	int startY = 0;
 	int targetX = 0;

@@ -52,3 +52,4 @@ private:
 
 	EntityList entityMap[HASH_MAP_SIZE][HASH_MAP_SIZE];
 };
+
