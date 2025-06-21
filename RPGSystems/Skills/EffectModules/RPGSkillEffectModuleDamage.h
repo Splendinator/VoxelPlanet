@@ -1,17 +1,6 @@
-﻿#pragma once
+﻿#include "RPGSkillEffectModuleBase.h"
 
 #include "RPGSystems/RPGSystem.h"
-#include "RPGSystems/Skills/RPGSkillsShared.h"
-
-// Effect applied on 
-EDITORCLASS(Abstract, EditInlineNew)
-class RPGSkillEffectModuleBase
-{
-	EDITORBODY()
-public:
-
-	virtual void ApplyEffect(const RPGSkillParams& params) const { PUREVIRTUAL() }
-};
 
 EDITORCLASS()
 class RPGSkillEffectModuleDamage : public RPGSkillEffectModuleBase
@@ -25,4 +14,3 @@ public:
 	EDITORPROPERTY()
 	DataCompositeProperty<RPGDamageMagnitude> damage;
 };
-

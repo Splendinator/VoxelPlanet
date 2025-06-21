@@ -2,7 +2,9 @@
 
 #include "DomMath/Types.h"
 #include "DomUtils/Pointers.h"
+#include "ECS/ECSTypes.h"
 
+class RPGSkillEffectModuleBase;
 class ActionDeciderBase;
 class RPGClassData;
 class RPGClassSpecialisationData;
@@ -92,6 +94,8 @@ struct ComponentRace
 
 struct ComponentProjectile
 {
+	RPGSkillEffectModuleBase* pProjectileEffect = nullptr; // Effect that happens when projectile hits something or reaches its target
+	EntityId caster;
 	float speed = 0.0f; // speed in tiles per turn (100 energy = 1 turn)
 	int startX = 0;
 	int startY = 0;

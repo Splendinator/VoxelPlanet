@@ -152,6 +152,7 @@
     <ClCompile Include="AI\Actions\ActionHandlers\ActionHandlerAttack.cpp" />
     <ClCompile Include="AI\Actions\ActionHandlers\ActionHandlerBase.cpp" />
     <ClCompile Include="AI\Actions\ActionHandlers\ActionHandlerMove.cpp" />
+    <ClCompile Include="AI\Actions\ActionHandlers\ActionHandlerProjectile.cpp" />
     <ClCompile Include="AI\Actions\ActionHandlers\ActionHandlerSkill.cpp" />
     <ClCompile Include="AI\Actions\ActionHandlers\ActionHandlerWait.cpp" />
     <ClCompile Include="AI\Paths\PathUtils.cpp" />
@@ -315,6 +316,7 @@
     </ClCompile>
     <ClCompile Include="Core\GameInstance.cpp" />
     <ClCompile Include="Core\GameSystem.cpp" />
+    <ClCompile Include="RPGSystems\Skills\EffectModules\RPGSkillEffectModuleProjectile.cpp" />
     <ClCompile Include="TestSuiteGameSystem.cpp" />
     <ClCompile Include="ECS\ECS.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
@@ -5509,8 +5511,8 @@
     <ClCompile Include="RPGSystems\Races\RPGRaceData.cpp" />
     <ClCompile Include="RPGSystems\RPGLevelScalingNumber.cpp" />
     <ClCompile Include="RPGSystems\RPGSystem.cpp" />
-    <ClCompile Include="RPGSystems\Skills\AimModule\RPGSkillAimModules.cpp" />
-    <ClCompile Include="RPGSystems\Skills\EffectModule\RPGSkillEffectModules.cpp" />
+    <ClCompile Include="RPGSystems\Skills\AimModules\RPGSkillAimModuleLine.cpp" />
+    <ClCompile Include="RPGSystems\Skills\EffectModules\RPGSkillEffectModuleDamage.cpp" />
     <ClCompile Include="RPGSystems\Skills\RPGSkillData.cpp" />
     <ClCompile Include="RPGSystems\Skills\RPGSkillSystem.cpp" />
     <ClCompile Include="UI\DragAndDrop\DragAndDropManager.cpp" />
@@ -6545,6 +6547,7 @@
     <ClInclude Include="AI\Actions\ActionHandlers\ActionHandlerAttack.h" />
     <ClInclude Include="AI\Actions\ActionHandlers\ActionHandlerBase.h" />
     <ClInclude Include="AI\Actions\ActionHandlers\ActionHandlerMove.h" />
+    <ClInclude Include="AI\Actions\ActionHandlers\ActionHandlerProjectile.h" />
     <ClInclude Include="AI\Actions\ActionHandlers\ActionHandlerSkill.h" />
     <ClInclude Include="AI\Actions\ActionHandlers\ActionHandlerWait.h" />
     <ClInclude Include="AI\Paths\PathUtils.h" />
@@ -6556,6 +6559,9 @@
     <ClInclude Include="Core\FilePaths.h" />
     <ClInclude Include="Core\GameInstance.h" />
     <ClInclude Include="Core\GameSystem.h" />
+    <ClInclude Include="RPGSystems\Skills\AimModules\RPGSkillAimModuleLine.h" />
+    <ClInclude Include="RPGSystems\Skills\EffectModules\RPGSkillEffectModuleDamage.h" />
+    <ClInclude Include="RPGSystems\Skills\EffectModules\RPGSkillEffectModuleProjectile.h" />
     <ClInclude Include="TestSuiteGameSystem.h" />
     <ClInclude Include="ECS\Components.h" />
     <ClInclude Include="ECS\ECS.h" />
@@ -6668,8 +6674,8 @@
     <ClInclude Include="RPGSystems\Races\RPGRaceData.h" />
     <ClInclude Include="RPGSystems\RPGLevelScalingNumber.h" />
     <ClInclude Include="RPGSystems\RPGSystem.h" />
-    <ClInclude Include="RPGSystems\Skills\AimModule\RPGSkillAimModules.h" />
-    <ClInclude Include="RPGSystems\Skills\EffectModule\RPGSkillEffectModules.h" />
+    <ClInclude Include="RPGSystems\Skills\AimModules\RPGSkillAimModuleBase.h" />
+    <ClInclude Include="RPGSystems\Skills\EffectModules\RPGSkillEffectModuleBase.h" />
     <ClInclude Include="RPGSystems\Skills\RPGSkillData.h" />
     <ClInclude Include="RPGSystems\Skills\RPGSkillsShared.h" />
     <ClInclude Include="RPGSystems\Skills\RPGSkillSystem.h" />

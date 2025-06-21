@@ -1,9 +1,9 @@
 ﻿#include "pch.h"
 
-#include "RPGSkillEffectModules.h"
+#include "RPGSkillEffectModuleDamage.h"
 
-#include "Ecs/ECS.h"
 #include "ECS/Systems/ECSSystemEntityMap.h"
+#include "Ecs/ECS.h"
 
 void RPGSkillEffectModuleDamage::ApplyEffect(const RPGSkillParams& params) const
 {

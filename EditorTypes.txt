@@ -256,9 +256,6 @@ bool bCtrl false
 bool bShift false
 bool bAlt false
 ;
-Class MyTempClass
-datacompositeproperty inputKeyProperty EInputKey nullptr none
-;
 Class StatefulHotbarActionBase
 meta Abstract
 meta Instanced
@@ -281,6 +278,7 @@ meta Abstract
 meta Singleton
 ;
 Class GameInstance
+meta Singleton
 vector pGameSystems GameSystem
 ;
 Class DirectoryData
@@ -303,6 +301,7 @@ float zoomSpeed 64
 Class ActionHandlerBase
 meta Abstract
 meta Singleton
+bool bCanThisHappenOnTheSameFrameAsOtherActions false
 ;
 Class ActionHandlerAttack
 Child ActionHandlerBase
@@ -397,6 +396,13 @@ meta Singleton
 string iconLayerName ""
 class RPGSkillAimModuleBase pAimModule nullptr
 class RPGSkillEffectModuleBase pEffectModule nullptr
+;
+Class RPGSkillEffectModuleProjectile
+Child RPGSkillEffectModuleBase
+string projectileFileName ""
+class ActionDeciderProjectile pActionDecider nullptr
+datacompositeproperty speed float nullptr none
+class RPGSkillEffectModuleBase pProjectileEffect nullptr
 ;
 Class RPGSkillEffectModuleDamage
 Child RPGSkillEffectModuleBase
@@ -503,12 +509,21 @@ Class ActionHandlerSkill
 Child ActionHandlerBase
 class RPGSkillSystem pSkillSystem nullptr
 ;
+Class ActionHandlerProjectile
+Child ActionHandlerBase
+class ECSSystemEntityMap pEntityMapSystem nullptr
+class RPGSystem pRpgSystem nullptr
+class DirectoryData pDirectoryData nullptr
+;
 Class ActionHandlerMove
 Child ActionHandlerBase
 ;
 Class ActionDeciderProjectile
 Child ActionDeciderBase
 class ECSSystemAction pActionSystem nullptr
+class ECSSystemEntityMap pEntityMap nullptr
+float skipSquareThresholdSq 0.2
+class ActionHandlerProjectile pProjectileAction nullptr
 ;
 Class ActionDeciderPlayer
 Child ActionDeciderBase

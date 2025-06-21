@@ -31,7 +31,7 @@ void EditorWindowEditAsset::Draw()
 	}
 	else
 	{
-		if (ImGui::Button("Open File in Explorer"))
+		if (ImGui::Button("Open File in Notepad"))
 		{
 			system(("explorer " + pAsset.lock()->GetAssetFilePath().string()).c_str());
 		}

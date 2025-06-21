@@ -27,7 +27,10 @@ protected:
 
 	// Try moving to a location, else try attacking an entity at that location.
 	ActionHandlerBase* TryMoveOrAttack(ECS& ecs, EntityId e, int deltaX, int deltaY);
+
+	ActionHandlerBase* TryMove(ECS& ecs, EntityId e, int deltaX, int deltaY);
 	
+	// #TEMP: We need to move the move and attack out of the base since debuffs and projectiles are using ActionDeciders and don't need this shit
 	EDITORPROPERTY()
 	ActionHandlerAttack* pAttackAction = nullptr;
 	EDITORPROPERTY()

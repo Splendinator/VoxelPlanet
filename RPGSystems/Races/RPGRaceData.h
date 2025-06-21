@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-// #TEMP: These need to be replaced with RPGLevelScalingNumbers
 EDITORSTRUCT()
 struct RPGRaceInitialAttributeValues
 {

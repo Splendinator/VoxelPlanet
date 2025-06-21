@@ -7,11 +7,11 @@ Vec2f PathUtils::GetCenterOfGrid(Vec2i gridPos)
 	return {(float)gridPos.x + 0.5f, (float)gridPos.y + 0.5f};
 }
 
-PathGridIntersectionPoint PathUtils::GetGridIntersectionPointOfLine(Vec2i lineStartPosGrid, Vec2i lineEndPosGrid, Vec2i targetGridPos)
+PathGridIntersectionPoints PathUtils::GetGridIntersectionPointOfLine(Vec2i lineStartPosGrid, Vec2i lineEndPosGrid, Vec2i targetGridPos)
 {
 	// I don't know if I'm overcomplicating the shit out of this, it feels like it shouldn't be ~80 lines of code just to see where a line intersects an AABB
 	
-	PathGridIntersectionPoint intersectionPoint;
+	PathGridIntersectionPoints intersectionPoint;
 
 	if (lineStartPosGrid == lineEndPosGrid)
 	{
@@ -53,6 +53,11 @@ PathGridIntersectionPoint PathUtils::GetGridIntersectionPointOfLine(Vec2i lineSt
 			Vec2f& target = bLineMovingRight ? intersectionPoint.entryPoint : intersectionPoint.exitPoint;
 			target.x = lineMinX + lineXLength * targetLeftLineIntersectFraction;
 			target.y = yIntersect;
+
+			if (!bLineMovingRight)
+			{
+				intersectionPoint.exitDirection = (intersectionPoint.exitDirection | EIntersectionExitDirectionFlags::Left);
+			}
 		}
 	}
 
@@ -65,6 +70,11 @@ PathGridIntersectionPoint PathUtils::GetGridIntersectionPointOfLine(Vec2i lineSt
 			Vec2f& target = bLineMovingRight ? intersectionPoint.exitPoint : intersectionPoint.entryPoint;
 			target.x = lineMinX + lineXLength * targetRightLineIntersectFraction;
 			target.y = yIntersect;
+
+			if (bLineMovingRight)
+			{
+				intersectionPoint.exitDirection = (intersectionPoint.exitDirection | EIntersectionExitDirectionFlags::Right);
+			}
 		}
 	}
 
@@ -77,6 +87,11 @@ PathGridIntersectionPoint PathUtils::GetGridIntersectionPointOfLine(Vec2i lineSt
 			Vec2f& target = bLineMovingDown ? intersectionPoint.entryPoint : intersectionPoint.exitPoint;
 			target.x = xIntersect;
 			target.y = lineMinY + lineYLength * targetTopLineIntersectFraction;
+
+			if (!bLineMovingDown)
+			{
+				intersectionPoint.exitDirection = (intersectionPoint.exitDirection | EIntersectionExitDirectionFlags::Top);
+			}
 		}
 	}
 
@@ -89,6 +104,11 @@ PathGridIntersectionPoint PathUtils::GetGridIntersectionPointOfLine(Vec2i lineSt
 			Vec2f& target = bLineMovingDown ? intersectionPoint.exitPoint : intersectionPoint.entryPoint;
 			target.x = xIntersect;
 			target.y = lineMinY + lineYLength * targetBottomLineIntersectFraction;
+
+			if (bLineMovingDown)
+			{
+				intersectionPoint.exitDirection = (intersectionPoint.exitDirection | EIntersectionExitDirectionFlags::Bottom);
+			}
 		}
 	}
 	

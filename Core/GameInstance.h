@@ -4,7 +4,7 @@ class GameSystem;
 
 // The data driven instance of the game.
 // A single instance of this is loaded when the game boots up and will be responsible for bootloading everything else in the game
-EDITORCLASS()
+EDITORCLASS(Singleton)
 class GameInstance
 {
 	EDITORBODY()

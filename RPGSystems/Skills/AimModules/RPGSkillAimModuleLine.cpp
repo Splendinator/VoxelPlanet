@@ -1,8 +1,7 @@
 ﻿#include "pch.h"
 
-#include "RPGSkillAimModules.h"
+#include "RPGSkillAimModuleLine.h"
 
-// RPGSkillAimModuleLine
 ERPGSkillHighlightType RPGSkillAimModuleLine::GetSkillHighlightTypeForLocation(const RPGSkillParams& params, const Vec2i& location) const
 {
 	// #TODO: Do projectile line (make a line util)

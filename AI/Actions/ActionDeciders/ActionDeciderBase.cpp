@@ -11,9 +11,40 @@
 
 ActionHandlerBase* ActionDeciderBase::TryMoveOrAttack(ECS& ecs, EntityId e, int deltaX, int deltaY)
 {
+	if (ActionHandlerBase* pAction = TryMove(ecs, e, deltaX, deltaY))
+	{
+		return pAction;
+	}
+
+	if (ECSSystemEntityMap* pSystemEntityMap = ecs.GetSystem<ECSSystemEntityMap>())
+	{
+		const int currentX = ecs.GetComponent<ComponentTransform>(e).x;
+		const int currentY = ecs.GetComponent<ComponentTransform>(e).y;
+		const int targetX = currentX + deltaX;
+		const int targetY = currentY + deltaY;
+		
+		const EntityList& entityList = pSystemEntityMap->GetEntities(targetX, targetY);
+		for (EntityId entity : entityList.entities)
+		{
+			if (ecs.EntityHasComponents<ComponentHealth>(entity))
+			{
+				if (pAttackAction)
+				{
+					ActionHandlerAttack& actionHandlerAttack = *pAttackAction;
+					actionHandlerAttack.target = entity;
+					return &actionHandlerAttack;
+				}
+			}
+		}
+	}
+	
+	return nullptr;
+}
+
+ActionHandlerBase* ActionDeciderBase::TryMove(ECS& ecs, EntityId e, int deltaX, int deltaY)
+{
 	if (ECSSystemPhysics* pSystemPhysics = ecs.GetSystem<ECSSystemPhysics>())
 	{
-		// Get entities current location
 		const int currentX = ecs.GetComponent<ComponentTransform>(e).x;
 		const int currentY = ecs.GetComponent<ComponentTransform>(e).y;
 		const int targetX = currentX + deltaX;
@@ -29,23 +60,7 @@ ActionHandlerBase* ActionDeciderBase::TryMoveOrAttack(ECS& ecs, EntityId e, int 
 				return &actionHandlerMove;
 			}
 		}
-		else if (ECSSystemEntityMap* pSystemEntityMap = ecs.GetSystem<ECSSystemEntityMap>())
-		{
-			const EntityList& entityList = pSystemEntityMap->GetEntities(targetX, targetY);
-			for (EntityId entity : entityList.entities)
-			{
-				if (ecs.EntityHasComponents<ComponentHealth>(entity))
-				{
-					if (pAttackAction)
-					{
-						ActionHandlerAttack& actionHandlerAttack = *pAttackAction;
-						actionHandlerAttack.target = entity;
-						return &actionHandlerAttack;
-					}
-				}
-			}
-		}
 	}
-
+	
 	return nullptr;
 }

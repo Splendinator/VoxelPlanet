@@ -6,12 +6,9 @@
 #include "ECS/ECS.h"
 #include "ECS/Systems/Callbacks/ECSSystemCallback.h"
 
-bool ECSSystemPhysics::CanMoveTo(int x, int y) const
+void ECSSystemPhysics::InitialiseInternal(ECS* pEcs)
 {
-	const int effectiveX = GetEffectiveX(x);
-	const int effectiveY = GetEffectiveY(y);
-
-	return !bGrid[effectiveX][effectiveY];
+	pEcs->RegisterSystemCallback(std::make_unique<ECSSystemCallback<ECSSystemPhysics, ComponentTransform, ComponentRigid>>(this));
 }
 
 void ECSSystemPhysics::Tick(const ECSSystemTickParams& params, const std::tuple<ComponentTransform*, ComponentRigid*>& components)
@@ -38,9 +35,12 @@ void ECSSystemPhysics::OnEntityDeleted(const ECSSystemEntityDeletionParams& para
 	bGrid[effectiveX][effectiveY] = false;
 }
 
-void ECSSystemPhysics::InitialiseInternal(ECS* pEcs)
+bool ECSSystemPhysics::CanMoveTo(int x, int y) const
 {
-	pEcs->RegisterSystemCallback(std::make_unique<ECSSystemCallback<ECSSystemPhysics, ComponentTransform, ComponentRigid>>(this));
+	const int effectiveX = GetEffectiveX(x);
+	const int effectiveY = GetEffectiveY(y);
+
+	return !bGrid[effectiveX][effectiveY];
 }
 
 int ECSSystemPhysics::GetEffectiveX(int x) const

@@ -112,7 +112,7 @@ void RPGSystem::DealDamage(RPGDamageParams params)
 		case EDamageType::Skill:
 		{
 			int skillDamage = pSkillDamage->GetAttributeValue(params.attackerEntity, attributeSharedData);
-			calculatedDamage = skillDamage * params.damageMagnitude.scaling;
+			calculatedDamage = params.damageMagnitude.baseDamage + skillDamage * params.damageMagnitude.scaling;
 			break;
 		}
 

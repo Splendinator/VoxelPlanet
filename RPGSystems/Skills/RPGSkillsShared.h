@@ -2,6 +2,7 @@
 
 #include "ECS/ECSTypes.h"
 
+class DirectoryData;
 class ECS;
 class ECSSystemEntityMap;
 class RPGSystem;
@@ -24,6 +25,7 @@ struct RPGSkillParams
 	ECS& ecs;
 	ECSSystemEntityMap& entityMapSystem;
 	RPGSystem& rpgSystem;
+	const DirectoryData& directoryData;
 	
 	EntityId caster;
 	

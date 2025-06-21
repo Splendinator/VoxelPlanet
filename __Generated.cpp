@@ -17,6 +17,7 @@
 #include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerAttack.h"
 #include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerBase.h"
 #include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerMove.h"
+#include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerProjectile.h"
 #include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerSkill.h"
 #include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerWait.h"
 #include "..\Roguelike\Camera\CameraSystem.h"
@@ -49,8 +50,11 @@
 #include "..\Roguelike\RPGSystems\Races\RPGRaceData.h"
 #include "..\Roguelike\RPGSystems\RPGLevelScalingNumber.h"
 #include "..\Roguelike\RPGSystems\RPGSystem.h"
-#include "..\Roguelike\RPGSystems\Skills\AimModule\RPGSkillAimModules.h"
-#include "..\Roguelike\RPGSystems\Skills\EffectModule\RPGSkillEffectModules.h"
+#include "..\Roguelike\RPGSystems\Skills\AimModules\RPGSkillAimModuleBase.h"
+#include "..\Roguelike\RPGSystems\Skills\AimModules\RPGSkillAimModuleLine.h"
+#include "..\Roguelike\RPGSystems\Skills\EffectModules\RPGSkillEffectModuleBase.h"
+#include "..\Roguelike\RPGSystems\Skills\EffectModules\RPGSkillEffectModuleDamage.h"
+#include "..\Roguelike\RPGSystems\Skills\EffectModules\RPGSkillEffectModuleProjectile.h"
 #include "..\Roguelike\RPGSystems\Skills\RPGSkillData.h"
 #include "..\Roguelike\RPGSystems\Skills\RPGSkillsShared.h"
 #include "..\Roguelike\RPGSystems\Skills\RPGSkillSystem.h"
@@ -677,31 +681,6 @@ void InputActionBase::_DeleteObject(void* pObject)
 	delete reinterpret_cast<InputActionBase*>(pObject);
 }
 
-// MyTempClass
-void MyTempClass::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
-{
-	MyTempClass* pMyTempClass = static_cast<MyTempClass*>(pObject);
-	pMyTempClass->inputKeyProperty = static_cast<EditorTypePropertyDataCompositeProperty*>(properties[propertyIndex++])->GetValue();
-}
-
-void* MyTempClass::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
-{
-	MyTempClass* pMyTempClass = new MyTempClass;
-	int propertyIndex = 0;
-	MyTempClass::_InitFromPropertiesSubset(pMyTempClass, properties, propertyIndex);
-	return pMyTempClass;
-}
-
-void* MyTempClass::_CreateEmptyObject()
-{
-	return new MyTempClass;
-}
-
-void MyTempClass::_DeleteObject(void* pObject)
-{
-	delete reinterpret_cast<MyTempClass*>(pObject);
-}
-
 // StatefulHotbarActionBase
 void StatefulHotbarActionBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -943,6 +922,7 @@ void CameraSystem::_DeleteObject(void* pObject)
 void ActionHandlerBase::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
 	ActionHandlerBase* pActionHandlerBase = static_cast<ActionHandlerBase*>(pObject);
+	pActionHandlerBase->bCanThisHappenOnTheSameFrameAsOtherActions = static_cast<EditorTypePropertyBool*>(properties[propertyIndex++])->GetValue();
 }
 
 void* ActionHandlerBase::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -1468,6 +1448,35 @@ void* RPGSkillData::_CreateEmptyObject()
 void RPGSkillData::_DeleteObject(void* pObject)
 {
 	delete reinterpret_cast<RPGSkillData*>(pObject);
+}
+
+// RPGSkillEffectModuleProjectile
+void RPGSkillEffectModuleProjectile::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	RPGSkillEffectModuleProjectile* pRPGSkillEffectModuleProjectile = static_cast<RPGSkillEffectModuleProjectile*>(pObject);
+	RPGSkillEffectModuleBase::_InitFromPropertiesSubset(static_cast<RPGSkillEffectModuleBase*>(pRPGSkillEffectModuleProjectile), properties, propertyIndex);
+	pRPGSkillEffectModuleProjectile->projectileFileName = static_cast<EditorTypePropertyString*>(properties[propertyIndex++])->GetValue();
+	pRPGSkillEffectModuleProjectile->pActionDecider = static_cast<ActionDeciderProjectile*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pRPGSkillEffectModuleProjectile->speed = static_cast<EditorTypePropertyDataCompositeProperty*>(properties[propertyIndex++])->GetValue();
+	pRPGSkillEffectModuleProjectile->pProjectileEffect = static_cast<RPGSkillEffectModuleBase*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* RPGSkillEffectModuleProjectile::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	RPGSkillEffectModuleProjectile* pRPGSkillEffectModuleProjectile = new RPGSkillEffectModuleProjectile;
+	int propertyIndex = 0;
+	RPGSkillEffectModuleProjectile::_InitFromPropertiesSubset(pRPGSkillEffectModuleProjectile, properties, propertyIndex);
+	return pRPGSkillEffectModuleProjectile;
+}
+
+void* RPGSkillEffectModuleProjectile::_CreateEmptyObject()
+{
+	return new RPGSkillEffectModuleProjectile;
+}
+
+void RPGSkillEffectModuleProjectile::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<RPGSkillEffectModuleProjectile*>(pObject);
 }
 
 // RPGSkillEffectModuleDamage
@@ -2144,6 +2153,34 @@ void ActionHandlerSkill::_DeleteObject(void* pObject)
 	delete reinterpret_cast<ActionHandlerSkill*>(pObject);
 }
 
+// ActionHandlerProjectile
+void ActionHandlerProjectile::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ActionHandlerProjectile* pActionHandlerProjectile = static_cast<ActionHandlerProjectile*>(pObject);
+	ActionHandlerBase::_InitFromPropertiesSubset(static_cast<ActionHandlerBase*>(pActionHandlerProjectile), properties, propertyIndex);
+	pActionHandlerProjectile->pEntityMapSystem = static_cast<ECSSystemEntityMap*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pActionHandlerProjectile->pRpgSystem = static_cast<RPGSystem*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pActionHandlerProjectile->pDirectoryData = static_cast<DirectoryData*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+}
+
+void* ActionHandlerProjectile::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ActionHandlerProjectile* pActionHandlerProjectile = new ActionHandlerProjectile;
+	int propertyIndex = 0;
+	ActionHandlerProjectile::_InitFromPropertiesSubset(pActionHandlerProjectile, properties, propertyIndex);
+	return pActionHandlerProjectile;
+}
+
+void* ActionHandlerProjectile::_CreateEmptyObject()
+{
+	return new ActionHandlerProjectile;
+}
+
+void ActionHandlerProjectile::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ActionHandlerProjectile*>(pObject);
+}
+
 // ActionHandlerMove
 void ActionHandlerMove::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -2175,6 +2212,9 @@ void ActionDeciderProjectile::_InitFromPropertiesSubset(void* pObject, const std
 	ActionDeciderProjectile* pActionDeciderProjectile = static_cast<ActionDeciderProjectile*>(pObject);
 	ActionDeciderBase::_InitFromPropertiesSubset(static_cast<ActionDeciderBase*>(pActionDeciderProjectile), properties, propertyIndex);
 	pActionDeciderProjectile->pActionSystem = static_cast<ECSSystemAction*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pActionDeciderProjectile->pEntityMap = static_cast<ECSSystemEntityMap*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
+	pActionDeciderProjectile->skipSquareThresholdSq = static_cast<EditorTypePropertyFloat*>(properties[propertyIndex++])->GetValue();
+	pActionDeciderProjectile->pProjectileAction = static_cast<ActionHandlerProjectile*>(static_cast<EditorTypePropertyClass*>(properties[propertyIndex++])->GetValue());
 }
 
 void* ActionDeciderProjectile::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
@@ -2599,7 +2639,6 @@ namespace __Generated
 		{"RPGClassSpecialisationData", &RPGClassSpecialisationData::_InitFromProperties},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_InitFromProperties},
 		{"InputActionBase", &InputActionBase::_InitFromProperties},
-		{"MyTempClass", &MyTempClass::_InitFromProperties},
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_InitFromProperties},
 		{"IHotbarItem", &IHotbarItem::_InitFromProperties},
 		{"HotbarSlot", &HotbarSlot::_InitFromProperties},
@@ -2627,6 +2666,7 @@ namespace __Generated
 		{"TestSuiteGameSystem", &TestSuiteGameSystem::_InitFromProperties},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_InitFromProperties},
 		{"RPGSkillData", &RPGSkillData::_InitFromProperties},
+		{"RPGSkillEffectModuleProjectile", &RPGSkillEffectModuleProjectile::_InitFromProperties},
 		{"RPGSkillEffectModuleDamage", &RPGSkillEffectModuleDamage::_InitFromProperties},
 		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_InitFromProperties},
 		{"RPGDamageMagnitude", &RPGDamageMagnitude::_InitFromProperties},
@@ -2651,6 +2691,7 @@ namespace __Generated
 		{"ECS", &ECS::_InitFromProperties},
 		{"ActionHandlerWait", &ActionHandlerWait::_InitFromProperties},
 		{"ActionHandlerSkill", &ActionHandlerSkill::_InitFromProperties},
+		{"ActionHandlerProjectile", &ActionHandlerProjectile::_InitFromProperties},
 		{"ActionHandlerMove", &ActionHandlerMove::_InitFromProperties},
 		{"ActionDeciderProjectile", &ActionDeciderProjectile::_InitFromProperties},
 		{"ActionDeciderPlayer", &ActionDeciderPlayer::_InitFromProperties},
@@ -2691,7 +2732,6 @@ namespace __Generated
 		{"RPGClassSpecialisationData", &RPGClassSpecialisationData::_CreateEmptyObject},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_CreateEmptyObject},
 		{"InputActionBase", &InputActionBase::_CreateEmptyObject},
-		{"MyTempClass", &MyTempClass::_CreateEmptyObject},
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_CreateEmptyObject},
 		{"IHotbarItem", &IHotbarItem::_CreateEmptyObject},
 		{"HotbarSlot", &HotbarSlot::_CreateEmptyObject},
@@ -2719,6 +2759,7 @@ namespace __Generated
 		{"TestSuiteGameSystem", &TestSuiteGameSystem::_CreateEmptyObject},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_CreateEmptyObject},
 		{"RPGSkillData", &RPGSkillData::_CreateEmptyObject},
+		{"RPGSkillEffectModuleProjectile", &RPGSkillEffectModuleProjectile::_CreateEmptyObject},
 		{"RPGSkillEffectModuleDamage", &RPGSkillEffectModuleDamage::_CreateEmptyObject},
 		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_CreateEmptyObject},
 		{"RPGDamageMagnitude", &RPGDamageMagnitude::_CreateEmptyObject},
@@ -2743,6 +2784,7 @@ namespace __Generated
 		{"ECS", &ECS::_CreateEmptyObject},
 		{"ActionHandlerWait", &ActionHandlerWait::_CreateEmptyObject},
 		{"ActionHandlerSkill", &ActionHandlerSkill::_CreateEmptyObject},
+		{"ActionHandlerProjectile", &ActionHandlerProjectile::_CreateEmptyObject},
 		{"ActionHandlerMove", &ActionHandlerMove::_CreateEmptyObject},
 		{"ActionDeciderProjectile", &ActionDeciderProjectile::_CreateEmptyObject},
 		{"ActionDeciderPlayer", &ActionDeciderPlayer::_CreateEmptyObject},
@@ -2783,7 +2825,6 @@ namespace __Generated
 		{"RPGClassSpecialisationData", &RPGClassSpecialisationData::_InitFromPropertiesSubset},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_InitFromPropertiesSubset},
 		{"InputActionBase", &InputActionBase::_InitFromPropertiesSubset},
-		{"MyTempClass", &MyTempClass::_InitFromPropertiesSubset},
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_InitFromPropertiesSubset},
 		{"IHotbarItem", &IHotbarItem::_InitFromPropertiesSubset},
 		{"HotbarSlot", &HotbarSlot::_InitFromPropertiesSubset},
@@ -2811,6 +2852,7 @@ namespace __Generated
 		{"TestSuiteGameSystem", &TestSuiteGameSystem::_InitFromPropertiesSubset},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_InitFromPropertiesSubset},
 		{"RPGSkillData", &RPGSkillData::_InitFromPropertiesSubset},
+		{"RPGSkillEffectModuleProjectile", &RPGSkillEffectModuleProjectile::_InitFromPropertiesSubset},
 		{"RPGSkillEffectModuleDamage", &RPGSkillEffectModuleDamage::_InitFromPropertiesSubset},
 		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_InitFromPropertiesSubset},
 		{"RPGDamageMagnitude", &RPGDamageMagnitude::_InitFromPropertiesSubset},
@@ -2835,6 +2877,7 @@ namespace __Generated
 		{"ECS", &ECS::_InitFromPropertiesSubset},
 		{"ActionHandlerWait", &ActionHandlerWait::_InitFromPropertiesSubset},
 		{"ActionHandlerSkill", &ActionHandlerSkill::_InitFromPropertiesSubset},
+		{"ActionHandlerProjectile", &ActionHandlerProjectile::_InitFromPropertiesSubset},
 		{"ActionHandlerMove", &ActionHandlerMove::_InitFromPropertiesSubset},
 		{"ActionDeciderProjectile", &ActionDeciderProjectile::_InitFromPropertiesSubset},
 		{"ActionDeciderPlayer", &ActionDeciderPlayer::_InitFromPropertiesSubset},
@@ -2874,7 +2917,6 @@ namespace __Generated
 		{"RPGClassSpecialisationData", &RPGClassSpecialisationData::_DeleteObject},
 		{"RPGAttributeModifierBase", &RPGAttributeModifierBase::_DeleteObject},
 		{"InputActionBase", &InputActionBase::_DeleteObject},
-		{"MyTempClass", &MyTempClass::_DeleteObject},
 		{"StatefulHotbarActionBase", &StatefulHotbarActionBase::_DeleteObject},
 		{"IHotbarItem", &IHotbarItem::_DeleteObject},
 		{"HotbarSlot", &HotbarSlot::_DeleteObject},
@@ -2902,6 +2944,7 @@ namespace __Generated
 		{"TestSuiteGameSystem", &TestSuiteGameSystem::_DeleteObject},
 		{"RPGSkillHighlightEntry", &RPGSkillHighlightEntry::_DeleteObject},
 		{"RPGSkillData", &RPGSkillData::_DeleteObject},
+		{"RPGSkillEffectModuleProjectile", &RPGSkillEffectModuleProjectile::_DeleteObject},
 		{"RPGSkillEffectModuleDamage", &RPGSkillEffectModuleDamage::_DeleteObject},
 		{"RPGSkillAimModuleLine", &RPGSkillAimModuleLine::_DeleteObject},
 		{"RPGDamageMagnitude", &RPGDamageMagnitude::_DeleteObject},
@@ -2926,6 +2969,7 @@ namespace __Generated
 		{"ECS", &ECS::_DeleteObject},
 		{"ActionHandlerWait", &ActionHandlerWait::_DeleteObject},
 		{"ActionHandlerSkill", &ActionHandlerSkill::_DeleteObject},
+		{"ActionHandlerProjectile", &ActionHandlerProjectile::_DeleteObject},
 		{"ActionHandlerMove", &ActionHandlerMove::_DeleteObject},
 		{"ActionDeciderProjectile", &ActionDeciderProjectile::_DeleteObject},
 		{"ActionDeciderPlayer", &ActionDeciderPlayer::_DeleteObject},

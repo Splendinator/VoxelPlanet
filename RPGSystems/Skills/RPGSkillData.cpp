@@ -2,10 +2,10 @@
 
 #include "RPGSkillData.h"
 
-#include "AimModule/RPGSkillAimModules.h"
+#include "AimModules/RPGSkillAimModuleBase.h"
 #include "Core/GameInstance.h"
 #include "Core/DirectoryData.h"
-#include "EffectModule/RPGSkillEffectModules.h"
+#include "EffectModules/RPGSkillEffectModuleBase.h"
 #include "RPGSkillSystem.h"
 
 RPGSkillData::~RPGSkillData()

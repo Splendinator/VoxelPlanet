@@ -31,4 +31,6 @@ protected:
 
 	// Energy units passed since game start (100 energy is a turn for an average entity)
 	u64 gameTime = 0;
+
+	bool bSomethingActedThisTurn = false;
 };

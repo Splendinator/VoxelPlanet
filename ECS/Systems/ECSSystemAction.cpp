@@ -10,6 +10,8 @@
 #include "ECS/ECS.h"
 #include "ECS/Systems/Callbacks/ECSSystemCallback.h"
 
+// #TEMP: Optimisation
+#pragma optimize("", off)
 void ECSSystemAction::InitialiseInternal(ECS* pEcs)
 {
 	pEcs->RegisterSystemCallback(std::make_unique<ECSSystemCallback<ECSSystemAction, ComponentAction>>(this));
@@ -42,11 +44,13 @@ void ECSSystemAction::PreTick(ECSSystemTickParams tickParams)
 				}
 			});
 	}
+
+	bSomethingActedThisTurn = false;
 }
 
 void ECSSystemAction::Tick(const ECSSystemTickParams& params, const std::tuple<ComponentAction*>& components)
 {
-	if (params.frame == 0)
+	if (bSomethingActedThisTurn || params.frame == 0)
 	{
 		// Skip first frame to give other systems a chance to boot up correctly
 		return; 
@@ -68,6 +72,8 @@ void ECSSystemAction::Tick(const ECSSystemTickParams& params, const std::tuple<C
 			pActionHandler->Reset();
 
 			pAction->energy = pAction->maxEnergy; // Took turn -- Reset energy to max
+
+			bSomethingActedThisTurn = !pActionHandler->bCanThisHappenOnTheSameFrameAsOtherActions;
 		}
 	}
 }
@@ -76,3 +82,4 @@ void ECSSystemAction::OnEntityDeleted(const ECSSystemEntityDeletionParams& param
 {
 	
 }
+#pragma optimize("", on)

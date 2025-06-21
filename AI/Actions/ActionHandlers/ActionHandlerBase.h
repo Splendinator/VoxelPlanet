@@ -23,4 +23,8 @@ public:
 
 	// Override this to reset the parameters. Needed to clean up singletons after use in the action system
 	virtual void Reset() { PUREVIRTUAL() };
+
+	// If we do most actions we need to tick all the other ECS systems so they can update (e.g. moving needs ECSSystemPhysics to update the entity's position or it won't collide with anything)
+	EDITORPROPERTY()
+	bool bCanThisHappenOnTheSameFrameAsOtherActions = false;
 };
