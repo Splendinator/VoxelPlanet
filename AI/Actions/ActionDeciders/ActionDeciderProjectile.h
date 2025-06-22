@@ -7,6 +7,7 @@ class ECSSystemAction;
 class ECSSystemEntityMap;
 struct ComponentProjectile;
 
+// ActionDecider that makes projectiles move in a straight line towards their target
 EDITORCLASS()
 class ActionDeciderProjectile : public ActionDeciderBase
 {
@@ -26,11 +27,12 @@ protected:
 	EDITORPROPERTY()
 	ECSSystemEntityMap* pEntityMap = nullptr;
 
-	// If the distance between the entry and exit point of the projectile is less than this squared then we skip the square
+	// If the distance between the entry and exit point of the projectile on a grid square is less than this squared then we skip the square (see PathGridIntersectionPoints)
 	// (basically, if the projectile only barely scrapes a square then move to the next one, likely doing a diagonal move instead of orthogonal)
 	EDITORPROPERTY()
 	float skipSquareThresholdSq = 0.2f;
 
+	// Action that happens when at the projectile's location when the projectile reaches its target or collides along the way.
 	EDITORPROPERTY()
 	ActionHandlerProjectile* pProjectileAction = nullptr;
 };

@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="AI\Actions\ActionDeciders\ActionDeciderAI.cpp" />
     <ClCompile Include="AI\Actions\ActionDeciders\ActionDeciderBase.cpp" />
+    <ClCompile Include="AI\Actions\ActionDeciders\ActionDeciderStatusEffect.cpp" />
     <ClCompile Include="AI\Actions\ActionDeciders\ActionDeciderPlayer.cpp" />
     <ClCompile Include="AI\Actions\ActionDeciders\ActionDeciderProjectile.cpp" />
     <ClCompile Include="AI\Actions\ActionHandlers\ActionHandlerAttack.cpp" />
@@ -316,6 +317,84 @@
     </ClCompile>
     <ClCompile Include="Core\GameInstance.cpp" />
     <ClCompile Include="Core\GameSystem.cpp" />
+    <ClCompile Include="Graphics\Private\ParticleSystem.cpp">
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>x64\Release\</BrowseInformationFile>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <CompileAs>Default</CompileAs>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>x64\Release\</ModuleDependenciesFile>
+      <ModuleOutputFile>x64\Release\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <Optimization>MaxSpeed</Optimization>
+      <ObjectFileName>x64\Release\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>x64\Release\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>x64\Release\Roguelike.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDll</RuntimeLibrary>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>x64\Release\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <SupportJustMyCode>false</SupportJustMyCode>
+      <TrackerLogDirectory>x64\Release\Roguelike.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <XMLDocumentationFileName>x64\Release\</XMLDocumentationFileName>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_MBCS;DOMIMGUI;_MBCS;</PreprocessorDefinitions>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Users\Dominic\Desktop\Big Folder of Userfulness\C++\My Headers;C:\VulkanSDK\1.2.198.1\Include;</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4100;</DisableSpecificWarnings>
+      <LinkCompiled>true</LinkCompiled>
+    </ClCompile>
+    <ClCompile Include="Graphics\Private\Shared.cpp" />
     <ClCompile Include="RPGSystems\Skills\EffectModules\RPGSkillEffectModuleProjectile.cpp" />
     <ClCompile Include="TestSuiteGameSystem.cpp" />
     <ClCompile Include="ECS\ECS.cpp">
@@ -6542,6 +6621,7 @@
   <ItemGroup>
     <ClInclude Include="AI\Actions\ActionDeciders\ActionDeciderAI.h" />
     <ClInclude Include="AI\Actions\ActionDeciders\ActionDeciderBase.h" />
+    <ClInclude Include="AI\Actions\ActionDeciders\ActionDeciderStatusEffect.h" />
     <ClInclude Include="AI\Actions\ActionDeciders\ActionDeciderPlayer.h" />
     <ClInclude Include="AI\Actions\ActionDeciders\ActionDeciderProjectile.h" />
     <ClInclude Include="AI\Actions\ActionHandlers\ActionHandlerAttack.h" />
@@ -6559,6 +6639,8 @@
     <ClInclude Include="Core\FilePaths.h" />
     <ClInclude Include="Core\GameInstance.h" />
     <ClInclude Include="Core\GameSystem.h" />
+    <ClInclude Include="Graphics\Private\ParticleSystem.h" />
+    <ClInclude Include="Graphics\Private\Shared.h" />
     <ClInclude Include="RPGSystems\Skills\AimModules\RPGSkillAimModuleLine.h" />
     <ClInclude Include="RPGSystems\Skills\EffectModules\RPGSkillEffectModuleDamage.h" />
     <ClInclude Include="RPGSystems\Skills\EffectModules\RPGSkillEffectModuleProjectile.h" />

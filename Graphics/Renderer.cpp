@@ -8,14 +8,18 @@
 #include "DomMath/Mat4.h"
 #include "DomMath/Math.h"
 #include "DomWindow/DomWindow.h"
-#include "RendererObject.h"
 #include "Graphics/VectorArt/VectorArt.h"
+#include "Private/ParticleSystem.h"
+#include "Private/Shared.h"
+#include "RendererObject.h"
 
 #include <vulkan/vulkan_win32.h>
 
 #ifdef DOMIMGUI
 #include "imgui_impl_vulkan.h"
 #endif //~ #ifdef DOMIMGUI
+
+using namespace dmgf::Internal;
 
 namespace
 {
@@ -45,10 +49,6 @@ namespace
 		std::vector<std::unique_ptr<RendererObject>> rendererObjects; // #TODO: This memory will be fragmented to FUCK and accessed every frame, we need an allocator later on
 	};
 
-	// #TODO: These needs to be grabbed from the surface
-	constexpr int EXTENT_WIDTH = 1776; // Width of renderable portion of screen
-	constexpr int EXTENT_HEIGHT = 969; // Height of renderable portion of screen
-
 	constexpr int VERTEX_BUFFER_SIZE = 6; // Num vertices in our vertex buffer
 
 	constexpr int MAX_NUM_INSTANCES = 16384; // Max quads that can be rendered in one go
@@ -61,7 +61,6 @@ namespace
 	VkInstance CreateInstance();
 
 	void PrintDeviceMemoryInfo(VkPhysicalDevice inHandlePhysicalDevice);
-	uint32_t FindMemoryIndex(VkMemoryPropertyFlags memoryFlags, uint32_t memoryTypeBits = (uint32_t)-1);
 	VkPhysicalDevice PickPhysicalDevice(const dmut::HeapAllocSize<VkPhysicalDevice>& physicalDevices);
 	VkPhysicalDevice CreatePhysicalDevice();
 
@@ -73,9 +72,7 @@ namespace
 	VkDevice CreateDevice();
 
 	VkQueue CreateQueue(uint32_t queueFamily, uint32_t queueIndex);
-
-	VkShaderModule CreateShader(const char* pShaderName);
-
+	
 	VkSwapchainKHR CreateSwapchain();
 
 	VkBuffer CreateVertexBuffer();
@@ -162,7 +159,7 @@ namespace
 	VkFramebuffer handleFrameBuffer2 = VK_NULL_HANDLE;
 	VkCommandBuffer handleCommandBuffer1 = VK_NULL_HANDLE;
 	VkCommandBuffer handleCommandBuffer2 = VK_NULL_HANDLE;
-	VkDeviceMemory handleDeviceMemoryVertex = VK_NULL_HANDLE;
+	VkDeviceMemory handleDeviceMemoryVertexBuffer = VK_NULL_HANDLE;
 	dmut::HeapAllocSize<VkImage> handleSwapChainImages;
 	VkDeviceMemory handleDepthMemory = VK_NULL_HANDLE;
 	VkBuffer handleDepthBuffer = VK_NULL_HANDLE;
@@ -174,7 +171,6 @@ namespace
 	
 	// Unused
 	VkBuffer handleStagingBuffer = VK_NULL_HANDLE;
-	VkDeviceMemory handleDeviceMemoryVertexBuffer = VK_NULL_HANDLE;
 
 	uint32_t deviceQueueFamilyIndex = 0;
 	const char* pShaderPath = "../Graphics/Shaders/CompiledShaders"; // compiled SPIRV files
@@ -212,9 +208,7 @@ namespace dmgf
 	void Init()
 	{
 #ifndef DOMRELEASE
-		const char* pCompilerPath = "C:/VulkanSDK/1.2.198.1/Bin/glslc.exe"; // Compiler
-		const char* pSourcePath = "../Graphics/Shaders"; // Source text files
-		VulkanUtils::CompileShaders(pCompilerPath, pSourcePath, pShaderPath);
+		VulkanUtils::CompileShaders(Shared::SHADER_COMPILER_PATH, Shared::COMPILED_SHADER_PATH, pShaderPath);
 #endif //~ #ifndef DOMRELEASE
 
 		handleInstance = CreateInstance();
@@ -223,13 +217,13 @@ namespace dmgf
 		handleDevice = CreateDevice();
 		handleGraphicsQueue = CreateQueue(deviceQueueFamilyIndex, 0);
 		handleSwapChain = CreateSwapchain();
-		handleShaderVertex = CreateShader("VectorVert.spv");
-		handleShaderFragment = CreateShader("VectorFrag.spv");
+		handleShaderVertex = Shared::CreateShader(handleDevice, "VectorVert.spv");
+		handleShaderFragment = Shared::CreateShader(handleDevice, "VectorFrag.spv");
 		handleVertextBuffer = CreateVertexBuffer();
 		handleRenderPass = CreateRenderPass();
 		DOMASSERT(handleSwapChainImages.GetSize() == 2, "We're fucked if this isn't 2, I can't be arsed to program a for loop");
 		
-		handleDepthImage = CreateImage(VkFormat::VK_FORMAT_D24_UNORM_S8_UINT, EXTENT_WIDTH, EXTENT_HEIGHT, VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+		handleDepthImage = CreateImage(VkFormat::VK_FORMAT_D24_UNORM_S8_UINT, Shared::EXTENT_WIDTH, Shared::EXTENT_HEIGHT, VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
 		handleDepthMemory = CreateDeviceMemoryFromImage(handleDepthImage);
 		BindImageMemory(handleDepthImage, handleDepthMemory);
 		handleDepthImageView = CreateImageView(handleDepthImage, VkImageAspectFlagBits::VK_IMAGE_ASPECT_DEPTH_BIT | VkImageAspectFlagBits::VK_IMAGE_ASPECT_STENCIL_BIT, VkFormat::VK_FORMAT_D24_UNORM_S8_UINT);
@@ -344,6 +338,15 @@ namespace dmgf
 			ImGui_ImplVulkan_DestroyFontUploadObjects();
 		}
 #endif //~ #ifdef DOMIMGUI
+
+		ParticleSystem::ParticleSystemInitInfo initInfo = {};
+		initInfo.handleInstance = handleInstance;
+		initInfo.handlePhysicalDevice = handlePhysicalDevice;
+		initInfo.handleDevice = handleDevice;
+		initInfo.handleRenderPass = handleRenderPass;
+		initInfo.pViewMatrix = &viewMatrix;
+		
+		ParticleSystem::Init(initInfo);
 	}
 
 	void UnInit()
@@ -406,6 +409,7 @@ namespace dmgf
 		
 		UpdateViewBuffer(deltaTime);
 		SubmitDrawCommand();
+
 #ifdef DOMIMGUI
 		ImGui_ImplVulkan_NewFrame();
 #endif //~ #ifdef DOMIMGUI
@@ -513,8 +517,8 @@ namespace dmgf
 	void RefreshViewMatrix()
 	{
 		const float inverseZoom = 1.0f / cameraData.zoom;
-		const float cameraX = EXTENT_WIDTH * inverseZoom * 0.5f - cameraData.x;
-		const float cameraY = EXTENT_HEIGHT * inverseZoom * 0.5f - cameraData.y;
+		const float cameraX = Shared::EXTENT_WIDTH * inverseZoom * 0.5f - cameraData.x;
+		const float cameraY = Shared::EXTENT_HEIGHT * inverseZoom * 0.5f - cameraData.y;
 		viewMatrix = dmma::generateTranslation({ cameraX, cameraY, 0.0f}) * dmma::generateScale({cameraData.zoom, cameraData.zoom, 1.0f});
 		viewMatrix.transpose();
 	}
@@ -536,12 +540,12 @@ namespace dmgf
 
 	float GetScreenWidth()
 	{
-		return EXTENT_WIDTH;
+		return Shared::EXTENT_WIDTH;
 	}
 
 	float GetScreenHeight()
 	{
-		return EXTENT_HEIGHT;
+		return Shared::EXTENT_HEIGHT;
 	}
 
 }
@@ -618,29 +622,6 @@ namespace
 		{
 			DOMLOG_PRINT("Memory Type", i, "flags:", memoryProperties.memoryTypes[i].propertyFlags);
 		}
-	}
-
-	uint32_t FindMemoryIndex(VkMemoryPropertyFlags memoryFlags, uint32_t memoryTypeBits /*= (uint32_t)-1*/)
-	{
-		VkPhysicalDeviceMemoryProperties memoryProperties;
-		vkGetPhysicalDeviceMemoryProperties(handlePhysicalDevice, &memoryProperties);
-
-		// See VkMemoryPropertyFlags for what the flags mean
-		for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; ++i)
-		{
-			if (!((1 << i) & memoryTypeBits))
-			{
-				// Not valid memory index
-				continue;
-			}
-			if ((memoryProperties.memoryTypes[i].propertyFlags & memoryFlags) == memoryFlags)
-			{
-				return i;
-			}
-		}
-
-		DOMLOG_WARN("Unable to find memory with flags", memoryFlags);
-		return VK_MAX_MEMORY_TYPES;
 	}
 
 	VkPhysicalDevice PickPhysicalDevice(const dmut::HeapAllocSize<VkPhysicalDevice>& physicalDevices)
@@ -785,7 +766,7 @@ namespace
 		createInfo.surface = handleSurface;
 		createInfo.imageFormat = VK_FORMAT_B8G8R8A8_UNORM; // Query device (surface?) to see if this is supported
 		createInfo.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-		createInfo.imageExtent = { EXTENT_WIDTH, EXTENT_HEIGHT };
+		createInfo.imageExtent = { Shared::EXTENT_WIDTH, Shared::EXTENT_HEIGHT };
 		createInfo.imageArrayLayers = 1;
 		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 		createInfo.minImageCount = 2;
@@ -808,28 +789,7 @@ namespace
 
 		return returnedSwapChain;
 	}
-
-	VkShaderModule CreateShader(const char* pShaderName)
-	{
-		std::string fullFilePath = pShaderPath;
-		fullFilePath.append("/");
-		fullFilePath.append(pShaderName);
-		dmut::HeapAllocSize<char> spirvCode = std::move(dmim::importText(fullFilePath.c_str()));
-
-		VkShaderModuleCreateInfo createInfo = {};
-
-		const size_t codeSize = spirvCode.GetSize() - 1;
-		DOMLOG_ERROR_IF(codeSize % sizeof(uint32_t), "spirv code should be a multiple of 4 bytes");
-
-		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		createInfo.codeSize = codeSize; // Ignore null terminator
-		createInfo.pCode = (const uint32_t*)(spirvCode.RawPtr());
-
-		VkShaderModule returnedShader = VK_NULL_HANDLE;
-		VulkanUtils::ErrorCheck(vkCreateShaderModule(handleDevice, &createInfo, nullptr, &returnedShader), fullFilePath.c_str());
-		return returnedShader;
-	}
-
+	
 	VkBuffer CreateVertexBuffer()
 	{
 		VkBufferCreateInfo createInfo = {};
@@ -1117,7 +1077,7 @@ namespace
 
 	void UpdateProjectionBuffer()
 	{
-		Mat4f projectionMatrix = dmma::generateOrthoganol(0, EXTENT_WIDTH, 0, EXTENT_HEIGHT, 0.0f, 1.0f);
+		Mat4f projectionMatrix = dmma::generateOrthoganol(0, Shared::EXTENT_WIDTH, 0, Shared::EXTENT_HEIGHT, 0.0f, 1.0f);
 		projectionMatrix.transpose();
 		
 		void* pDeviceData = nullptr;
@@ -1178,7 +1138,7 @@ namespace
 	{
 		// #JANK: This is the same as the in-game projection matrix because it's a 2D game but in-case we ever go 3D I guess I'll have this function
 
-		Mat4f projectionMatrix = dmma::generateOrthoganol(0, EXTENT_WIDTH, 0, EXTENT_HEIGHT, 0.0f, 1.0f);
+		Mat4f projectionMatrix = dmma::generateOrthoganol(0, Shared::EXTENT_WIDTH, 0, Shared::EXTENT_HEIGHT, 0.0f, 1.0f);
 		projectionMatrix.transpose();
 
 		void* pDeviceData = nullptr;
@@ -1287,14 +1247,14 @@ namespace
 		VkViewport viewport = {};
 		viewport.x = 0.0f;
 		viewport.y = 0.0f;
-		viewport.width = EXTENT_WIDTH;
-		viewport.height = EXTENT_HEIGHT;
+		viewport.width = Shared::EXTENT_WIDTH;
+		viewport.height = Shared::EXTENT_HEIGHT;
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 
 		VkRect2D scissor = {};
 		scissor.offset = { 0, 0 };
-		scissor.extent = { EXTENT_WIDTH, EXTENT_HEIGHT };
+		scissor.extent = { Shared::EXTENT_WIDTH, Shared::EXTENT_HEIGHT };
 
 		VkPipelineViewportStateCreateInfo viewportState = {};
 		viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -1441,7 +1401,7 @@ namespace
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		allocInfo.pNext = nullptr;
 		allocInfo.allocationSize = memorySize;
-		allocInfo.memoryTypeIndex = FindMemoryIndex(memoryFlags);
+		allocInfo.memoryTypeIndex = VulkanUtils::FindMemoryIndex(handlePhysicalDevice, memoryFlags);
 
 		VkDeviceMemory returnedHandle = VK_NULL_HANDLE;
 		VulkanUtils::ErrorCheck(vkAllocateMemory(handleDevice, &allocInfo, nullptr, &returnedHandle), "DeviceMemory");
@@ -1516,8 +1476,8 @@ namespace
 		createInfo.renderPass = handleRenderPass;
 		createInfo.attachmentCount = (uint32_t)inHandleImageViews.GetSize();
 		createInfo.pAttachments = inHandleImageViews.RawPtr();
-		createInfo.width = EXTENT_WIDTH;
-		createInfo.height = EXTENT_HEIGHT;
+		createInfo.width = Shared::EXTENT_WIDTH;
+		createInfo.height = Shared::EXTENT_HEIGHT;
 		createInfo.layers = 1;
 
 		VkFramebuffer returnedHandle = VK_NULL_HANDLE;
@@ -1538,6 +1498,8 @@ namespace
 		VulkanUtils::ErrorCheck(vkAcquireNextImageKHR(handleDevice, handleSwapChain, UINT64_MAX, handleSubmitDrawCommandsSemaphore, VK_NULL_HANDLE, &currentBuffer));
 
 		VkCommandBuffer handleCommandBuffer = currentBuffer == 0 ? handleCommandBuffer1 : handleCommandBuffer2;
+		VkFramebuffer handleCurrentFrameBuffer = currentBuffer == 0 ? handleFrameBuffer1 : handleFrameBuffer2;
+		
 		VkCommandBufferBeginInfo commandBufferBegin = {};
 		commandBufferBegin.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		VulkanUtils::ErrorCheck(vkBeginCommandBuffer(handleCommandBuffer, &commandBufferBegin));
@@ -1547,20 +1509,20 @@ namespace
 			{ 0.1f, 0.1f, 0.1f, 1.0f }, // Colour
 			{ 0.0f, 0 } // Depth
 		};
-
+		
 		VkRenderPassBeginInfo renderPassBegin = {};
 		renderPassBegin.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassBegin.pNext = nullptr;
 		renderPassBegin.renderPass = handleRenderPass;
-		renderPassBegin.framebuffer = (currentBuffer % 2) ? handleFrameBuffer1 : handleFrameBuffer2;
+		renderPassBegin.framebuffer = handleCurrentFrameBuffer;
 		renderPassBegin.renderArea.offset.x = 0;
 		renderPassBegin.renderArea.offset.y = 0;
-		renderPassBegin.renderArea.extent.width = EXTENT_WIDTH;
-		renderPassBegin.renderArea.extent.height = EXTENT_HEIGHT;
+		renderPassBegin.renderArea.extent.width = Shared::EXTENT_WIDTH;
+		renderPassBegin.renderArea.extent.height = Shared::EXTENT_HEIGHT;
 		renderPassBegin.clearValueCount = 2;
 		renderPassBegin.pClearValues = clearValues;
 		vkCmdBeginRenderPass(handleCommandBuffer, &renderPassBegin, VK_SUBPASS_CONTENTS_INLINE);
-
+		
 		VkDeviceSize vertexBufferOffset = 0;
 
 		vkCmdBindVertexBuffers(handleCommandBuffer, 0, 1, &handleVertextBuffer, &vertexBufferOffset);
@@ -1616,6 +1578,8 @@ namespace
 			RenderObjects(renderedObjectsHUD);
 		}
 
+		ParticleSystem::Draw(handleCommandBuffer, handleCurrentFrameBuffer);
+		
 #ifdef DOMIMGUI
 		vkCmdNextSubpass(handleCommandBuffer, VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
 
@@ -1624,6 +1588,7 @@ namespace
 #endif //~ #ifdef DOMIMGUI
 
 		vkCmdEndRenderPass(handleCommandBuffer);
+		
 		vkEndCommandBuffer(handleCommandBuffer);
 		
 		VkFenceCreateInfo fenceInfo;

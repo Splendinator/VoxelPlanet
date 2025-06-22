@@ -102,3 +102,9 @@ struct ComponentProjectile
 	int targetX = 0;
 	int targetY = 0;
 };
+
+struct ComponentStatusEffect
+{
+	
+	EntityId caster;
+};

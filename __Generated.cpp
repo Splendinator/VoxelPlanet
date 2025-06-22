@@ -14,6 +14,7 @@
 #include "..\Roguelike\AI\Actions\ActionDeciders\ActionDeciderBase.h"
 #include "..\Roguelike\AI\Actions\ActionDeciders\ActionDeciderPlayer.h"
 #include "..\Roguelike\AI\Actions\ActionDeciders\ActionDeciderProjectile.h"
+#include "..\Roguelike\AI\Actions\ActionDeciders\ActionDeciderStatusEffect.h"
 #include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerAttack.h"
 #include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerBase.h"
 #include "..\Roguelike\AI\Actions\ActionHandlers\ActionHandlerMove.h"
@@ -2206,6 +2207,31 @@ void ActionHandlerMove::_DeleteObject(void* pObject)
 	delete reinterpret_cast<ActionHandlerMove*>(pObject);
 }
 
+// ActionDeciderStatusEffect
+void ActionDeciderStatusEffect::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
+{
+	ActionDeciderStatusEffect* pActionDeciderStatusEffect = static_cast<ActionDeciderStatusEffect*>(pObject);
+	ActionDeciderBase::_InitFromPropertiesSubset(static_cast<ActionDeciderBase*>(pActionDeciderStatusEffect), properties, propertyIndex);
+}
+
+void* ActionDeciderStatusEffect::_InitFromProperties(const std::vector<EditorTypePropertyBase*>& properties)
+{
+	ActionDeciderStatusEffect* pActionDeciderStatusEffect = new ActionDeciderStatusEffect;
+	int propertyIndex = 0;
+	ActionDeciderStatusEffect::_InitFromPropertiesSubset(pActionDeciderStatusEffect, properties, propertyIndex);
+	return pActionDeciderStatusEffect;
+}
+
+void* ActionDeciderStatusEffect::_CreateEmptyObject()
+{
+	return new ActionDeciderStatusEffect;
+}
+
+void ActionDeciderStatusEffect::_DeleteObject(void* pObject)
+{
+	delete reinterpret_cast<ActionDeciderStatusEffect*>(pObject);
+}
+
 // ActionDeciderProjectile
 void ActionDeciderProjectile::_InitFromPropertiesSubset(void* pObject, const std::vector<EditorTypePropertyBase*>& properties, int& propertyIndex)
 {
@@ -2693,6 +2719,7 @@ namespace __Generated
 		{"ActionHandlerSkill", &ActionHandlerSkill::_InitFromProperties},
 		{"ActionHandlerProjectile", &ActionHandlerProjectile::_InitFromProperties},
 		{"ActionHandlerMove", &ActionHandlerMove::_InitFromProperties},
+		{"ActionDeciderStatusEffect", &ActionDeciderStatusEffect::_InitFromProperties},
 		{"ActionDeciderProjectile", &ActionDeciderProjectile::_InitFromProperties},
 		{"ActionDeciderPlayer", &ActionDeciderPlayer::_InitFromProperties},
 		{"WorldGenerationContinent", &WorldGenerationContinent::_InitFromProperties},
@@ -2786,6 +2813,7 @@ namespace __Generated
 		{"ActionHandlerSkill", &ActionHandlerSkill::_CreateEmptyObject},
 		{"ActionHandlerProjectile", &ActionHandlerProjectile::_CreateEmptyObject},
 		{"ActionHandlerMove", &ActionHandlerMove::_CreateEmptyObject},
+		{"ActionDeciderStatusEffect", &ActionDeciderStatusEffect::_CreateEmptyObject},
 		{"ActionDeciderProjectile", &ActionDeciderProjectile::_CreateEmptyObject},
 		{"ActionDeciderPlayer", &ActionDeciderPlayer::_CreateEmptyObject},
 		{"WorldGenerationContinent", &WorldGenerationContinent::_CreateEmptyObject},
@@ -2879,6 +2907,7 @@ namespace __Generated
 		{"ActionHandlerSkill", &ActionHandlerSkill::_InitFromPropertiesSubset},
 		{"ActionHandlerProjectile", &ActionHandlerProjectile::_InitFromPropertiesSubset},
 		{"ActionHandlerMove", &ActionHandlerMove::_InitFromPropertiesSubset},
+		{"ActionDeciderStatusEffect", &ActionDeciderStatusEffect::_InitFromPropertiesSubset},
 		{"ActionDeciderProjectile", &ActionDeciderProjectile::_InitFromPropertiesSubset},
 		{"ActionDeciderPlayer", &ActionDeciderPlayer::_InitFromPropertiesSubset},
 		{"WorldGenerationContinent", &WorldGenerationContinent::_InitFromPropertiesSubset},
@@ -2971,6 +3000,7 @@ namespace __Generated
 		{"ActionHandlerSkill", &ActionHandlerSkill::_DeleteObject},
 		{"ActionHandlerProjectile", &ActionHandlerProjectile::_DeleteObject},
 		{"ActionHandlerMove", &ActionHandlerMove::_DeleteObject},
+		{"ActionDeciderStatusEffect", &ActionDeciderStatusEffect::_DeleteObject},
 		{"ActionDeciderProjectile", &ActionDeciderProjectile::_DeleteObject},
 		{"ActionDeciderPlayer", &ActionDeciderPlayer::_DeleteObject},
 		{"WorldGenerationContinent", &WorldGenerationContinent::_DeleteObject},

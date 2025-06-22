@@ -10,8 +10,6 @@
 #include "ECS/ECS.h"
 #include "ECS/Systems/Callbacks/ECSSystemCallback.h"
 
-// #TEMP: Optimisation
-#pragma optimize("", off)
 void ECSSystemAction::InitialiseInternal(ECS* pEcs)
 {
 	pEcs->RegisterSystemCallback(std::make_unique<ECSSystemCallback<ECSSystemAction, ComponentAction>>(this));
@@ -82,4 +80,3 @@ void ECSSystemAction::OnEntityDeleted(const ECSSystemEntityDeletionParams& param
 {
 	
 }
-#pragma optimize("", on)

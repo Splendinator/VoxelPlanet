@@ -518,6 +518,9 @@ class DirectoryData pDirectoryData nullptr
 Class ActionHandlerMove
 Child ActionHandlerBase
 ;
+Class ActionDeciderStatusEffect
+Child ActionDeciderBase
+;
 Class ActionDeciderProjectile
 Child ActionDeciderBase
 class ECSSystemAction pActionSystem nullptr
